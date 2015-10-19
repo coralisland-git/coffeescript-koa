@@ -1,0 +1,47 @@
+doctype
+html.no-focus
+    head
+        meta(charset='utf-8')
+        title LaserNinja
+        link#css-local(rel='stylesheet', href='/vendor/oneui.min.css')
+        link(rel='stylesheet', href='/css/main.css')
+
+    body
+
+    //|
+    //|  This template is based on the OneAdmin theme
+    //|  Go here to see tons of other options and styles:
+    //|  http://pixelcave.com/demo/oneui/
+    //|
+
+    #page-container.sidebar-l.sidebar-o.side-scroll
+
+        nav#sidebar
+
+            #sidebar-scroll
+
+                .sidebar-content
+
+                    .side-header.side-content.bg-white-op
+
+                        button.btn.btn-link.text-gray.pull-right.hidden-md.hidden-lg(type='button', data-toggle='layout', data-action='sidebar_close')
+                            i.fa.fa-times
+
+                        a.h5.text-white(href='/')
+                            span.h4.font-w600.sidebar-mini-hide Test Cases
+
+                    .side-content
+
+                        ul.nav-main
+
+                            li
+                                a#linkMakeOutline(href='#')
+                                    i.si.si-vector
+                                    span Make outline
+
+        main#main-container.main
+
+            p TEST
+
+    script(src='/vendor/oneui.min.js')
+
