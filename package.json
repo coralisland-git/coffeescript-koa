@@ -3,6 +3,8 @@
   "version": "0.0.1",
   "private": "true",
   "dependencies": {
+    "coffee-middleware": "^0.3.0",
+    "connect-coffee-script": "^0.2.1",
     "express": "^4.13.3",
     "jade": "*",
     "morgan": "^1.6.1",

@@ -6,6 +6,11 @@ html.no-focus
         link#css-local(rel='stylesheet', href='/vendor/oneui.min.css')
         link(rel='stylesheet', href='/css/main.css')
 
+        script(src='/vendor/oneui.min.js')
+        script(src='/vendor/moment.min.js')
+        script(src='/vendor/numeral.min.js')
+        script(src='/test/js/test_common.js')
+
     body
 
     //|
@@ -35,13 +40,13 @@ html.no-focus
                         ul.nav-main
 
                             li
-                                a#linkMakeOutline(href='#')
-                                    i.si.si-vector
-                                    span Make outline
+                                a#linkMakeOutline(href='/dynamic_data_1')
+                                    i.si.si-arrow-right
+                                    span Dynamic Data Test 1
 
         main#main-container.main
 
-            p TEST
+            |!{ page }
 
-    script(src='/vendor/oneui.min.js')
+
 
