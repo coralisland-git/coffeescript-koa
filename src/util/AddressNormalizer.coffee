@@ -34,6 +34,8 @@ class AddressNormalizer
     ##|  NEW york becomes New York
     ##|  MCARTHUR AIRpORT becomes McArthur Airport
     fixTitleCase: (strTitleText) =>
+        strTitleText.replace /\w\S*/g, (txt) ->
+            txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
 
 
 
