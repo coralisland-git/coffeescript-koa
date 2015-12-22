@@ -51,9 +51,16 @@ runScript = (coffeeFile, response) ->
 
 
 app.use '/test/js', (request, response, next) ->
-	coffeeFile = __dirname + "/test/js/" + request.path.replace ".js", ".coffee"
-	runScript coffeeFile, response
-
+	if /\.json/.test request.path
+		jsonFile = __dirname + "/test/js/" + request.path
+		console.log "Static JSON: ", jsonFile
+		file = fs.readFile jsonFile, (err, data) ->
+			response
+				.contentType('application/json')
+				.send data.toString()
+	else
+		coffeeFile = __dirname + "/test/js/" + request.path.replace ".js", ".coffee"
+		runScript coffeeFile, response
 
 app.use '/js', (request, response, next) ->
 	coffeeFile = __dirname + "/src/" + request.path.replace ".js", ".coffee"

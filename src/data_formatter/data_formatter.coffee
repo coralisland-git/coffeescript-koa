@@ -4,9 +4,8 @@
 ##|
 
 # create a namespace to export our public methods
-Exports = module? and module.exports? and module.exports then module.exports else window
-
-class Exports.DataFormatter
+root = exports ? this
+root.DataFormatter = class DataFormatter
 
 	##|
 	##| Output:  Suggested width of the data to display in pixels

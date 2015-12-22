@@ -4,8 +4,6 @@
 ##|  to save or load the configuration if needed
 ##|
 
-DataFormatter = require './data_formatter'
-
 class DataTypeCollection
 
     constructor: (configName) ->
