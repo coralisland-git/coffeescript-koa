@@ -3,7 +3,10 @@
 ##|  is designed to be human readable
 ##|
 
-class DataFormatter
+# create a namespace to export our public methods
+Exports = module? and module.exports? and module.exports then module.exports else window
+
+class Exports.DataFormatter
 
 	##|
 	##| Output:  Suggested width of the data to display in pixels

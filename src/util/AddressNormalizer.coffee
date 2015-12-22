@@ -6,18 +6,18 @@ class AddressNormalizer
     tile_x: null
     tile_y: null
 
-    house_number:null
-    street_number: null
-    street_prefix: null
-    street_direction: null
-    street_suffix: null
+    house_number     : null
+    street_number    : null
+    street_prefix    : null
+    street_direction : null
+    street_suffix    : null
 
     unit_number: null
 
-    city: null
-    state: null
-    zipcode: null
-    zipfour: null
+    city    : null
+    state   : null
+    zipcode : null
+    zipfour : null
 
     seperator: ', '
 
