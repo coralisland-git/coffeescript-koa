@@ -34,7 +34,6 @@ app.use '/css', stylus.middleware
 	compile: (str, path) =>
 		return stylus(str).set('filename', path)
 
-
 runScript = (coffeeFile, response) ->
 	file = fs.readFile coffeeFile, (err, data) ->
 		try
@@ -67,6 +66,23 @@ app.use '/js', (request, response, next) ->
 	runScript coffeeFile, response
 
 app.use express.static(process.cwd() + '/test/')
+
+app.get '/*.css', (req, res) ->
+	try
+		console.log "PATH=", req.path
+		file = __dirname + req.path
+		file = file.replace ".css", ".styl"
+		fs.readFile file, (err, data) ->
+			if err
+				res.send err
+			else
+				stylus(data.toString()).set("filename", req.path).render (err, css) ->
+					if err
+						res.send err
+					else
+						res.contentType('text/css').send css
+	catch e
+		console.log "Error:", e, e.stack
 
 app.get '/', (req, res) ->
 	res.render 'default', (err, html) ->

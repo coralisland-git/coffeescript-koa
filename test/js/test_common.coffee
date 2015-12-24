@@ -10,6 +10,8 @@ counter  = 0
 addTest = (label, fnCall) ->
 
 	code = fnCall.toString()
+	code = code.replace "<", "&lt;"
+	code = code.replace ">", "&gt;"
 	code = code.replace "function () {\n", ""
 	code = code.replace /[\r\n]*}$/, ""
 	code = code.replace "\n", "<br>"
@@ -19,7 +21,7 @@ addTest = (label, fnCall) ->
 	html = "
 		<tr><td class='test_label'> #{label} </td>
 			<td class='test_result'> <div id='result#{counter}'></div> </td>
-			<td class='test_code'> #{code} </td>
+			<td class='test_code'> <code><pre>#{code}</pre></code> </td>
 		</tr>
 	"
 
@@ -44,8 +46,13 @@ go = () ->
 	else
 
 		try
-			result = allTests[0].callback
-			$(allTests[0].tag).html result
+			result = allTests[0].callback()
+			t = typeof result
+			if typeof t == "string"
+				$(allTests[0].tag).html result
+			else
+				$(allTests[0].tag).append result
+
 			allTests.splice 0, 1
 			setTimeout () ->
 				go()

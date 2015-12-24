@@ -4,9 +4,29 @@
 ##|  to save or load the configuration if needed
 ##|
 
-class DataTypeCollection
+root = exports ? this
 
-    constructor: (configName) ->
+root.DataType = class DataType
+
+    source        : ''       ##| Data source to copy from
+    visible       : false    ##| Visible (Used for tables)
+    editable      : false    ##| Editable (Inline edit for display)
+    hideable      : true     ##| Can be hidden
+    required      : false    ##| Used to create a new record
+    type          : ''       ##| Data type text
+    tooltip       : ''       ##| Tooltip text
+    formatter     : null
+    displayFormat : null
+
+    constructor: () ->
+
+root.DataTypeCollection = class DataTypeCollection
+
+    colList : []
+
+    constructor: (configName, cols) ->
+
+        if cols? then @configureColumns cols
 
     ##|
     ##|  Given an array of column configuration structures, create new
@@ -19,39 +39,25 @@ class DataTypeCollection
     ## editable   : true
     ## type       : 'datetime'
     ## required   : false
-    configureColumns: (columns, @tableCacheName) =>
+    configureColumns: (columns) =>
 
         for col in columns
 
-            c = new TableViewCol col.source, col.name
+            c = new DataType()
+
+            for name, value of col
+                c[name] = value
 
             ##|
-            ##|  Check for an override in the config
-            customValue = user.tableConfigGetColumnVisible(@tableCacheName, c.name)
-            if customValue != null
-                col.visible = customValue
-
-            ##|
-            ##|  Tooltip, if specified, is shown when you hover over the column
-            c.tooltip  = col.tooltip
-            c.visible  = col.visible
-            c.editable = col.editable
-            c.options  = col.options
-
-            formatter = c.initFormat col.type, col.options
-
-            if col.limit and col.limit > 0 and col.limit < 30
-                if formatter.width == null
-                    formatter.setWidth "#{col.limit * 8}px"
+            ##|  Allocate the data formatter
+            c.formatter = globalDataFormatter.getFormatter col.type
 
             ##|
             ##| Optional render function on the column
             if typeof col.render == "function"
-                formatter.displayFormat = col.render
-
-            ##|
-            ##| Optional width setting
-            if typeof col.width == "number"
-                formatter.setWidth(col.width + "px");
+                c.displayFormat = col.render
 
             @colList.push(c)
+
+
+

@@ -52,6 +52,14 @@ root.DataFormatter = class DataFormatter
 
 		@formats[formattingClass.name] = formattingClass
 
+	getFormatter: (dataType) =>
+
+		if !@formats[dataType]
+			console.log "Registered types:", @formats
+			throw new Error("Invalid type: " + dataType)
+
+		return @formats[dataType]
+
 
 	##|
 	##|  Format some data based on the type and

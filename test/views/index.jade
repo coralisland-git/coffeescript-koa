@@ -9,7 +9,10 @@ html.no-focus
         script(src='/vendor/oneui.min.js')
         script(src='/vendor/moment.min.js')
         script(src='/vendor/numeral.min.js')
+        script(src='/vendor/handlebars-v3.0.3.js')
         script(src='/test/js/test_common.js')
+
+        script(src='/js/util/GlobalValueManager.js')
 
     body
 
@@ -47,6 +50,11 @@ html.no-focus
                                 a#linkAddress(href='/address_normalizer_1')
                                     i.si.si-arrow-right
                                     span Address Data test 1
+
+                            li
+                                a#linkAddress(href='/popup_menu_1')
+                                    i.si.si-arrow-right
+                                    span Popup menus
 
                             li
                                 a#linkMakeOutline(href='/data_mapper_1')

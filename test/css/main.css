@@ -36,3 +36,7 @@
 .fage {
   padding-left: 20px;
 }
+pre {
+  padding: 0px;
+  border: 0px;
+}
