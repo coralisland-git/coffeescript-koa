@@ -4,6 +4,7 @@ nib     = require 'nib'
 logger  = require 'morgan'
 coffee  = require 'coffee-script'
 fs      = require 'fs'
+favicon = require 'serve-favicon'
 
 withPrettyErrors = (fn) ->
 	(code, options = {}) ->
@@ -22,6 +23,8 @@ app.set 'view engine', 'jade'
 ##|
 ##|  Setup logging
 app.use logger('dev')
+
+app.use favicon(__dirname + '/favicon.ico')
 
 app.use (req, res, next) =>
 	req.headers['if-none-match'] = 'no-match-for-this'

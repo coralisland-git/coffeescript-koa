@@ -7,6 +7,7 @@ $ ->
 		##|  TableConfigTest is the column collection loaded at compile time
 
 		dtc = new DataTypeCollection "TestConfig", TableConfigTest
+		console.log "DTC=", dtc.colList
 		builder = new DataMapperBuilder data, dtc, "#testCase"
 
 	$.ajax

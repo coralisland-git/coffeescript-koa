@@ -1,5 +1,26 @@
 class DataMapperBuilder
 
+	onClickMap: (e) =>
+
+		e.stopPropagation()
+		e.preventDefault()
+
+		clickName = $(e.currentTarget).attr("box_name")
+
+		##|
+		##|  Grab a reference to the row that was selected
+		elBox = @SourceFields[clickName]
+
+		##|
+		##|  Create the popup menu
+		pop = new PopupMenu "Map Destination", e
+
+		for idx, dataType of @KnownFields.colList
+			pop.addItem dataType.name + dataType.editable, (e, info) =>
+				console.log "Clicked ", info
+				true
+			, dataType
+
 	constructor: (sourceObj, knownFields, holder) ->
 
 		##
@@ -22,6 +43,9 @@ class DataMapperBuilder
 				if a.toUpperCase() > b.toUpperCase() then return 1
 				return 0
 
+			@SourceFields = {}
+			@KnownFields  = knownFields
+
 			yPos = 0
 			for name in correctOrder
 				value = sourceObj[name]
@@ -41,9 +65,11 @@ class DataMapperBuilder
 					class	 : "mapColumn"
 
 				elBox.mapBox = $ "<div />",
-					class: "mapBox"
-					html : "None"
+					class:    "mapBox"
+					html:     "None"
+					box_name: name
 
+				elBox.mapBox.on 'click', @onClickMap
 
 				elBox.el.append label
 				elBox.el.append sampleData
@@ -56,6 +82,7 @@ class DataMapperBuilder
 					# left            : 10 + "px"
 					backgroundColor : "#eeeeee"
 
+				@SourceFields[name] = elBox
 
 				@elMain.append elBox.el
 				yPos += 44
