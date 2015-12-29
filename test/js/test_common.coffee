@@ -7,14 +7,15 @@ counter  = 0
 ##|  displayed to the user, the block is executed by a timer in the "go"
 ##|  function.   Each block is executed in turn.
 ##|
-addTest = (label, fnCall) ->
+addTest = (label, fnCall, code) ->
 
-	code = fnCall.toString()
-	code = code.replace "<", "&lt;"
-	code = code.replace ">", "&gt;"
-	code = code.replace "function () {\n", ""
-	code = code.replace /[\r\n]*}$/, ""
-	code = code.replace "\n", "<br>"
+	if !code? or not code
+		code = fnCall.toString()
+		code = code.replace "<", "&lt;"
+		code = code.replace ">", "&gt;"
+		code = code.replace "function () {\n", ""
+		code = code.replace /[\r\n]*}$/, ""
+		code = code.replace "\n", "<br>"
 
 	label = label.replace " (", "<br>("
 
@@ -24,6 +25,9 @@ addTest = (label, fnCall) ->
 			<td class='test_code'> <code><pre>#{code}</pre></code> </td>
 		</tr>
 	"
+
+	if !window.elTestTable? or not 	window.elTestTable
+		window.elTestTable = $("#testTable")
 
 	window.elTestTable.append html
 
@@ -35,6 +39,26 @@ addTest = (label, fnCall) ->
 	allTests.push test
 
 	counter++
+
+addTestButton = (label, buttonText, fnCall) ->
+
+	code = fnCall.toString()
+	code = code.replace "<", "&lt;"
+	code = code.replace ">", "&gt;"
+	code = code.replace "function () {\n", ""
+	code = code.replace /[\r\n]*}$/, ""
+	code = code.replace "\n", "<br>"
+
+	addTest label, ()->
+
+		button = $ "<div />",
+			class: "btn btn-primary"
+			html: buttonText
+		.bind 'click', (e) ->
+			e.preventDefault()
+			e.stopPropagation()
+			fnCall(e)
+	, code
 
 go = () ->
 
