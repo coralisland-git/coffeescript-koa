@@ -1,5 +1,44 @@
 class DataMapperBuilder
 
+	deserialize: (txt) =>
+
+		@mapData = JSON.parse txt
+		@redrawDataTypes()
+
+	serialize: () =>
+		text = JSON.stringify(@mapData)
+		console.log "TEXT=", text
+
+	##|
+	##|  Click the + sign to add a rule to an item
+	onClickMapPlus: (e) =>
+
+		e.stopPropagation()
+		e.preventDefault()
+
+		clickName = $(e.currentTarget).attr("box_name")
+
+		console.log "CURRENT:", @mapData[clickName]
+
+		for idx, dataType of @KnownFields.colList
+			if dataType.name == @mapData[clickName].mapName
+				console.log "KNOWN  :", dataType
+
+		m = new ModalDialog
+			showOnCreate: false
+			content:      "Add a custom processing rule, mapping to field: "
+			position:     "top"
+			title:        "Custom Rule"
+			ok:           "Save"
+
+		m.getForm().addTextInput "pattern", "Target Pattern"
+		m.getForm().addTextInput "Destination", "Map To"
+
+		m.getForm().onSubmit = (form) =>
+			console.log "Form=", form
+
+		m.show()
+
 	onClickMap: (e) =>
 
 		e.stopPropagation()
@@ -16,7 +55,11 @@ class DataMapperBuilder
 		pop = new PopupMenu "Map '#{clickName}'", e
 		pop.resize(400)
 
+		pop.addItem "Edit Target", (e, info) =>
+			@onSelectEdit clickName
+
 		for idx, dataType of @KnownFields.colList
+
 			if dataType.isSelected? and dataType.isSelected
 
 				pop.addItem "Copy to " + dataType.name, (e, info) =>
@@ -26,6 +69,48 @@ class DataMapperBuilder
 				pop.addItem "Append to " + dataType.name, (e, info) =>
 					@onSelectMap info, clickName, "append"
 				, idx
+
+	onSelectEdit: (clickName) =>
+
+		m = new ModalDialog
+			showOnCreate: false
+			content:      "Type a field name or custom field"
+			position:     "top"
+			title:        "Field Mapping"
+			ok:           "Save"
+
+		fieldNames = []
+		for idx, dataType of @KnownFields.colList
+			fieldNames.push dataType.name
+
+		m.getForm().addTextInput "dest", "Target Field"
+		.makeTypeahead fieldNames
+
+		m.getForm().onSubmit = (form) =>
+			console.log "Submitted form, test value=", form.dest
+			for idx, dataType of @KnownFields.colList
+				if form.dest == dataType.name
+					dataType.mapdata.mapType = "copy"
+					dataType.mapdata.mapSource = clickName
+					@mapData[clickName] =
+						mapType: "copy"
+						mapSource: clickName
+						mapDest: dataType.source
+						mapName: dataType.name
+					@redrawDataTypes()
+					m.hide()
+					return
+
+			@mapData[clickName] =
+				mapType: "formula"
+				mapSource: clickName
+				mapDest: form.dest
+				mapName: null
+			@redrawDataTypes()
+
+			m.hide()
+
+		m.show()
 
 	onSelectMap: (idx, clickName, action) =>
 
@@ -80,27 +165,49 @@ class DataMapperBuilder
 
 		##
 		for idx, dataType of @KnownFields.colList
-			if dataType.mapdata.mapType == "copy"
-				dataType.el.find("i").addClass "fa-tag"
-				dataType.el.addClass "assigned"
-			else if dataType.mapdata.mapType == "append"
-				dataType.el.find("i").addClass "fa-copy"
-				dataType.el.addClass "assigned"
-			else
+
+			found = false
+			for i, mapdata of @mapData
+
+				if mapdata.mapName == dataType.name
+
+					if mapdata.mapType == "copy"
+						dataType.el.find("i").addClass "fa-tag"
+						dataType.el.addClass "assigned"
+						found = true
+					else if mapdata.mapType == "append"
+						dataType.el.find("i").addClass "fa-copy"
+						dataType.el.addClass "assigned"
+						found = true
+
+			if not found
 				dataType.el.find("i").removeClass "fa-tag"
+				dataType.el.find("i").removeClass "fa-copy"
 				dataType.el.removeClass "assigned"
 
+
 		for name, field of @SourceFields
+			found = true
 			if @mapData[name]? and @mapData[name].mapType == "copy"
 				field.mapBox.html "<i class='fa fa-fw fa-tag'/> Copy to " + @mapData[name].mapDest
 				field.el.children().addClass "assigned"
 			else if @mapData[name]? and @mapData[name].mapType == "append"
 				field.mapBox.html "<i class='fa fa-fw fa-copy'/> Append to " + @mapData[name].mapDest
 				field.el.children().addClass "assigned"
+			else if @mapData[name]? and @mapData[name].mapType == "formula"
+				field.mapBox.html "<i class='fa fa-fw fa-arrow-right'/> Custom to " + @mapData[name].mapDest
+				field.el.children().addClass "assigned"
 			else
+				found = false
 				field.mapBox.html "<i class='fa fa-fw'/> None"
 				field.el.children().removeClass "assigned"
 
+			if found
+				field.mapBoxPlus.show()
+			else
+				field.mapBoxPlus.hide()
+
+		@serialize()
 		true
 
 	##|
@@ -124,9 +231,6 @@ class DataMapperBuilder
 			@elMain = $(holder)
 			@elMain.css
 				width    : "100%"
-
-			console.log "Holder=", holder
-			console.log @elMain
 
 			codes = (k for k of sourceObj)
 			correctOrder = codes.sort (a, b) ->
@@ -161,11 +265,19 @@ class DataMapperBuilder
 					html:     "None"
 					box_name: name
 
+				elBox.mapBoxPlus = $ "<div />",
+					class:    "mapBoxPlus"
+					html:     "<i class='fa fa-fw fa-plus' />"
+					box_name: name
+
 				elBox.mapBox.on 'click', @onClickMap
+
+				elBox.mapBoxPlus.on 'click', @onClickMapPlus
 
 				elBox.el.append label
 				elBox.el.append sampleData
 				elBox.el.append elBox.mapBox
+				elBox.el.append elBox.mapBoxPlus
 
 				elBox.el.css
 					padding         : "4px"

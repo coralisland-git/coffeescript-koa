@@ -1,36 +1,61 @@
-class ModalDialog
+substringMatcher = (strs) ->
+	return (q, cb) ->
+		matches = []
+		substrRegex = new RegExp(q, 'i')
+		for o in strs
+			if substrRegex.test o
+				matches.push o
+		cb matches
 
-	content:      "Default content"
-	title:        "Default title"
-	ok:           "Ok"
-	close:        "Close"
-	showFooter:   true
-	showOnCreate: true
-	position:     'top'
+class FormField
 
-	isFormDialog: false
+	constructor: (@fieldName, @label, @type) ->
+		@html = @getHtml()
 
-	makeFormDialog: () =>
+	getHtml: () =>
+		return "<input name='#{@fieldName}' id='#{@fieldName}' type='#{@type}' class='form-control' />"
 
-		@isFormDialog = true
-		@content += "<form id='messageBoxForm'>"
-		@close = "Cancel"
+	makeTypeahead: (options) =>
+		@typeaheadOptions = options
 
-	##|
-	##|  Add a text input field
-	addTextInputField: (fieldName, label, fnValidate) =>
+	onPressEnter: () =>
+		## do nothing
 
-		@makeFormDialog()
-		@content += @templateFormFieldText
-			fieldName: fieldName
-			label: label
+	onPressEscape: () =>
+		## do nothing
 
-		if !@firstField?
-			@firstField = fieldName
+	onAfterShow: () =>
 
-	constructor:  (options) ->
+		if @typeaheadOptions?
+			@el.addClass ".typeahead"
+			@el.typeahead
+				hint: true
+				highlight: true
+				minLength: 1
+			,
+				name: 'options'
+				source: substringMatcher(@typeaheadOptions)
 
-		@gid = GlobalValueManager.NextGlobalID()
+			@el.bind "typeahead:select", (ev, suggestion) =>
+				console.log "DID CHANGE:", suggestion
+
+			@el.bind "keypress", (e) =>
+				if e.keyCode == 13
+					@onPressEnter(e)
+					return false
+
+				if e.keyCode == 27
+					@onPressEscape(e)
+					return false
+
+				return true
+
+
+class FormWrapper
+
+	constructor: () ->
+		@fields = []
+		@gid    = "form" + GlobalValueManager.NextGlobalID()
 
 		@templateFormFieldText = Handlebars.compile '''
 			<div class="form-group">
@@ -40,6 +65,82 @@ class ModalDialog
 				<div id="{{fieldName}}error" class="text-danger"></div>
 			</div>
 		'''
+
+	##|
+	##|  Add a text input field
+	addTextInput: (fieldName, label, fnValidate) =>
+
+		field = new FormField(fieldName, label, "text")
+		@fields.push(field)
+		return field
+
+	##|
+	##|  Generate HTML
+	getHtml: () =>
+
+		content = "<form id='#{@gid}'>"
+
+		for field in @fields
+			content += @templateFormFieldText(field)
+
+		content += "</form>";
+
+	onSubmit: () =>
+		console.log "SUBMIT"
+
+	onSubmitAction: (e) =>
+		for field in @fields
+			this[field.fieldName] = field.el.val()
+
+		@onSubmit(this)
+		if e?
+			e.preventDefault()
+			e.stopPropagation()
+
+		return false
+
+	onAfterShow: () =>
+
+		@elForm = $("##{@gid}")
+		firstField = null
+		for field in @fields
+			field.el = @elForm.find("##{field.fieldName}")
+			field.onAfterShow()
+			if !firstField
+				firstField = field
+				firstField.el.focus()
+
+			field.onPressEnter = (e)=>
+				@onSubmitAction(e)
+
+		@elForm.on "submit", @onSubmitAction
+		true
+
+class ModalDialog
+
+	content:      "Default content"
+	title:        "Default title"
+	ok:           "Ok"
+	close:        "Close"
+	showFooter:   true
+	showOnCreate: true
+	position:     'top'
+	formWrapper:  null
+
+	makeFormDialog: () =>
+
+		@close = "Cancel"
+
+	getForm: () =>
+
+		if !@formWrapper? or !@formWrapper
+			@formWrapper = new FormWrapper()
+
+		return @formWrapper
+
+	constructor:  (options) ->
+
+		@gid = GlobalValueManager.NextGlobalID()
 
 		@template = Handlebars.compile '''
 			<div class="modal" id="modal{{gid}}" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
@@ -94,8 +195,12 @@ class ModalDialog
 		@hide();
 		true
 
-	onButton2: () =>
-		console.log "Default on button 2"
+	onButton2: (e) =>
+		if @formWrapper?
+			@formWrapper.onSubmitAction(e)
+		else
+			console.log "Default on button 2"
+
 		@hide();
 		true
 
@@ -104,26 +209,14 @@ class ModalDialog
 
 	show: (options) =>
 
-		if @isFormDialog
-			@content += "</form>"
+		if @formWrapper?
+			@content += @formWrapper.getHtml()
 
 		html = @template(this)
 		$("body").append html
 
 		@modal = $("#modal#{@gid}")
 		@modal.modal(options)
-
-		if @firstField? and @firstField
-			setTimeout ()=>
-				$("##{@firstField}").focus()
-				$("#messageBoxForm").on "submit", (e) =>
-					console.log "SUBMIT"
-					@modal.find(".btn2").trigger("click", e)
-					e.preventDefault()
-					e.stopPropagation()
-					return false
-			, 200
-
 		@modal.on "hidden.bs.modal", () =>
 			##|
 			##|  Remove HTML from body
@@ -160,7 +253,10 @@ class ModalDialog
 				'margin-top' : () =>
 					Math.max(0, ($(window).scrollTop() + ($(window).height() - @modal.height()) / 2 ))
 
-
+		if @formWrapper?
+			setTimeout ()=>
+				@formWrapper.onAfterShow()
+			, 10
 
 class ModalMessageBox extends ModalDialog
 

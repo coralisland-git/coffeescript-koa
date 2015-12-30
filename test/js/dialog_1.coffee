@@ -66,7 +66,11 @@ $ ->
 			title:        "Form Title"
 			ok:           "Go"
 
-		m.addTextInputField "input1", "Example Input 1"
+		m.getForm().addTextInput "input1", "Example Input 1"
+		m.getForm().onSubmit = (form) =>
+			console.log "Submitted form, test value=", form.input1
+			m.hide()
+
 		m.show()
 
 	addTestButton "Simple Form 2", "Open", () ->
@@ -77,9 +81,15 @@ $ ->
 			title:        "Form Title"
 			ok:           "Go"
 
-		m.addTextInputField "input1", "Example Input 1"
-		m.addTextInputField "input2", "Example Input 2"
-		m.addTextInputField "input3", "Example Input 3"
+		m.getForm().addTextInput "input1", "Example Input 1"
+		m.getForm().addTextInput "input2", "Example Input 2"
+		m.getForm().addTextInput "input3", "Example Input 3"
+
+		m.getForm().onSubmit = (form) =>
+			console.log "Submitted form, test value 1=", form.input1
+			console.log "Submitted form, test value 2=", form.input2
+			console.log "Submitted form, test value 3=", form.input3
+			m.hide()
 
 		m.onButton2 = (e, fields) ->
 			console.log "FIELDS=", fields
@@ -88,5 +98,28 @@ $ ->
 
 		m.show()
 
+	states = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia',
+	'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts',
+	'Michigan', 'Minnesota','Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico',
+	'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina',
+	'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming' ]
+
+	addTestButton "Form Typeahead", "Open", () ->
+
+		m = new ModalDialog
+			showOnCreate: false
+			content:      "Type part of a state name"
+			position:     "top"
+			title:        "Typeahead Test"
+			ok:           "Go"
+
+		m.getForm().addTextInput "input1", "State"
+		.makeTypeahead states
+
+		m.getForm().onSubmit = (form) =>
+			console.log "Submitted form, test value=", form.input1
+			m.hide()
+
+		m.show()
 
 	go()
