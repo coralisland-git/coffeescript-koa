@@ -1,29 +1,53 @@
 $ ->
 
+	demoMode = 0
+
 	startTest = (data) ->
 
-		##|
-		##|  Data is a JSON record that we want to work with (test_data/DataRawRec1.json)
-		##|  TableConfigTest is the column collection loaded at compile time
+			##|
+			##|  Data is a JSON record that we want to work with (test_data/DataRawRec1.json)
+			##|  TableConfigTest is the column collection loaded at compile time
 
-		dtc = new DataTypeCollection "TestConfig", TableConfigTest
-		console.log "DTC=", dtc.colList
-		builder = new DataMapperBuilder data, dtc, "#testCase"
+			dtc = new DataTypeCollection "TestConfig", TableConfigTest
+			builder = new DataMapperBuilder data, dtc, "#testCase"
 
-		src = '''
-			{"GF20030226223929852543000000":{"mapType":"copy","mapSource":"GF20030226223929852543000000","mapDest":"property_type","mapName":"Property Type"}}
-		'''
+			if demoMode == 0
+				##|
+				##| No data as the default
+				console.log "Starting without data"
+				src = ''
 
-		builder.deserialize src
+			else if demoMode == 1
 
-	$.ajax
-		url: '/test/js/test_data/DataRawRec1.json'
+				console.log "Starting with some data"
+				src = '''
+					{"GF20030226223929852543000000":{"mapType":"copy","mapSource":"GF20030226223929852543000000","mapDest":"property_type","mapName":"Property Type","transform":[{"type":"transform","pattern":"asdf","dest":"asdfadsf"}]}}
+				'''
 
-	.done (data) ->
-		startTest data
+			builder.deserialize src
 
-	.fail (e) ->
-		console.log "Failed to get data:", e
+	startDemo = (dm)->
+
+		demoMode = dm
+		$("#testCase").html ""
+
+		$.ajax
+			url: '/test/js/test_data/DataRawRec1.json'
+
+		.done (data) ->
+			startTest data
+
+		.fail (e) ->
+			console.log "Failed to get data:", e
+
+
+	addTestButton "Open without save data", "Open", ()->
+		startDemo(0)
+
+	addTestButton "Open with some save data", "Open", ()->
+		startDemo(1)
+
+	go()
 
 
 

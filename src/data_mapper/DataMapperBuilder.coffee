@@ -2,12 +2,55 @@ class DataMapperBuilder
 
 	deserialize: (txt) =>
 
-		@mapData = JSON.parse txt
+		try
+			@mapData = JSON.parse txt
+		catch e
+			##|  ignore parse errors
+			console.log "DataMapperBuilder, deserialize: ", e
+
 		@redrawDataTypes()
+
+		setTimeout ()=>
+			# @addTransformRule('GF20030226223929852543000000','transform','asdf','asdfadsf');
+			console.log "test"
+			# @serialize()
+		, 1500
 
 	serialize: () =>
 		text = JSON.stringify(@mapData)
 		console.log "TEXT=", text
+
+	##|
+	##|  Add a transformation rule to a given field
+	##|  if that rule already exists, update it.
+	addTransformRule: (clickName, ruleType, pattern, dest) =>
+
+		console.log "addTransformRule('#{clickName}','#{ruleType}','#{pattern}','#{dest}');"
+
+		##|
+		##|  Add the new rule under the "transform" array
+		##|
+
+		if !@mapData[clickName]? then return
+		if !@mapData[clickName].transform?
+			@mapData[clickName].transform = []
+
+		for t in @mapData[clickName].transform
+			if t.type == ruleType and t.pattern == pattern
+				t.dest = dest
+				@redrawDataTypes()
+				return true
+
+		##|
+		##|  Create a new rule
+		@mapData[clickName].transform.push
+			type    : ruleType
+			pattern : pattern
+			dest    : dest
+
+		@redrawDataTypes()
+		true
+
 
 	##|
 	##|  Click the + sign to add a rule to an item
@@ -31,11 +74,15 @@ class DataMapperBuilder
 			title:        "Custom Rule"
 			ok:           "Save"
 
-		m.getForm().addTextInput "pattern", "Target Pattern"
-		m.getForm().addTextInput "Destination", "Map To"
+		m.getForm().addTextInput "pattern",     "Target Pattern"
+		m.getForm().addTextInput "destination", "Map To"
 
 		m.getForm().onSubmit = (form) =>
+			##|
+			##|  Add a new type of mapping rule
 			console.log "Form=", form
+			@addTransformRule clickName, "transform", form.pattern, form.destination
+			true
 
 		m.show()
 
@@ -161,6 +208,23 @@ class DataMapperBuilder
 				dataType.el.removeClass "selected"
 				delete dataType.isSelected
 
+	redrawTransformRules: (name, field) =>
+
+		if !@mapData[name].transform? then return false
+		for t in @mapData[name].transform
+
+			if !field.elTransformTable?
+				td = $ "<td colspan='2' />"
+				field.elTransformTable = $ "<table class='transformRuleTable' />"
+				td.append field.elTransformTable
+				field.elTransform.append td
+				field.elTransfromElements = {}
+
+			if !field.elTransfromElements[t.name]?
+
+				row = $ @templateRuleLine(t)
+				field.elTransfromElements[t.name] = field.elTransformTable.append row
+
 	redrawDataTypes: () =>
 
 		##
@@ -191,12 +255,15 @@ class DataMapperBuilder
 			if @mapData[name]? and @mapData[name].mapType == "copy"
 				field.mapBox.html "<i class='fa fa-fw fa-tag'/> Copy to " + @mapData[name].mapDest
 				field.el.children().addClass "assigned"
+				@redrawTransformRules name, field
 			else if @mapData[name]? and @mapData[name].mapType == "append"
 				field.mapBox.html "<i class='fa fa-fw fa-copy'/> Append to " + @mapData[name].mapDest
 				field.el.children().addClass "assigned"
+				@redrawTransformRules name, field
 			else if @mapData[name]? and @mapData[name].mapType == "formula"
 				field.mapBox.html "<i class='fa fa-fw fa-arrow-right'/> Custom to " + @mapData[name].mapDest
 				field.el.children().addClass "assigned"
+				@redrawTransformRules name, field
 			else
 				found = false
 				field.mapBox.html "<i class='fa fa-fw'/> None"
@@ -228,7 +295,7 @@ class DataMapperBuilder
 			@SourceFields = {}
 			@KnownFields  = knownFields
 
-			@elMain = $(holder)
+			@elMain = $(holder).append "<table class='dataMapperMain' />"
 			@elMain.css
 				width    : "100%"
 
@@ -241,6 +308,15 @@ class DataMapperBuilder
 				return 0
 
 			@setupKnownFields();
+
+			@templateRuleLine = Handlebars.compile '''
+				<tr>
+				<td class='ruleType'> {{type}} </td>
+				<td class='rulePattern'> {{pattern}} </td>
+				<td class='ruleDest'> {{dest}} </td>
+				<td class='ruleMinus'> <i class='fa fa-minus' /> </td>
+				</tr>
+			'''
 
 			yPos = 0
 			for name in correctOrder
@@ -256,19 +332,19 @@ class DataMapperBuilder
 				elBox = {}
 				elBox.name = name
 				elBox.value = value
-				elBox.el = $ "<div />",
+				elBox.el = $ "<tr />",
 					id       : "builder_#{name}"
 					class	 : "mapColumn"
 
-				elBox.mapBox = $ "<div />",
-					class:    "mapBox"
-					html:     "None"
-					box_name: name
+				elBox.mapBox = $ "<td />",
+					class    : "mapBox"
+					html     : "None"
+					box_name : name
 
-				elBox.mapBoxPlus = $ "<div />",
-					class:    "mapBoxPlus"
-					html:     "<i class='fa fa-fw fa-plus' />"
-					box_name: name
+				elBox.mapBoxPlus = $ "<td />",
+					class    : "mapBoxPlus"
+					html     : "<i class='fa fa-fw fa-plus' />"
+					box_name : name
 
 				elBox.mapBox.on 'click', @onClickMap
 
@@ -281,14 +357,18 @@ class DataMapperBuilder
 
 				elBox.el.css
 					padding         : "4px"
-					# position        : 'absolute'
-					# top             : yPos + "px"
-					# left            : 10 + "px"
 					backgroundColor : "#eeeeee"
 
 				@SourceFields[name] = elBox
 
+				##|
+				##|  Transform rules
+				elBox.elTransform = $ "<tr />",
+					id: "tr_#{name}"
+					class: "transformRules"
+
 				@elMain.append elBox.el
+				@elMain.append elBox.elTransform
 				yPos += 44
 
 			##|
@@ -322,8 +402,6 @@ class DataMapperBuilder
 			##|  Fix the width
 			w = @elMain.width()
 			@elMain.css "width", w-240
-
-			# @elMain.css "height", yPos + 10
 
 		catch e
 			console.log "Exception in DataMapperBuilder: ", e, e.stack
