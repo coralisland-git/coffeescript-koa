@@ -1,10 +1,11 @@
-express = require 'express'
-stylus  = require 'stylus'
-nib     = require 'nib'
-logger  = require 'morgan'
-coffee  = require 'coffee-script'
-fs      = require 'fs'
-favicon = require 'serve-favicon'
+express    = require 'express'
+stylus     = require 'stylus'
+nib        = require 'nib'
+logger     = require 'morgan'
+coffee     = require 'coffee-script'
+fs         = require 'fs'
+favicon    = require 'serve-favicon'
+livereload = require 'express-livereload'
 
 withPrettyErrors = (fn) ->
 	(code, options = {}) ->
@@ -36,6 +37,9 @@ app.use '/css', stylus.middleware
 	src: __dirname + '/test/css/'
 	compile: (str, path) =>
 		return stylus(str).set('filename', path)
+
+livereload app, config =
+	watchDir: __dirname + "/test/css/"
 
 runScript = (coffeeFile, response) ->
 	file = fs.readFile coffeeFile, (err, data) ->

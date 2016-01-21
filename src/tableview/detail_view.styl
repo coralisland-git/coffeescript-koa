@@ -1,0 +1,77 @@
+
+.detailview
+
+    width:         100%
+    border-inside: 1px solid #909090
+    white-space:   nowrap;
+    table-layout:  fixed;
+
+    tbody tr:hover td
+        background-color: rgba(237, 192, 80, 1.0)
+        cursor: pointer
+
+    tbody tr:nth-child(even)
+        background: #ffffff;
+
+    tbody tr:nth-child(odd)
+        background: #f8f8f8;
+
+        td,
+        th
+            border-top: 1px dotted #dddddd
+            border-bottom: 1px dotted #dddddd
+
+    th
+        width: 180px
+        text-align: right
+        padding-right: 4px
+        line-height: 1.3em
+        font-size: 0.65vw
+        border-right: 1px dotted #dddddd
+        padding-top: 4px
+        padding-bottom: 4px
+        color: #404040
+
+    td
+        overflow: hidden
+        line-height: 1.3em
+        font-size: 0.65vw
+        padding-left: 4px
+        padding-right: 4px
+
+    td.editable:hover
+        background-color: #eebbbb
+        cursor: text
+
+    td.editable
+
+        padding-left: 4px
+        padding-right: 4px
+        padding-top: 2px
+        padding-top: 2px
+        color: #106010
+
+    td.editing
+
+        padding-left: 0px
+        padding-right: 0px
+        padding-top: 0px
+        padding-top: 0px
+
+        .dynamic_edit
+            border: 0px
+            width: 100%
+            height: 100%
+            padding-left: 4px
+            padding-right: 4px
+            padding-top: 0px
+            padding-top: 0px
+            margin: 0px
+            background-color: rgba(204, 228, 240, 1.0)
+
+.block-content-table
+    background-color: #fff
+    padding-top: 8px
+
+
+

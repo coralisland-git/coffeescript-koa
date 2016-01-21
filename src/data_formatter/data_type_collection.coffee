@@ -23,6 +23,7 @@ root.DataType = class DataType
 root.DataTypeCollection = class DataTypeCollection
 
     colList : []
+    col     : {}
 
     constructor: (configName, cols) ->
 
@@ -32,32 +33,44 @@ root.DataTypeCollection = class DataTypeCollection
     ##|  Given an array of column configuration structures, create new
     ##|  columns automatically based on the configuration.
     ##|  Example:
-    ## name       : 'Create Date'
-    ## source     : 'create_date'
-    ## visible    : true
-    ## hideable   : true
-    ## editable   : true
-    ## type       : 'datetime'
-    ## required   : false
+    ##|
+    ##|  name       : 'Create Date'
+    ##|  source     : 'create_date'
+    ##|  visible    : true
+    ##|  hideable   : true
+    ##|  editable   : true
+    ##|  type       : 'datetime'
+    ##|  required   : false
+    ##|
+    configureColumn: (col) =>
+
+        c = new DataType()
+
+        for name, value of col
+            c[name] = value
+
+        ##|
+        ##|  Allocate the data formatter
+        c.formatter = globalDataFormatter.getFormatter col.type
+
+        ##|
+        ##| Optional render function on the column
+        if typeof col.render == "function"
+            c.displayFormat = col.render
+
+        @col[c.source] = c
+        @colList.push(c.source)
+
+
+    ##|
+    ##|  Same as configureColumn but allows and array to be passed in
+    ##|
     configureColumns: (columns) =>
 
         for col in columns
+            @configureColumn(col)
 
-            c = new DataType()
 
-            for name, value of col
-                c[name] = value
-
-            ##|
-            ##|  Allocate the data formatter
-            c.formatter = globalDataFormatter.getFormatter col.type
-
-            ##|
-            ##| Optional render function on the column
-            if typeof col.render == "function"
-                c.displayFormat = col.render
-
-            @colList.push(c)
 
 
 

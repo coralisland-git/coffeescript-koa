@@ -1,0 +1,108 @@
+.tableview:before
+    content  : ""
+    position : absolute
+
+.tableview
+    width: 100%
+    border-inside: 1px solid #909090
+    white-space:  nowrap;
+    table-layout:fixed;
+
+    th
+        color: black
+        font-weight: 600
+        font-size: 12px
+        padding: 4px
+        border-left: 1px dotted rgba(0,0,0, 0.1)
+        overflow: hidden;
+
+    tbody tr:hover td
+        background-color: rgba(237, 192, 80, 1.0)
+        cursor: pointer
+
+    tbody tr:nth-child(even)
+        background: #ffffff;
+
+    tbody tr:nth-child(odd)
+        background: #f8f8f8;
+
+        td
+            border-top: 1px dotted #dddddd
+            border-bottom: 1px dotted #dddddd
+
+    td
+        padding-left: 4px
+        padding-right: 2px
+        padding-top: 6px
+        padding-bottom: 6px
+        font-size: 12px
+        color: #101010
+        font-weight: 400
+        border-left: 1px dotted rgba(0,0,0, 0.1)
+        overflow: hidden;
+
+    th:last-child,
+    td:last-child
+        padding-right: 20px
+
+    th:first-child,
+    td:first-child
+        padding-left: 20px
+
+    th.checkable
+    td.checkable
+    td:first-child.checkable
+        width: 26px
+        margin-left: 0px
+        padding-left: 4px
+        padding-right: 4px
+
+    tbody tr.selected td
+        background-color: rgba(237, 192, 80, 1.0)
+        // background-color: red
+        // border: 2px solid green
+
+    td.messageRow
+        background-color: rgba(162, 165, 147, 0.7)
+        line-height: 18px
+        font-weight: 600
+        color: rgba(76, 79, 56, 1.0)
+        text-align: center
+
+    td.editable:hover
+        background-color: #eebbbb
+        cursor: text
+
+    td.editable
+
+        padding-left: 4px
+        padding-right: 4px
+        padding-top: 2px
+        padding-top: 2px
+        // border-bottom: 1px solid #bbccbb
+        color: #106010
+
+    td.editing
+
+        padding-left: 0px
+        padding-right: 0px
+        padding-top: 0px
+        padding-top: 0px
+
+        .dynamic_edit
+            border: 0px
+            width: 100%
+            height: 100%
+            padding-left: 4px
+            padding-right: 4px
+            padding-top: 0px
+            padding-top: 0px
+            margin: 0px
+            background-color: rgba(204, 228, 240, 1.0)
+
+span.fage
+    text-align: right
+    float: right
+    color: #606060
+    padding-right: 8px
+

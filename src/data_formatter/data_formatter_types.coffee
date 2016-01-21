@@ -2,6 +2,8 @@ class DataFormatterType
 
 	name:	""
 	width:  null
+	editorShowing: false
+	editorPath   : ""
 
 	##|
 	##|  Text to add to the css for displaying
@@ -12,6 +14,105 @@ class DataFormatterType
 
 	unformat: (data, path) =>
 		return null
+
+	allowKey: (keyCode) =>
+		return true
+
+	##|
+	##|  Start editing an element
+	editData: (parentElement, currentValue, path, @onSaveCallback) =>
+
+		left     = 0
+		top      = 0
+		width    = 100
+		height   = 40
+		elParent = null
+
+		@editorPath = path
+
+		if parentElement?
+
+			elParent = $(parentElement)
+			pos      = elParent.position()
+			left     = pos.left
+			top      = pos.top
+			width	 = elParent.outerWidth(false)
+			height	 = elParent.outerHeight(false)
+
+		@editorShowing = true
+		@openEditor(elParent, left, top, width, height, currentValue, path)
+
+	saveValue: (newValue) =>
+
+		console.log "Saving value", newValue
+		if @onSaveCallback?
+			@onSaveCallback @editorPath, newValue
+		true
+
+	appendEditor: () =>
+
+		$("body").append(@elEditor)
+
+		@elEditor.on "blur", (e) =>
+			if @editorShowing
+				@editorShowing = false
+				e.preventDefault()
+				e.stopPropagation()
+				@elEditor.hide()
+				return true
+			return false
+
+		##|
+		##|  Close the popup with the escape key
+		@elEditor.on "keydown", (e) =>
+			if e.keyCode == 13
+				@saveValue(@elEditor.val())
+				@editorShowing = false
+				e.preventDefault()
+				e.stopPropagation()
+				@elEditor.hide()
+				return false
+
+			if e.keyCode == 27
+				@editorShowing = false
+				e.preventDefault()
+				e.stopPropagation()
+				@elEditor.hide()
+				return false
+
+			if @allowKey e.keyCode
+				return true
+			else
+				return false
+
+		$("document").on "click", (e) =>
+			console.log "Click"
+
+
+	##|
+	##|  Open the dynamic text editor
+	openEditor: (elParent, left, top, width, height, currentValue, path) =>
+
+		if !@elEditor
+			@elEditor = $ "<input />",
+				type: "text"
+				class: "dynamic_edit"
+
+			@appendEditor()
+
+		@elEditor.css
+			position  : "absolute"
+			"z-index" : 5001
+			top       : top
+			left      : left
+			width     : width
+			height    : height
+
+		@elEditor.val currentValue
+
+		@elEditor.show()
+		@elEditor.focus()
+
 
 class DataFormatText extends DataFormatterType
 
@@ -51,6 +152,18 @@ class DataFormatNumber extends DataFormatterType
 class DataFormatFloat extends DataFormatterType
 
 	name: "decimal"
+
+	allowKey: (keyCode) =>
+		return true
+
+		if keyCode >= 48 and keyCode <= 57 then return true
+		if keyCode >= 96 and keyCode <= 105 then return true
+		if keyCode == 190 then return true
+		if keyCode == 189 then return true
+		if keyCode == 119 then return true
+		if keyCode == 109 then return true
+		console.log "Rejecting key:", keyCode
+		return false
 
 	format: (data, options, path) =>
 		return numeral(DataFormatter.getNumber data).format("#,###.##")
