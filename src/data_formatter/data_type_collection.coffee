@@ -4,9 +4,7 @@
 ##|  to save or load the configuration if needed
 ##|
 
-root = exports ? this
-
-root.DataType = class DataType
+class DataType
 
     source        : ''       ##| Data source to copy from
     visible       : false    ##| Visible (Used for tables)
@@ -20,13 +18,12 @@ root.DataType = class DataType
 
     constructor: () ->
 
-root.DataTypeCollection = class DataTypeCollection
+class DataTypeCollection
 
-    colList : []
-    col     : {}
+    constructor: (@configName, cols) ->
 
-    constructor: (configName, cols) ->
-
+        @col = {}
+        @colList = []
         if cols? then @configureColumns cols
 
     ##|
@@ -52,6 +49,7 @@ root.DataTypeCollection = class DataTypeCollection
         ##|
         ##|  Allocate the data formatter
         c.formatter = globalDataFormatter.getFormatter col.type
+        c.extraClassName = "col_" + @configName + "_" + col.source
 
         ##|
         ##| Optional render function on the column
@@ -70,7 +68,29 @@ root.DataTypeCollection = class DataTypeCollection
         for col in columns
             @configureColumn(col)
 
+        ##|
+        ##|  See if there is any CSS to inject
 
+        css = ""
+        for i, col of @col
+
+            str = ""
+            if col.width? and col.width
+                str += "width : #{col.width}px; "
+            if col.align? and col.align
+                str += "text-align : " + col.align
+
+            if str and str.length > 0
+                css += "." + col.extraClassName + " {"
+                css += str
+                css += "}\n"
+
+        if css
+            $("head").append "<style type='text/css'>\n" + css + "\n</style>"
+
+        # $('head').append('<style type="text/css">body{font:normal 14pt Ar
+
+        true
 
 
 

@@ -7,8 +7,9 @@ TableConfigZipcodes.push
 	hideable   : true
 	editable   : false
 	type       : 'text'
-	width      : 60
+	width      : 70
 	required   : true
+	tooltip	   : "Example tooltip, code is the actual zipcode."
 
 TableConfigZipcodes.push
 	name       : 'City'
@@ -16,7 +17,7 @@ TableConfigZipcodes.push
 	visible    : true
 	hideable   : false
 	editable   : false
-	type       : 'int'
+	type       : 'text'
 	required   : true
 
 TableConfigZipcodes.push
@@ -28,6 +29,7 @@ TableConfigZipcodes.push
 	limit      : 60
 	type       : 'text'
 	required   : false
+	width      : 40
 
 TableConfigZipcodes.push
 	name       : 'County'

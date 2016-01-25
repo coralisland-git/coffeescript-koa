@@ -10,42 +10,31 @@ class TableViewCol
 	##|
 	##| @param name [string] The name of the column
 	##| @param title [string] The title to show in the header
-	constructor : (@name, @title) ->
-		@elHolder   = null
-		@tagType    = "td"
-		@dataType 	= null
+	constructor : (@tableName, @col) ->
+		@visible = @col.visible
+		@width   = @col.width
 
-	checkHolderElement: () =>
-		if @elHolder == null
-			@elHolder = $("#c#{@gid}")
+		if !@visible? then @visible = true
+		if !@width? then @width = ""
 
-		true
-
-	##|
-	##|  Initialize the column based on a type and options
-	##|  The type must be one of the types supported by data_type_collection
-	##|
-	initFormat: (@dataType, @options) =>
-		@formatter = globalDataFormatter.getFormatter @dataType
-		true
-
-	RenderHeader: =>
+	RenderHeader: (extraClassName) =>
 		if @visible == false then return ""
 
-		if typeof @formatter == "undefined" or @formatter == null
-			@initFormat "text"
-
 		html = "<th style='";
-		if (@formatter.width) then html += "width: " + @formatter.width + ";"
+		if (@width) then html += "width: " + @width + ";"
 
-		html += @formatter.styleFormat + "'"
+		html += "'"
 
-		if typeof @tooltip != "undefined"
-			html += " tooltip='simple' data-title='#{@tooltip}'"
+		if @col.extraClassName? and @col.extraClassName.length > 0
+			html += "class='#{@col.extraClassName}'"
+
+		if @col.tooltip? and @col.tooltip.length > 0
+			html += " tooltip='simple' data-title='#{@col.tooltip}'"
 
 		html += ">";
-		html += @title;
+		html += @col.name;
 		html += "</th>";
+
 		return html
 
 	onClickLink: ()=>

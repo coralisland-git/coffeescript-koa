@@ -1,33 +1,70 @@
 $ ->
 
-    demoMode = 0
+    ##|
+    ##|  This is just for diagnostics,  you don't need to verify the data map is
+    ##|  loaded normally.  The data types should be loaded upon startup.
+    addTest "Confirm Zipcodes datatype loaded", () ->
+        dm = DataMap.getDataMap()
+        if !dm? then return false
 
-    zipcodeTableTest1 = ()->
-
-    startDemo = (dm)->
-
-        demoMode = dm
-        $("#testCase").html ""
-
-        dtc = new DataTypeCollection "ZipcodeTable", TableConfigZipcodes
-
-        ds  = new DataSet "zipcodes", dtc
-        ds.setAjaxSource "/test/js/test_data/zipcodes.json", "data", "code"
-        ds.doLoadData()
-        .then (data) ->
-
-            table = new TableView("#testCase", null, "code")
-            table.configureColumns TableConfigZipcodes, "Zipcodes"
-
-            for code, o of data
-                table.addRow o
-
-            table.render()
+        zipcodes = dm.types["zipcode"]
+        if !zipcodes? then return false
+        if !zipcodes.col["code"]? then return false
 
         true
 
-    addTestButton "Open without save data", "Open", ()->
-        startDemo(0)
+    ##|
+    ##|  Load the zipcodes JSON file.
+    ##|  This will insert the zipcodes into the global data map.
+    addTest "Loading Zipcodes", () ->
+
+        new Promise (resolve, reject) ->
+            ds  = new DataSet "zipcode"
+            ds.setAjaxSource "/test/js/test_data/zipcodes.json", "data", "code"
+            ds.doLoadData()
+            .then (dsObject)->
+                resolve(true)
+            .catch (e) ->
+                console.log "Error loading zipcode data: ", e
+                resolve(false)
+
+    addTestButton "Render table", "Open", ()->
+
+        addHolder("renderTest1");
+        table = new TableView($("#renderTest1"), null, "code")
+        table.addTable "zipcode"
+        table.render()
+
+        true
+
+    addTestButton "Render table 2", "Open", ()->
+
+        addHolder("renderTest1");
+        table = new TableView($("#renderTest1"), null, "code")
+        noAreaCode = (col)  -> col.name != "Area Code"
+        filter = (obj, key) -> obj.county == "HAMPDEN"
+        table.sort = (a, b) ->
+
+            aa = DataMap.getDataField("zipcode", a.key, "city")
+            bb = DataMap.getDataField("zipcode", b.key, "city")
+            if aa < bb then return -1
+            if aa > bb then return 1
+            return 0
+
+        table.addTable "zipcode", noAreaCode, filter
+        table.render()
+
+        true
+
+    addTestButton "Configure Columns", "Open", ()->
+
+        addHolder("renderTest1");
+        table = new TableView($("#renderTest1"), null, "code")
+        table.setTableCacheName "test_zipcodes"
+        table.addTable "zipcode"
+        table.render()
+
+        true
 
     go()
 

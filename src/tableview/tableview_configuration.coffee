@@ -9,23 +9,34 @@ class PopupWindowTableConfiguration extends PopupWindow
 
 		@resize 900, 700
 		@tableConfig = new TableView(@windowScroll, refTable.tableCacheName, "name")
-		@tableConfig.tableConfigDatabase = refTable.tableConfigDatabase
+		@tableConfig.tableConfigDatabase = refTable.tableCacheName
 
-		c = @tableConfig.addColumn("title", "Title")
-		f = c.initFormat "text"
-		f.setWidth "110px"
+		console.log "tableConfigDatabase=", @tableConfig.tableConfigDatabase
 
-		c = @tableConfig.addColumn "tooltip", "Additional Information"
-		c.initFormat "text"
+		columns = []
+		columns.push
+			name   : "Title"
+			source : "name"
+			type   : "text"
+			width  : "110px"
+
+		columns.push
+			name   : "Additional Information"
+			source : "tooltip"
+			type   : "text"
+
+		DataMap.setDataTypes "colConfig", columns
 
 		for col in refTable.colList
-			col.checked = col.visible != false
-			@tableConfig.addRow col
+			console.log "COL=", col
+			# col.checked = col.visible != false
+			# @tableConfig.addRow col
 
-		@tableConfig.setHeight @getBodyHeight()
+		@tableConfig.addTable "colConfig"
 		@tableConfig.render()
 
 		@tableConfig.onSetCheckbox = (checkbox_key, value) =>
+			console.log "HERE", checkbox_key, value
 			user.tableConfigSetColumnVisible refTable.tableCacheName, checkbox_key, value
 
 		@open()

@@ -69,8 +69,8 @@ class GlobalValueManager
         clickY = 0
 
         if (e.clientX || e.clientY) && document.body && document.body.scrollLeft != null
-            clientX = e.clientX + document.body.scrollLeft
-            clientY = e.clientY + document.body.scrollTop
+            clickX = e.clientX + document.body.scrollLeft
+            clickY = e.clientY + document.body.scrollTop
 
         if (e.clientX || e.clientY) && document.compatMode == 'CSS1Compat' && document.documentElement && document.documentElement.scrollLeft != null
             clickX = e.clientX + document.documentElement.scrollLeft

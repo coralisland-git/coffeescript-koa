@@ -26,6 +26,7 @@
 }
 .testTable td.test_result {
   padding-left: 10px;
+  padding-right: 10px;
   text-align: left;
   border-right: 1px solid #ccc;
 }

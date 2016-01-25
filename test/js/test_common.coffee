@@ -1,6 +1,12 @@
 allTests = []
 counter  = 0
 
+addHolder = (name) ->
+
+    $("#" + name).remove()
+    $("#testCase").append($("<div id='" + name + "' style='padding-top: 20px;' />"))
+    true
+
 ##|
 ##|  Very simple call that takes a label (some notes for the user) and
 ##|  a javascript block to execute as the test.   The code and label are
@@ -11,8 +17,8 @@ addTest = (label, fnCall, code) ->
 
 	if !code? or not code
 		code = fnCall.toString()
-		code = code.replace "<", "&lt;"
-		code = code.replace ">", "&gt;"
+		code = code.replace /</g, "&lt;"
+		code = code.replace />/g, "&gt;"
 		code = code.replace "function () {\n", ""
 		code = code.replace /[\r\n]*}$/, ""
 		code = code.replace "\n", "<br>"
@@ -60,27 +66,44 @@ addTestButton = (label, buttonText, fnCall) ->
 			fnCall(e)
 	, code
 
+goNext = () ->
+
+	allTests.splice 0, 1
+	setTimeout () ->
+		go()
+	, 100
+
 go = () ->
 
 	if allTests.length == 0
 
-		window.elTestCase.append $ "<p> Complete. </p>"
+		window.elTestCase.append $ "<br><p> Complete. </p>"
 		return
 
 	else
 
 		try
 			result = allTests[0].callback()
-			t = typeof result
-			if typeof t == "string"
-				$(allTests[0].tag).html result
-			else
-				$(allTests[0].tag).append result
 
-			allTests.splice 0, 1
-			setTimeout () ->
-				go()
-			, 100
+			if typeof result != "object"
+				$(allTests[0].tag).html result
+				goNext()
+			else
+				if result.constructor.toString().match /Promise/
+
+					console.log "Waiting on promise"
+					result.then (trueResult) ->
+						$(allTests[0].tag).append trueResult
+						goNext()
+					.catch (e)  ->
+						$(allTests[0].tag).append "Exception:" + e
+
+				else
+
+					$(allTests[0].tag).append result
+					console.log "P=", result.constructor.toString()
+					goNext()
+
 		catch e
 			console.log "Exception:", e
 

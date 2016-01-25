@@ -29,11 +29,55 @@ class DataMap
 
         dm = DataMap.getDataMap()
 
-        if !dm.types[tableName]
-            dm.types[tableName] = new DataTypeCollection()
+        if !dm.types[tableName]?
+            dm.types[tableName] = new DataTypeCollection(tableName)
 
         dm.types[tableName].configureColumns columns
         true
+
+    ##|
+    ##|  Return the columns associated with a given table
+    ##|  reduceFunction is called with every table name,
+    ##|  and return the columns that return true.
+    @getColumnsFromTable: (tableName, reduceFunction) =>
+
+        dm = DataMap.getDataMap()
+
+        columns = []
+        if !dm.types[tableName]
+            return columns
+
+        for i in dm.types[tableName].colList
+            col = dm.types[tableName].col[i]
+
+            keepColumn = true
+            if reduceFunction?
+                keepColumn = reduceFunction(col)
+
+            if keepColumn
+                columns.push col
+
+        return columns
+
+    @getValuesFromTable: (tableName, reduceFunction) =>
+
+        dm = DataMap.getDataMap()
+        console.log "D[", tableName, "]=", dm.data[tableName]
+        if !dm.data[tableName]? then return []
+
+        results = []
+
+        for key, obj of dm.data[tableName]
+            keepRow = true
+            if reduceFunction?
+                keepRow = reduceFunction(obj)
+
+            if keepRow
+                results.push
+                    key   : key
+                    table : tableName
+
+        return results
 
     editValue: (path, el) =>
 
@@ -83,6 +127,8 @@ class DataMap
 
         dm = DataMap.getDataMap()
 
+        # console.log "addData[", tableName, "][", keyValue, "][", values ,"]"
+
         if !dm.data[tableName]
             dm.data[tableName] = {}
 
@@ -98,7 +144,14 @@ class DataMap
 
         true
 
-    @renderField: (tagNam, tableName, fieldName, keyValue) =>
+    @getDataField: (tableName, keyValue, fieldName) =>
+
+        dm = DataMap.getDataMap()
+        if !dm.data[tableName]? or !dm.data[tableName][keyValue]?
+            return ""
+        return dm.data[tableName][keyValue][fieldName]
+
+    @renderField: (tagNam, tableName, fieldName, keyValue, extraClassName) =>
 
         dm = DataMap.getDataMap()
 
@@ -128,11 +181,14 @@ class DataMap
                 otherhtml += " onClick='globalOpenEditor(this);' "
                 className += " editable"
 
+        if extraClassName? and extraClassName.length > 0
+            className += " #{extraClassName}"
+
         if !currentValue? or currentValue == null
             currentValue = ""
 
 
-        console.log "path=", path, dm.types[tableName].col[fieldName]
+        # console.log "path=", path, dm.types[tableName].col[fieldName]
 
         html = "<#{tagNam} data-path='#{path}' class='#{className}' #{otherhtml}>" +
             currentValue + "</#{tagNam}>"

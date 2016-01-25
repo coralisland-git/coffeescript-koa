@@ -2,7 +2,6 @@
 
 This class represents one set of data which means
 
-    a)  Columns or a definition of the data
     b)  A source for the data
 
 ###
@@ -13,19 +12,10 @@ root.DataSet = class DataSet
     ##|
     ##|  Create a new data set
     ##|  param @baseName - The name for this data set, used to map the set to a database
-    ##|  param columnData - A supported list of columns
-    ##|     a DataTypeCollection
-    constructor : (@baseName, columnData)->
+    constructor : (@baseName)->
 
-        @columns = {}
-        @data    = {}
-
-        if columnData? and columnData instanceof DataTypeCollection
-            ##|
-            ##|  Initialize the data set with a list of columns
-            ##|  based on the DataTypeCollection from data_formatter
-            ##|
-            @columns = columnData.colList
+        @data       = {}
+        @useDataMap = true
 
 
     setAjaxSource: (url, @subElement, @keyElement) =>
@@ -54,6 +44,11 @@ root.DataSet = class DataSet
                     if @subElement? and @subElement
                         rawData = rawData[@subElement]
 
+                    ##|
+                    ##|  Access the global data map
+                    if @useDataMap
+                        dm = DataMap.getDataMap()
+
                     for i, o of rawData
 
                         if @keyElement?
@@ -61,9 +56,12 @@ root.DataSet = class DataSet
                         else
                             key = i
 
-                        @data[key] = o
+                        if @useDataMap
+                            DataMap.addData @baseName, key, o
+                        else
+                            @data[key] = o
 
-                    resolve(@data)
+                    resolve(this)
 
                 .fail (e) =>
 

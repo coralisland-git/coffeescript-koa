@@ -26,110 +26,52 @@ class TableView
 	##| @param keyColum [string] optional column name for the unique id in the database
 	##|
 	constructor: (@elTableHolder, @tableName, @keyColumn) ->
-		@colList     = []
-		@rowData     = []
-		@sort        = 0
-		@tableHeight = 0
-		@showHeaders = true
+
+		@colList        = []
+		@rowData        = []
+		@sort           = 0
+		@showHeaders    = true
+		@showCheckboxes = false
+		@showFilters	= true
+
+		##|
+		##|  Search filters
+		@currentFilters = {}
+		@rowDataElements = {}
 
 		##|
 		##|  No context menu setup by default
 		@contextMenuCallbackFunction = 0
-		@contextMenuCallSetup = 0
+		@contextMenuCallSetup        = 0
 
 		if (!@elTableHolder[0])
 			console.log "Error: Table id #{@elTableHolder} doesn't exist"
 
 		@tableConfig = {}
 		@tableConfigDatabase = null
-		@basePath = 0
 
 	##|
 	##|  Set the base path for each cell of data to follow
 	setBasePath: (@basePath) =>
 		window.db.watch "#{@basePath}/", @onSocketChangeNotification
 
-	onSocketChangeNotification: (path, data) =>
-
-		for i in @rowData
-			if path.startsWith "#{@basePath}/#{i["id"]}/"
-				field = path.replace "/#{@basePath}/#{i["id"]}/", ""
-				# console.log "received update on field [", field, "] to [", data, "] for id=", i.id
-				if typeof i[field] != "undefined"
-					i[field] = data
-					@render()
-
-				return
-
-	##|
-	##|  Given an array of column configuration structures, create new
-	##|  columns automatically based on the configuration.
-	##|  Example:
-	## name       : 'Create Date'
-	## source     : 'create_date'
-	## visible    : true
-	## hideable   : true
-	## editable   : true
-	## type       : 'datetime'
-	## required   : false
-	configureColumns: (columns, @tableCacheName) =>
-
-		for col in columns
-
-			c = new TableViewCol col.source, col.name
-
-			##|
-			##|  Check for an override in the config
-			# customValue = user.tableConfigGetColumnVisible(@tableCacheName, c.name)
-			# if customValue != null
-			# 	col.visible = customValue
-
-			##|
-			##|  Tooltip, if specified, is shown when you hover over the column
-			c.tooltip  = col.tooltip
-			c.visible  = col.visible
-			c.editable = col.editable
-			c.options  = col.options
-
-			c.initFormat col.type, col.options
-
-			# formatter = c.initFormat col.type, col.options
-
-			# if col.limit and col.limit > 0 and col.limit < 30
-			# 	if formatter.width == null
-			# 		formatter.setWidth "#{col.limit * 8}px"
-
-			##|
-			##| Optional render function on the column
-			# if typeof col.render == "function"
-			# 	formatter.displayFormat = col.render
-
-			# ##|
-			# ##| Optional width setting
-			# if typeof col.width == "number"
-			# 	formatter.setWidth(col.width + "px");
-
-			@colList.push(c)
-
-		@rowCallback = @defaultRowClick
+	addTable: (tableName, columnReduceFunction, reduceFunction) =>
 
 		##|
-		##| Setup an event to watch for table configuration changes
-		$("body").on "tableConfig", (e) =>
-			##|
-			##|  Update for table config received
-			console.log "Received TableConfig: ", @tableCacheName
-			changed = false;
+		##|  Find the columns for the specific table name
+		columns = DataMap.getColumnsFromTable(tableName, columnReduceFunction)
+		for col in columns
 
-			# for i in @colList
-			# 	customValue = user.tableConfigGetColumnVisible(@tableCacheName, i.name)
-			# 	if customValue != null
-			# 		if i.visible != customValue
-			# 			changed = true
-			# 			i.visible = customValue
+			c = new TableViewCol tableName, col
+			@colList.push(c)
 
-			if changed
-				@render()
+		##|
+		##|  Get the data from that table
+		data = DataMap.getValuesFromTable tableName, reduceFunction
+		for row in data
+			if @showCheckboxes
+				row.checked = false
+			@rowData.push row
 
 		true
 
@@ -138,21 +80,6 @@ class TableView
 	defaultRowClick: (row, e) =>
 
 		console.log "DEF ROW CLICK=", row, e
-
-		if /editable/.test e.target.className
-			##|
-			##|  Click on an editable field
-			field_name = $(e.target).attr("f")
-			if typeof field_name != "undefined"
-				##|
-				##| Edit this field
-				for col in @colList
-					if col.name == field_name
-						attr = $(e.target).attr("data-path")
-						coords = GlobalValueManager.GetCoordsFromEvent(e)
-						col.showEditor coords.x, coords.y, row, attr, $(e.target)
-						return true
-
 		false
 
 	onClickCheckbox : (key) =>
@@ -226,7 +153,6 @@ class TableView
 
 		return html
 
-
 	setupEvents: (@rowCallback, @rowMouseover) =>
 
 	internalSetupMouseEvents: () =>
@@ -255,6 +181,7 @@ class TableView
 					return false
 
 			if result == false
+
 				##|
 				##| Check to see if it's a checkbox row
 				if typeof data.checked != "undefined"
@@ -327,11 +254,17 @@ class TableView
 		@setupContextMenu @contextMenuCallbackFunction
 
 	##|
+	##|  Table cache name is set, this allows saving/loading table configuration
+	setTableCacheName: (@tableCacheName) =>
+
+
+	##|
 	##|  Internal function called when there is a right click context menu event
 	##|  on a header column.   This will display the column options.
 	##|
 	onContextMenuHeader: (coords, column) =>
 
+		console.log "COORDS=", coords
 		popupMenu = new PopupMenu "Column: #{column}", coords.x-150, coords.y
 
 		if typeof @tableCacheName != "undefined" && @tableCacheName != null
@@ -354,44 +287,15 @@ class TableView
 	filterFunction : (row) =>
 		return false
 
-	##|
-	##|  If the table config has changed, re-render the table
-	##|
-	processTableConfig: () =>
-
-		didChange = false
-		for i in @colList
-			if i.visible == true && @tableConfig[i.name] == false
-				didChange = true
-				i.visible = false
-
-			if i.visible == false && @tableConfig[i.name] == true
-				didChange = true
-				i.visible = true
-
-		if didChange
-			@render()
-
-		return didChange
-
 	render: () =>
 
-		##|
-		##|  Cause the real rendering to happen in another thread
-		setTimeout () =>
-			@realRender()
-		, 10
-		return true
-
-	realRender : () =>
+		@rowDataElements = {}
 
 		##|
 		##|  Create a unique ID for the table, that doesn't change
 		##|  even if the table is re-drawn
 		if typeof @gid == "undefined"
 			@gid = GlobalValueManager.NextGlobalID()
-
-		@processTableConfig()
 
 		##|
 		##|  draw the table header
@@ -402,24 +306,49 @@ class TableView
 		if @showHeaders
 			html += "<thead><tr>";
 
+			##|
+			##|  Add a checkbox to the table that is persistant
 			if @keyColumn and @tableName
 				html += "<th class='checkable'>&nbsp;</th>"
 
 			for i in @colList
-				html += i.RenderHeader();
+				console.log "i=", i
+				html += i.RenderHeader(i.extraClassName);
 
-			html += "</tr></thead>";
+			html += "</tr>";
+
+		if @showFilters
+			html += "<thead><tr>";
+
+			##|
+			##|  Add a checkbox to the table that is persistant
+			if @keyColumn and @tableName
+				html += "<th class='checkable'>&nbsp;</th>"
+
+			for i in @colList
+				console.log "i=", i
+				html += "
+					<td class='dataFilterWrapper'>
+					<input class='dataFilter #{i.col.formatter.name}' data-path='/#{i.tableName}/#{i.col.source}'>
+					</td>
+				"
+
+			html += "</tr>";
 
 		##|
 		##|  Start adding the body
+		html += "</thead>"
 		html += "<tbody id='tbody#{@gid}'>";
 
-		counter = 0
+        # ---- html += DataMap.renderField "div", "zipcode", "city", "03105"
+
+		# counter = 0
 		if (typeof @sort == "function")
 			@rowData.sort @sort
 
 		for counter, i of @rowData
-			if @filterFunction i then continue
+
+			# if @filterFunction i then continue
 
 			if typeof i == "string"
 				html += "<tr class='messageRow'><td class='messageRow' colspan='#{@colList.length+1}'"
@@ -428,10 +357,9 @@ class TableView
 				##|
 				##|  Create the "TR" tag
 				html += "<tr class='trow' data-id='#{counter}' "
+
 				if typeof i.checkbox_key != "undefined" and typeof @tableName != "undefined" and @tableName != null
-					html += "data-key='#{i.checkbox_key}'";
-				if typeof i.metro_area != "undefined"
-					html += "data-metro-area='#{i.metro_area}'"
+					html += "data-path='#{i.path}'";
 
 				html += ">"
 
@@ -440,29 +368,79 @@ class TableView
 				##|  column using the column object.
 				if @keyColumn and @tableName
 					html += @renderCheckable(i)
-				for col in @colList
-					if @basePath != 0
-						col.setBasePath @basePath + "/" + i.id
-					str = col.Render(counter, i);
-					html += str
-				html += "</tr>";
 
-			# counter++
+				for col in @colList
+					str = DataMap.renderField "td", col.tableName, col.col.source, i.key, col.col.extraClassName
+					html += str
+
+				html += "</tr>";
 
 		html += "</tbody></table>";
 
 		@elTheTable = @elTableHolder.html(html);
 
 		setTimeout () =>
-			globalResizeScrollable();
-			setupSimpleTooltips();
-		, 100
+			# globalResizeScrollable();
+			if setupSimpleTooltips?
+				setupSimpleTooltips();
+		, 1
 
 		##|
 		##|  This is a new render which means we need to re-establish any context menu
 		@contextMenuCallSetup = 0
 		@setupContextMenuHeader()
 		@internalSetupMouseEvents()
+
+		if @showFilters
+			@elTheTable.find("input.dataFilter").on "keyup", @filterKeypress
+
+		true
+
+	##|
+	##|  Key press in a filter field
+	filterKeypress: (e) =>
+
+		parts      = $(e.target).attr("data-path").split /\//
+		tableName  = parts[1]
+		columnName = parts[2]
+
+		if !@currentFilters[tableName]?
+			@currentFilters[tableName] = {}
+
+		@currentFilters[tableName][columnName] = $(e.target).val()
+		console.log "VAL=", @currentFilters[tableName]
+		@applyFilters()
+
+		return true
+
+	##|
+	##| Apply the filters stored in "currentFilters" to each
+	##| column and show/hide the rows
+	applyFilters: () =>
+
+		filters = {}
+		for counter, i of @rowData
+
+			keepRow = true
+
+			if @currentFilters[i.table]
+				for col in @colList
+					if !@currentFilters[i.table][col.col.source]? then continue
+
+					if !filters[i.table+col.col.source]
+						filters[i.table+col.col.source] = new RegExp( @currentFilters[i.table][col.col.source] , "i");
+
+					aa = DataMap.getDataField(i.table, i.key, col.col.source)
+					if !filters[i.table+col.col.source].test aa
+						keepRow = false
+
+			if !@rowDataElements[counter]
+				@rowDataElements[counter] = @elTheTable.find("tr[data-id='#{counter}']")
+
+			if keepRow
+				@rowDataElements[counter].show()
+			else
+				@rowDataElements[counter].hide()
 
 		true
 

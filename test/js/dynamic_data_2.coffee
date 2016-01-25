@@ -37,7 +37,7 @@ $ ->
 
     addTest "Render Field", () =>
 
-        html  = "<div>";
+        html  = "<br>6 fields, last 2 are editable:<br><div>";
         html += DataMap.renderField("div", "zipcode", "code", "03105")
         html += DataMap.renderField "div", "zipcode", "city", "03105"
         html += DataMap.renderField "div", "zipcode", "state", "03105"
@@ -47,7 +47,24 @@ $ ->
         html += "</div>";
 
         $("#testCase").append($ html)
+        true
 
+    addTest "Render Property", () ->
+
+        DataMap.addData "property", 1234,
+            id: 1234
+            address: "1234 Fake Street"
+            pool: "Yes"
+
+        console.log DataMap.getDataMap().data["property"]
+
+        html  = "<br>Three property table fields, id, address, pool <br><table><tr>";
+        html += DataMap.renderField "td", "property", "id", 1234
+        html += DataMap.renderField "td", "property", "address", 1234
+        html += DataMap.renderField "td", "property", "pool", 1234
+        html += "</tr></table>";
+
+        $("#testCase").append($ html)
         true
 
     addTestButton "Change value", "Change NH to CA", () =>
@@ -59,7 +76,6 @@ $ ->
             state: "CA"
 
         true
-
 
     go()
 

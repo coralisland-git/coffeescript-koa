@@ -1,9 +1,9 @@
 class DataFormatterType
 
-	name:	""
-	width:  null
-	editorShowing: false
-	editorPath   : ""
+	name          : 	""
+	width         : null
+	editorShowing : false
+	editorPath    : ""
 
 	##|
 	##|  Text to add to the css for displaying
@@ -209,7 +209,15 @@ class DataFormatDate extends DataFormatterType
 class DataFormatDateTime extends DataFormatterType
 
 	name: "datetime"
-	width: 90
+
+	openEditor: (elParent, left, top, width, height, currentValue, path) =>
+
+		##|
+		##|  Show a popup menu
+        @picker = new PopupMenuCalendar currentValue, top, left
+        @picker.onChange = (newValue) =>
+            @recordChange @name, newValue
+		true
 
 	format: (data, options, path) =>
 		m = DataFormatter.getMoment data
@@ -252,6 +260,23 @@ class DataFormatDateAge extends DataFormatterType
 class DataFormatEnum extends DataFormatterType
 
 	name: "enum"
+
+	openEditor: (elParent, left, top, width, height, currentValue, path) =>
+
+		##|
+		##|  Show a popup menu
+		p = new PopupMenu "Options", left, top
+		if typeof @options == "object" and typeof @options.length == "number"
+			for i, o of @options
+				# console.log "Adding[", i, "][", o, "]"
+				p.addItem o, (coords, data) =>
+					# console.log "Saving[", data, "]"
+					@saveValue data
+				, o
+		else
+			console.log "Invalid options: ", @options
+
+		true
 
 	##|
 	##| In this case, the options is an array or a comma seperated list of values
