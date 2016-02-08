@@ -9,6 +9,14 @@ class TableView
 	imgChecked     : "<img src='images/checkbox.png' width='16' height='16' alt='Selected' />"
 	imgNotChecked  : "<img src='images/checkbox_no.png' width='16' height='16' alt='Selected' />"
 
+	##|
+	##| Checkboxes
+	onSetCheckbox: (checkbox_key, value) =>
+		##|
+		##|  By default this is a property
+		# api.SetCheckbox window.currentProperty.id, checkbox_key, value
+		console.log "onSetCheckbox(", checkbox_key, ",", value, ")"
+
 	size : () =>
 		return @rowData.length
 
@@ -22,21 +30,18 @@ class TableView
 	##| a managed table.   This should be a simple <table id='something'> tag.
 	##|
 	##| @param elTableHolder [jQuery Element] the $() referenced element that will hold the table
-	##| @param tableName [string] optional name of the source table for checkboxes
-	##| @param keyColum [string] optional column name for the unique id in the database
 	##|
-	constructor: (@elTableHolder, @tableName, @keyColumn) ->
+	constructor: (@elTableHolder, @showCheckboxes) ->
 
 		@colList        = []
 		@rowData        = []
 		@sort           = 0
 		@showHeaders    = true
-		@showCheckboxes = false
 		@showFilters	= true
 
 		##|
 		##|  Search filters
-		@currentFilters = {}
+		@currentFilters  = {}
 		@rowDataElements = {}
 
 		##|
@@ -44,33 +49,47 @@ class TableView
 		@contextMenuCallbackFunction = 0
 		@contextMenuCallSetup        = 0
 
+		if !@showCheckboxes?
+			@showCheckboxes = false
+
 		if (!@elTableHolder[0])
 			console.log "Error: Table id #{@elTableHolder} doesn't exist"
 
 		@tableConfig = {}
 		@tableConfigDatabase = null
 
-	##|
-	##|  Set the base path for each cell of data to follow
-	setBasePath: (@basePath) =>
-		window.db.watch "#{@basePath}/", @onSocketChangeNotification
+	addJoinTable: (tableName, columnReduceFunction, sourceField) =>
+
+		columns = DataMap.getColumnsFromTable tableName, columnReduceFunction
+		for col in columns
+			if col.source != sourceField
+				c = new TableViewCol tableName, col
+				c.joinKey = sourceField
+				c.joinTable = @primaryTableName
+				@colList.push(c)
+
+		true
 
 	addTable: (tableName, columnReduceFunction, reduceFunction) =>
+
+		@primaryTableName = tableName
 
 		##|
 		##|  Find the columns for the specific table name
 		columns = DataMap.getColumnsFromTable(tableName, columnReduceFunction)
 		for col in columns
-
 			c = new TableViewCol tableName, col
 			@colList.push(c)
+
 
 		##|
 		##|  Get the data from that table
 		data = DataMap.getValuesFromTable tableName, reduceFunction
 		for row in data
 			if @showCheckboxes
+				row.checkbox_key = tableName + "_" + row.key
 				row.checked = false
+
 			@rowData.push row
 
 		true
@@ -78,63 +97,27 @@ class TableView
 	##|
 	##|  Default callback for a row that is clicked
 	defaultRowClick: (row, e) =>
-
 		console.log "DEF ROW CLICK=", row, e
 		false
-
-	onClickCheckbox : (key) =>
-		for i in @rowData
-			if i[@keyColumn] == key
-				console.log "Found record", i, i.checked
-				i.checked = i.checked != true
-				console.log "Checked is now ", i.checked
-
-				if i.checked
-					$("#check_#{@tableName}_#{key}").html @imgChecked
-				else
-					$("#check_#{@tableName}_#{key}").html @imgNotChecked
-
-				@onCheckbox(i)
-
-	onCheckbox : (obj) =>
-		checkBoxes = []
-		for o in @rowData
-			if o.checked then checkBoxes.push o[@keyColumn]
-		true
 
 	##|
 	##|  Remove the checkbox for all items except those included
 	##|  in the bookmark array that comes from the server
 	resetChecked : (bookmarkArray) =>
+
 		for i, o of @rowData
 			o.checked = false
 			for x, y of bookmarkArray
 				if y.key == o.checkbox_key
 					o.checked = true
 
-			key = o[@keyColumn]
+			key = o.key
 			if o.checked
 				$("#check_#{@gid}_#{key}").html @imgChecked
 			else
 				$("#check_#{@gid}_#{key}").html @imgNotChecked
 
 		false
-
-	addRow : (obj) =>
-		obj.checkbox_key = @tableName + "_" + obj[@keyColumn];
-
-		if typeof obj.checked == "undefined"
-			obj.checked = false
-
-		if @cleanupFunction
-			@cleanupFunction(obj)
-
-		if window.currentProperty && window.currentProperty.bookmarks
-			for o in window.currentProperty.bookmarks
-				if o.key == obj.checkbox_key
-					obj.checked = true
-
-		@rowData.push(obj);
 
 	renderCheckable : (obj) =>
 
@@ -145,11 +128,10 @@ class TableView
 		if obj.checked
 			img = @imgChecked
 
-		key = obj[@keyColumn]
 		if @tableName == "property" and key == window.currentProperty.id
 			html = "<td class='checkable'> &nbsp; </td>"
 		else
-			html = "<td class='checkable' id='check_#{@gid}_#{key}'>" + img + "</td>"
+			html = "<td class='checkable' id='check_#{@gid}_#{obj.key}'>" + img + "</td>"
 
 		return html
 
@@ -184,15 +166,16 @@ class TableView
 
 				##|
 				##| Check to see if it's a checkbox row
-				if typeof data.checked != "undefined"
+				console.log "data=", data
+				if data.checked?
 					data.checked = !data.checked
-					key = data[@keyColumn]
+					key = data.key
 					if data.checked
 						$("#check_#{@gid}_#{key}").html @imgChecked
 					else
 						$("#check_#{@gid}_#{key}").html @imgNotChecked
 
-					console.log "CHECKED BOX gid=", @gid, " key=", key, " table_key=", data.checkbox_key, " checked=", data.checked
+					# console.log "CHECKED BOX gid=", @gid, " key=", key, " table_key=", data.checkbox_key, " checked=", data.checked
 					@onSetCheckbox data.checkbox_key, data.checked
 
 			false
@@ -212,11 +195,6 @@ class TableView
 				data = @findRowFromElement e.target
 				@rowMouseover data, "out"
 			false
-
-	onSetCheckbox: (checkbox_key, value) =>
-		##|
-		##|  By default this is a property
-		api.SetCheckbox window.currentProperty.id, checkbox_key, value
 
 	setupContextMenu: (@contextMenuCallbackFunction) =>
 
@@ -294,7 +272,7 @@ class TableView
 		##|
 		##|  Create a unique ID for the table, that doesn't change
 		##|  even if the table is re-drawn
-		if typeof @gid == "undefined"
+		if !@gid?
 			@gid = GlobalValueManager.NextGlobalID()
 
 		##|
@@ -308,11 +286,10 @@ class TableView
 
 			##|
 			##|  Add a checkbox to the table that is persistant
-			if @keyColumn and @tableName
+			if @showCheckboxes
 				html += "<th class='checkable'>&nbsp;</th>"
 
 			for i in @colList
-				console.log "i=", i
 				html += i.RenderHeader(i.extraClassName);
 
 			html += "</tr>";
@@ -322,11 +299,10 @@ class TableView
 
 			##|
 			##|  Add a checkbox to the table that is persistant
-			if @keyColumn and @tableName
+			if @showCheckboxes
 				html += "<th class='checkable'>&nbsp;</th>"
 
 			for i in @colList
-				console.log "i=", i
 				html += "
 					<td class='dataFilterWrapper'>
 					<input class='dataFilter #{i.col.formatter.name}' data-path='/#{i.tableName}/#{i.col.source}'>
@@ -357,21 +333,23 @@ class TableView
 				##|
 				##|  Create the "TR" tag
 				html += "<tr class='trow' data-id='#{counter}' "
-
-				if typeof i.checkbox_key != "undefined" and typeof @tableName != "undefined" and @tableName != null
-					html += "data-path='#{i.path}'";
-
 				html += ">"
 
 				##|
 				##|  Add a checkbox column possibly and then render the
 				##|  column using the column object.
-				if @keyColumn and @tableName
+				if @showCheckboxes
 					html += @renderCheckable(i)
 
 				for col in @colList
-					str = DataMap.renderField "td", col.tableName, col.col.source, i.key, col.col.extraClassName
-					html += str
+					if col.visible
+						if col.joinKey?
+							val = DataMap.getDataField col.joinTable, i.key, col.joinKey
+							str = DataMap.renderField "td", col.tableName, col.col.source, val, col.col.extraClassName
+						else
+							str = DataMap.renderField "td", col.tableName, col.col.source, i.key, col.col.extraClassName
+
+						html += str
 
 				html += "</tr>";
 
@@ -388,7 +366,7 @@ class TableView
 		##|
 		##|  This is a new render which means we need to re-establish any context menu
 		@contextMenuCallSetup = 0
-		@setupContextMenuHeader()
+		# @setupContextMenuHeader()
 		@internalSetupMouseEvents()
 
 		if @showFilters
@@ -456,6 +434,7 @@ class TableView
 	reset: () =>
 		@elTableHolder.html ""
 		@rowData = []
+		@colList = []
 		true
 
 	setFilterFunction: (filterFunction) =>

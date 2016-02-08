@@ -31,7 +31,7 @@ $ ->
     addTestButton "Render table", "Open", ()->
 
         addHolder("renderTest1");
-        table = new TableView($("#renderTest1"), null, "code")
+        table = new TableView $("#renderTest1")
         table.addTable "zipcode"
         table.render()
 
@@ -40,7 +40,7 @@ $ ->
     addTestButton "Render table 2", "Open", ()->
 
         addHolder("renderTest1");
-        table = new TableView($("#renderTest1"), null, "code")
+        table = new TableView $("#renderTest1")
         noAreaCode = (col)  -> col.name != "Area Code"
         filter = (obj, key) -> obj.county == "HAMPDEN"
         table.sort = (a, b) ->
@@ -59,12 +59,52 @@ $ ->
     addTestButton "Configure Columns", "Open", ()->
 
         addHolder("renderTest1");
-        table = new TableView($("#renderTest1"), null, "code")
-        table.setTableCacheName "test_zipcodes"
+        table = new TableView $("#renderTest1")
         table.addTable "zipcode"
         table.render()
 
         true
+
+    addTestButton "Custom Column", "Open", ()->
+
+        DataMap.setDataTypes "zipcode", [
+            name    : "Custom"
+            source  : "code2"
+            visible : true
+            type    : "text"
+            width   : 300
+            render  : (val, path) ->
+                return "{" + path + "} = " + val
+        ]
+
+        addHolder("renderTest1");
+        table = new TableView $("#renderTest1")
+        table.addTable "zipcode"
+        table.render()
+
+        true
+
+
+    addTestButton "Join Table", "Open", ()->
+
+        addHolder("renderTest1");
+        table = new TableView $("#renderTest1")
+        table.addTable "zipcode"
+        table.addJoinTable "county", null, "county"
+
+        table.render()
+
+        true
+
+    addTestButton "Checkboxes", "Open", ()->
+
+        addHolder("renderTest1");
+        table = new TableView $("#renderTest1"), true
+        table.addTable "zipcode"
+        table.render()
+
+        true
+
 
     go()
 

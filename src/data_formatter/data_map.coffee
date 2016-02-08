@@ -62,7 +62,7 @@ class DataMap
     @getValuesFromTable: (tableName, reduceFunction) =>
 
         dm = DataMap.getDataMap()
-        console.log "D[", tableName, "]=", dm.data[tableName]
+        # console.log "D[", tableName, "]=", dm.data[tableName]
         if !dm.data[tableName]? then return []
 
         results = []
@@ -173,9 +173,12 @@ class DataMap
 
             formatter = dm.types[tableName].col[fieldName].formatter
 
-            if formatter? and formatter?
+            if formatter? and formatter
                 currentValue = formatter.format currentValue, dm.types[tableName].col[fieldName].options, path
                 className += " " + formatter.name
+
+            if dm.types[tableName].col[fieldName].render? and typeof dm.types[tableName].col[fieldName].render == "function"
+                currentValue = dm.types[tableName].col[fieldName].render(currentValue, path)
 
             if dm.types[tableName].col[fieldName].editable
                 otherhtml += " onClick='globalOpenEditor(this);' "

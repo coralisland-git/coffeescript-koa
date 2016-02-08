@@ -135,6 +135,8 @@ class GlobalValueManager
         if typeof date != "string"
             return null;
 
+        date = date.replace "T", " "
+
         if date.match /\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d/
             return moment(date, "YYYY-MM-DD HH:mm:ss")
 
