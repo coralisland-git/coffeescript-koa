@@ -8,7 +8,7 @@ $ ->
 			##|  Data is a JSON record that we want to work with (test_data/DataRawRec1.json)
 			##|  TableConfigTest is the column collection loaded at compile time
 
-			dtc = new DataTypeCollection "TestConfig", TableConfigTest
+			dtc = new DataTypeCollection "TestConfig", TableConfigProperty
 			builder = new DataMapperBuilder data, dtc, "#testCase"
 
 			if demoMode == 0
@@ -32,7 +32,7 @@ $ ->
 		$("#testCase").html ""
 
 		$.ajax
-			url: '/test/js/test_data/DataRawRec1.json'
+			url: '/js/test_data/DataRawRec1.json'
 
 		.done (data) ->
 			startTest data

@@ -3,17 +3,23 @@ html.no-focus
     head
         meta(charset='utf-8')
         title Test Pages
+
+        link(rel='stylesheet', href='/ninja.css')
+
         link#css-local(rel='stylesheet', href='/vendor/oneui.min.css')
-        link(rel='stylesheet', href='/css/main.css')
+        link(rel='stylesheet', href='/css/test.css')
 
         script(src='/vendor/oneui.min.js')
         script(src='/vendor/moment.min.js')
         script(src='/vendor/numeral.min.js')
         script(src='/vendor/handlebars-v3.0.3.js')
         script(src='/vendor/typeahead.bundle.min.js')
-        script(src='/test/js/test_common.js')
+        script(src='/vendor/iscroll.js')
+        script(src='/vendor/draggabilly.pkgd.min.js')
 
-        script(src='/js/util/GlobalValueManager.js')
+        script(src='/ninja.js')
+        script(src='/js/test_common.js')
+
 
     body
 
@@ -44,53 +50,53 @@ html.no-focus
                         ul.nav-main
 
                             li
-                                a#linkMakeOutline(href='/dynamic_data_1')
+                                a#linkMakeOutline(href='/index.html?page=dynamic_data_1')
                                     i.si.si-arrow-right
                                     span Dynamic Data
 
                             li
-                                a#linkMakeOutline(href='/dynamic_data_2')
+                                a#linkMakeOutline(href='/index.html?page=dynamic_data_2')
                                     i.si.si-arrow-right
                                     span Dynamic Data 2
 
                             li
-                                a#linkMakeOutline(href='/dynamic_data_3')
+                                a#linkMakeOutline(href='/index.html?page=dynamic_data_3')
                                     i.si.si-arrow-right
                                     span Data Searching
 
                             li
-                                a#linkMakeOutline(href='/dialog_1')
+                                a#linkMakeOutline(href='/index.html?page=dialog_1')
                                     i.si.si-arrow-right
                                     span Dialog Boxes
 
                             li
-                                a#linkAddress(href='/address_normalizer_1')
+                                a#linkAddress(href='/index.html?page=address_normalizer_1')
                                     i.si.si-arrow-right
                                     span Address Data
 
                             li
-                                a#linkAddress(href='/popup_menu_1')
+                                a#linkAddress(href='/index.html?page=popup_menu_1')
                                     i.si.si-arrow-right
                                     span Popup menus
 
                             li
-                                a#linkAddress(href='/popup_window_1')
+                                a#linkAddress(href='/index.html?page=popup_window_1')
                                     i.si.si-arrow-right
                                     span Popup window
 
                             li
-                                a#linkMakeOutline(href='/data_mapper_1')
+                                a#linkMakeOutline(href='/index.html?page=data_mapper_1')
                                     i.si.si-arrow-right
                                     span Data Mapping UI
 
                             li
-                                a#linkMakeOutline(href='/tables_1')
+                                a#linkMakeOutline(href='/index.html?page=tables_1')
                                     i.si.si-arrow-right
                                     span Tables
 
         main#main-container.main
 
-            |!{ page }
+            #testCase
 
 
 

@@ -228,9 +228,10 @@ class DataMapperBuilder
 	redrawDataTypes: () =>
 
 		##
-		for idx, dataType of @KnownFields.colList
+		for idx, dataType of @KnownFields.col
 
 			found = false
+			# dataType = @KnownFields.col[dataTypeName]
 			for i, mapdata of @mapData
 
 				if mapdata.mapName == dataType.name
@@ -382,8 +383,9 @@ class DataMapperBuilder
 				class: "knownTitle"
 				html: "Mappable Columns"
 
-			for idx, dataType of @KnownFields.colList
+			for idx, dataTypeName of @KnownFields.colList
 
+				dataType = @KnownFields.col[dataTypeName]
 				el = $ "<div />",
 					class:   "knownItem"
 					popname: dataType.source

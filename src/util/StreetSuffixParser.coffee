@@ -219,3 +219,8 @@ class StreetSuffixParser
         if f.toLowerCase() is name.toLowerCase()
           suffix = key
     suffix
+
+try
+    GlobalStreetSuffixParser = new StreetSuffixParser();
+catch e
+    console.log "Exception while registering global Address Formatter:", e

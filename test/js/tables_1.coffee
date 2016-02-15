@@ -20,7 +20,7 @@ $ ->
 
         new Promise (resolve, reject) ->
             ds  = new DataSet "zipcode"
-            ds.setAjaxSource "/test/js/test_data/zipcodes.json", "data", "code"
+            ds.setAjaxSource "/js/test_data/zipcodes.json", "data", "code"
             ds.doLoadData()
             .then (dsObject)->
                 resolve(true)

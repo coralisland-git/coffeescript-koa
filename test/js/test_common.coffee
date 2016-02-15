@@ -122,5 +122,12 @@ $ ->
 	##|  save a reference to the results table
 	window.elTestTable = $("#testTable")
 
+	##|
+	##|  Check for a hash value and load a test page
+	if document.location.search?
+		m = document.location.search.match /page=(.*)/
+		if m? and m[1]
+			page = m[1]
+			$("body").append "<script src='/js/" + page + ".js' /></script>"
 
 
