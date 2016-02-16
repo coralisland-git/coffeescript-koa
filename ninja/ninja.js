@@ -1,4 +1,4 @@
-var AddressNormalizer, BusyDialog, DataFormatBoolean, DataFormatCurrency, DataFormatDate, DataFormatDateAge, DataFormatDateTime, DataFormatDistance, DataFormatEnum, DataFormatFloat, DataFormatInt, DataFormatNumber, DataFormatPercent, DataFormatText, DataFormatTimeAgo, DataFormatter, DataFormatterType, DataMap, DataMapper, DataMapperBuilder, DataSet, DataType, DataTypeCollection, ErrorMessageBox, FormField, FormWrapper, GlobalAddressNormalizer, GlobalStreetSuffixParser, GlobalValueManager, ModalDialog, ModalMessageBox, PopupMenu, PopupMenuCalendar, PopupWindow, PopupWindowTableConfiguration, StreetSuffixParser, TableView, TableViewCol, TableViewDetailed, e, globalDataFormatter, globalOpenEditor, initializeSimpleTooltips, root, setupSimpleTooltips, simpleTooltipTimer, substringMatcher,
+var AddressNormalizer, AddressParser, BusyDialog, DataFormatBoolean, DataFormatCurrency, DataFormatDate, DataFormatDateAge, DataFormatDateTime, DataFormatDistance, DataFormatEnum, DataFormatFloat, DataFormatInt, DataFormatNumber, DataFormatPercent, DataFormatText, DataFormatTimeAgo, DataFormatter, DataFormatterType, DataMap, DataMapper, DataMapperBuilder, DataSet, DataType, DataTypeCollection, ErrorMessageBox, FormField, FormWrapper, GlobalAddressNormalizer, GlobalAddressParser, GlobalStreetSuffixParser, GlobalValueManager, ModalDialog, ModalMessageBox, PopupMenu, PopupMenuCalendar, PopupWindow, PopupWindowTableConfiguration, StreetSuffixParser, TableView, TableViewCol, TableViewDetailed, e, globalDataFormatter, globalOpenEditor, initializeSimpleTooltips, root, setupSimpleTooltips, simpleTooltipTimer, substringMatcher,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
@@ -3436,6 +3436,65 @@ try {
 } catch (_error) {
   e = _error;
   console.log("Exception while registering global Address Formatter:", e);
+}
+
+AddressParser = (function() {
+  AddressParser.prototype.address = null;
+
+  AddressParser.prototype.seperator = ', ';
+
+  AddressParser.prototype.response = {};
+
+  function AddressParser(address) {
+    if (!address || !AddressParser.check(address)) {
+      throw 'invalid address supplied';
+    }
+    this.address = address;
+    this.response = {};
+  }
+
+  AddressParser.prototype.parse = function() {
+    this.parts = this.address.split(this.seperator);
+    this.processStreet($.trim(this.parts[0]));
+    this.response.city = $.trim(this.parts[1]);
+    this.response.state = $.trim(this.parts[2]);
+    this.response.zipcode = $.trim(this.parts[3]);
+    return this.response;
+  };
+
+  AddressParser.prototype.processStreet = function(streetString) {
+    this.matches = /^(\d+)\s(.+)$/.exec(streetString);
+    this.response.street_number = this.matches[1];
+    this.streetParts = this.matches[2].split(" ");
+    this.response.street_prefix = this.streetParts[0];
+    if (this.streetParts.length >= 3) {
+      this.response.street_direction = this.streetParts[1].length ? this.streetParts[1] : void 0;
+      this.suffixString = this.streetParts[2];
+    } else if (this.streetParts.length === 2) {
+      this.suffixString = this.streetParts[1];
+    } else {
+      this.suffixString = null;
+    }
+    if (this.suffixString) {
+      this.suffixParser = new StreetSuffixParser();
+      this.suffix = this.suffixParser.getSuffix(this.suffixString);
+    }
+    return this.response.street_suffix = this.suffix;
+  };
+
+  AddressParser.check = function(address) {
+    return /^\d+\s[\w\s']+,[\w\s.]+,[\s\w]+,\s?(\d{5}|\d{5}-\d{4})$/.test(address);
+  };
+
+  return AddressParser;
+
+})();
+
+try {
+  GlobalAddressParser = new AddressParser('2467 Bearded Iris Lane, High Point, North Carolina, 27265');
+} catch (_error) {
+  e = _error;
+  console.log("Exception while registering global Address Parser:", e);
 }
 
 GlobalValueManager = (function() {

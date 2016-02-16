@@ -28,3 +28,6 @@ node_modules
 
 #webstorm
 .idea
+
+#build generated folder
+ninja/test

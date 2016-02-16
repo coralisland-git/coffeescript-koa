@@ -66,4 +66,25 @@ $ ->
       state: 'North Carolina',
       zipcode: '27265'
     s.getDisplayAddress()
+
+  addTest "Parse the address string and makes address parts", ()->
+    a = new AddressParser '2467 Bearded Iris Lane, High Point, North Carolina, 27265'
+    object = a.parse()
+    JSON.stringify object, null, 4
+
+  addTest "Parse the address string and makes address parts", ()->
+    a = new AddressParser '1318 Forsyth , Kernersville, North Carolina, 27284'
+    object = a.parse()
+    JSON.stringify object, null, 4
+
+  addTest "Parse the address string and makes address parts", ()->
+    a = new AddressParser "326 Robyn's Glen Circle, Greensboro, North Carolina, 27409"
+    object = a.parse()
+    JSON.stringify object, null, 4
+
+  addTest "Parse the address string and makes address parts", ()->
+    a = new AddressParser "1415 Old Salisbury Road"
+    object = a.parse()
+    JSON.stringify object, null, 4
+
   go()
