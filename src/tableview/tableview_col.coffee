@@ -21,12 +21,23 @@ class TableViewCol
 		if @visible == false then return ""
 
 		html = "<th style='";
-		if (@width) then html += "width: " + @width + ";"
+		if (@width)
+			if typeof @width == "string"
+				html += "width: " + @width + ";"
+			else
+				html += "width: " + @width + "px;"
 
 		html += "'"
 
-		if @col.extraClassName? and @col.extraClassName.length > 0
-			html += "class='#{@col.extraClassName}'"
+		if !@col.extraClassName?
+			@col.extraClassName = ""
+
+		html += "class='data " + @col.extraClassName
+
+		if @col.formatter?
+			html += " dt_" + @col.formatter.name
+
+		html += "'"
 
 		if @col.tooltip? and @col.tooltip.length > 0
 			html += " tooltip='simple' data-title='#{@col.tooltip}'"

@@ -132,8 +132,11 @@ class DataFormatText extends DataFormatterType
 class DataFormatInt extends DataFormatterType
 
 	name: "int"
+	styleFormat: "text-align: right;"
 
 	format: (data, options, path) =>
+		if options? and options != null
+			return numeral(DataFormatter.getNumber data).format(options)
 		return numeral(DataFormatter.getNumber data).format("#,###")
 
 	unformat: (data, path) =>
@@ -142,6 +145,7 @@ class DataFormatInt extends DataFormatterType
 class DataFormatNumber extends DataFormatterType
 
 	name: "number"
+	styleFormat: "text-align: right;"
 
 	format: (data, options, path) =>
 		return numeral(DataFormatter.getNumber data).format("#,###.[##]")
@@ -152,6 +156,7 @@ class DataFormatNumber extends DataFormatterType
 class DataFormatFloat extends DataFormatterType
 
 	name: "decimal"
+	styleFormat: "text-align: right;"
 
 	allowKey: (keyCode) =>
 		return true
@@ -174,8 +179,12 @@ class DataFormatFloat extends DataFormatterType
 class DataFormatCurrency extends DataFormatterType
 
 	name: "money"
+	styleFormat: "text-align: right;"
 
 	format: (data, options, path) =>
+		if !data? or data == null or data == 0 or data == ""
+			return "&mdash;"
+
 		return numeral(DataFormatter.getNumber data).format('$ #,###.[##]')
 
 	unformat: (data, path) =>
@@ -184,6 +193,7 @@ class DataFormatCurrency extends DataFormatterType
 class DataFormatPercent extends DataFormatterType
 
 	name: "percent"
+	styleFormat: "text-align: right;"
 
 	format: (data, options, path) =>
 		return numeral(DataFormatter.getNumber data).format('#,###.[##] %')
@@ -233,6 +243,7 @@ class DataFormatDateAge extends DataFormatterType
 
 	name: "age"
 	width: 135
+	styleFormat: "text-align: right;"
 
 	format: (data, options, path) =>
 		m = DataFormatter.getMoment data

@@ -303,11 +303,12 @@ class TableView
 				html += "<th class='checkable'>&nbsp;</th>"
 
 			for i in @colList
-				html += "
-					<td class='dataFilterWrapper'>
-					<input class='dataFilter #{i.col.formatter.name}' data-path='/#{i.tableName}/#{i.col.source}'>
-					</td>
-				"
+				if i.visible
+					html += "
+						<td class='dataFilterWrapper'>
+						<input class='dataFilter #{i.col.formatter.name}' data-path='/#{i.tableName}/#{i.col.source}'>
+						</td>
+					"
 
 			html += "</tr>";
 

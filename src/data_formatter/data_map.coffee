@@ -95,19 +95,12 @@ class DataMap
         formatter.editData el, existingValue, path, @updatePathValue
         true
 
-    updatePathValue: (path, newValue) =>
+    updateScreenPathValue: (path, newValue, didDataChange) =>
 
-        ##| Split the path name
-        ##| ["", "zipcode", "03105", "lon"]
-        parts = path.split '/'
+        parts     = path.split '/'
         tableName = parts[1]
         keyValue  = parts[2]
         fieldName = parts[3]
-
-        existingValue = @data[tableName][keyValue][fieldName]
-        console.log "Compare ", existingValue, " to ", newValue
-        if existingValue == newValue then return true
-        @data[tableName][keyValue][fieldName] = newValue
 
         result = $("[data-path='#{path}']")
         if result.length > 0
@@ -119,9 +112,43 @@ class DataMap
                 currentValue = formatter.format currentValue, @types[tableName].col[fieldName].options, path
 
             result.html currentValue
-            .addClass "dataChanged"
+            if didDataChange then result.addClass "dataChanged"
 
         true
+
+    updatePathValue: (path, newValue) =>
+
+        ##| Split the path name
+        ##| ["", "zipcode", "03105", "lon"]
+        parts = path.split '/'
+        tableName = parts[1]
+        keyValue  = parts[2]
+        fieldName = parts[3]
+
+        existingValue = @data[tableName][keyValue][fieldName]
+        # console.log "Compare ", existingValue, " to ", newValue
+        if existingValue == newValue then return true
+        @data[tableName][keyValue][fieldName] = newValue
+        @updateScreenPathValue path, newValue, true
+
+        true
+
+    @stateSave: () =>
+        dm = DataMap.getDataMap()
+        localStorage["DataMap"] = JSON.stringify(dm.data)
+        return
+
+    @stateLoad: () =>
+        jtext = localStorage["DataMap"]
+        if jtext? and jtext != null
+            dm = DataMap.getDataMap()
+
+            try
+                dm.data = JSON.parse(jtext)
+            catch
+                dm.data = {}
+
+        return
 
     @addData: (tableName, keyValue, values) =>
 
@@ -136,6 +163,8 @@ class DataMap
             ##|
             ##|  Entirely new value, don't check for updates
             dm.data[tableName][keyValue] = values
+            for keyName, subkeyVal of values
+                dm.updateScreenPathValue "/#{tableName}/#{keyValue}/#{keyName}", subkeyVal, false
             return true
 
         for varName, value of values
@@ -175,7 +204,7 @@ class DataMap
 
             if formatter? and formatter
                 currentValue = formatter.format currentValue, dm.types[tableName].col[fieldName].options, path
-                className += " " + formatter.name
+                className += " dt_" + formatter.name
 
             if dm.types[tableName].col[fieldName].render? and typeof dm.types[tableName].col[fieldName].render == "function"
                 currentValue = dm.types[tableName].col[fieldName].render(currentValue, path)
@@ -189,7 +218,6 @@ class DataMap
 
         if !currentValue? or currentValue == null
             currentValue = ""
-
 
         # console.log "path=", path, dm.types[tableName].col[fieldName]
 
