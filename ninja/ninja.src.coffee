@@ -3211,12 +3211,74 @@ class AddressParser
 
   response: {}
 
+  states:
+    'Alabama': 'AL'
+    'Alaska': 'AK'
+    'American Samoa': 'AS'
+    'Arizona': 'AZ'
+    'Arkansas': 'AR'
+    'California': 'CA'
+    'Colorado': 'CO'
+    'Connecticut': 'CT'
+    'Delaware': 'DE'
+    'District Of Columbia': 'DC'
+    'Federated States Of Micronesia': 'FM'
+    'Florida': 'FL'
+    'Georgia': 'GA'
+    'Guam': 'GU'
+    'Hawaii': 'HI'
+    'Idaho': 'ID'
+    'Illinois': 'IL'
+    'Indiana': 'IN'
+    'Iowa': 'IA'
+    'Kansas': 'KS'
+    'Kentucky': 'KY'
+    'Louisiana': 'LA'
+    'Maine': 'ME'
+    'Marshall Islands': 'MH'
+    'Maryland': 'MD'
+    'Massachusetts': 'MA'
+    'Michigan': 'MI'
+    'Minnesota': 'MN'
+    'Mississippi': 'MS'
+    'Missouri': 'MO'
+    'Montana': 'MT'
+    'Nebraska': 'NE'
+    'Nevada': 'NV'
+    'New Hampshire': 'NH'
+    'New Jersey': 'NJ'
+    'New Mexico': 'NM'
+    'New York': 'NY'
+    'North Carolina': 'NC'
+    'North Dakota': 'ND'
+    'Northern Mariana Islands': 'MP'
+    'Ohio': 'OH'
+    'Oklahoma': 'OK'
+    'Oregon': 'OR'
+    'Palau': 'PW'
+    'Pennsylvania': 'PA'
+    'Puerto Rico': 'PR'
+    'Rhode Island': 'RI'
+    'South Carolina': 'SC'
+    'South Dakota': 'SD'
+    'Tennessee': 'TN'
+    'Texas': 'TX'
+    'Utah': 'UT'
+    'Vermont': 'VT'
+    'Virgin Islands': 'VI'
+    'Virginia': 'VA'
+    'Washington': 'WA'
+    'West Virginia': 'WV'
+    'Wisconsin': 'WI'
+    'Wyoming': 'WY'
+
   constructor: (address) ->
 ##|  pass address string to be parsed| seperator which is used to differentiate parts of the address
     if !address or !AddressParser.check(address)
       throw 'invalid address supplied'
     @address = address;
-    @response = {}
+    @response =
+      warnings: []
 
 
 ##|
@@ -3228,15 +3290,24 @@ class AddressParser
     #| process street_number and street name
     @processStreet($.trim @parts[0])
 
-    @response.city = $.trim @parts[1]
-    @response.state = $.trim @parts[2]
-    @response.zipcode = $.trim @parts[3]
+    @response.city = if $.trim(@parts[1]).length then $.trim(@parts[1]) else undefined
+    @response.zipcode = if $.trim(@parts[3]).length then $.trim(@parts[3]) else undefined
+    @response.state = @getStateShortName(if $.trim(@parts[2]).length then $.trim(@parts[2]) else undefined)
+
+    ##| verify city against zipcode
+    @verifyCity()
+
+    ##| get zipcode if not found and city/state is given
+    @getZipCode()
+
+    if !@response.warnings.length
+      delete @response.warnings
     @response
 
 ##|
 ##| Return the street_number, street_prefix, street_suffix
   processStreet: (streetString) ->
-    @matches = /^(\d+)\s(.+)$/.exec streetString
+    @matches = /^(\d+\s)?(.+)$/.exec streetString
     @response.street_number = @matches[1]
     @streetParts = @matches[2].split " "
     @response.street_prefix = @streetParts[0]
@@ -3252,10 +3323,43 @@ class AddressParser
       @suffixParser = new StreetSuffixParser()
       @suffix = @suffixParser.getSuffix @suffixString
     @response.street_suffix = @suffix
+
+##|
+##| Return 2 character state name from the full name
+  getStateShortName: (state) ->
+    if state and state.length > 2
+      if @states[state]
+        @states[state]
+      else
+        @response.warnings.push "State Abbreviation not found"
+        state
+    else
+      state
+
+
+##|
+##| verify city against provided zipcode and if invalid inserts warning
+  verifyCity: ->
+    if @response.zipcode and @response.city
+      _city = DataMap.getDataField('zipcode',@response.zipcode,'city');
+      if _city != @response.city
+        @response.warnings.push("Invalid City #{@response.city} != #{_city}")
+
+##|
+##| check if zipcode is not available it gets from city/state
+  getZipCode: ->
+    if !@response.zipcode and (@response.city or @response.state)
+      _zipObj = DataMap.getValuesFromTable 'zipcode', (obj) =>
+                  return obj.city is @response.city or obj.state is @response.state
+                .pop()
+      if _zipObj.hasOwnProperty 'key'
+        if !@response.state
+          @response.state = DataMap.getDataMap().data['zipcode'][_zipObj.key].state;
+        @response.zipcode = _zipObj.key
 ##|
 ##| Return true if the given address is valid
   @check: (address) ->
-    /^\d+\s[\w\s']+,[\w\s.]+,[\s\w]+,\s?(\d{5}|\d{5}-\d{4})$/.test address
+    /^(\d+\s)?[\w\s'.,]+(\d{5}|\d{5}-\d{4})?$/.test address
 
 try
   GlobalAddressParser  = new AddressParser '2467 Bearded Iris Lane, High Point, North Carolina, 27265';

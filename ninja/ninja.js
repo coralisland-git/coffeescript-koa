@@ -3445,25 +3445,94 @@ AddressParser = (function() {
 
   AddressParser.prototype.response = {};
 
+  AddressParser.prototype.states = {
+    'Alabama': 'AL',
+    'Alaska': 'AK',
+    'American Samoa': 'AS',
+    'Arizona': 'AZ',
+    'Arkansas': 'AR',
+    'California': 'CA',
+    'Colorado': 'CO',
+    'Connecticut': 'CT',
+    'Delaware': 'DE',
+    'District Of Columbia': 'DC',
+    'Federated States Of Micronesia': 'FM',
+    'Florida': 'FL',
+    'Georgia': 'GA',
+    'Guam': 'GU',
+    'Hawaii': 'HI',
+    'Idaho': 'ID',
+    'Illinois': 'IL',
+    'Indiana': 'IN',
+    'Iowa': 'IA',
+    'Kansas': 'KS',
+    'Kentucky': 'KY',
+    'Louisiana': 'LA',
+    'Maine': 'ME',
+    'Marshall Islands': 'MH',
+    'Maryland': 'MD',
+    'Massachusetts': 'MA',
+    'Michigan': 'MI',
+    'Minnesota': 'MN',
+    'Mississippi': 'MS',
+    'Missouri': 'MO',
+    'Montana': 'MT',
+    'Nebraska': 'NE',
+    'Nevada': 'NV',
+    'New Hampshire': 'NH',
+    'New Jersey': 'NJ',
+    'New Mexico': 'NM',
+    'New York': 'NY',
+    'North Carolina': 'NC',
+    'North Dakota': 'ND',
+    'Northern Mariana Islands': 'MP',
+    'Ohio': 'OH',
+    'Oklahoma': 'OK',
+    'Oregon': 'OR',
+    'Palau': 'PW',
+    'Pennsylvania': 'PA',
+    'Puerto Rico': 'PR',
+    'Rhode Island': 'RI',
+    'South Carolina': 'SC',
+    'South Dakota': 'SD',
+    'Tennessee': 'TN',
+    'Texas': 'TX',
+    'Utah': 'UT',
+    'Vermont': 'VT',
+    'Virgin Islands': 'VI',
+    'Virginia': 'VA',
+    'Washington': 'WA',
+    'West Virginia': 'WV',
+    'Wisconsin': 'WI',
+    'Wyoming': 'WY'
+  };
+
   function AddressParser(address) {
     if (!address || !AddressParser.check(address)) {
       throw 'invalid address supplied';
     }
     this.address = address;
-    this.response = {};
+    this.response = {
+      warnings: []
+    };
   }
 
   AddressParser.prototype.parse = function() {
     this.parts = this.address.split(this.seperator);
     this.processStreet($.trim(this.parts[0]));
-    this.response.city = $.trim(this.parts[1]);
-    this.response.state = $.trim(this.parts[2]);
-    this.response.zipcode = $.trim(this.parts[3]);
+    this.response.city = $.trim(this.parts[1]).length ? $.trim(this.parts[1]) : void 0;
+    this.response.zipcode = $.trim(this.parts[3]).length ? $.trim(this.parts[3]) : void 0;
+    this.response.state = this.getStateShortName($.trim(this.parts[2]).length ? $.trim(this.parts[2]) : void 0);
+    this.verifyCity();
+    this.getZipCode();
+    if (!this.response.warnings.length) {
+      delete this.response.warnings;
+    }
     return this.response;
   };
 
   AddressParser.prototype.processStreet = function(streetString) {
-    this.matches = /^(\d+)\s(.+)$/.exec(streetString);
+    this.matches = /^(\d+\s)?(.+)$/.exec(streetString);
     this.response.street_number = this.matches[1];
     this.streetParts = this.matches[2].split(" ");
     this.response.street_prefix = this.streetParts[0];
@@ -3482,8 +3551,48 @@ AddressParser = (function() {
     return this.response.street_suffix = this.suffix;
   };
 
+  AddressParser.prototype.getStateShortName = function(state) {
+    if (state && state.length > 2) {
+      if (this.states[state]) {
+        return this.states[state];
+      } else {
+        this.response.warnings.push("State Abbreviation not found");
+        return state;
+      }
+    } else {
+      return state;
+    }
+  };
+
+  AddressParser.prototype.verifyCity = function() {
+    var _city;
+    if (this.response.zipcode && this.response.city) {
+      _city = DataMap.getDataField('zipcode', this.response.zipcode, 'city');
+      if (_city !== this.response.city) {
+        return this.response.warnings.push("Invalid City " + this.response.city + " != " + _city);
+      }
+    }
+  };
+
+  AddressParser.prototype.getZipCode = function() {
+    var _zipObj;
+    if (!this.response.zipcode && (this.response.city || this.response.state)) {
+      _zipObj = DataMap.getValuesFromTable('zipcode', (function(_this) {
+        return function(obj) {
+          return obj.city === _this.response.city || obj.state === _this.response.state;
+        };
+      })(this)).pop();
+      if (_zipObj.hasOwnProperty('key')) {
+        if (!this.response.state) {
+          this.response.state = DataMap.getDataMap().data['zipcode'][_zipObj.key].state;
+        }
+        return this.response.zipcode = _zipObj.key;
+      }
+    }
+  };
+
   AddressParser.check = function(address) {
-    return /^\d+\s[\w\s']+,[\w\s.]+,[\s\w]+,\s?(\d{5}|\d{5}-\d{4})$/.test(address);
+    return /^(\d+\s)?[\w\s'.,]+(\d{5}|\d{5}-\d{4})?$/.test(address);
   };
 
   return AddressParser;

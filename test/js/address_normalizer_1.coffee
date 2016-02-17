@@ -67,24 +67,60 @@ $ ->
       zipcode: '27265'
     s.getDisplayAddress()
 
+
+  addTest "Loading Zipcodes", () ->
+    new Promise (resolve, reject) ->
+      ds  = new DataSet "zipcode"
+      ds.setAjaxSource "/js/test_data/zipcodes.json", "data", "code"
+      ds.doLoadData()
+      .then (dsObject)->
+        resolve(true)
+      .catch (e) ->
+        console.log "Error loading zipcode data: ", e
+        resolve(false)
+
   addTest "Parse the address string and makes address parts", ()->
-    a = new AddressParser '2467 Bearded Iris Lane, High Point, North Carolina, 27265'
+    a = new AddressParser '2467 Bearded Iris Lane, Agawam, North Carolina, 01001'
     object = a.parse()
     JSON.stringify object, null, 4
 
   addTest "Parse the address string and makes address parts", ()->
-    a = new AddressParser '1318 Forsyth , Kernersville, North Carolina, 27284'
+    a = new AddressParser '627 Riverside Drive, Amherst, Florida, 01002'
     object = a.parse()
     JSON.stringify object, null, 4
 
   addTest "Parse the address string and makes address parts", ()->
-    a = new AddressParser "326 Robyn's Glen Circle, Greensboro, North Carolina, 27409"
+    a = new AddressParser "360 5th Avenue, Chicopee, Ohio, 01021"
     object = a.parse()
     JSON.stringify object, null, 4
 
-  addTest "Parse the address string and makes address parts", ()->
+  addTest "Parse the address string without city and zipcode", ()->
     a = new AddressParser "1415 Old Salisbury Road"
     object = a.parse()
     JSON.stringify object, null, 4
 
+  addTest "Parse the address string without street number", ()->
+    a = new AddressParser "Robyn's Glen Circle, Cummington, North Carolina, 01026"
+    object = a.parse()
+    JSON.stringify object, null, 4
+
+  addTest "Parse the address string with invalid state name", ()->
+    a = new AddressParser '627 Riverside Drive, Hollywood, Floridaa, 01008'
+    object = a.parse()
+    JSON.stringify object, null, 4
+
+  addTest "Parse the address string with different zip and city", ()->
+    a = new AddressParser "360 5th Avenue, Easthampton, Ohio, 01021"
+    object = a.parse()
+    JSON.stringify object, null, 4
+
+  addTest "Parse the address string without zip code and with city", ()->
+    a = new AddressParser "360 5th Avenue, Easthampton"
+    object = a.parse()
+    JSON.stringify object, null, 4
+
+  addTest "Parse the address string without zip code and with state/city", ()->
+    a = new AddressParser "360 5th Avenue, Mashpee, Massachusetts"
+    object = a.parse()
+    JSON.stringify object, null, 4
   go()
