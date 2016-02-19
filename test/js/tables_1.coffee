@@ -105,7 +105,13 @@ $ ->
 
         true
 
-
+    addTestButton "context menu with sorting in header according to DataType", "Open", ()->
+        addHolder("renderTest1");
+        table = new TableView $("#renderTest1")
+        table.addTable "zipcode"
+        table.render()
+        table.setupContextMenu()
+        true
     go()
 
 

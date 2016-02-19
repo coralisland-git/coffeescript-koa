@@ -39,8 +39,9 @@ class PopupMenu
 		if @x + @popupWidth + 10> width
 			@x = width - @popupWidth - 10
 
-		if @y + @popupHeight + 10 > height
-			@y = height - @popupHeight - 10
+##| because of table context menu popup had to comment
+#		if @y + @popupHeight + 10 > height
+#			@y = height - @popupHeight - 10
 
 		window.popupMenuHolder.css
 			left:  @x

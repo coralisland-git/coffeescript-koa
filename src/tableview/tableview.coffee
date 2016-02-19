@@ -243,10 +243,45 @@ class TableView
 	onContextMenuHeader: (coords, column) =>
 
 		console.log "COORDS=", coords
-		popupMenu = new PopupMenu "Column: #{column}", coords.x-150, coords.y
+		_c = @colList.filter (_column) =>
+			return _column.col.name is column
+		.pop()
+
+		##| if column is sortable in dataTypes
+		if _c.col.sortable
+			_popupMenu = new PopupMenu "Column: #{column}", coords.x-150, coords.y
+
+			##| define sorter function using jquery tr switching
+			_sorter = (conditions) =>
+				_table = $("#table#{@gid}")
+				_rows = _table.find('tbody tr')
+				_popupMenu.closeTimer()
+				_rows.sort (a, b) ->
+					keyA = $(a).find(".#{_c.col.extraClassName}").text()
+					keyB = $(b).find(".#{_c.col.extraClassName}").text()
+					if $(a).find(".#{_c.col.extraClassName}").hasClass("dt_decimal")
+						keyA = parseFloat keyA
+						keyB = parseFloat keyB
+					return conditions keyA,keyB
+				$.each _rows, (index, row) ->
+					_table.children("tbody").append(row)
+
+			##| add sorting menu item
+			_popupMenu.addItem "Sort Ascending", () =>
+				return _sorter (a,b)->
+					if a > b then return 1;
+					if a < b then return -1;
+					return 0
+			_popupMenu.addItem "Sort Descending", () ->
+				return _sorter (a,b)->
+					if a < b then return 1;
+					if a > b then return -1;
+					return 0
 
 		if typeof @tableCacheName != "undefined" && @tableCacheName != null
-			popupMenu.addItem "Configure Columns", (coords, data) =>
+			if !_popupMenu
+				_popupMenu = new PopupMenu "Column: #{column}", coords.x-150, coords.y
+			_popupMenu.addItem "Configure Columns", (coords, data) =>
 				@onConfigureColumns
 					x: coords.x
 					y: coords.y

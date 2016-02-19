@@ -10,6 +10,7 @@ TableConfigZipcodes.push
 	width      : 70
 	required   : true
 	tooltip	   : "Example tooltip, code is the actual zipcode."
+	sortable	 : true
 
 TableConfigZipcodes.push
 	name       : 'City'
@@ -19,6 +20,7 @@ TableConfigZipcodes.push
 	editable   : false
 	type       : 'text'
 	required   : true
+	sortable	 : true
 
 TableConfigZipcodes.push
 	name       : 'State'
@@ -30,6 +32,7 @@ TableConfigZipcodes.push
 	type       : 'text'
 	required   : false
 	width      : 40
+	sortable	 : true
 
 TableConfigZipcodes.push
 	name       : 'County'
@@ -40,6 +43,7 @@ TableConfigZipcodes.push
 	limit      : 120
 	type       : 'text'
 	required   : false
+	sortable	 : true
 
 TableConfigZipcodes.push
 	name       : 'Area Code'
@@ -50,6 +54,7 @@ TableConfigZipcodes.push
 	limit      : 90
 	type       : 'text'
 	required   : false
+	sortable	 : true
 
 TableConfigZipcodes.push
 	name       : 'Lat'
@@ -59,6 +64,7 @@ TableConfigZipcodes.push
 	editable   : true
 	type       : 'decimal'
 	required   : false
+	sortable	 : true
 
 TableConfigZipcodes.push
 	name       : 'Lon'
@@ -68,6 +74,7 @@ TableConfigZipcodes.push
 	editable   : true
 	type       : 'decimal'
 	required   : false
+	sortable	 : true
 
 $ ->
 	##|
