@@ -146,6 +146,26 @@ $ ->
         #width can be dynamic as parameter | default = 32
         table.setAutoHideColumn()
         true
+
+    addTestButton "simpleobject data type test", "Open", ()->
+        ##| set the address as object in data map, to manipulate address field as simple object
+        for key,obj of DataMap.getDataMap().data.zipcode
+            obj.address = {city:obj.city,state:obj.state,country:obj.county}
+
+        DataMap.setDataTypes "zipcode", [
+            name    : "Address"
+            source  : "address"
+            visible : true
+            type    : "simpleobject"
+            width   : 200,
+            options:
+                compile: "{{city}}, {{state}}, {{country}}"
+        ]
+        addHolder("renderTest1");
+        table = new TableView $("#renderTest1")
+        table.addTable "zipcode"
+        table.render()
+        true
         
     go()
 
