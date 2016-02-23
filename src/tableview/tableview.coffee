@@ -505,7 +505,6 @@ class TableView
 			@elTableHolder.find("thead tr:first th").each () ->
 				if $(this).outerWidth() < width
 					_headerHideIndexes.push($(this).index())
-			console.log _headerHideIndexes
 			##| make sure to have hide left columns first
 			while _headerHideIndexes.length
 				_index = _headerHideIndexes.pop();
