@@ -495,4 +495,25 @@ class TableView
 		if parent then return @findRowFromElement(parent, stackCount + 1)
 		return null
 
+	setAutoHideColumn: (width=32) =>
+		_handleResize = =>
+			_headerHideIndexes = [];
+			##| reset table to calculate based on updated width
+			@elTableHolder.find("tr").each () ->
+				$(this).find("th,td").removeClass('hide')
+
+			@elTableHolder.find("thead tr:first th").each () ->
+				if $(this).outerWidth() < width
+					_headerHideIndexes.push($(this).index())
+			console.log _headerHideIndexes
+			##| make sure to have hide left columns first
+			while _headerHideIndexes.length
+				_index = _headerHideIndexes.pop();
+				if @elTableHolder.find("tr th:eq(#{_index})").outerWidth() < width
+					@elTableHolder.find("tr").each () ->
+						$(this).find("th:eq(#{_index}),td:eq(#{_index})").addClass('hide')
+		_handleResize()
+		$(window).on 'resize', _handleResize
+
+
 

@@ -112,6 +112,41 @@ $ ->
         table.render()
         table.setupContextMenu()
         true
+        
+    addTestButton "auto hide columns from left on resize", "Open", ()->
+        DataMap.setDataTypes "zipcode", [
+            name    : "Custom-1"
+            source  : "code1"
+            visible : true
+            type    : "text"
+            width   : 300
+            render  : (val, path) ->
+                return "250px"
+        ]
+        DataMap.setDataTypes "zipcode", [
+            name    : "hidden column1"
+            source  : "code2"
+            visible : true
+            type    : "text"
+            render  : (val, path) ->
+                return "can hide"
+        ]
+        DataMap.setDataTypes "zipcode", [
+            name    : "Hidden Column2"
+            source  : "code3"
+            visible : true
+            type    : "text"
+            render  : (val, path) ->
+                return "hide"
+        ]
+        addHolder("renderTest1");
+        table = new TableView $("#renderTest1")
+        table.addTable "zipcode"
+        table.render()
+        #width can be dynamic as parameter | default = 32
+        table.setAutoHideColumn()
+        true
+        
     go()
 
 
