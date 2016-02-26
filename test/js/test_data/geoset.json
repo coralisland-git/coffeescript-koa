@@ -1,0 +1,3353 @@
+{
+  "1": {
+    "_id": "56c7866d6ba5427d39d7aa36",
+    "_version": 1,
+    "bbox": [
+      1384251.245856002,
+      460978.995856002,
+      1536997.245856002,
+      647741.1258560121
+    ],
+    "county": "Mecklenburg",
+    "dataset_type": "Parcel",
+    "description": "Property related information, including parcel and lot boundaries and right-of-way lines. Real Estate Computer Assisted Mass Appraisal (CAMA) data has been appended to parcels.",
+    "display_template": [
+      {
+        "mapType": "Copy",
+        "sourceField": "pid",
+        "targetField": "parcel_id"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "commonpid",
+        "targetField": "parcel_number"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "ownerlastn",
+        "targetField": "owner_last_name"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "ownerfirst",
+        "targetField": "owner_first_name"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "houseno",
+        "targetField": "street_number"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "stdir",
+        "targetField": "street_direction"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "stname",
+        "targetField": "street_name"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "sttype",
+        "targetField": "street_suffix"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "municipali",
+        "targetField": "city"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "mailaddr1",
+        "targetField": "owner_address"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "landvalue",
+        "targetField": "land_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "totalvalue",
+        "targetField": "total_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "dateofsale",
+        "targetField": "last_sale_date"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "price",
+        "targetField": "last_sale_price"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "yearbuilt",
+        "targetField": "year_built"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "heatedarea",
+        "targetField": "sqft"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "storyheigh",
+        "targetField": "num_stories"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "foundation",
+        "targetField": "basement"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "bldggrade",
+        "targetField": "grade"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "fullbaths",
+        "targetField": "num_bathrooms_full"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "halfbaths",
+        "targetField": "num_bathrooms_half"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "bedrooms",
+        "targetField": "num_bedrooms"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "deedbook",
+        "targetField": "deed_book"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "deedpage",
+        "targetField": "deed_page"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "legalrefer",
+        "targetField": "description"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "netbldgval",
+        "targetField": "building_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "neighbourh",
+        "targetField": "subdivision"
+      }
+    ],
+    "example_lat": "-80.86516079244",
+    "example_lon": "35.11595544947",
+    "id": 1,
+    "import": {
+      "datafiles": {
+        "dbf": "import/1/Parcel_TaxData.dbf",
+        "prj": "import/1/Parcel_TaxData.prj",
+        "shp": "import/1/Parcel_TaxData.shp",
+        "shx": "import/1/Parcel_TaxData.shx",
+        "xml": "import/1/Parcel_TaxData.shp.xml"
+      },
+      "ext": "zip",
+      "file": "import/1/download.zip",
+      "len": 123224158,
+      "proj4": "+proj=lcc +lat_1=34.33333333333334 +lat_2=36.16666666666666 +lat_0=33.75 +lon_0=-79 +x_0=609601.2199999997 +y_0=0 +datum=NAD83 +units=us-ft +no_defs",
+      "projection": {
+        "GRS_1980": "6378137.0,298.257222101",
+        "D_North_American_1983": "SPHEROID",
+        "Greenwich": 0,
+        "Degree": 0.0174532925199433,
+        "GCS_North_American_1983": "DATUM,PRIMEM,UNIT",
+        "False_Easting": 2000000.002616666,
+        "False_Northing": 0,
+        "Central_Meridian": -79,
+        "Standard_Parallel_1": 34.33333333333334,
+        "Standard_Parallel_2": 36.16666666666666,
+        "Latitude_Of_Origin": 33.75,
+        "Foot_US": 0.3048006096012192,
+        "type": "Lambert_Conformal_Conic"
+      },
+      "url": "http://maps.co.mecklenburg.nc.us/opendata/parcel_taxdata.zip"
+    },
+    "metro_area": "Charlotte",
+    "source_url": "http://maps.co.mecklenburg.nc.us/opendata/Parcel_TaxData.zip",
+    "title": "Meck Tax Parcels with CAMA Data",
+    "total_points": 382725,
+    "totalpoints": 382715,
+    "lastModified": "2016-02-23T02:07:18.317Z"
+  },
+  "2": {
+    "_id": "56c7866d6ba5427d39d7aa37",
+    "_version": 1,
+    "county": "Mecklenburg",
+    "description": "Mecklenburg country neighborhood profiles with 2010 data.",
+    "example_lat": "-80.78154200000",
+    "example_lon": "35.21244000000",
+    "id": 2,
+    "import": {
+      "ext": "geojson",
+      "file": "import/2/download.geojson",
+      "len": 3412788,
+      "proj4": "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs",
+      "url": "https://raw.githubusercontent.com/mecklenburg-gis/mecklenburg-gis-opendata/master/data/neighborhood_profile_areas.geojson"
+    },
+    "metro_area": "Charlotte",
+    "source_url": "http://raw.github.com/mecklenburg-gis/mecklenburg-gis-opendata/master/data/neighborhood_profile_areas.geojson",
+    "title": "Mack Neighborhood Profiles",
+    "total_points": 464,
+    "lastModified": "2016-02-19T21:17:33.045Z"
+  },
+  "4": {
+    "_id": "56c7866d6ba5427d39d7aa38",
+    "_version": 1,
+    "county": "Mecklenburg",
+    "dataset_type": "Flood Plane",
+    "description": "Dataset contains polygons that represent the Proposed FEMA Floodway(0.1). The floodway is an area that must be reserved in order to discharge of the 100 year flood without cumulatively increasing the water surface elevation more than 0.1 feet. No fill or construction is permitted in this area",
+    "example_lat": "-80.85300000000",
+    "example_lon": "35.16442200000",
+    "id": 4,
+    "import": {
+      "ext": "geojson",
+      "file": "import/4/download.geojson",
+      "len": 9369801,
+      "proj4": "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs",
+      "url": "https://raw.githubusercontent.com/mecklenburg-gis/mecklenburg-gis-opendata/master/data/regulated_floodplains.geojson"
+    },
+    "metro_area": "Charlotte",
+    "source_url": "https://raw.github.com/mecklenburg-gis/mecklenburg-gis-opendata/master/data/regulated_floodplains.geojson",
+    "title": "Meck Flood Zones",
+    "total_points": 516,
+    "lastModified": "2016-02-19T21:17:33.046Z"
+  },
+  "5": {
+    "_id": "56c7866d6ba5427d39d7aa39",
+    "_version": 1,
+    "bbox": [
+      1388020.5702310055,
+      468909.1858560145,
+      1527205.0283560008,
+      646363.5002310127
+    ],
+    "citation": "Utility Right-of-Ways",
+    "county": "Mecklenburg",
+    "description": "The dataset contains the utility right-of-ways for the county digitized from data compiled from county manual tax maps onto planimetric maps. The name of the utility company owning the right-of-way is part of the dataset.",
+    "id": 5,
+    "import": {
+      "datafiles": {
+        "dbf": "import/5/UtilityROW.dbf",
+        "prj": "import/5/UtilityROW.prj",
+        "sbn": "import/5/UtilityROW.sbn",
+        "sbx": "import/5/UtilityROW.sbx",
+        "shp": "import/5/UtilityROW.shp",
+        "shx": "import/5/UtilityROW.shx",
+        "xml": "import/5/UtilityROW.shp.xml"
+      },
+      "ext": "zip",
+      "file": "import/5/download.zip",
+      "len": 155616,
+      "proj4": "+proj=lcc +lat_1=34.33333333333334 +lat_2=36.16666666666666 +lat_0=33.75 +lon_0=-79 +x_0=609601.2199999997 +y_0=0 +datum=NAD83 +units=us-ft +no_defs",
+      "projection": {
+        "GRS_1980": "6378137.0,298.257222101",
+        "D_North_American_1983": "SPHEROID",
+        "Greenwich": 0,
+        "Degree": 0.0174532925199433,
+        "GCS_North_American_1983": "DATUM,PRIMEM,UNIT",
+        "False_Easting": 2000000.002616666,
+        "False_Northing": 0,
+        "Central_Meridian": -79,
+        "Standard_Parallel_1": 34.33333333333334,
+        "Standard_Parallel_2": 36.16666666666666,
+        "Latitude_Of_Origin": 33.75,
+        "Foot_US": 0.3048006096012192,
+        "type": "Lambert_Conformal_Conic"
+      },
+      "url": "http://maps.co.mecklenburg.nc.us/opendata/utilityrow.zip"
+    },
+    "metro_area": "Charlotte",
+    "source_url": "http://maps.co.mecklenburg.nc.us/opendata/UtilityROW.zip",
+    "title": "Meck Utility",
+    "total_points": 280,
+    "totalpoints": 36,
+    "lastModified": "2016-02-23T02:10:43.774Z"
+  },
+  "6": {
+    "_id": "56c7866d6ba5427d39d7aa3a",
+    "_version": 1,
+    "county": "Mecklenburg",
+    "description": "This dataset contains all the rail lines in the county and is based on the county's street centerline file. The county in description is Mecklenburg County, North Carolina.",
+    "example_lat": "-80.74242600000",
+    "example_lon": "35.23248000000",
+    "id": 6,
+    "import": {
+      "ext": "geojson",
+      "file": "import/6/download.geojson",
+      "len": 186834,
+      "proj4": "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs",
+      "url": "https://raw.githubusercontent.com/mecklenburg-gis/mecklenburg-gis-opendata/master/data/railroads.geojson"
+    },
+    "metro_area": "Charlotte",
+    "source_url": "https://raw.github.com/mecklenburg-gis/mecklenburg-gis-opendata/master/data/railroads.geojson",
+    "title": "Meck Railroads",
+    "total_points": 364,
+    "lastModified": "2016-02-19T21:17:33.048Z"
+  },
+  "7": {
+    "_id": "56c7866d6ba5427d39d7aa3b",
+    "_version": 1,
+    "county": "Union",
+    "description": "MAPFLDHAZAR is a polygon feature class representing the area within the flood mapping boundaries defined by the engineering models for the 100 year, 500 year and floodway. The MapFldHazAr spatial table contains information about the flood hazard within the study area. These zones are used by FEMA to designate the Special Flood Hazard Area (SFHA), identify areas of coastal high hazard flooding, and for insurance rating purposes. These data are the flood hazard areas that are or will be depicted on the FIRM.",
+    "example_lat": "-80.81255400304",
+    "example_lon": "35.00061926322",
+    "id": 7,
+    "import": {
+      "datafiles": {
+        "atx": "import/7/FEMA_2014.Label.atx",
+        "dbf": "import/7/FEMA_2014.dbf",
+        "prj": "import/7/FEMA_2014.prj",
+        "sbn": "import/7/FEMA_2014.sbn",
+        "sbx": "import/7/FEMA_2014.sbx",
+        "shp": "import/7/FEMA_2014.shp",
+        "shx": "import/7/FEMA_2014.shx",
+        "xml": "import/7/FEMA_2014.shp.xml"
+      },
+      "ext": "zip",
+      "file": "import/7/download.zip",
+      "len": 10838423,
+      "url": "http://www.co.union.nc.us/Portals/0/GIS/shapes/2014FEMA.zip",
+      "proj4": "+proj=lcc +lat_1=34.33333333333334 +lat_2=36.16666666666666 +lat_0=33.75 +lon_0=-79 +x_0=609601.2199999997 +y_0=0 +datum=NAD83 +units=us-ft +no_defs",
+      "projection": {
+        "GRS_1980": "6378137.0,298.257222101",
+        "D_North_American_1983": "SPHEROID",
+        "Greenwich": 0,
+        "Degree": 0.0174532925199433,
+        "GCS_North_American_1983": "DATUM,PRIMEM,UNIT",
+        "False_Easting": 2000000.002616666,
+        "False_Northing": 0,
+        "Central_Meridian": -79,
+        "Standard_Parallel_1": 34.33333333333334,
+        "Standard_Parallel_2": 36.16666666666666,
+        "Latitude_Of_Origin": 33.75,
+        "Foot_US": 0.3048006096012192,
+        "type": "Lambert_Conformal_Conic"
+      }
+    },
+    "metro_area": "Charlotte",
+    "source_url": "http://www.co.union.nc.us/Portals/0/GIS/shapes/2014FEMA.zip",
+    "title": "Union Flood Zones",
+    "total_points": 755,
+    "lastModified": "2016-02-19T21:17:33.049Z",
+    "totalpoints": 755,
+    "bbox": [
+      1448948.3697916716,
+      390259.47395832837,
+      1618409.1458333284,
+      533135.0084635466
+    ]
+  },
+  "8": {
+    "_id": "56c7866d6ba5427d39d7aa3c",
+    "_version": 1,
+    "bbox": [
+      1448923.3302617818,
+      389803.55096685886,
+      1618420.2862146944,
+      534393.1276007742
+    ],
+    "county": "Union ",
+    "dataset_type": "Parcel",
+    "description": "",
+    "display_template": [
+      {
+        "mapType": "Copy",
+        "sourceField": "PIN",
+        "targetField": "parcel_id"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "PropertySt",
+        "targetField": "address"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "OwnerName1",
+        "targetField": "owner_first_name"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "OwnerName2",
+        "targetField": "owner_last_name"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "OwnerAddre",
+        "targetField": "owner_address"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "PlatBook",
+        "targetField": "plat_book"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "PlatPage",
+        "targetField": "plat_page"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "LegalAc",
+        "targetField": "acreage"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "Legal1",
+        "targetField": "description"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "Sale1D",
+        "targetField": "last_sale_date"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "Sale1Amt",
+        "targetField": "last_sale_price"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "RoofDesc",
+        "targetField": "Roof Type"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "CondDesc",
+        "targetField": "grade"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "NumRms",
+        "targetField": "Number of Rooms"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "NumBdRms",
+        "targetField": "num_bedrooms"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "Num2Baths",
+        "targetField": "num_bathrooms_full"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "BldgType",
+        "targetField": "Building Type"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "Stories",
+        "targetField": "num_stories"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "YrBuilt",
+        "targetField": "year_built"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "FinSize",
+        "targetField": "sqft"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "FuelDesc",
+        "targetField": "Fuel Type"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "HeatDesc",
+        "targetField": "Heating Type"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "CentrlAC",
+        "targetField": "Central AC"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "Attic",
+        "targetField": "Attic"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "AtticFin",
+        "targetField": "Attic SQFT"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "BsmtArea",
+        "targetField": "Basement area"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "BsmtFin",
+        "targetField": "Basement SQFT"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "AttGarSF",
+        "targetField": "Garage SQFT"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "TotVal1",
+        "targetField": "total_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "TaxLand1",
+        "targetField": "land_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "TaxDwlg1",
+        "targetField": "building_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "TaxTot1",
+        "targetField": "assessed_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "TaxTot2",
+        "targetField": "assessed_value2"
+      }
+    ],
+    "example_lat": "-80.75314001746",
+    "example_lon": "34.84499256480",
+    "id": 8,
+    "import": {
+      "datafiles": {
+        "dbf": "import/8/Parcels_120115.dbf",
+        "prj": "import/8/Parcels_120115.prj",
+        "shp": "import/8/Parcels_120115.shp",
+        "shx": "import/8/Parcels_120115.shx",
+        "xml": "import/8/Parcels_120115.shp.xml"
+      },
+      "ext": "zip",
+      "file": "import/8/download.zip",
+      "len": 50364168,
+      "proj4": "+proj=lcc +lat_1=34.33333333333334 +lat_2=36.16666666666666 +lat_0=33.75 +lon_0=-79 +x_0=609601.2199999997 +y_0=0 +datum=NAD83 +units=us-ft +no_defs",
+      "projection": {
+        "Central_Meridian": -79,
+        "D_North_American_1983": "SPHEROID",
+        "Degree": 0.0174532925199433,
+        "False_Easting": 2000000.002616666,
+        "False_Northing": 0,
+        "Foot_US": 0.3048006096012192,
+        "GCS_North_American_1983": "DATUM,PRIMEM,UNIT",
+        "GRS_1980": "6378137.0,298.257222101",
+        "Greenwich": 0,
+        "Latitude_Of_Origin": 33.75,
+        "Standard_Parallel_1": 34.33333333333334,
+        "Standard_Parallel_2": 36.16666666666666,
+        "type": "Lambert_Conformal_Conic"
+      },
+      "url": "http://www.co.union.nc.us/Portals/0/GIS/shapes/Parcels.zip"
+    },
+    "metro_area": "Charlotte",
+    "source_url": "http://www.co.union.nc.us/Portals/0/GIS/shapes/Parcels.zip",
+    "title": "Union County Parcel Points",
+    "total_points": 0,
+    "totalpoints": 101462,
+    "lastModified": "2016-02-23T12:52:17.714Z"
+  },
+  "15": {
+    "_id": "56c7866d6ba5427d39d7aa3d",
+    "_version": 1,
+    "county": "Shelby",
+    "description": "Agency: TN Dept. of Education. Frequency of updates: Yearly. Description: Geocoded point locations of public and private elementary, middle, and high schools. Projection: TN State Plane NAD83 Feet.",
+    "example_lat": "-90.00528345178",
+    "example_lon": "35.00464165855",
+    "id": 15,
+    "metro_area": "Nashville",
+    "source_url": "http://tnmap.tn.gov/arcgis/rest/services/COMMUNITY/EDUCATION_SCHOOLS_K12_2011/MapServer/0/query?geometry=232210.57666468%2C8619.3610369366%2C3716655.0211091%2C1971286.0277036&geometryType=esriGeometryEnvelope&f=json&outSR=4326",
+    "title": "Shelby Schools",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.054Z"
+  },
+  "17": {
+    "_id": "56c7866d6ba5427d39d7aa3e",
+    "_version": 1,
+    "county": "Wake",
+    "description": "REQUIRED: A brief narrative summary of the data set.",
+    "example_lat": "-78.58845129642",
+    "example_lon": "36.02555620518",
+    "id": 17,
+    "metro_area": "Raleigh",
+    "source_url": "ftp://wakeftp.co.wake.nc.us/gis/Webdownloads/SHAPEFILES/Wake_Subdivisions_2016_01.zip",
+    "title": "Wake Subdivisions",
+    "total_points": 5335,
+    "lastModified": "2016-02-23T12:52:43.735Z",
+    "import": {
+      "url": "ftp://wakeftp.co.wake.nc.us/gis/Webdownloads/SHAPEFILES/Wake_Subdivisions_2016_01.zip",
+      "ext": "zip",
+      "file": "import/17/download.zip",
+      "download_stamp": "2016-02-23T02:19:23.823Z",
+      "datafiles": {
+        "cpg": "import/17/Wake_Subdivisions_2016_01.cpg",
+        "dbf": "import/17/Wake_Subdivisions_2016_01.dbf",
+        "prj": "import/17/Wake_Subdivisions_2016_01.prj",
+        "sbn": "import/17/Wake_Subdivisions_2016_01.sbn",
+        "sbx": "import/17/Wake_Subdivisions_2016_01.sbx",
+        "shp": "import/17/Wake_Subdivisions_2016_01.shp",
+        "xml": "import/17/Wake_Subdivisions_2016_01.shp.xml",
+        "shx": "import/17/Wake_Subdivisions_2016_01.shx",
+        "lyr": "import/17/Subdivisions.lyr",
+        "doc": "import/17/SubdivisionsMetadata.doc"
+      },
+      "proj4": "+proj=lcc +lat_1=34.33333333333334 +lat_2=36.16666666666666 +lat_0=33.75 +lon_0=-79 +x_0=609601.2199999997 +y_0=0 +datum=NAD83 +units=us-ft +no_defs",
+      "projection": {
+        "GRS_1980": "6378137.0,298.257222101",
+        "D_North_American_1983": "SPHEROID",
+        "Greenwich": 0,
+        "Degree": 0.0174532925199433,
+        "GCS_North_American_1983": "DATUM,PRIMEM,UNIT",
+        "False_Easting": 2000000.002616666,
+        "False_Northing": 0,
+        "Central_Meridian": -79,
+        "Standard_Parallel_1": 34.33333333333334,
+        "Standard_Parallel_2": 36.16666666666666,
+        "Latitude_Of_Origin": 33.75,
+        "Foot_US": 0.3048006096012192,
+        "type": "Lambert_Conformal_Conic"
+      }
+    },
+    "bbox": [
+      2009065.2832032293,
+      644111.141364947,
+      2218823.99981457,
+      846742.0049136579
+    ]
+  },
+  "18": {
+    "_id": "56c7866d6ba5427d39d7aa3f",
+    "_version": 1,
+    "county": "Wake",
+    "dataset_type": "Parcel",
+    "description": "",
+    "display_template": [
+      {
+        "mapType": "Copy",
+        "sourceField": "PIN_NUM",
+        "targetField": "parcel_id"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "PARCEL_PK",
+        "targetField": "parcel_number"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "CALC_AREA",
+        "targetField": "acreage"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "OWNER",
+        "targetField": "owner_last_name"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "ADDR1",
+        "targetField": "owner_address"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "DEED_BOOK",
+        "targetField": "deed_book"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "DEED_PAGE",
+        "targetField": "deed_page"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "BLDG_VAL",
+        "targetField": "building_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "LAND_VAL",
+        "targetField": "land_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "TOTVALASSD",
+        "targetField": "total_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "PROPDESC",
+        "targetField": "description"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "HEATEDAREA",
+        "targetField": "sqft"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "STNAME",
+        "targetField": "street_name"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "STYPE",
+        "targetField": "street_suffix"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "STPRE",
+        "targetField": "street_direction"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "STNUM",
+        "targetField": "street_number"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SITEADDR",
+        "targetField": "address"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "CITY",
+        "targetField": "city"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "YEAR_BUILT",
+        "targetField": "year_built"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "TOTSALPRIC",
+        "targetField": "last_sale_price"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SALE_DATE",
+        "targetField": "last_sale_date"
+      }
+    ],
+    "example_lat": "-78.52735177563",
+    "example_lon": "35.79302611779",
+    "id": 18,
+    "metro_area": "Raleigh",
+    "source_url": "ftp://wakeftp.co.wake.nc.us/gis/Webdownloads/SHAPEFILES/Wake_Property_2016_02.zip",
+    "title": "Wake Property 2014 12",
+    "tooltip1": "ADDR1",
+    "tooltip2": "ADDR2",
+    "total_points": 346774,
+    "lastModified": "2016-02-23T13:00:58.075Z",
+    "import": {
+      "url": "ftp://wakeftp.co.wake.nc.us/gis/Webdownloads/SHAPEFILES/Wake_Property_2016_02.zip",
+      "ext": "zip",
+      "file": "import/18/download.zip",
+      "download_stamp": "2016-02-23T12:52:45.219Z",
+      "datafiles": {
+        "cpg": "import/18/Wake_Property_2016_02.cpg",
+        "dbf": "import/18/Wake_Property_2016_02.dbf",
+        "prj": "import/18/Wake_Property_2016_02.prj",
+        "sbn": "import/18/Wake_Property_2016_02.sbn",
+        "sbx": "import/18/Wake_Property_2016_02.sbx",
+        "shp": "import/18/Wake_Property_2016_02.shp",
+        "xml": "import/18/Wake_Property_2016_02.shp.xml",
+        "shx": "import/18/Wake_Property_2016_02.shx",
+        "lyr": "import/18/APA_STRUCTURE.lyr",
+        "doc": "import/18/ParcelMetadata.doc"
+      },
+      "proj4": "+proj=lcc +lat_1=34.33333333333334 +lat_2=36.16666666666666 +lat_0=33.75 +lon_0=-79 +x_0=609601.2199999997 +y_0=0 +datum=NAD83 +units=us-ft +no_defs",
+      "projection": {
+        "GRS_1980": "6378137.0,298.257222101",
+        "D_North_American_1983": "SPHEROID",
+        "Greenwich": 0,
+        "Degree": 0.0174532925199433,
+        "GCS_North_American_1983": "DATUM,PRIMEM,UNIT",
+        "False_Easting": 2000000.002616666,
+        "False_Northing": 0,
+        "Central_Meridian": -79,
+        "Standard_Parallel_1": 34.33333333333334,
+        "Standard_Parallel_2": 36.16666666666666,
+        "Latitude_Of_Origin": 33.75,
+        "Foot_US": 0.3048006096012192,
+        "type": "Lambert_Conformal_Conic"
+      }
+    },
+    "bbox": [
+      2001465.3748441488,
+      644111.1413648427,
+      2221323.249992907,
+      847042.0297458321
+    ]
+  },
+  "19": {
+    "_id": "56c7866d6ba5427d39d7aa40",
+    "_version": 1,
+    "county": "Granville",
+    "description": "",
+    "example_lat": "-78.71155892916",
+    "example_lon": "36.07397825113",
+    "id": 19,
+    "metro_area": "Raleigh",
+    "source_url": "ftp://wakeftp.co.wake.nc.us/gis/Webdownloads/SHAPEFILES/Wake_Floodplain_2006_04.zip",
+    "title": "Wake FLood Plains",
+    "total_points": 2883,
+    "lastModified": "2016-02-23T13:02:01.970Z",
+    "import": {
+      "url": "ftp://wakeftp.co.wake.nc.us/gis/Webdownloads/SHAPEFILES/Wake_Floodplain_2006_04.zip",
+      "ext": "zip",
+      "file": "import/19/download.zip",
+      "download_stamp": "2016-02-23T13:00:59.609Z",
+      "datafiles": {
+        "shx": "import/19/Wake_Floodplain_2006_04.shx",
+        "dbf": "import/19/Wake_Floodplain_2006_04.dbf",
+        "prj": "import/19/Wake_Floodplain_2006_04.prj",
+        "sbn": "import/19/Wake_Floodplain_2006_04.sbn",
+        "sbx": "import/19/Wake_Floodplain_2006_04.sbx",
+        "shp": "import/19/Wake_Floodplain_2006_04.shp",
+        "xml": "import/19/Wake_Floodplain_2006_04.shp.xml"
+      },
+      "proj4": "+proj=lcc +lat_1=34.33333333333334 +lat_2=36.16666666666666 +lat_0=33.75 +lon_0=-79 +x_0=609601.2199999997 +y_0=0 +datum=NAD83 +units=us-ft +no_defs",
+      "projection": {
+        "GRS_1980": "6378137.0,298.257222101",
+        "D_North_American_1983": "SPHEROID",
+        "Greenwich": 0,
+        "Degree": 0.0174532925199433,
+        "GCS_North_American_1983": "DATUM,PRIMEM,UNIT",
+        "False_Easting": 2000000.002616666,
+        "False_Northing": 0,
+        "Central_Meridian": -79,
+        "Standard_Parallel_1": 34.33333333333334,
+        "Standard_Parallel_2": 36.16666666666666,
+        "Latitude_Of_Origin": 33.75,
+        "Foot_US": 0.3048006096012192,
+        "type": "Lambert_Conformal_Conic"
+      }
+    },
+    "bbox": [
+      2004280.687056243,
+      646542.2701978786,
+      2221122.0077061923,
+      846862.7532004416
+    ]
+  },
+  "20": {
+    "_id": "56c7866d6ba5427d39d7aa41",
+    "_version": 1,
+    "county": "Wake",
+    "description": "",
+    "example_lat": "-78.65043382137",
+    "example_lon": "35.77767950435",
+    "id": 20,
+    "metro_area": "Raleigh",
+    "source_url": "ftp://wakeftp.co.wake.nc.us/gis/Webdownloads/SHAPEFILES/Raleigh_Railroads_2013.zip",
+    "title": "Wake Railroads 2013",
+    "total_points": 355,
+    "lastModified": "2016-02-23T13:02:04.518Z",
+    "import": {
+      "url": "ftp://wakeftp.co.wake.nc.us/gis/Webdownloads/SHAPEFILES/Raleigh_Railroads_2013.zip",
+      "ext": "zip",
+      "file": "import/20/download.zip",
+      "download_stamp": "2016-02-23T13:02:03.430Z",
+      "datafiles": {
+        "shx": "import/20/Raleigh_Railroads_2013.shx",
+        "dbf": "import/20/Raleigh_Railroads_2013.dbf",
+        "prj": "import/20/Raleigh_Railroads_2013.prj",
+        "sbn": "import/20/Raleigh_Railroads_2013.sbn",
+        "sbx": "import/20/Raleigh_Railroads_2013.sbx",
+        "shp": "import/20/Raleigh_Railroads_2013.shp",
+        "xml": "import/20/Raleigh_Railroads_2013.shp.xml"
+      },
+      "proj4": "+proj=lcc +lat_1=34.33333333333334 +lat_2=36.16666666666666 +lat_0=33.75 +lon_0=-79 +x_0=609601.2199999997 +y_0=0 +datum=NAD83 +units=us-ft +no_defs",
+      "projection": {
+        "GRS_1980": "6378137.0,298.257222101",
+        "D_North_American_1983": "SPHEROID",
+        "Greenwich": 0,
+        "Degree": 0.0174532925199433,
+        "GCS_North_American_1983": "DATUM,PRIMEM,UNIT",
+        "False_Easting": 2000000.002616666,
+        "False_Northing": 0,
+        "Central_Meridian": -79,
+        "Standard_Parallel_1": 34.33333333333334,
+        "Standard_Parallel_2": 36.16666666666666,
+        "Latitude_Of_Origin": 33.75,
+        "Foot_US": 0.3048006096012192,
+        "type": "Lambert_Conformal_Conic"
+      }
+    },
+    "bbox": [
+      2072501.1103347242,
+      717499.3739203811,
+      2140001.122972235,
+      795779.8226741254
+    ]
+  },
+  "21": {
+    "_id": "56c7866d6ba5427d39d7aa42",
+    "_version": 1,
+    "county": "Union ",
+    "description": "This dataset contains addresses for structures within Union County, NC. The data is based on 2007 aerial photography and is maintained and updated by the GIS department of Union County, NC. Please read the data quality and completeness report for more details.",
+    "id": 21,
+    "metro_area": "Charlotte",
+    "source_url": "http://www.co.union.nc.us/Portals/0/GIS/shapes/address_points.zip",
+    "title": "Union County Address Points",
+    "total_points": 84011,
+    "lastModified": "2016-02-23T13:02:52.369Z",
+    "import": {
+      "url": "http://www.co.union.nc.us/Portals/0/GIS/shapes/address_points.zip",
+      "ext": "zip",
+      "file": "import/21/download.zip",
+      "download_stamp": "2016-02-23T13:02:08.957Z",
+      "len": 2268156,
+      "datafiles": {
+        "dbf": "import/21/address_points_012716.dbf",
+        "prj": "import/21/address_points_012716.prj",
+        "shp": "import/21/address_points_012716.shp",
+        "xml": "import/21/address_points_012716.shp.xml",
+        "shx": "import/21/address_points_012716.shx"
+      },
+      "proj4": "+proj=lcc +lat_1=34.33333333333334 +lat_2=36.16666666666666 +lat_0=33.75 +lon_0=-79 +x_0=609601.2199999997 +y_0=0 +datum=NAD83 +units=us-ft +no_defs",
+      "projection": {
+        "GRS_1980": "6378137.0,298.257222101",
+        "D_North_American_1983": "SPHEROID",
+        "Greenwich": 0,
+        "Degree": 0.0174532925199433,
+        "GCS_North_American_1983": "DATUM,PRIMEM,UNIT",
+        "False_Easting": 2000000.002616666,
+        "False_Northing": 0,
+        "Central_Meridian": -79,
+        "Standard_Parallel_1": 34.33333333333334,
+        "Standard_Parallel_2": 36.16666666666666,
+        "Latitude_Of_Origin": 33.75,
+        "Foot_US": 0.3048006096012192,
+        "type": "Lambert_Conformal_Conic"
+      }
+    },
+    "bbox": [
+      1449197.0931383073,
+      390084.8933570981,
+      1617626.7021882534,
+      533989.131004706
+    ]
+  },
+  "22": {
+    "_id": "56c7866d6ba5427d39d7aa43",
+    "_version": 1,
+    "county": "Cabarrus",
+    "dataset_type": "Parcel",
+    "description": "",
+    "display_template": [
+      {
+        "mapType": "Copy",
+        "sourceField": "PIN14",
+        "targetField": "parcel_number"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "SHEET",
+        "targetField": "Sheet"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "BLOCK",
+        "targetField": "Block"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "ParcelNum",
+        "targetField": "Parcel Num (County)"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SUBDIV_NAM",
+        "targetField": "subdivision"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "LOT_NUM",
+        "targetField": "Lot Number"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "NBH_NAME",
+        "targetField": "subdivision_id"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "NBH_NUM",
+        "targetField": "neighborhood_id"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "CALCULATED",
+        "targetField": "acreage"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "PropertyRe",
+        "targetField": "parcel_id"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "LegalDesc",
+        "targetField": "description"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "MarketValu",
+        "targetField": "total_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "AssessedVa",
+        "targetField": "assessed_value"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "PriorLandV",
+        "targetField": "Prior Land Value"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "PriorTotal",
+        "targetField": "Prior Total"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "LandValue",
+        "targetField": "land_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "BuildingVa",
+        "targetField": "building_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "PlatBook",
+        "targetField": "plat_book"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "PlatPage",
+        "targetField": "plat_page"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "AcctName1",
+        "targetField": "owner_last_name"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "MailAddr1",
+        "targetField": "address"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "MailCity",
+        "targetField": "city"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "MailState",
+        "targetField": "state"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SalePrice",
+        "targetField": "last_sale_price"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "DeedBook",
+        "targetField": "deed_book"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "DeedPage",
+        "targetField": "deed_page"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "DateQuesti",
+        "targetField": "last_sale_date"
+      }
+    ],
+    "example_lat": "-80.59360949124",
+    "example_lon": "35.40756408318",
+    "id": 22,
+    "metro_area": "Charlotte",
+    "source_url": "https://www.cabarruscounty.us/government/departments/information-technology/Data%20Downloads/TaxParcels.zip",
+    "title": "Cabarrus Tax and Parcel Data",
+    "tooltip1": "LegalDesc",
+    "total_points": 0,
+    "lastModified": "2016-02-23T13:03:53.338Z",
+    "import": {
+      "url": "https://www.cabarruscounty.us/government/departments/information-technology/Data%20Downloads/TaxParcels.zip",
+      "ext": "zip",
+      "file": "import/22/download.zip",
+      "download_stamp": "2016-02-23T13:03:49.502Z",
+      "len": 34468602,
+      "datafiles": {
+        "dbf": "import/22/TaxParcels/TaxParcels.dbf",
+        "prj": "import/22/TaxParcels/TaxParcels.prj",
+        "shp": "import/22/TaxParcels/TaxParcels.shp",
+        "xml": "import/22/TaxParcels/TaxParcels.shp.xml",
+        "shx": "import/22/TaxParcels/TaxParcels.shx"
+      }
+    }
+  },
+  "23": {
+    "_id": "56c7866d6ba5427d39d7aa44",
+    "_version": 1,
+    "county": "Cabarrus",
+    "description": "Locations of railroads within Cabarrus County, NC",
+    "example_lat": "-80.62439465381",
+    "example_lon": "35.50076736900",
+    "id": 23,
+    "metro_area": "Charlotte",
+    "source_url": "https://www.cabarruscounty.us/government/departments/information-technology/Data%20Downloads/Railroad.zip",
+    "title": "Cabarrus Railroad",
+    "total_points": 46,
+    "lastModified": "2016-02-23T13:03:57.401Z",
+    "import": {
+      "url": "https://www.cabarruscounty.us/government/departments/information-technology/Data%20Downloads/Railroad.zip",
+      "ext": "zip",
+      "file": "import/23/download.zip",
+      "download_stamp": "2016-02-23T13:03:57.104Z",
+      "len": 20956,
+      "datafiles": {
+        "dbf": "import/23/Railroad/Railroad.dbf",
+        "prj": "import/23/Railroad/Railroad.prj",
+        "shp": "import/23/Railroad/Railroad.shp",
+        "xml": "import/23/Railroad/Railroad.shp.xml",
+        "shx": "import/23/Railroad/Railroad.shx"
+      },
+      "proj4": "+proj=lcc +lat_1=34.33333333333334 +lat_2=36.16666666666666 +lat_0=33.75 +lon_0=-79 +x_0=609601.2199999997 +y_0=0 +datum=NAD83 +units=us-ft +no_defs",
+      "projection": {
+        "GRS_1980": "6378137.0,298.257222101",
+        "D_North_American_1983": "SPHEROID",
+        "Greenwich": 0,
+        "Degree": 0.0174532925199433,
+        "GCS_North_American_1983": "DATUM,PRIMEM,UNIT",
+        "False_Easting": 2000000.002616666,
+        "False_Northing": 0,
+        "Central_Meridian": -79,
+        "Standard_Parallel_1": 34.33333333333334,
+        "Standard_Parallel_2": 36.16666666666666,
+        "Latitude_Of_Origin": 33.75,
+        "Foot_US": 0.3048006096012192,
+        "type": "Lambert_Conformal_Conic"
+      }
+    },
+    "bbox": [
+      1498134.7164578757,
+      541079.5964408846,
+      1612222.928570895,
+      642676.9563593115
+    ]
+  },
+  "24": {
+    "_id": "56c7866d6ba5427d39d7aa45",
+    "_version": 1,
+    "county": "Cabarrus",
+    "description": "Physical locations of schools within Cabarrus County, NC",
+    "id": 24,
+    "metro_area": "Charlotte",
+    "source_url": "https://www.cabarruscounty.us/government/departments/information-technology/Data%20Downloads/Schools.zip",
+    "title": "Cabarrus Schools",
+    "total_points": 51,
+    "lastModified": "2016-02-23T13:03:59.178Z",
+    "import": {
+      "url": "https://www.cabarruscounty.us/government/departments/information-technology/Data%20Downloads/Schools.zip",
+      "ext": "zip",
+      "file": "import/24/download.zip",
+      "download_stamp": "2016-02-23T13:03:58.900Z",
+      "len": 8576,
+      "datafiles": {
+        "dbf": "import/24/Schools/Schools.dbf",
+        "prj": "import/24/Schools/Schools.prj",
+        "shp": "import/24/Schools/Schools.shp",
+        "xml": "import/24/Schools/Schools.shp.xml",
+        "shx": "import/24/Schools/Schools.shx"
+      },
+      "proj4": "+proj=lcc +lat_1=34.33333333333334 +lat_2=36.16666666666666 +lat_0=33.75 +lon_0=-79 +x_0=609601.2199999997 +y_0=0 +datum=NAD83 +units=us-ft +no_defs",
+      "projection": {
+        "GRS_1980": "6378137.0,298.257222101",
+        "D_North_American_1983": "SPHEROID",
+        "Greenwich": 0,
+        "Degree": 0.0174532925199433,
+        "GCS_North_American_1983": "DATUM,PRIMEM,UNIT",
+        "False_Easting": 2000000.002616666,
+        "False_Northing": 0,
+        "Central_Meridian": -79,
+        "Standard_Parallel_1": 34.33333333333334,
+        "Standard_Parallel_2": 36.16666666666666,
+        "Latitude_Of_Origin": 33.75,
+        "Foot_US": 0.3048006096012192,
+        "type": "Lambert_Conformal_Conic"
+      }
+    },
+    "bbox": [
+      1481128.2312699524,
+      546426.755953245,
+      1573466.0796450444,
+      642331.1585220478
+    ]
+  },
+  "25": {
+    "_id": "56c7866d6ba5427d39d7aa46",
+    "_version": 1,
+    "county": "Cabarrus",
+    "description": "REQUIRED: A brief narrative summary of the data set.",
+    "id": 25,
+    "metro_area": "Charlotte",
+    "source_url": "https://www.cabarruscounty.us/government/departments/information-technology/Data%20Downloads/ParcelAddresses.zip",
+    "title": "Cabarrus Address Information",
+    "tooltip1": "MailAddr1",
+    "tooltip2": "MailAddr1",
+    "total_points": 106710,
+    "lastModified": "2016-02-23T13:06:46.668Z",
+    "import": {
+      "url": "https://www.cabarruscounty.us/government/departments/information-technology/Data%20Downloads/ParcelAddresses.zip",
+      "ext": "zip",
+      "file": "import/25/download.zip",
+      "download_stamp": "2016-02-23T13:04:34.342Z",
+      "len": 26939021,
+      "datafiles": {
+        "dbf": "import/25/ParcelAddresses/ParcelAddresses.dbf",
+        "prj": "import/25/ParcelAddresses/ParcelAddresses.prj",
+        "shp": "import/25/ParcelAddresses/ParcelAddresses.shp",
+        "xml": "import/25/ParcelAddresses/ParcelAddresses.shp.xml",
+        "shx": "import/25/ParcelAddresses/ParcelAddresses.shx"
+      },
+      "proj4": "+proj=lcc +lat_1=34.33333333333334 +lat_2=36.16666666666666 +lat_0=33.75 +lon_0=-79 +x_0=609601.2199999997 +y_0=0 +datum=NAD83 +units=us-ft +no_defs",
+      "projection": {
+        "GRS_1980": "6378137.0,298.257222101",
+        "D_North_American_1983": "SPHEROID",
+        "Greenwich": 0,
+        "Degree": 0.0174532925199433,
+        "GCS_North_American_1983": "DATUM,PRIMEM,UNIT",
+        "False_Easting": 2000000.002616666,
+        "False_Northing": 0,
+        "Central_Meridian": -79,
+        "Standard_Parallel_1": 34.33333333333334,
+        "Standard_Parallel_2": 36.16666666666666,
+        "Latitude_Of_Origin": 33.75,
+        "Foot_US": 0.3048006096012192,
+        "type": "Lambert_Conformal_Conic"
+      }
+    },
+    "bbox": [
+      1468426.3551632464,
+      525884.3969449699,
+      1612532.816844821,
+      655735.1840507388
+    ]
+  },
+  "26": {
+    "_id": "56c7866d6ba5427d39d7aa47",
+    "_version": 1,
+    "county": "Gaston",
+    "description": "",
+    "example_lat": "-81.36945109279",
+    "example_lon": "35.41685360680",
+    "id": 26,
+    "metro_area": "Charlotte",
+    "source_url": "https://cloud.gastongov.com/owncloud/public.php?service=files&t=baf8d1abaf68d8dbab99af58374ae76a&download&path=//Flood.zip",
+    "title": "Gaston Flood Zones",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.067Z"
+  },
+  "27": {
+    "_id": "56c7866d6ba5427d39d7aa48",
+    "_version": 1,
+    "county": "Gaston",
+    "description": "",
+    "example_lat": "-81.15201875598",
+    "example_lon": "35.18412031761",
+    "id": 27,
+    "metro_area": "Charlotte",
+    "source_url": "https://cloud.gastongov.com/owncloud/public.php?service=files&t=baf8d1abaf68d8dbab99af58374ae76a&download&path=/ParcelCAMA.zip",
+    "title": "Gaston Parcel CAMA",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.070Z"
+  },
+  "28": {
+    "_id": "56c7866d6ba5427d39d7aa49",
+    "_version": 1,
+    "county": "Gaston",
+    "description": "",
+    "example_lat": "-81.41109360450",
+    "example_lon": "35.36735655450",
+    "id": 28,
+    "metro_area": "Charlotte",
+    "source_url": "https://cloud.gastongov.com/owncloud/public.php?service=files&t=baf8d1abaf68d8dbab99af58374ae76a&download&path=//RailRoad.zip",
+    "title": "Gaston Railroads",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.071Z"
+  },
+  "29": {
+    "_id": "56c7866d6ba5427d39d7aa4a",
+    "_version": 1,
+    "county": "Gaston",
+    "description": "",
+    "id": 29,
+    "metro_area": "Charlotte",
+    "source_url": "https://cloud.gastongov.com/owncloud/public.php?service=files&t=baf8d1abaf68d8dbab99af58374ae76a&download&path=//Schools.zip",
+    "title": "Gaston Schools",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.073Z"
+  },
+  "30": {
+    "_id": "56c7866d6ba5427d39d7aa4b",
+    "_version": 1,
+    "county": "Iredell",
+    "dataset_type": "Parcel",
+    "description": "",
+    "display_template": [
+      {
+        "mapType": "Copy",
+        "sourceField": "PIN",
+        "targetField": "parcel_id"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "Name",
+        "targetField": "owner_last_name"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "DWBook",
+        "targetField": "deed_book"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "DWPage",
+        "targetField": "deed_page"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "TaxAcres",
+        "targetField": "acreage"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SD_Name",
+        "targetField": "subdivision"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SD_Phase",
+        "targetField": "subdivision_id"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "Descriptio",
+        "targetField": "description"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "NBHCode",
+        "targetField": "neighborhood_id"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "Bldg_Value",
+        "targetField": "building_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "Land_Value",
+        "targetField": "land_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "Total_Valu",
+        "targetField": "total_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "Sale_Date",
+        "targetField": "last_sale_date"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "Sales_Pric",
+        "targetField": "last_sale_price"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "AYB",
+        "targetField": "year_built"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "EYB",
+        "targetField": "Effective Year Built"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "Bedroom",
+        "targetField": "num_bedrooms"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "Bath",
+        "targetField": "num_bathrooms_full"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "Half_Bath",
+        "targetField": "num_bathrooms_half"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "Actual_Hea",
+        "targetField": "sqft"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "QualityAdj",
+        "targetField": "grade"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "Quality",
+        "targetField": "Build Quality"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "Ext_Wall_1",
+        "targetField": "Exterior Wall 1"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "Ext_Wall_2",
+        "targetField": "Exterior Wall 2"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "Roof_Struc",
+        "targetField": "Roof Structure"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "Roof_Cover",
+        "targetField": "Roof Cover"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "Heating_Ty",
+        "targetField": "Heating Type"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "Heating_Fu",
+        "targetField": "Heating Fuel"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "Air_Condit",
+        "targetField": "AC Type"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "Fireplace",
+        "targetField": "Fireplace"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "Zoning",
+        "targetField": "Zoning"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "Dwelling_S",
+        "targetField": "num_stories"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "FOUNDATION",
+        "targetField": "Foundation"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "SUB_FLOOR",
+        "targetField": "Subfloor"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "INT_WALL_1",
+        "targetField": "Interior Walls"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "INT_WALL_2",
+        "targetField": "Interior Walls 2"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "Floor_Cov_",
+        "targetField": "Flooring"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "SPEC_COND_",
+        "targetField": "Special Conditions"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "CITY",
+        "targetField": "city"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "STATE",
+        "targetField": "state"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "HouseNumbe",
+        "targetField": "street_number"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SDIR",
+        "targetField": "street_direction"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "STREET",
+        "targetField": "street_name"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "STYPE",
+        "targetField": "street_suffix"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "CityTaxCod",
+        "targetField": "City Tax Code"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "CityTaxDes",
+        "targetField": "City Tax Description"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "FireTaxCod",
+        "targetField": "Fire Tax Code"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "FireTaxDes",
+        "targetField": "Fire Tax Description"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "SchoolTaxC",
+        "targetField": "School Tax Code"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "SchoolTaxD",
+        "targetField": "School Tax Description"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "SpecialTax",
+        "targetField": "Special Tax"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "SpecialT_1",
+        "targetField": "Special Tax 2"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "SolidWas_1",
+        "targetField": "Waste Type"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "Township_1",
+        "targetField": "Township"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "Tax_Year",
+        "targetField": "Tax Year"
+      }
+    ],
+    "example_lat": "-80.86598534885",
+    "example_lon": "35.53423185253",
+    "id": 30,
+    "mapping": {
+      "5": {
+        "description": "Iredell Appr Card",
+        "geo_set_id": "30",
+        "id": "5",
+        "link_template": "http://www.co.iredell.nc.us/apprcard/apprcard.asp?Parcel=%PIN%&Card=001",
+        "link_title": "Iredell Property Card"
+      }
+    },
+    "metro_area": "Charlotte",
+    "source_url": "http://www.co.iredell.nc.us/Departments/GISMaps/DownloadLibrary/Parcels.zip",
+    "title": "Iredell Parcel",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.074Z"
+  },
+  "31": {
+    "_id": "56c7866d6ba5427d39d7aa4c",
+    "_version": 1,
+    "county": "Iredell",
+    "description": "",
+    "id": 31,
+    "metro_area": "Charlotte",
+    "source_url": "http://www.co.iredell.nc.us/Departments/GISMaps/DownloadLibrary/Appraisal%20Data%20Extraction.zip",
+    "title": "Iredell Appraisal Data ",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.079Z"
+  },
+  "32": {
+    "_id": "56c7866d6ba5427d39d7aa4d",
+    "_version": 1,
+    "description": "",
+    "id": 32,
+    "metro_area": "Tampa-Orlando",
+    "source_url": "ftp://public:access@ftp.hcpafl.org/shapefiles/allsales_05_26_2015.zip",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.080Z",
+    "title": "Tampa sales data"
+  },
+  "33": {
+    "_id": "56c7866d6ba5427d39d7aa4e",
+    "_version": 1,
+    "description": "",
+    "example_lat": "-82.48105125383",
+    "example_lon": "27.93405603275",
+    "id": 33,
+    "metro_area": "Tampa-Orlando",
+    "source_url": "ftp://public:access@ftp.hcpafl.org/shapefiles/subdivisions_05_26_2015.zip",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.080Z"
+  },
+  "34": {
+    "_id": "56c7866d6ba5427d39d7aa4f",
+    "_version": 1,
+    "county": "Hillsborough",
+    "dataset_type": "Parcel",
+    "description": "",
+    "display_template": [
+      {
+        "mapType": "Copy",
+        "sourceField": "FOLIO",
+        "targetField": "parcel_number"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "PIN",
+        "targetField": "parcel_id"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "OWNER",
+        "targetField": "owner_last_name"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "ADDR_1",
+        "targetField": "owner_address"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SUB",
+        "targetField": "subdivision_id"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SITE_ADDR",
+        "targetField": "address"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SITE_CITY",
+        "targetField": "city"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "LEGAL1",
+        "targetField": "subdivision"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "LEGAL2",
+        "targetField": "description"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "tBEDS",
+        "targetField": "num_bedrooms"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "tBATHS",
+        "targetField": "num_bathrooms_full"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "tSTORIES",
+        "targetField": "num_stories"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "JUST",
+        "targetField": "total_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "LAND",
+        "targetField": "land_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "BLDG",
+        "targetField": "building_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "ACT",
+        "targetField": "year_built"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "HEAT_AR",
+        "targetField": "sqft"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "ASD_VAL",
+        "targetField": "assessed_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "MUNI",
+        "targetField": "grade"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "S_DATE",
+        "targetField": "last_sale_date"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "S_AMT",
+        "targetField": "last_sale_price"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "ACREAGE",
+        "targetField": "acreage"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "NBHC",
+        "targetField": "neighborhood_id"
+      }
+    ],
+    "example_lat": "-82.36499685258",
+    "example_lon": "27.76920493973",
+    "id": 34,
+    "mapping": [
+      null,
+      {
+        "description": "Hillsborough County Tax Bill",
+        "geo_set_id": "34",
+        "id": "1",
+        "link_template": "https://hillsborough.county-taxes.com/public/real_estate/parcels/A%FOLIO%?year=2014",
+        "link_title": "Tax Bill"
+      },
+      {
+        "description": "Hillsborough County Property Search",
+        "geo_set_id": "34",
+        "id": "2",
+        "link_template": "http://gis.hcpafl.org/propertysearch/#/parcel/basic/%STRAP%",
+        "link_title": "Property Details"
+      }
+    ],
+    "metro_area": "Tampa-Orlando",
+    "source_url": "ftp://public:access@ftp.hcpafl.org/shapefiles/parcel_05_26_2015.zip",
+    "title": "Hillsborough County Parcel Data",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.081Z"
+  },
+  "36": {
+    "_id": "56c7866d6ba5427d39d7aa50",
+    "_version": 1,
+    "description": "",
+    "example_lat": "-82.36295711859",
+    "example_lon": "27.64819699706",
+    "id": 36,
+    "metro_area": "Tampa-Orlando",
+    "source_url": "ftp://public:access@ftp.hcpafl.org/shapefiles/annotations_05_26_2015.zip",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.085Z"
+  },
+  "37": {
+    "_id": "56c7866d6ba5427d39d7aa51",
+    "_version": 1,
+    "description": "",
+    "id": 37,
+    "metro_area": "Tampa-Orlando",
+    "source_url": "ftp://ftp.scgov.net/Pub/data/SCGIS/gislayers/Education.zip",
+    "title": "Education",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.088Z"
+  },
+  "38": {
+    "_id": "56c7866d6ba5427d39d7aa52",
+    "_version": 1,
+    "county": "Sarasota",
+    "description": "Limited parcel data",
+    "example_lat": "-82.42307325514",
+    "example_lon": "27.32119195266",
+    "id": 38,
+    "metro_area": "Columbia",
+    "source_url": "ftp://ftp.scgov.net/Pub/GIS/Sarasota_Parcels_May2015.gdb.zip",
+    "title": "Sarasota Parcels",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.090Z"
+  },
+  "40": {
+    "_id": "56c7866d6ba5427d39d7aa53",
+    "_version": 1,
+    "county": "Orange",
+    "dataset_type": "Parcel",
+    "description": "",
+    "display_template": [
+      {
+        "mapType": "Copy",
+        "sourceField": "PARCELID",
+        "targetField": "parcel_id"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "TVSD",
+        "targetField": "total_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "LNDVAL",
+        "targetField": "land_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "IMPQUAL",
+        "targetField": "grade"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "ACTYRBLT",
+        "targetField": "year_built"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "TOTLVGAREA",
+        "targetField": "sqft"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SALEPRC1",
+        "targetField": "last_sale_price"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SALEYR1",
+        "targetField": "last_sale_date"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "ORBOOK1",
+        "targetField": "deed_book"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "ORPAGE1",
+        "targetField": "deed_page"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "OADDR1",
+        "targetField": "owner_last_name"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "OADDR2",
+        "targetField": "owner_address"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SLEGAL",
+        "targetField": "subdivision"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "NBRHDCD",
+        "targetField": "neighborhood_id"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "PHYADDR1",
+        "targetField": "address"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "PHYCITY",
+        "targetField": "city"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "ACRES",
+        "targetField": "acreage"
+      }
+    ],
+    "example_lat": "-81.18410348764",
+    "example_lon": "28.53134471107",
+    "id": 40,
+    "mapping": {
+      "3": {
+        "description": "Orange County, FL - Property Search",
+        "geo_set_id": "40",
+        "id": "3",
+        "link_template": "https://www.ocpafl.org/Searches/ParcelSearch.aspx/PID/%PARCELID%",
+        "link_title": "Property Details"
+      }
+    },
+    "metro_area": "Tampa-Orlando",
+    "source_url": "ftp://ftp1.fgdl.org/pub/county/orange/orange_core/parcels_1048.zip",
+    "title": "Orange County Parcels",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.091Z"
+  },
+  "43": {
+    "_id": "56c7866d6ba5427d39d7aa54",
+    "_version": 1,
+    "description": "",
+    "id": 43,
+    "metro_area": "Tampa-Orlando",
+    "source_url": "http://gis.pinellascounty.org/GisDataSets/SHP/schools.zip",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.092Z"
+  },
+  "47": {
+    "_id": "56c7866d6ba5427d39d7aa55",
+    "_version": 1,
+    "description": "",
+    "id": 47,
+    "metro_area": "Columbia",
+    "source_url": "ftp://ftp.scgov.net/Pub/data/SCGIS/gislayers/HealthMedical.zip",
+    "title": "Healthmedical",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.093Z"
+  },
+  "48": {
+    "_id": "56c7866d6ba5427d39d7aa56",
+    "_version": 1,
+    "description": "Limited parcel data",
+    "id": 48,
+    "metro_area": "Columbia",
+    "source_url": "ftp://ftp.scgov.net/Pub/data/SCGIS/gislayers/Parcels.zip",
+    "title": "Sarasota Parcels - Different version",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.094Z"
+  },
+  "49": {
+    "_id": "56c7866d6ba5427d39d7aa57",
+    "_version": 1,
+    "description": "",
+    "id": 49,
+    "metro_area": "Columbia",
+    "source_url": "ftp://ftp.scgov.net/Pub/data/SCGIS/gislayers/TransportationFacilities.zip",
+    "title": "Transportation Facilities",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.095Z"
+  },
+  "50": {
+    "_id": "56c7866d6ba5427d39d7aa58",
+    "_version": 1,
+    "description": "",
+    "id": 50,
+    "metro_area": "Columbia",
+    "source_url": "ftp://ftp.scgov.net/Pub/data/SCGIS/gislayers/CommunityFacilities.zip",
+    "title": "Communityfacilities",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.095Z"
+  },
+  "61": {
+    "_id": "56c7866d6ba5427d39d7aa59",
+    "_version": 1,
+    "county": "Seminole",
+    "dataset_type": "Parcel",
+    "description": "Limited parcel data",
+    "example_lat": "-81.42773497679",
+    "example_lon": "28.65670159943",
+    "id": 61,
+    "metro_area": "Tampa-Orlando",
+    "source_url": "http://www.apps.seminolecountyfl.gov/is/gis/GISData/Parcels.gdb.zip",
+    "title": "Seminole County",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.096Z"
+  },
+  "62": {
+    "_id": "56c7866d6ba5427d39d7aa5a",
+    "_version": 1,
+    "description": "",
+    "id": 62,
+    "metro_area": "N/A",
+    "source_url": "http://msc.fema.gov/portal/downloadProduct?productTypeID=APPLICATION&productSubTypeID=HAZUS_APP&productID=HAZUS_APP",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.097Z"
+  },
+  "63": {
+    "_id": "56c7866d6ba5427d39d7aa5b",
+    "_version": 1,
+    "county": "Pinellas",
+    "dataset_type": "Parcel",
+    "description": "",
+    "display_template": [
+      {
+        "mapType": "Copy",
+        "sourceField": "GID",
+        "targetField": "parcel_number"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "PARCEL_ID",
+        "targetField": "parcel_id"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "ACREAGE",
+        "targetField": "acreage"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "ADDR_NUM",
+        "targetField": "street_number"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "ADDR_STR",
+        "targetField": "street_name"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "NOTE_1",
+        "targetField": "Note 1"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "NOTE_2",
+        "targetField": "Note 2"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "NOTE_3",
+        "targetField": "Note 3"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "CITY",
+        "targetField": "city"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SUBDIV",
+        "targetField": "subdivision"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "ZIP_CODE",
+        "targetField": "Zipcode"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "HOA",
+        "targetField": "Hoa"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "FIRE_DST",
+        "targetField": "Fire District"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "BASIN_NAME",
+        "targetField": "Basin Name"
+      }
+    ],
+    "id": 63,
+    "metro_area": "Tampa-Orlando",
+    "source_url": "http://gis.pinellascounty.org/GisDataSets/SHP/Parcels.zip",
+    "title": "Pinellas County - Limited Parcel Data",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.097Z"
+  },
+  "67": {
+    "_id": "56c7866d6ba5427d39d7aa5c",
+    "_version": 1,
+    "county": "Iredell",
+    "dataset_type": "Parcel",
+    "description": "",
+    "display_template": [
+      {
+        "mapType": "Copy",
+        "sourceField": "STNAME",
+        "targetField": "state"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "CNTYNAME",
+        "targetField": "county"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "PARNO",
+        "targetField": "parcel_id"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "ALTPARNO",
+        "targetField": "parcel_number"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "STRUCTYEAR",
+        "targetField": "year_built"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "IMPROVVAL",
+        "targetField": "Improvements Value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "LANDVAL",
+        "targetField": "land_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "PARVAL",
+        "targetField": "total_value"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "OWNNAME",
+        "targetField": "Owner Name"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "OWNFRST",
+        "targetField": "owner_first_name"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "OWNLAST",
+        "targetField": "owner_last_name"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "MAILADD",
+        "targetField": "owner_address"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SADDNO",
+        "targetField": "street_number"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SADDSTNAME",
+        "targetField": "street_name"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "LEGDECFULL",
+        "targetField": "description"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SUBDIVISIO",
+        "targetField": "subdivision"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SOURCEREF",
+        "targetField": "deed_book"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SALEDATETX",
+        "targetField": "last_sale_date"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "GISACRES",
+        "targetField": "acreage"
+      }
+    ],
+    "id": 67,
+    "metro_area": "Charlotte",
+    "source_url": "http://data.nconemap.gov/downloads/vector/parcels/Iredell_parcels_032114.zip",
+    "title": "NC ONE - Iredell",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.101Z"
+  },
+  "68": {
+    "_id": "56c7866d6ba5427d39d7aa5d",
+    "_version": 1,
+    "county": "Wake",
+    "dataset_type": "Parcel",
+    "description": "",
+    "display_template": [
+      {
+        "mapType": "Copy",
+        "sourceField": "ALTPARNO",
+        "targetField": "parcel_id"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "CNTYNAME",
+        "targetField": "county"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "GISACRES",
+        "targetField": "acreage"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "LANDVAL",
+        "targetField": "land_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "LEGDECFULL",
+        "targetField": "description"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "MADDSTNAME",
+        "targetField": "owner_address"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "MAILADD",
+        "targetField": "address"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "MCITY",
+        "targetField": "city"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "OWNFRST",
+        "targetField": "owner_first_name"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "OWNLAST",
+        "targetField": "owner_last_name"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "PARNO",
+        "targetField": "parcel_number"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "PARVAL",
+        "targetField": "total_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SADDNO",
+        "targetField": "street_number"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SADDSTNAME",
+        "targetField": "street_name"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SADDSTSUF",
+        "targetField": "street_suffix"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SALEDATETX",
+        "targetField": "last_sale_date"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SOURCEREF",
+        "targetField": "deed_book"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "STNAME",
+        "targetField": "state"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "STRUCTYEAR",
+        "targetField": "year_built"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SUBDIVISIO",
+        "targetField": "subdivision"
+      }
+    ],
+    "example_lat": "-78.70110822478",
+    "example_lon": "35.90919350690",
+    "id": 68,
+    "metro_area": "N/A",
+    "source_url": "http://data.nconemap.gov/downloads/vector/parcels/Wake_parcels_02042015.zip",
+    "title": "NC ONE - Wake",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.102Z"
+  },
+  "69": {
+    "_id": "56c7866d6ba5427d39d7aa5e",
+    "_version": 1,
+    "county": "Guilford",
+    "dataset_type": "Parcel",
+    "description": "",
+    "display_template": [
+      {
+        "mapType": "Copy",
+        "sourceField": "ALTPARNO",
+        "targetField": "parcel_id"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "CNTYNAME",
+        "targetField": "county"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "LANDVAL",
+        "targetField": "land_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "LEGDECFULL",
+        "targetField": "description"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "MADDSTNAME",
+        "targetField": "owner_address"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "MAILADD",
+        "targetField": "address"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "MCITY",
+        "targetField": "city"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "OWNFRST",
+        "targetField": "owner_first_name"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "OWNLAST",
+        "targetField": "owner_last_name"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "PARNO",
+        "targetField": "parcel_number"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "PARVAL",
+        "targetField": "total_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SALEDATETX",
+        "targetField": "last_sale_date"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SOURCEREF",
+        "targetField": "deed_book"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "STNAME",
+        "targetField": "state"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "STRUCTYEAR",
+        "targetField": "year_built"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SUBDIVISIO",
+        "targetField": "subdivision"
+      }
+    ],
+    "id": 69,
+    "metro_area": "N/A",
+    "source_url": "http://data.nconemap.gov/downloads/vector/parcels/Guilford_parcels_03032015.zip",
+    "title": "NC ONE - Guildford",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.103Z"
+  },
+  "70": {
+    "_id": "56c7866d6ba5427d39d7aa5f",
+    "_version": 1,
+    "county": "Union",
+    "description": "",
+    "id": 70,
+    "metro_area": "N/A",
+    "source_url": "http://data.nconemap.gov/downloads/vector/parcels/Union_parcels_032114.zip",
+    "title": "NC ONE - Union",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.104Z"
+  },
+  "71": {
+    "_id": "56c7866d6ba5427d39d7aa60",
+    "_version": 1,
+    "county": "Forsyth",
+    "dataset_type": "Parcel",
+    "description": "",
+    "display_template": [
+      {
+        "mapType": "Copy",
+        "sourceField": "ALTPARNO",
+        "targetField": "parcel_id"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "CNTYNAME",
+        "targetField": "county"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "LANDVAL",
+        "targetField": "land_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "LEGDECFULL",
+        "targetField": "description"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "MADDSTNAME",
+        "targetField": "owner_address"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "MAILADD",
+        "targetField": "address"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "MCITY",
+        "targetField": "city"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "OWNFRST",
+        "targetField": "owner_first_name"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "OWNLAST",
+        "targetField": "owner_last_name"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "PARNO",
+        "targetField": "parcel_number"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "PARVAL",
+        "targetField": "total_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SALEDATETX",
+        "targetField": "last_sale_date"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SOURCEREF",
+        "targetField": "deed_book"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "STNAME",
+        "targetField": "state"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "STRUCTYEAR",
+        "targetField": "year_built"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SUBDIVISIO",
+        "targetField": "subdivision"
+      }
+    ],
+    "id": 71,
+    "metro_area": "N/A",
+    "source_url": "http://data.nconemap.gov/downloads/vector/parcels/Forsyth_parcels_2015_05_11.zip",
+    "title": "NC ONE - Forsyth",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.105Z"
+  },
+  "72": {
+    "_id": "56c7866d6ba5427d39d7aa61",
+    "_version": 1,
+    "county": "Durham",
+    "description": "",
+    "id": 72,
+    "metro_area": "N/A",
+    "source_url": "http://data.nconemap.gov/downloads/vector/parcels/Durham_parcels_032114.zip",
+    "title": "NC ONE - Durham",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.106Z"
+  },
+  "73": {
+    "_id": "56c7866d6ba5427d39d7aa62",
+    "_version": 1,
+    "county": "Cabarrus",
+    "dataset_type": "Parcel",
+    "description": "Field description here: http://data.nconemap.gov/geoportal/catalog/search/resource/details.page?uuid=%7B311C8E33-3289-4333-8435-C417C1EC8A35%7D",
+    "display_template": [
+      {
+        "mapType": "Copy",
+        "sourceField": "ALTPARNO",
+        "targetField": "parcel_id"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "CNTYNAME",
+        "targetField": "county"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "GISACRES",
+        "targetField": "acreage"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "LANDVAL",
+        "targetField": "land_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "LEGDECFULL",
+        "targetField": "description"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "MADDSTNAME",
+        "targetField": "owner_address"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "OWNFRST",
+        "targetField": "owner_first_name"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "OWNNAME",
+        "targetField": "owner_last_name"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "PARNO",
+        "targetField": "parcel_number"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "PARVAL",
+        "targetField": "total_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SADDNO",
+        "targetField": "street_number"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SADDSTNAME",
+        "targetField": "street_name"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SADDSTSUF",
+        "targetField": "street_suffix"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SADDSTTYP",
+        "targetField": "street_suffix2"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SALEDATETX",
+        "targetField": "last_sale_date"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SCITY",
+        "targetField": "city"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SITEADD",
+        "targetField": "address"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SOURCEREF",
+        "targetField": "deed_book"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "STNAME",
+        "targetField": "state"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "STRUCTYEAR",
+        "targetField": "year_built"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SUBDIVISIO",
+        "targetField": "subdivision"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "SUBSURFOWN",
+        "targetField": "Sub Surface Owner"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "SZIP",
+        "targetField": "zipcode"
+      }
+    ],
+    "id": 73,
+    "metro_area": "N/A",
+    "source_url": "http://data.nconemap.gov/downloads/vector/parcels/Cabarrus_parcels_021915.zip",
+    "title": "NC ONE - Cabarrus",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.108Z"
+  },
+  "77": {
+    "_id": "56c7866d6ba5427d39d7aa63",
+    "_version": 1,
+    "dataset_type": "Parcel",
+    "description": "",
+    "display_template": [
+      {
+        "mapType": "Copy",
+        "sourceField": "CNTYNAME",
+        "targetField": "county"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "PARCELID",
+        "targetField": "parcel_id"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "IMPROVVAL",
+        "targetField": "building_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "LNDVAL",
+        "targetField": "land_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "JV",
+        "targetField": "total_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "AVSD",
+        "targetField": "assessed_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "ONAME",
+        "targetField": "owner_last_name"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "OADDR1",
+        "targetField": "owner_address"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "PHYADDR1",
+        "targetField": "address"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "PHYCITY",
+        "targetField": "city"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SLEGAL",
+        "targetField": "description"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "ACTYRBLT",
+        "targetField": "year_built"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "TOTLVGAREA",
+        "targetField": "sqft"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SALEPRC1",
+        "targetField": "last_sale_price"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SALEDATE1",
+        "targetField": "last_sale_date"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "ORBOOK1",
+        "targetField": "deed_book"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "ORPAGE1",
+        "targetField": "deed_page"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SUBDIVNM",
+        "targetField": "subdivision"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SUBDIVID",
+        "targetField": "subdivision_id"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "ACRES",
+        "targetField": "acreage"
+      }
+    ],
+    "example_lat": "-82.23908488982",
+    "example_lon": "29.51858962774",
+    "id": 77,
+    "mapping": {
+      "4": {
+        "description": "Florida - Property Link",
+        "geo_set_id": "77",
+        "id": "4",
+        "link_template": "%PALINK%",
+        "link_title": "Florida Property Details"
+      }
+    },
+    "metro_area": "Tampa-Orlando",
+    "source_url": "ftp://ftp1.fgdl.org/pub/state/parcels_14.zip",
+    "title": "Florida State Combined",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.109Z"
+  },
+  "78": {
+    "_id": "56c7866d6ba5427d39d7aa64",
+    "_version": 1,
+    "description": "",
+    "id": 78,
+    "metro_area": "Tampa-Orlando",
+    "source_url": "ftp://ftp1.fgdl.org/pub/state/parcels_cnty_14.zip",
+    "title": "Florida by County",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.109Z"
+  },
+  "79": {
+    "_id": "56c7866d6ba5427d39d7aa65",
+    "_version": 1,
+    "description": "",
+    "id": 79,
+    "metro_area": "Tampa-Orlando",
+    "source_url": "ftp://ftp1.fgdl.org//pub/state/dfirm_fldhaz_feb15.zip",
+    "title": "Fllorida disaster",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.110Z"
+  },
+  "80": {
+    "_id": "56c7866d6ba5427d39d7aa66",
+    "_version": 1,
+    "description": "",
+    "id": 80,
+    "metro_area": "Atlanta",
+    "source_url": "http://gis.atlantaga.gov/apps/gislayers/download/layers/PLAN_NEIGHBORHOODS.zip",
+    "title": "Atlanta - Neighborhoods",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.111Z"
+  },
+  "81": {
+    "_id": "56c7866d6ba5427d39d7aa67",
+    "_version": 1,
+    "description": "",
+    "id": 81,
+    "metro_area": "Atlanta",
+    "source_url": "http://gis.atlantaga.gov/apps/gislayers/download/layers/PLAN_NPUS.zip",
+    "title": "Atlanta - Neighborhood Planning Units",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.111Z"
+  },
+  "82": {
+    "_id": "56c7866d6ba5427d39d7aa68",
+    "_version": 1,
+    "description": "",
+    "id": 82,
+    "metro_area": "Atlanta",
+    "source_url": "http://gis.atlantaga.gov/apps/gislayers/download/layers/COA_AddrPoint03112015.zip",
+    "title": "Atlanta - Address Points",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.112Z"
+  },
+  "101": {
+    "_id": "56c7866d6ba5427d39d7aa69",
+    "_version": 1,
+    "dataset_type": "Parcel",
+    "description": "Properties imported from Zillow",
+    "display_template": [
+      {
+        "mapType": "Copy",
+        "sourceField": "zpid",
+        "targetField": "parcel_id"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "links_homedetails",
+        "targetField": "Link Home Details"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "links_graphsanddata",
+        "targetField": "Link Graphs"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "links_mapthishome",
+        "targetField": "Link Map"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "links_comparables",
+        "targetField": "Link Comps"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "address_street",
+        "targetField": "address"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "address_city",
+        "targetField": "city"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "address_state",
+        "targetField": "state"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "address_latitude",
+        "targetField": "lat"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "address_longitude",
+        "targetField": "lon"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "taxAssessmentYear",
+        "targetField": "assessed_year"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "taxAssessment",
+        "targetField": "assessed_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "yearBuilt",
+        "targetField": "year_built"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "lotSizeSqFt",
+        "targetField": "Lot Size (SQFT)"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "finishedSqFt",
+        "targetField": "sqft"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "bathrooms",
+        "targetField": "num_bathrooms_full"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "bedrooms",
+        "targetField": "num_bedrooms"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "totalRooms",
+        "targetField": "Total Rooms"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "lastSoldDate",
+        "targetField": "last_sale_date"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "lastSoldPrice",
+        "targetField": "last_sale_price"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "zestimate_amount",
+        "targetField": "Zestimate"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "zestimate_last-updated",
+        "targetField": "Zestimate Last Updated"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "zestimate_valuationRange_low",
+        "targetField": "Valuation Low"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "zestimate_valuationRange_high",
+        "targetField": "Valuation High"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "rentzestimate_amount",
+        "targetField": "Rent Estimate"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "rentzestimate_last-updated",
+        "targetField": "Rent Estimate Update"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "rentzestimate_valuationRange_low",
+        "targetField": "Rent Valuation Low"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "rentzestimate_valuationRange_high",
+        "targetField": "Rent Valuation High"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "localRealEstate_region_links_forSaleByOwner",
+        "targetField": "Link FSBO"
+      }
+    ],
+    "id": 101,
+    "title": "Zillow - Properties",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.113Z"
+  },
+  "102": {
+    "_id": "56c7866d6ba5427d39d7aa6a",
+    "_version": 1,
+    "dataset_type": "Parcel",
+    "description": "Properties from Rently",
+    "display_template": [
+      {
+        "mapType": "Copy",
+        "sourceField": "address",
+        "targetField": "address"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "latitude",
+        "targetField": "lat"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "longitude",
+        "targetField": "lon"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "picture",
+        "targetField": "Picture Small"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "picture_large",
+        "targetField": "Picture Large"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "application_url",
+        "targetField": "Application Link"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "manager_name",
+        "targetField": "Leasing Company"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "bedrooms",
+        "targetField": "num_bedrooms"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "bathrooms",
+        "targetField": "num_bathrooms_full"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "rent",
+        "targetField": "rent"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "size",
+        "targetField": "sqft"
+      }
+    ],
+    "id": 102,
+    "title": "Rently",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.116Z"
+  },
+  "103": {
+    "_id": "56c7866d6ba5427d39d7aa6b",
+    "_version": 1,
+    "description": "Properties from QPublic",
+    "id": 103,
+    "title": "QPublic",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.117Z"
+  },
+  "104": {
+    "_id": "56c7866d6ba5427d39d7aa6c",
+    "_version": 1,
+    "description": "Rental Properties",
+    "id": 104,
+    "title": "American homes 4 Rent",
+    "total_points": 0,
+    "lastModified": "2016-02-19T21:17:33.119Z"
+  },
+  "105": {
+    "_id": "56c7866d6ba5427d39d7aa6d",
+    "_version": 1,
+    "county": "Cararrus",
+    "dataset_type": "Parcel",
+    "description": "REQUIRED: A brief narrative summary of the data set.",
+    "display_template": [
+      {
+        "mapType": "Copy",
+        "sourceField": "con_cat",
+        "targetField": "address"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "addressnum",
+        "targetField": "street_number"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "road_name",
+        "targetField": "street_name"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "road_type",
+        "targetField": "street_suffix"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "City",
+        "targetField": "city"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "State",
+        "targetField": "state"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "PIN14",
+        "targetField": "parcel_id"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "SUBDIV_NAM",
+        "targetField": "subdivision"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "NBH_NAME",
+        "targetField": "neighborhood_id"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "CALCULATED",
+        "targetField": "acreage"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "PARCEL",
+        "targetField": "parcel_number"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "LegalDesc",
+        "targetField": "description"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "MarketValu",
+        "targetField": "Market value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "AssessedVa",
+        "targetField": "assessed_value"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "PriorLandV",
+        "targetField": "Prior land value"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "PriorBuild",
+        "targetField": "Prior building value"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "PriorTotal",
+        "targetField": "Prior total value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "LandValue",
+        "targetField": "land_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "BuildingVa",
+        "targetField": "building_value"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "PlatBook",
+        "targetField": "plat_book"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "PlatPage",
+        "targetField": "plat_page"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "AcctName1",
+        "targetField": "owner_last_name"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "MailAddr1",
+        "targetField": "owner_address"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "Flood_100Y",
+        "targetField": "Flood Zone (100 Year)"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "Flood_500Y",
+        "targetField": "Flood Zone (500 Year)"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "POL_NAME1",
+        "targetField": "Police Department"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "LATITUDE",
+        "targetField": "lat"
+      },
+      {
+        "mapType": "Copy",
+        "sourceField": "LONGITUDE",
+        "targetField": "lon"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "Elementary",
+        "targetField": "Elementary School"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "MiddleScho",
+        "targetField": "Middle School"
+      },
+      {
+        "mapType": "Formula",
+        "sourceField": "HighSchool",
+        "targetField": "High school"
+      }
+    ],
+    "id": 105,
+    "mapping": {
+      "6": {
+        "description": "Cabarrus Appraisal Card",
+        "geo_set_id": "105",
+        "id": "6",
+        "link_template": "http://tax.cabarruscounty.us/AppraisalCard.aspx?Parcel=%PIN14%",
+        "link_title": "Cabarrus Appraisal Card"
+      },
+      "7": {
+        "description": "Cabarrus Tax Bill",
+        "geo_set_id": "105",
+        "id": "7",
+        "link_template": "http://tax.cabarruscounty.us/TaxBill.aspx?parcel=%PIN14%",
+        "link_title": "Cabarrus Tax Bill"
+      },
+      "8": {
+        "description": "Cabarrus Parcel Report PDF",
+        "geo_set_id": "105",
+        "id": "8",
+        "link_template": "http://apps.cabarruscounty.us/PublicReport/ViewReport.aspx?WhichReport=ParcelReport&Parcel=%PIN14%&rs:Format=PDF",
+        "link_title": "Cabarrus Parcel Report PDF"
+      },
+      "9": {
+        "description": "Cabarrus Photos",
+        "geo_set_id": "105",
+        "id": "9",
+        "link_template": "http://photos.cabarruscounty.us/WebLink/Search.aspx?dbid=0&searchcommand=%28%7BLf%3AName%3D%22%PIN14%*%22%2C%20Type%3D%22DBF%22%7D%29",
+        "link_title": "Cabarrus Photos"
+      }
+    },
+    "metro_area": "Charlotte",
+    "source_url": "https://www.cabarruscounty.us/government/departments/information-technology/Data%20Downloads/ParcelAddresses.zip",
+    "title": "Cabarrus County - Parcel, Address, and Ownership data combined.",
+    "total_points": 106710,
+    "lastModified": "2016-02-23T12:50:49.052Z",
+    "import": {
+      "url": "https://www.cabarruscounty.us/government/departments/information-technology/Data%20Downloads/ParcelAddresses.zip",
+      "ext": "zip",
+      "file": "import/105/download.zip",
+      "download_stamp": "2016-02-23T12:48:42.326Z",
+      "len": 26939021,
+      "datafiles": {
+        "dbf": "import/105/ParcelAddresses/ParcelAddresses.dbf",
+        "prj": "import/105/ParcelAddresses/ParcelAddresses.prj",
+        "shp": "import/105/ParcelAddresses/ParcelAddresses.shp",
+        "xml": "import/105/ParcelAddresses/ParcelAddresses.shp.xml",
+        "shx": "import/105/ParcelAddresses/ParcelAddresses.shx"
+      },
+      "proj4": "+proj=lcc +lat_1=34.33333333333334 +lat_2=36.16666666666666 +lat_0=33.75 +lon_0=-79 +x_0=609601.2199999997 +y_0=0 +datum=NAD83 +units=us-ft +no_defs",
+      "projection": {
+        "GRS_1980": "6378137.0,298.257222101",
+        "D_North_American_1983": "SPHEROID",
+        "Greenwich": 0,
+        "Degree": 0.0174532925199433,
+        "GCS_North_American_1983": "DATUM,PRIMEM,UNIT",
+        "False_Easting": 2000000.002616666,
+        "False_Northing": 0,
+        "Central_Meridian": -79,
+        "Standard_Parallel_1": 34.33333333333334,
+        "Standard_Parallel_2": 36.16666666666666,
+        "Latitude_Of_Origin": 33.75,
+        "Foot_US": 0.3048006096012192,
+        "type": "Lambert_Conformal_Conic"
+      }
+    },
+    "bbox": [
+      1468426.3551632464,
+      525884.3969449699,
+      1612532.816844821,
+      655735.1840507388
+    ]
+  }
+}

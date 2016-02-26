@@ -11,8 +11,9 @@ class DataMap
 
     constructor: ()->
 
-        @data  = {}
-        @types = {}
+        @data   = {}
+        @types  = {}
+        @onSave = {}
 
     ##|
     ##|  Returns a global instance of the data map
@@ -21,6 +22,17 @@ class DataMap
             root.globalDataMap = new DataMap()
 
         return root.globalDataMap
+
+    ##|
+    ##|  Call this function to set a callback when an editable field changes
+    ##|  due to an inline editor.   The callback receives
+    ##|  Table Name, Key, Old Value, New Value
+    @setSaveCallback: (tableName, callbackFunction) =>
+
+        dm = DataMap.getDataMap()
+        dm.onSave[tableName] = callbackFunction
+
+        true
 
     ##|
     ##|  Set the data type for a given type of data
@@ -92,7 +104,7 @@ class DataMap
         console.log "Existing:", existingValue
         formatter     = @types[tableName].col[fieldName].formatter
         console.log "F=", formatter
-        formatter.editData el, existingValue, path, @updatePathValue
+        formatter.editData el, existingValue, path, @updatePathValueEvent
         true
 
     updateScreenPathValue: (path, newValue, didDataChange) =>
@@ -113,6 +125,26 @@ class DataMap
 
             result.html currentValue
             if didDataChange then result.addClass "dataChanged"
+
+        true
+
+    updatePathValueEvent: (path, newValue) =>
+
+        ##|
+        ##|  Works just like updatePathValue except that an event is triggered (onSave) if available
+        parts = path.split '/'
+        tableName = parts[1]
+        keyValue  = parts[2]
+        fieldName = parts[3]
+
+        existingValue = @data[tableName][keyValue][fieldName]
+        if existingValue == newValue then return true
+
+        @data[tableName][keyValue][fieldName] = newValue
+        @updateScreenPathValue path, newValue, true
+
+        if @onSave[tableName]?
+            @onSave[tableName](keyValue, fieldName, existingValue, newValue)
 
         true
 
