@@ -385,7 +385,15 @@ class DataFormatTimeAgo extends DataFormatterType
 		if !m? then return ""
 		return m.format "YYYY-MM-DD HH:mm:ss"
 
+class DataFormatSimpleObject extends DataFormatterType
+	name: "simpleobject"
 
+	format: (data,options,path) =>
+		if !options.compile
+			throw new Error "compilation template not defined inside options.compile"
+		return Handlebars.compile(options.compile)(data)
+	unformat: (data,path) =>
+		return data
 try
 	globalDataFormatter = new DataFormatter()
 
@@ -402,6 +410,7 @@ try
 	globalDataFormatter.register(new DataFormatBoolean())
 	globalDataFormatter.register(new DataFormatPercent())
 	globalDataFormatter.register(new DataFormatTimeAgo())
+	globalDataFormatter.register(new DataFormatSimpleObject())
 
 catch e
 	console.log "Exception while registering global Data Formatter:", e
