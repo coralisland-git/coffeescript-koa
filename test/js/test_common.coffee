@@ -54,7 +54,6 @@ addTestButton = (label, buttonText, fnCall) ->
 	code = code.replace "function () {\n", ""
 	code = code.replace /[\r\n]*}$/, ""
 	code = code.replace "\n", "<br>"
-
 	addTest label, ()->
 
 		button = $ "<div />",

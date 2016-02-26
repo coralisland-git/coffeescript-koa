@@ -70,13 +70,13 @@ class TableView
 
 		true
 
-	addTable: (tableName, columnReduceFunction, reduceFunction) =>
+	addTable: (tableName, @columnReduceFunction, @reduceFunction) =>
 
 		@primaryTableName = tableName
 
 		##|
 		##|  Find the columns for the specific table name
-		columns = DataMap.getColumnsFromTable(tableName, columnReduceFunction)
+		columns = DataMap.getColumnsFromTable(tableName, @columnReduceFunction)
 		for col in columns
 			c = new TableViewCol tableName, col
 			@colList.push(c)
@@ -84,14 +84,7 @@ class TableView
 
 		##|
 		##|  Get the data from that table
-		data = DataMap.getValuesFromTable tableName, reduceFunction
-		for row in data
-			if @showCheckboxes
-				row.checkbox_key = tableName + "_" + row.key
-				row.checked = false
-
-			@rowData.push row
-
+		@updateRowData()
 		true
 
 	##|
@@ -236,6 +229,40 @@ class TableView
 	setTableCacheName: (@tableCacheName) =>
 
 
+	##| apply sorting based on selected context menu
+	applySorting: (column, type = 'ASC' ) =>
+		## | update rows if new data added
+		if( @rowData.length != DataMap.getValuesFromTable(@primaryTableName).length)
+			@updateRowData()
+			for counter, i of @rowData
+				##| if row is not present for that data, render new row
+				if !@elTheTable.find("tr [data-path^='/#{@primaryTableName}/#{i.key}/']").length
+					@elTheTable.find('tbody').prepend(@renderRow(_previousRowsCount++,i,true))
+
+		##| define sorter function using jquery tr switching
+		_sorter = (conditions) =>
+			_table = $("#table#{@gid}")
+			_rows = _table.find('tbody tr')
+			_rows.sort (a, b) ->
+				keyA = $(a).find(".#{column.col.extraClassName}").text()
+				keyB = $(b).find(".#{column.col.extraClassName}").text()
+				if $(a).find(".#{column.col.extraClassName}").hasClass("dt_decimal")
+					keyA = parseFloat keyA
+					keyB = parseFloat keyB
+				return conditions keyA,keyB
+			$.each _rows, (index, row) ->
+				_table.children("tbody").append(row)
+
+		if type == 'ASC'
+			_sorter (a,b) ->
+				if a > b then return 1;
+				if a < b then return -1;
+				return 0
+		else
+			_sorter (a,b) ->
+				if a < b then return 1;
+				if a > b then return -1;
+				return 0
 	##|
 	##|  Internal function called when there is a right click context menu event
 	##|  on a header column.   This will display the column options.
@@ -246,37 +273,19 @@ class TableView
 		_c = @colList.filter (_column) =>
 			return _column.col.name is column
 		.pop()
-
 		##| if column is sortable in dataTypes
 		if _c.col.sortable
 			_popupMenu = new PopupMenu "Column: #{column}", coords.x-150, coords.y
 
-			##| define sorter function using jquery tr switching
-			_sorter = (conditions) =>
-				_table = $("#table#{@gid}")
-				_rows = _table.find('tbody tr')
-				_popupMenu.closeTimer()
-				_rows.sort (a, b) ->
-					keyA = $(a).find(".#{_c.col.extraClassName}").text()
-					keyB = $(b).find(".#{_c.col.extraClassName}").text()
-					if $(a).find(".#{_c.col.extraClassName}").hasClass("dt_decimal")
-						keyA = parseFloat keyA
-						keyB = parseFloat keyB
-					return conditions keyA,keyB
-				$.each _rows, (index, row) ->
-					_table.children("tbody").append(row)
+
 
 			##| add sorting menu item
 			_popupMenu.addItem "Sort Ascending", () =>
-				return _sorter (a,b)->
-					if a > b then return 1;
-					if a < b then return -1;
-					return 0
-			_popupMenu.addItem "Sort Descending", () ->
-				return _sorter (a,b)->
-					if a < b then return 1;
-					if a > b then return -1;
-					return 0
+				_popupMenu.closeTimer()
+				@applySorting(_c)
+			_popupMenu.addItem "Sort Descending", () =>
+				_popupMenu.closeTimer()
+				@applySorting(_c,'DSC')
 
 		if typeof @tableCacheName != "undefined" && @tableCacheName != null
 			if !_popupMenu
@@ -299,6 +308,18 @@ class TableView
 	##|  If return's true, then the row is skipped
 	filterFunction : (row) =>
 		return false
+
+	updateRowData: () =>
+		##|
+		##|  Get latest data from that table using dataMap
+		@rowData = []
+		data = DataMap.getValuesFromTable @primaryTableName, @reduceFunction
+		for row in data
+			if @showCheckboxes
+				row.checkbox_key = @primaryTableName + "_" + row.key
+				row.checked = false
+
+			@rowData.push row
 
 	render: () =>
 
@@ -366,28 +387,7 @@ class TableView
 				html += "<tr class='messageRow'><td class='messageRow' colspan='#{@colList.length+1}'"
 				html += ">#{i}</td></tr>";
 			else
-				##|
-				##|  Create the "TR" tag
-				html += "<tr class='trow' data-id='#{counter}' "
-				html += ">"
-
-				##|
-				##|  Add a checkbox column possibly and then render the
-				##|  column using the column object.
-				if @showCheckboxes
-					html += @renderCheckable(i)
-
-				for col in @colList
-					if col.visible
-						if col.joinKey?
-							val = DataMap.getDataField col.joinTable, i.key, col.joinKey
-							str = DataMap.renderField "td", col.tableName, col.col.source, val, col.col.extraClassName
-						else
-							str = DataMap.renderField "td", col.tableName, col.col.source, i.key, col.col.extraClassName
-
-						html += str
-
-				html += "</tr>";
+				html += @renderRow(counter,i)
 
 		html += "</tbody></table>";
 
@@ -409,6 +409,32 @@ class TableView
 			@elTheTable.find("input.dataFilter").on "keyup", @filterKeypress
 
 		true
+
+
+
+	renderRow: (counter,i,isNewRow = false) =>
+		##|
+		##|  Create the "TR" tag
+		html = "<tr class='trow #{if isNewRow then 'newDataRow' else ''}' data-id='#{counter}' "
+		html += ">"
+
+		##|
+		##|  Add a checkbox column possibly and then render the
+		##|  column using the column object.
+		if @showCheckboxes
+			html += @renderCheckable(i)
+
+		for col in @colList
+			if col.visible
+				if col.joinKey?
+					val = DataMap.getDataField col.joinTable, i.key, col.joinKey
+					str = DataMap.renderField "td", col.tableName, col.col.source, val, col.col.extraClassName
+				else
+					str = DataMap.renderField "td", col.tableName, col.col.source, i.key, col.col.extraClassName
+
+				html += str
+
+		html += "</tr>";
 
 	##|
 	##|  Key press in a filter field
@@ -433,8 +459,10 @@ class TableView
 	applyFilters: () =>
 
 		filters = {}
+		if( @rowData.length != DataMap.getValuesFromTable(@primaryTableName).length)
+			_previousRowsCount = @rowData.length
+			@updateRowData()
 		for counter, i of @rowData
-
 			keepRow = true
 
 			if @currentFilters[i.table]
@@ -447,6 +475,21 @@ class TableView
 					aa = DataMap.getDataField(i.table, i.key, col.col.source)
 					if !filters[i.table+col.col.source].test aa
 						keepRow = false
+
+			_removeNewRowClass = (_html) =>
+				setTimeout () =>
+					_key = $(_html).data 'id'
+					console.log _key
+					@elTheTable.find("tr[data-id=#{_key}]").removeClass 'newDataRow'
+				,3000
+
+			##| if row is not present for that data, render new row
+			if !@elTheTable.find("tr [data-path^='/#{@primaryTableName}/#{i.key}/']").length
+				_html = @renderRow(_previousRowsCount,i,true)
+				@elTheTable.find('tbody').prepend(_html)
+				_removeNewRowClass _html
+				_previousRowsCount++
+
 
 			if !@rowDataElements[counter]
 				@rowDataElements[counter] = @elTheTable.find("tr[data-id='#{counter}']")

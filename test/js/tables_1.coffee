@@ -166,7 +166,34 @@ $ ->
         table.addTable "zipcode"
         table.render()
         true
-        
+
+    addTestButton "dynamic add/remove row test case", "Open", ()->
+        addHolder("renderTest1");
+        table = new TableView $("#renderTest1")
+        table.addTable "zipcode"
+        table.render()
+        _btnText = "&lt;input type='button' id='deleteFirstRow' class='btn btn-danger' style='margin-bottom:15px;' value='Delete First Row' /&gt;"
+        _btnText = _btnText.replace('&lt;','<').replace('&gt;','>')
+        $('#renderTest1').prepend _btnText
+        _btnText = "&lt;input type='button' id='addNewRow' class='btn btn-success' style='margin-bottom:15px;' value='Add New Row' /&gt;"
+        _btnText = _btnText.replace('&lt;','<').replace('&gt;','>')
+        $('#renderTest1').prepend _btnText
+        $('#addNewRow').on 'click', () ->
+            ##| manipulate data
+            _randomKey = Math.floor Math.random()*90000 + 10000
+            _randomData = DataMap.getDataMap().data['zipcode']["0#{Math.floor Math.random() * (1098 - 1070 + 1) + 1070}"]
+            if _randomData
+                _randomData['code'] = _randomKey
+            ##| add data
+            DataMap.addData 'zipcode', _randomKey, _randomData
+            ##| applyFilters to update new Data
+            table.applyFilters()
+        $('#deleteFirstRow').on 'click', () ->
+            ##| get first row key from table to pass as arg in function
+            _key = $('#renderTest1 tbody tr').first().find('.col_zipcode_code').text()
+            ##| function to delete the data from dataMap and from screen
+            DataMap.deleteDataByKey 'zipcode', _key
+        true
     go()
 
 

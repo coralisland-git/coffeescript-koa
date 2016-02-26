@@ -173,6 +173,19 @@ class DataMap
 
         true
 
+    @deleteDataByKey: (tableName, keyValue) =>
+        dm = DataMap.getDataMap()
+
+        if dm.data[tableName] and dm.data[tableName][keyValue]
+            ##| remove table row if found
+            if $("[data-path^='/#{tableName}/#{keyValue}/']").length
+                $("[data-path^='/#{tableName}/#{keyValue}/']").parent('tr').remove()
+
+            delete dm.data[tableName][keyValue]
+            $("[data-path^='/#{tableName}/#{keyValue}/']").html ""
+
+        true
+
     @getDataField: (tableName, keyValue, fieldName) =>
 
         dm = DataMap.getDataMap()
