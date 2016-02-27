@@ -44,6 +44,9 @@ class TableViewCol
 
 		html += ">";
 		html += @col.name;
+		##| sorting icon if inline sorting
+		if @inlineSorting
+			html += "<i class='fa fa-sort table-sorter pull-right'></i>"
 		html += "</th>";
 
 		return html

@@ -112,6 +112,17 @@ $ ->
         table.render()
         table.setupContextMenu()
         true
+
+    addTestButton "inline sorting with icon in header according to DataType", "Open", ()->
+        addHolder("renderTest1");
+        table = new TableView $("#renderTest1")
+        table.addTable "zipcode"
+        table.addInlineSortingSupport()
+        table.render()
+        $('#renderTest1').prepend "<input type='button' id='sortByCity' class='btn btn-info' style='margin-bottom:15px;' value='Sort By City DESC' />"
+        $('#sortByCity').on 'click', ()->
+            table.sortByColumn('City','DSC')
+        true
         
     addTestButton "auto hide columns from left on resize", "Open", ()->
         DataMap.setDataTypes "zipcode", [

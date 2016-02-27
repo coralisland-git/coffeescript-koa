@@ -38,6 +38,7 @@ class TableView
 		@sort           = 0
 		@showHeaders    = true
 		@showFilters	= true
+		@inlineSorting = false
 
 		##|
 		##|  Search filters
@@ -66,6 +67,7 @@ class TableView
 				c = new TableViewCol tableName, col
 				c.joinKey = sourceField
 				c.joinTable = @primaryTableName
+				c.inlineSorting = @inlineSorting
 				@colList.push(c)
 
 		true
@@ -79,6 +81,7 @@ class TableView
 		columns = DataMap.getColumnsFromTable(tableName, @columnReduceFunction)
 		for col in columns
 			c = new TableViewCol tableName, col
+			c.inlineSorting = @inlineSorting
 			@colList.push(c)
 
 
@@ -86,6 +89,11 @@ class TableView
 		##|  Get the data from that table
 		@updateRowData()
 		true
+
+	addInlineSortingSupport: () =>
+		@inlineSorting = true
+		@colList.map (column) -> column.inlineSorting = true
+
 
 	##|
 	##|  Default callback for a row that is clicked
@@ -408,6 +416,9 @@ class TableView
 		if @showFilters
 			@elTheTable.find("input.dataFilter").on "keyup", @filterKeypress
 
+		if @inlineSorting
+			@bindInlineSortingEvents()
+
 		true
 
 
@@ -435,6 +446,39 @@ class TableView
 				html += str
 
 		html += "</tr>";
+
+	##| function to sort column according to inline sort
+	sortByColumn: (_name,_type = 'ASC') =>
+		_this = this
+		_table = $("#table#{@gid}")
+		_sorters = _table.find '.table-sorter'
+		_th = _table.find("th:contains(#{_name})").first()
+		_sorters.each () ->
+			$(this).parent().attr('data-current-sorting','none')
+			$(this).removeClass('fa-sort-asc fa-sort-desc').addClass('fa-sort')
+		_col = @colList.filter (_col) ->
+			_col.col.name == _name
+		.pop()
+		if _type is 'ASC'
+			_th.attr('data-current-sorting','ASC')
+			_th.find('.fa').removeClass('fa-sort fa-sort-desc').addClass('fa-sort-asc')
+		else
+			_th.attr('data-current-sorting','DSC')
+			_th.find('.fa').removeClass('fa-sort fa-sort-asc').addClass('fa-sort-desc')
+		_this.applySorting(_col,_type)
+
+	##| function to bind inline sorting event on th click
+	bindInlineSortingEvents: () =>
+		_table = $("#table#{@gid}")
+		_sorters = _table.find '.table-sorter'
+		_this = this
+		_sorters.each () ->
+			_th = $(this).parent()
+			_th.attr('data-current-sorting','none').css('cursor','pointer')
+			_th.on 'click', () ->
+				_currentSorting = $(this).attr('data-current-sorting')
+				_type = if _currentSorting is 'ASC' then 'DSC' else 'ASC'
+				_this.sortByColumn($(this).text(),_type)
 
 	##|
 	##|  Key press in a filter field
