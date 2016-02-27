@@ -40,7 +40,7 @@ $ ->
     addTestButton "Render table 2", "Open", ()->
 
         addHolder("renderTest1");
-        table = new TableView $("#renderTest1")
+        table = new TableView $("#renderTest1"), true
         noAreaCode = (col)  -> col.name != "Area Code"
         filter = (obj, key) -> obj.county == "HAMPDEN"
         table.sort = (a, b) ->
