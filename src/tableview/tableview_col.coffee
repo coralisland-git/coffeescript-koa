@@ -21,6 +21,16 @@ class TableViewCol
 		if @visible == false then return ""
 
 		html = "<th style='";
+		##| if width is 0 then consider as auto width = left padding + max length text width + right padding
+		if(@width is 0 || @width is '0px' || @width is "" )
+			@width = 2 + 4 # 4 is left padding 2 is right padding
+			##| get the max length value from all data values
+			_currentWord = ''
+			DataMap.getValuesFromTable @tableName, (obj) =>
+				_currentWord = if obj[@col.source].length > _currentWord.length then obj[@col.source] else _currentWord
+			_rulerElement = $("<span id='ruler'>#{_currentWord}</span>").appendTo('body')
+			@width += parseInt(_rulerElement.width())
+			_rulerElement.remove()
 		if (@width)
 			if typeof @width == "string"
 				html += "width: " + @width + ";"

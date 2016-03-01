@@ -127,7 +127,6 @@ class PopupWindow
 
 		if typeof @x == "undefined" or @x < 0 then @x = 0
 		if typeof @y == "undefined" or @y < 0 then @y = 0
-
 		id   = GlobalValueManager.NextGlobalID()
 		html = $ "<div />",
 			class: "PopupWindow"

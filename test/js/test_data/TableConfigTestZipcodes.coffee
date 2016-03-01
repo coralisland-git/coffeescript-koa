@@ -18,6 +18,7 @@ TableConfigZipcodes.push
 	visible    : true
 	hideable   : false
 	editable   : false
+	width			 : 0
 	type       : 'text'
 	required   : true
 	sortable	 : true
