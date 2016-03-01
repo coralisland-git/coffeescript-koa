@@ -27,7 +27,7 @@ class TableViewCol
 			##| get the max length value from all data values
 			_currentWord = ''
 			DataMap.getValuesFromTable @tableName, (obj) =>
-				_currentWord = if obj[@col.source].length > _currentWord.length then obj[@col.source] else _currentWord
+				_currentWord = if obj[@col.source]? and obj[@col.source].length > _currentWord.length then obj[@col.source] else _currentWord
 			_rulerElement = $("<span id='ruler'>#{_currentWord}</span>").appendTo('body')
 			@width += parseInt(_rulerElement.width())
 			_rulerElement.remove()
