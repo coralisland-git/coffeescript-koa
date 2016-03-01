@@ -523,7 +523,6 @@ class TableView
 			_removeNewRowClass = (_html) =>
 				setTimeout () =>
 					_key = $(_html).data 'id'
-					console.log _key
 					@elTheTable.find("tr[data-id=#{_key}]").removeClass 'newDataRow'
 				,3000
 

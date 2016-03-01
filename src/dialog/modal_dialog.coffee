@@ -9,11 +9,11 @@ substringMatcher = (strs) ->
 
 class FormField
 
-	constructor: (@fieldName, @label, @type) ->
+	constructor: (@fieldName, @label, @value, @type) ->
 		@html = @getHtml()
 
 	getHtml: () =>
-		return "<input name='#{@fieldName}' id='#{@fieldName}' type='#{@type}' class='form-control' />"
+		return "<input name='#{@fieldName}' id='#{@fieldName}' type='#{@type}' value='#{@value}' class='form-control' />"
 
 	makeTypeahead: (options) =>
 		@typeaheadOptions = options
@@ -60,7 +60,7 @@ class FormWrapper
 		@templateFormFieldText = Handlebars.compile '''
 			<div class="form-group">
 				<label for="{{fieldName}}"> {{label}} </label>
-				<input class="form-control" id="{{fieldName}}" name="{{fieldName}}">
+				<input class="form-control" id="{{fieldName}}" value="{{value}}" name="{{fieldName}}">
 				<br>
 				<div id="{{fieldName}}error" class="text-danger"></div>
 			</div>
@@ -68,9 +68,8 @@ class FormWrapper
 
 	##|
 	##|  Add a text input field
-	addTextInput: (fieldName, label, fnValidate) =>
-
-		field = new FormField(fieldName, label, "text")
+	addTextInput: (fieldName, label, value, fnValidate) =>
+		field = new FormField(fieldName, label,value, "text")
 		@fields.push(field)
 		return field
 
@@ -91,7 +90,6 @@ class FormWrapper
 	onSubmitAction: (e) =>
 		for field in @fields
 			this[field.fieldName] = field.el.val()
-
 		@onSubmit(this)
 		if e?
 			e.preventDefault()

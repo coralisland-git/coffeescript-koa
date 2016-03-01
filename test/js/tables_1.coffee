@@ -205,6 +205,48 @@ $ ->
             ##| function to delete the data from dataMap and from screen
             DataMap.deleteDataByKey 'zipcode', _key
         true
+
+    addTestButton "editable popup on click", "Open", ()->
+        addHolder("renderTest1");
+        table = new TableView $("#renderTest1")
+        table.addTable "zipcode"
+        table.render()
+        $('#renderTest1').prepend "<input type='button' id='createNew' class='btn btn-info' style='margin-bottom:15px;' value='Create New' />"
+        $('#createNew').on 'click', ()->
+            p = new PopupForm('zipcode','code')
+            p.onCreateNew = (tableName, data) ->
+                console.log tableName,data
+                ##| apply filter or sorting to update the newly create row
+                setTimeout () ->
+                    table.applyFilters()
+                ,1
+                true
+
+        table.rowCallback = (data,e) ->
+            if data.key
+                new PopupForm('zipcode','code',data.key)
+        true
+
+    addTestButton "editable popup on click with custom columns", "Open", ()->
+        addHolder("renderTest1");
+        table = new TableView $("#renderTest1")
+        table.addTable "zipcode"
+        table.render()
+        _columns = []
+        _columns.push
+            name       : 'State'
+            source     : 'state'
+            type       : 'text'
+            required   : true
+        _columns.push
+            name       : 'County'
+            source     : 'county'
+            type       : 'text'
+            required   : true
+        table.rowCallback = (data,e) ->
+            if data.key
+                new PopupForm('zipcode','code',data.key,_columns)
+        true
     go()
 
 
