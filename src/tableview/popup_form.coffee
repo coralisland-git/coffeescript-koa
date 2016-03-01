@@ -7,13 +7,40 @@
 ##|      popup = new PopupForm(tableName, keyColumnSource, key, columns)
 ##|
 
+class PopUpFormWrapper extends FormWrapper
 
+  constructor: () ->
+    @fields = []
+    @gid    = "form" + GlobalValueManager.NextGlobalID()
+
+    @templateFormFieldText = Handlebars.compile '''
+			<div class="form-group">
+				<label for="{{fieldName}}" class="col-md-3 control-label"> {{label}} </label>
+				<div class="col-md-9">
+				  <input class="form-control" id="{{fieldName}}" value="{{value}}" name="{{fieldName}}">
+          <div id="{{fieldName}}error" class="text-danger help-block"></div>
+        </div>
+			</div>
+		'''
+
+  ##|
+  ##|  Generate HTML
+  getHtml: () =>
+
+    content = "<form id='#{@gid}' class='form-horizontal'>"
+
+    for field in @fields
+      content += @templateFormFieldText(field)
+
+    content += "</form>";
+
+
+##| class to get PopupForm
 class PopupForm extends ModalDialog
 
   showOnCreate: false;
   content:      ""
   close:        "Cancel"
-
   constructor: (@tableName, @keyElement,@key, @columns) ->
     if !@keyElement
       throw new Error "Key name is not supplied in the PopupForm"
@@ -27,7 +54,7 @@ class PopupForm extends ModalDialog
                   c.editable
 
     ##| get formWrapper object
-    @getForm()
+    @formWrapper = new PopUpFormWrapper()
 
     ##| generate text fields
     @createTextFields()
