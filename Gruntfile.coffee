@@ -98,7 +98,8 @@ module.exports = (grunt) ->
 					"ninja/test/js/dynamic_data_3.js"       : [ "test/js/dynamic_data_3.coffee" ]
 					"ninja/test/js/popup_menu_1.js"         : [ "test/js/popup_menu_1.coffee" ]
 					"ninja/test/js/popup_window_1.js"       : [ "test/js/popup_window_1.coffee" ]
-					"ninja/test/js/tables_1.js"             : [ "test/js/tables_1.coffee" ]
+					"ninja/test/js/tables_1.js"             : [ "test/js/tables_1.coffee" ],
+					"ninja/test/js/tables_2.js"             : [ "test/js/tables_2.coffee" ]
 					"ninja/test/js/test_common.js"          : [ "test/js/test_common.coffee", "test/js/test_data/*coffee" ]
 
 		watch:
