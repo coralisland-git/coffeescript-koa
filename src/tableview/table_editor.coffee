@@ -37,6 +37,9 @@ class TableEditor
     if @allowButtons
       @createButtons()
 
+  clear: ->
+    @tableHolder.html ""
+    
   setDataTypes: () ->
     ##| These data type will be same for all the table editor
     DataMap.setDataTypes "_editor_#{@editedTableKey}", [
