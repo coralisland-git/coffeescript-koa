@@ -13,7 +13,7 @@ class PopupWindow
 	popupWidth:  600
 	popupHeight: 400
 	isVisible:   false
-
+	allowHorizontalScroll: false
 	##|
 	##|  Returns the available height for the body element
 	getBodyHeight: () =>
@@ -181,6 +181,8 @@ class PopupWindow
 			scrollbars: true
 			bounce: false
 			resizeScrollbars: false
+			freeScroll: @allowHorizontalScroll
+			scrollX: @allowHorizontalScroll
 
 		@dragabilly = new Draggabilly "#popup#{id}",
 			handle: "#popuptitle#{id}"

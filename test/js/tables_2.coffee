@@ -171,4 +171,10 @@ $ ->
       if data.key
         new PopupForm('zipcode','code',data.key,_columns)
     true
+
+  addTestButton "popup table", "Open", ()->
+    zipCodeTable = new TableView $("#_popupTable")
+    zipCodeTable.addTable "zipcode"
+    popup = new PopupTable zipCodeTable, 'zipCodeDemoTable'
+    true
   go()
