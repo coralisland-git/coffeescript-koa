@@ -387,6 +387,10 @@ class TableView
 		if (typeof @sort == "function")
 			@rowData.sort @sort
 
+		##| if no row found then default message
+		if @rowData.length is 0
+			@addMessageRow "No results"
+
 		for counter, i of @rowData
 
 			# if @filterFunction i then continue
