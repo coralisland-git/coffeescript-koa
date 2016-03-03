@@ -9,7 +9,7 @@ substringMatcher = (strs) ->
 
 class FormField
 
-	constructor: (@fieldName, @label, @value, @type) ->
+	constructor: (@fieldName, @label, @value, @type, @attrs = {}) ->
 		@html = @getHtml()
 
 	getHtml: () =>
@@ -60,7 +60,11 @@ class FormWrapper
 		@templateFormFieldText = Handlebars.compile '''
 			<div class="form-group">
 				<label for="{{fieldName}}"> {{label}} </label>
-				<input class="form-control" id="{{fieldName}}" value="{{value}}" name="{{fieldName}}">
+				<input class="form-control" type="{{type}}" id="{{fieldName}}" value="{{value}}" name="{{fieldName}}"
+				{{#each attrs}}
+    			{{@key}}="{{this}}"
+				{{/each}}
+				/>
 				<br>
 				<div id="{{fieldName}}error" class="text-danger"></div>
 			</div>
@@ -68,11 +72,18 @@ class FormWrapper
 
 	##|
 	##|  Add a text input field
-	addTextInput: (fieldName, label, value, fnValidate) =>
-		field = new FormField(fieldName, label,value, "text")
+	addTextInput: (fieldName, label, value,attrs, fnValidate) =>
+		@addInput(fieldName,label,value,"text",attrs,fnValidate)
+
+	##| Add general input field
+	addInput: (fieldName, label, value, type = "text",attrs = {},fnValidate) =>
+		type = if type is "boolean" then "checkbox" else type
+		if type is "checkbox" and value is 1
+			attrs.checked = "checked"
+		value = if type is "checkbox" then 1 else value
+		field = new FormField(fieldName, label,value, type, attrs)
 		@fields.push(field)
 		return field
-
 	##|
 	##|  Generate HTML
 	getHtml: () =>
@@ -89,6 +100,7 @@ class FormWrapper
 
 	onSubmitAction: (e) =>
 		for field in @fields
+			console.log field.el.val(),field.fieldName
 			this[field.fieldName] = field.el.val()
 		@onSubmit(this)
 		if e?
@@ -232,7 +244,7 @@ class ModalDialog
 			e.stopPropagation()
 
 			options = {}
-			@modal.find("input").each (idx, el) =>
+			@modal.find("input,select").each (idx, el) =>
 				name = $(el).attr("name")
 				val  = $(el).val()
 				options[name] = val

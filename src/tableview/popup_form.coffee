@@ -4,7 +4,7 @@
 ##|  This class creates a popup window with form that can be used to edit table row.
 ##|
 ##|  @example
-##|      popup = new PopupForm(tableName, keyColumnSource, key, columns)
+##|      popup = new PopupForm(tableName, keyColumnSource, key, columns, defaultValues)
 ##|
 
 class PopUpFormWrapper extends FormWrapper
@@ -17,7 +17,25 @@ class PopUpFormWrapper extends FormWrapper
 			<div class="form-group">
 				<label for="{{fieldName}}" class="col-md-3 control-label"> {{label}} </label>
 				<div class="col-md-9">
-				  <input class="form-control" id="{{fieldName}}" value="{{value}}" name="{{fieldName}}">
+				  <input type="{{type}}" class="form-control" id="{{fieldName}}" value="{{value}}" name="{{fieldName}}"
+          {{#each attrs}}
+            {{@key}}="{{this}}"
+          {{/each}}
+          />
+          <div id="{{fieldName}}error" class="text-danger help-block"></div>
+        </div>
+			</div>
+		'''
+
+    @templateFormFieldSelect = Handlebars.compile '''
+			<div class="form-group">
+				<label for="{{fieldName}}" class="col-md-3 control-label"> {{label}} </label>
+				<div class="col-md-9">
+				  <select class="form-control" id="{{fieldName}}" name="{{fieldName}}">
+            {{#each attrs.options}}
+              <option value="{{this}}" {{#if @first}} selected="selected" {{/if}}>{{this}}</option>
+            {{/each}}
+          </select>
           <div id="{{fieldName}}error" class="text-danger help-block"></div>
         </div>
 			</div>
@@ -30,7 +48,7 @@ class PopUpFormWrapper extends FormWrapper
     content = "<form id='#{@gid}' class='form-horizontal'>"
 
     for field in @fields
-      content += @templateFormFieldText(field)
+      content += if field.type is "select" then @templateFormFieldSelect(field) else @templateFormFieldText(field)
 
     content += "</form>";
 
@@ -41,7 +59,7 @@ class PopupForm extends ModalDialog
   showOnCreate: false;
   content:      ""
   close:        "Cancel"
-  constructor: (@tableName, @keyElement,@key, @columns) ->
+  constructor: (@tableName, @keyElement,@key, @columns, @defaults) ->
     if !@keyElement
       throw new Error "Key name is not supplied in the PopupForm"
 
@@ -52,16 +70,15 @@ class PopupForm extends ModalDialog
     if !@columns
       @columns = DataMap.getColumnsFromTable @tableName, (c) ->
                   c.editable
-
     ##| get formWrapper object
     @formWrapper = new PopUpFormWrapper()
 
     ##| generate text fields
-    @createTextFields()
+    @createInputFields()
 
     @show()
 
-  createTextFields: () ->
+  createInputFields: () ->
     ##| if in create mode insert key column and make it required
     if !@key
       @keyColumn = DataMap.getColumnsFromTable @tableName, (c) =>
@@ -74,7 +91,10 @@ class PopupForm extends ModalDialog
     for _column in @columns
       if _column.source is @keyElement
         @keyColumn = _column
-      @formWrapper.addTextInput _column.source,_column.name,DataMap.getDataField(@tableName,@key,_column.source)
+      _value = if @key then DataMap.getDataField(@tableName,@key,_column.source) else null
+      if @defaults and @defaults[_column.source]
+        _value = @defaults[_column.source]
+      @formWrapper.addInput _column.source,_column.name,_value,(if !_column.element then _column.type else _column.element),if _column.options? then {options:_column.options}
 
   onButton2 : (e,form) ->
     _valid = true
@@ -99,4 +119,3 @@ class PopupForm extends ModalDialog
         if @onCreateNew(@tableName,form)
           DataMap.addData @tableName, form[@keyElement], form
           @hide()
-

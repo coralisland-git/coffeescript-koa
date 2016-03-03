@@ -50,6 +50,7 @@ class TableEditor
         type: "text"
         editable:true
         required:true
+        width:120
       }
       {
         name: "Source"
@@ -57,6 +58,7 @@ class TableEditor
         visible: true,
         type: "text"
         editable:true
+        width:120
       }
       {
         name: "Visible"
@@ -64,6 +66,7 @@ class TableEditor
         visible: true,
         type: "boolean"
         editable:true
+        width:120
       }
       {
         name: "Hideable"
@@ -71,6 +74,7 @@ class TableEditor
         visible: true,
         type: "boolean"
         editable:true
+        width:120
       }
       {
         name: "Type"
@@ -79,6 +83,9 @@ class TableEditor
         type: "text"
         editable:true
         required:true
+        width:120,
+        element:"select",
+        options: Object.keys globalDataFormatter.formats
       }
       {
         name: "Width"
@@ -86,6 +93,7 @@ class TableEditor
         visible: true,
         type: "text"
         editable:true
+        width:120
       }
       {
         name: "Tooltip"
@@ -93,6 +101,7 @@ class TableEditor
         visible: true,
         type: "text"
         editable:true
+        width:120
       }
       {
         name: "Sortable"
@@ -100,6 +109,15 @@ class TableEditor
         visible: true,
         type: "boolean"
         editable:true
+        width:120
+      }
+      {
+        name: "Required"
+        source: "required"
+        visible: true,
+        type: "boolean"
+        editable:true
+        width:120
       }
       {
         name: "Render"
@@ -107,6 +125,7 @@ class TableEditor
         visible: true,
         type: "text"
         editable:true
+        width:120
       }
     ]
 
@@ -142,7 +161,7 @@ class TableEditor
   setButtonEvents: ->
     _table = @editorTable
     $("#_editor_#{@editedTableKey}_create").on "click", =>
-      p = new PopupForm("_editor_#{@editedTableKey}","source")
+      p = new PopupForm("_editor_#{@editedTableKey}","source",null,null,{visible:1,hideable:1,required:0,sortable:1,type:"text"})
       p.onCreateNew = (tableName, data) =>
         ##| update data map data types if new inserted and add in rowList
         DataMap.setDataTypes tableName,[data]
