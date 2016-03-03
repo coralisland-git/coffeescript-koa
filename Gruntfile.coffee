@@ -93,6 +93,7 @@ module.exports = (grunt) ->
 					"ninja/test/js/address_normalizer_1.js" : [ "test/js/address_normalizer_1.coffee" ]
 					"ninja/test/js/data_mapper_1.js"        : [ "test/js/data_mapper_1.coffee" ]
 					"ninja/test/js/dialog_1.js"             : [ "test/js/dialog_1.coffee" ]
+					"ninja/test/js/globalval_1.js"          : [ "test/js/globalval_1.coffee" ]
 					"ninja/test/js/dynamic_data_1.js"       : [ "test/js/dynamic_data_1.coffee" ]
 					"ninja/test/js/dynamic_data_2.js"       : [ "test/js/dynamic_data_2.coffee" ]
 					"ninja/test/js/dynamic_data_3.js"       : [ "test/js/dynamic_data_3.coffee" ]

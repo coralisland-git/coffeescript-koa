@@ -132,6 +132,9 @@ class GlobalValueManager
         if date == null
             return null;
 
+        if date? and typeof date == "object" and date.getTime?
+            return moment(date)
+
         if typeof date != "string"
             return null;
 
@@ -188,6 +191,38 @@ class GlobalValueManager
 
         html += "<span class='fage'>" + age + "</span>"
 
+    ##|
+    ##| Given a date in a Moment object, return an HTML display
+    ##| This includes a span with the age of the date such as 32 days
+    ##|
+    ##| @param [Moment] date The date object
+    ##|
+    @DateTimeFormat = (stamp) ->
+
+        if stamp == null
+            if val then return val
+            return "&mdash;"
+
+        html = "<span class='fdate'>" + stamp.format("dddd, MMMM Do YYYY, h:mm:ss a") + "</span>"
+
+        age = moment().diff(stamp)
+        age = age / 86400000
+
+        if (age < 1)
+            hrs = age * 24
+            if hrs > 3
+                age = numeral(hrs).format("#") + " hours"
+            else
+                min = age * (24 * 60)
+                age = numeral(min).format("#") + " minutes"
+        else if (age < 401)
+            age = numeral(age).format("#") + " days"
+        else if (age < 365 * 2)
+            age = numeral(age / 30.5).format("#") + " months"
+        else
+            age = numeral(age / 365).format("#.#") + " years"
+
+        html += "<span class='fage'>" + age + "</span>"
 
     ##|
     ##|  Give some text, returns a title version, for example
