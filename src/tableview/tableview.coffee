@@ -426,7 +426,6 @@ class TableView
 			$("#table#{@gid}").append _html
 			_tableHolder = @elTableHolder
 			@elTableHolder.find(".table-body").scroll (e)->
-				console.log -1*this.scrollLeft
 				_tableHolder.find(".table-header").css('left',(-1*this.scrollLeft) + 'px')
 
 		setTimeout () =>
