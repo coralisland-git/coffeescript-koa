@@ -139,8 +139,7 @@ class TableView
 	setupEvents: (@rowCallback, @rowMouseover) =>
 
 	internalSetupMouseEvents: () =>
-
-		@elTheTable.find("tr td").bind "click touchbegin", (e) =>
+		@elTheTable.bind "click touchbegin", (e) =>
 
 			e.preventDefault()
 			e.stopPropagation()
@@ -180,21 +179,13 @@ class TableView
 					@onSetCheckbox data.checkbox_key, data.checked
 
 			false
-
-		@elTheTable.find("tr td").bind "mouseover", (e) =>
+		## to test the mouseover callback
+		@elTheTable.bind "mouseover mouseout", (e) =>
 			e.preventDefault()
 			e.stopPropagation()
 			if typeof @rowMouseover == "function"
 				data = @findRowFromElement e.target
-				@rowMouseover data, "over"
-			false
-
-		@elTheTable.find("tr td").bind "mouseout", (e) =>
-			e.preventDefault()
-			e.stopPropagation()
-			if typeof @rowMouseover == "function"
-				data = @findRowFromElement e.target
-				@rowMouseover data, "out"
+				@rowMouseover data, if e.type is "mouseover" then "over" else "out"
 			false
 
 	setupContextMenu: (@contextMenuCallbackFunction) =>
@@ -578,7 +569,6 @@ class TableView
 
 		if typeof stackCount == "undefined" then stackCount = 0
 		if stackCount > 4 then return null
-
 		data_id = $(e).attr("data-id")
 		if data_id then return @rowData[data_id]
 		parent = $(e).parent()
