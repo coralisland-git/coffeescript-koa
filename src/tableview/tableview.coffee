@@ -320,6 +320,9 @@ class TableView
 
 			@rowData.push row
 
+	##| make the table with fixed header and scrollable
+	fixedHeaderAndScrollable: (@fixedHeader = true) ->
+
 	render: () =>
 
 		@rowDataElements = {}
@@ -330,9 +333,19 @@ class TableView
 		if !@gid?
 			@gid = GlobalValueManager.NextGlobalID()
 
-		##|
-		##|  draw the table header
-		html = "<table class='tableview' id='table#{@gid}'>"
+		html = "";
+		##| if fixed header and resizable
+		if @fixedHeader
+			if !@showHeaders
+				throw new Error "fixed header can't be done without header"
+			html += """<div class='table-wrapper' id='tableWrapper#{@gid}'><div class='outer-container'>
+										<div class='inner-container'>
+											<div class='table-header'>
+												<table id="tableheader#{@gid}" class="tableview">"""
+		else
+			##|
+			##|  draw the table header
+			html += "<table class='tableview' id='table#{@gid}'>"
 
 		##|
 		##|  Add headers
@@ -370,6 +383,12 @@ class TableView
 		##|
 		##|  Start adding the body
 		html += "</thead>"
+		if @fixedHeader
+			html += """</table>
+            		</div>
+								<div class="table-body">
+									<table id='table#{@gid}' class="tableview">"""
+
 		html += "<tbody id='tbody#{@gid}'>";
 
         # ---- html += DataMap.renderField "div", "zipcode", "city", "03105"
@@ -393,8 +412,22 @@ class TableView
 				html += @renderRow(counter,i)
 
 		html += "</tbody></table>";
+		if @fixedHeader
+			html += "</div></div></div></div>"
+			#| add width to individual td
 
 		@elTheTable = @elTableHolder.html(html);
+
+		##| if the fixed header add the width to first row td
+		if @fixedHeader
+			_html = "";
+			$("#tableheader#{@gid} tr:first th").each (index,e) =>
+				_html += "<col width='"+$(e).outerWidth()+"px' />"
+			$("#table#{@gid}").append _html
+			_tableHolder = @elTableHolder
+			@elTableHolder.find(".table-body").scroll (e)->
+				console.log -1*this.scrollLeft
+				_tableHolder.find(".table-header").css('left',(-1*this.scrollLeft) + 'px')
 
 		setTimeout () =>
 			# globalResizeScrollable();

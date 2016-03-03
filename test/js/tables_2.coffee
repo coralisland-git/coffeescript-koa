@@ -177,4 +177,13 @@ $ ->
     zipCodeTable.addTable "zipcode"
     popup = new PopupTable zipCodeTable, 'zipCodeDemoTable'
     true
+
+  addTestButton "table with fixed header and scrollable", "Open", ()->
+    addHolder("renderTest1");
+    $('#renderTest1').height(350); ##| to add scroll the height is fix
+    table = new TableView $("#renderTest1")
+    table.addTable "zipcode"
+    table.fixedHeaderAndScrollable()
+    table.render()
+    true
   go()
