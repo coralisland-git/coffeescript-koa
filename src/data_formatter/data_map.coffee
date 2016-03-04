@@ -166,19 +166,21 @@ class DataMap
         true
 
     @stateSave: () =>
-        dm = DataMap.getDataMap()
-        localStorage["DataMap"] = JSON.stringify(dm.data)
+        # TODO: Figure out a better way to save and load state
+        # dm = DataMap.getDataMap()
+        # localStorage["DataMap"] = JSON.stringify(dm.data)
         return
 
     @stateLoad: () =>
-        jtext = localStorage["DataMap"]
-        if jtext? and jtext != null
-            dm = DataMap.getDataMap()
+        # TODO: Figure out a better way to save state
+        # jtext = localStorage["DataMap"]
+        # if jtext? and jtext != null
+        #     dm = DataMap.getDataMap()
 
-            try
-                dm.data = JSON.parse(jtext)
-            catch
-                dm.data = {}
+        #     try
+        #         dm.data = JSON.parse(jtext)
+        #     catch
+        #         dm.data = {}
 
         return
 
