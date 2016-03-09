@@ -1,53 +1,75 @@
-##
-##  A Table manager class that is designed to quickly build scrollable tables
-##
-##  @class TableView
-##  @uses iScroll5
-
+# A Table manager class that is designed to quickly build scrollable tables
+# @namespace TableView
+# @example How to create table view
+#		new TableView $('.tableHolder')
 class TableView
+
 
 	imgChecked     : "<img src='images/checkbox.png' width='16' height='16' alt='Selected' />"
 	imgNotChecked  : "<img src='images/checkbox_no.png' width='16' height='16' alt='Selected' />"
 
-	##|
-	##| Checkboxes
+	###
+	@example add onSetCheckbox
+	$tableView.onSetCheckbox checkboxKey,value
+	@param [String] checkbox_key to identify the checkbox key
+	@param [String] value to identify the value of checkbox
+  ###
 	onSetCheckbox: (checkbox_key, value) =>
 		##|
 		##|  By default this is a property
 		# api.SetCheckbox window.currentProperty.id, checkbox_key, value
 		console.log "onSetCheckbox(", checkbox_key, ",", value, ")"
 
+	###
+  @example to get the size of table row
+  	tableView.size()
+  @return [Integer] the length of the rows in table
+	###
 	size : () =>
 		return @rowData.length
 
+	###
+  returns the number of rows checked
+  @example
+		tableView.numberChecked()
+	@return [Integer] the number of rows that are checked
+	###
 	numberChecked: () =>
 		total = 0
 		for i, o of @rowData
 			if o.checked then total++
 		total
 
-	##| Initialize the class by sending in the ID of the tag you want to become
-	##| a managed table.   This should be a simple <table id='something'> tag.
-	##|
-	##| @param elTableHolder [jQuery Element] the $() referenced element that will hold the table
-	##|
+	###
+  Initialize the class by sending in the ID of the tag you want to become a managed table.
+  This should be a simple <table id='something'> tag.
+  @example
+		tableView.numberChecked()
+	@param elTableHolder [jQuery Element] the $() referenced element that will hold the table
+  @param showCheckbox [boolean] weather to show checkbox as first column
+	###
 	constructor: (@elTableHolder, @showCheckboxes) ->
 
+		#@property Array list of columns as array
 		@colList        = []
+		#@property Array list of rows as array
 		@rowData        = []
+		#@property boolean|function sorting function to apply on render
 		@sort           = 0
+		#@property boolean to show headers of table
 		@showHeaders    = true
+		#@property boolean to show textbox to filter data
 		@showFilters	= true
+		#@property boolean to enable inline sorting clicking on column
 		@inlineSorting = false
 
-		##|
-		##|  Search filters
+
 		@currentFilters  = {}
 		@rowDataElements = {}
 
-		##|
-		##|  No context menu setup by default
+		#@property boolean|function callback to call on context menu click
 		@contextMenuCallbackFunction = 0
+		#@property boolean|function add menu to context menu
 		@contextMenuCallSetup        = 0
 
 		if !@showCheckboxes?
@@ -56,9 +78,20 @@ class TableView
 		if (!@elTableHolder[0])
 			console.log "Error: Table id #{@elTableHolder} doesn't exist"
 
+		#@property Object current table configurations
 		@tableConfig = {}
+		#@property Object table database configuration
 		@tableConfigDatabase = null
 
+	###
+  to add the join table with current rendered table
+  @example
+  	table.addJoinTable "county", null, "county"
+  @param String tableName the table to add as join table from datamap
+  @param Function|null columnReduceFunction function to filter the join table columns
+  @param String sourceField column to find as common in both table
+  @return boolean to ensure join added
+	###
 	addJoinTable: (tableName, columnReduceFunction, sourceField) =>
 
 		columns = DataMap.getColumnsFromTable tableName, columnReduceFunction
@@ -72,6 +105,15 @@ class TableView
 
 		true
 
+	###
+  to add the table in the view from datamap
+  @example
+  	tableView "zipcode",null,null
+  @param String tableName name of the table inside datamap
+  @param Function|null columnReduceFunction function to filter the column
+  @param Function|null reduceFunction function to filter the data
+  @return boolean
+	###
 	addTable: (tableName, @columnReduceFunction, @reduceFunction) =>
 
 		@primaryTableName = tableName
@@ -90,20 +132,35 @@ class TableView
 		@updateRowData()
 		true
 
+	###
+  add support for inline sorting when clicking on the column header
+  @example
+  	tableView.addInlineSortingSupport()
+	###
 	addInlineSortingSupport: () =>
 		@inlineSorting = true
 		@colList.map (column) -> column.inlineSorting = true
 
 
-	##|
-	##|  Default callback for a row that is clicked
+	###
+  to add the default table row click event
+  @example
+  	tableView.defaultRowClick = (rowData,eventObject) ->
+  @param Object row the data of row in form object that is clicked
+  @param Object the object of click event
+  @return boolean weather event is succeed
+	###
 	defaultRowClick: (row, e) =>
 		console.log "DEF ROW CLICK=", row, e
 		false
 
-	##|
-	##|  Remove the checkbox for all items except those included
-	##|  in the bookmark array that comes from the server
+	###
+  Remove the checkbox for all items except those included in the bookmark array that comes from the server
+  @example
+  	tableView.resetChecked [1,2,3]
+  @param Array bookmarkArray the array of key to consider as bookmark
+  @return boolean
+	###
 	resetChecked : (bookmarkArray) =>
 
 		for i, o of @rowData
@@ -120,6 +177,12 @@ class TableView
 
 		false
 
+	###
+  render the checkable row with checkbox as first column
+  @example
+  	tableView.renderCheckable dataRowObject
+  @return String html the html of the row as string
+	###
 	renderCheckable : (obj) =>
 
 		if typeof obj.rowOptionAllowCheck != "undefined" and obj.rowOptionAllowCheck == false
@@ -136,8 +199,18 @@ class TableView
 
 		return html
 
+	###
+  set up events callback
+  @example
+  	tableView.setUpEvents (rowData,e)-> , (rowData,eventType)->
+  @param Function rowCallback callback to execute at the row click
+  @param Function rowMouseOver callback to execute at the mouse over|out event
+	###
 	setupEvents: (@rowCallback, @rowMouseover) =>
 
+	###
+  to setup event internally for the table
+	###
 	internalSetupMouseEvents: () =>
 		@elTheTable.bind "click touchbegin", (e) =>
 
@@ -188,6 +261,12 @@ class TableView
 				@rowMouseover data, if e.type is "mouseover" then "over" else "out"
 			false
 
+	###
+  to add context menu with header column click
+  @example
+  	tableView.setupContextMenu (coordinates,data) ->
+  @param Function contextMenuCallbackFunction function to execute on the click of context menu item
+	###
 	setupContextMenu: (@contextMenuCallbackFunction) =>
 
 		if @contextMenuCallSetup == 1 then return true
@@ -218,17 +297,24 @@ class TableView
 
 		true
 
-	##|
-	##|  Internal function called to setup the context menu on the header
+	###
+  Internal function called to setup the context menu on the header
+	###
 	setupContextMenuHeader: =>
 		@setupContextMenu @contextMenuCallbackFunction
 
-	##|
-	##|  Table cache name is set, this allows saving/loading table configuration
+	###
+  Table cache name is set, this allows saving/loading table configuration
+  @param String tableCacheName the cache name to attach with table
+	###
 	setTableCacheName: (@tableCacheName) =>
 
 
-	##| apply sorting based on selected context menu
+	###
+  internal function to apply sorting on table with column and sorting type
+  @param Object column column on which sorting should be applied
+  @param String type it can be ASC|DESC
+	###
 	applySorting: (column, type = 'ASC' ) =>
 		## | update rows if new data added
 		if( @rowData.length != DataMap.getValuesFromTable(@primaryTableName).length)
@@ -262,10 +348,10 @@ class TableView
 				if a < b then return 1;
 				if a > b then return -1;
 				return 0
-	##|
-	##|  Internal function called when there is a right click context menu event
-	##|  on a header column.   This will display the column options.
-	##|
+
+	###
+	Internal function called when there is a right click context menu event on a header column.   This will display the column options.
+	###
 	onContextMenuHeader: (coords, column) =>
 
 		console.log "COORDS=", coords
@@ -295,19 +381,33 @@ class TableView
 					y: coords.y
 
 
-	##|
-	##|  Display a popup to adjust the columns of the table
+	###
+  Display a popup to adjust the columns of the table
+  @example
+  	tableView.onConfigureColumns x:200
+  		y:300
+  @param Object coords coordinates x and y where to show the menu
+	###
 	onConfigureColumns: (coords) =>
 
 		popup = new PopupWindowTableConfiguration "Configure Columns", coords.x-150, coords.y
 		popup.show(this)
 
 
-	##|
-	##|  If return's true, then the row is skipped
+	###
+  function to filter rows If return's true, then the row is skipped
+  @example
+  	tableView.filterFunction (row)->
+  @param Object row the current row which is in the process
+	###
 	filterFunction : (row) =>
 		return false
 
+	###
+  to update the row data on the screen if new data has been added in datamapper they can be considered here
+  @example
+  	tableView.updateRowData()
+	###
 	updateRowData: () =>
 		##|
 		##|  Get latest data from that table using dataMap
@@ -320,9 +420,18 @@ class TableView
 
 			@rowData.push row
 
-	##| make the table with fixed header and scrollable
+	###
+  make the table with fixed header and scrollable
+  @example
+  	tableView.fixedHeaderAndScrollable()
+	###
 	fixedHeaderAndScrollable: (@fixedHeader = true) ->
 
+	###
+  function to render the added table inside the table holder element
+  @example
+  	tableView.render()
+	###
 	render: () =>
 
 		@rowDataElements = {}
@@ -449,7 +558,12 @@ class TableView
 		true
 
 
-
+	###
+  internal function to get the html of a single row
+  @param Integer counter the position of the row
+  @param Object dataElement the data element with key as property retrived from data mapper
+  @return String html the html of the row
+	###
 	renderRow: (counter,i,isNewRow = false) =>
 		##|
 		##|  Create the "TR" tag
@@ -474,7 +588,13 @@ class TableView
 
 		html += "</tr>";
 
-	##| function to sort column according to inline sort
+	###
+  function to sort the table based on column and type
+  @example
+  	tableView.sortByColumn "state","DESC"
+  @param string name name of column to apply sorting on
+  @param string type type of sorting it can be ASC|DESC
+	###
 	sortByColumn: (_name,_type = 'ASC') =>
 		_this = this
 		_table = $("#table#{@gid}")
@@ -494,7 +614,9 @@ class TableView
 			_th.find('.fa').removeClass('fa-sort fa-sort-asc').addClass('fa-sort-desc')
 		_this.applySorting(_col,_type)
 
-	##| function to bind inline sorting event on th click
+	###
+  internal function to bind the table header row click event which are called withing inlineSortingSupport
+	###
 	bindInlineSortingEvents: () =>
 		_table = $("#table#{@gid}")
 		_sorters = _table.find '.table-sorter'
@@ -507,8 +629,9 @@ class TableView
 				_type = if _currentSorting is 'ASC' then 'DSC' else 'ASC'
 				_this.sortByColumn($(this).text(),_type)
 
-	##|
-	##|  Key press in a filter field
+	###
+  internal event Key press in a filter field, that executes during the filter text box keypress event
+	###
 	filterKeypress: (e) =>
 
 		parts      = $(e.target).attr("data-path").split /\//
@@ -524,9 +647,9 @@ class TableView
 
 		return true
 
-	##|
-	##| Apply the filters stored in "currentFilters" to each
-	##| column and show/hide the rows
+	###
+  Apply the filters stored in "currentFilters" to each column and show/hide the rows
+	###
 	applyFilters: () =>
 
 		filters = {}
@@ -571,21 +694,36 @@ class TableView
 
 		true
 
-	##
-	## Add a row that takes the full width
+	###
+  Add a row that takes the full width using colspan
+	###
 	addMessageRow : (message) =>
 		@rowData.push message
 		return 0;
 
+	###
+  clear the table using jquery .html ""
+  @example
+  	tableView.clear() will remove all the html of table
+	###
 	clear : =>
 		@elTableHolder.html ""
 
+	###
+  clear the html and also remove the associated column and rows reference
+  @example
+  	tableView.reset()
+	###
 	reset: () =>
 		@elTableHolder.html ""
 		@rowData = []
 		@colList = []
 		true
 
+	###
+  add custom filter function which will be called on the key press of filter field
+  @param Function callback to be called in keypress
+	###
 	setFilterFunction: (filterFunction) =>
 
 		@filterFunction = filterFunction
@@ -595,6 +733,9 @@ class TableView
 		GlobalValueManager.Watch "redrawTables", () =>
 			@render()
 
+	###
+  internal function to find the row Element from the event object
+	###
 	findRowFromElement: (e, stackCount) =>
 
 		# console.log "FindRowFromElement:", e, stackCount
@@ -607,6 +748,10 @@ class TableView
 		if parent then return @findRowFromElement(parent, stackCount + 1)
 		return null
 
+	###
+  add responsive capabilities by adding auto hide columns having width less than passed thresold
+  @param Integer width default is 32 so columns having width less than 32 will be hidden if space is not enough
+	###
 	setAutoHideColumn: (width=32) =>
 		_handleResize = =>
 			_headerHideIndexes = [];

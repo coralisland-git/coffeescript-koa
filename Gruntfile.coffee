@@ -17,7 +17,7 @@ module.exports = (grunt) ->
 				options:
 					port: 9000
 					hostname: "0.0.0.0"
-					bases: [ "ninja/test/" ]
+					bases: [ "ninja/test","doc" ]
 
 		##|
 		##|  Copy task, takes all the files in the different build folders
