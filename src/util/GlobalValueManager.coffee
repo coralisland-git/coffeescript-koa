@@ -7,6 +7,8 @@
 ##|
 ##|  Global variables
 
+reDateUtc = /\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ/
+
 class GlobalValueManager
 
     @globalCellID    : 0
@@ -138,6 +140,10 @@ class GlobalValueManager
         if typeof date != "string"
             return null;
 
+
+        if reDateUtc.test date
+            return moment(date)
+
         date = date.replace "T", " "
 
         if date.match /\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d/
@@ -200,7 +206,6 @@ class GlobalValueManager
     @DateTimeFormat = (stamp) ->
 
         if stamp == null
-            if val then return val
             return "&mdash;"
 
         html = "<span class='fdate'>" + stamp.format("dddd, MMMM Do YYYY, h:mm:ss a") + "</span>"

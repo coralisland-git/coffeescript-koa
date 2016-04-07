@@ -239,8 +239,7 @@ class TableView
 
 				##|
 				##| Check to see if it's a checkbox row
-				console.log "data=", data
-				if data.checked?
+				if data? and data.checked?
 					data.checked = !data.checked
 					key = data.key
 					if data.checked
@@ -403,9 +402,9 @@ class TableView
 	filterFunction : (row) =>
 		return false
 
-	###
-  to update the row data on the screen if new data has been added in datamapper they can be considered here
-  @example
+	### ------------------------------------------------------------------------------------------------------------------
+	to update the row data on the screen if new data has been added in datamapper they can be considered here
+	@example
   	tableView.updateRowData()
 	###
 	updateRowData: () =>
@@ -420,17 +419,39 @@ class TableView
 
 			@rowData.push row
 
+	### ------------------------------------------------------------------------------------------------------------------
+	Set the holder element to go to the bottom of the screen
 	###
-  make the table with fixed header and scrollable
-  @example
-  	tableView.fixedHeaderAndScrollable()
+	setHolderToBottom: () =>
+
+		height = $(window).height()
+		pos = @elTableHolder.position()
+
+		newHeight = height - pos.top
+		@elTableHolder.height(newHeight)
+		# console.log "Window Height=", height, " Pos=", pos, "NewHeight=", newHeight
+
+		##|
+		##|  If the width of the table scrolls, this fixes it
+		width = @elTableHolder.width()
+		console.log "W=", width
+		console.log "I=", @elTableHolder.find(".inner-container")
+		console.log "W2=", @elTableHolder.find(".inner-container").width()
+		if width > 0
+			@elTableHolder.find(".inner-container").width(width)
+
+		true
+
+
+	### ------------------------------------------------------------------------------------------------------------------
+	make the table with fixed header and scrollable
 	###
 	fixedHeaderAndScrollable: (@fixedHeader = true) ->
 
-	###
-  function to render the added table inside the table holder element
-  @example
-  	tableView.render()
+	### ------------------------------------------------------------------------------------------------------------------
+	function to render the added table inside the table holder element
+	@example
+	tableView.render()
 	###
 	render: () =>
 
@@ -445,20 +466,28 @@ class TableView
 		html = "";
 		##| if fixed header and resizable
 		if @fixedHeader
+
 			if !@showHeaders
 				throw new Error "fixed header can't be done without header"
-			html += """<div class='table-wrapper' id='tableWrapper#{@gid}'><div class='outer-container'>
-										<div class='inner-container'>
-											<div class='table-header'>
-												<table id="tableheader#{@gid}" class="tableview">"""
+
+			html += """
+				<div class='table-wrapper' id='tableWrapper#{@gid}'><div class='outer-container'>
+					<div class='inner-container'>
+						<div class='table-header'>
+							<table id="tableheader#{@gid}" class="tableview">
+				"""
+
 		else
+
 			##|
 			##|  draw the table header
+			html += "<div class='tableviewSimpleWrapper'>"
 			html += "<table class='tableview' id='table#{@gid}'>"
 
 		##|
 		##|  Add headers
 		if @showHeaders
+
 			html += "<thead><tr>";
 
 			##|
@@ -472,6 +501,7 @@ class TableView
 			html += "</tr>";
 
 		if @showFilters
+
 			html += "<thead><tr>";
 
 			##|
@@ -524,8 +554,16 @@ class TableView
 		if @fixedHeader
 			html += "</div></div></div></div>"
 			#| add width to individual td
+		else
+			html += "</div>"
 
 		@elTheTable = @elTableHolder.html(html);
+
+		##|
+		##|  If the holder element has no height defined and we have a fixed header
+		##|  set the holder element to fill to bottom
+		if @elTableHolder.height() == 0 and @fixedHeader
+			@setHolderToBottom()
 
 		##| if the fixed header add the width to first row td
 		if @fixedHeader

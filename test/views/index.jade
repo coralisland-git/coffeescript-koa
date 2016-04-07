@@ -16,6 +16,7 @@ html.no-focus
         script(src='/vendor/typeahead.bundle.min.js')
         script(src='/vendor/iscroll.js')
         script(src='/vendor/draggabilly.pkgd.min.js')
+        script(src='/vendor/jquery.indexeddb.js')
 
         script(src='/ninja.js')
         script(src='/js/test_common.js')
@@ -90,6 +91,11 @@ html.no-focus
                                     span Popup window
 
                             li
+                                a#linkMakeOutline(href='/index.html?page=tabs_1')
+                                    i.si.si-arrow-right
+                                    span Tabs
+
+                            li
                                 a#linkMakeOutline(href='/index.html?page=data_mapper_1')
                                     i.si.si-arrow-right
                                     span Data Mapping UI
@@ -102,6 +108,10 @@ html.no-focus
                                 a#linkMakeOutline(href='/index.html?page=tables_2')
                                     i.si.si-arrow-right
                                     span Tables Advanced
+                            li
+                                a#linkMakeOutline(href='/index.html?page=tables_3')
+                                    i.si.si-arrow-right
+                                    span Tables Automatic
                             li
                                 a#linkMakeOutline(href='/index.html?page=table_editor')
                                     i.si.si-arrow-right

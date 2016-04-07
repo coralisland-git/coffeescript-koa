@@ -11,9 +11,10 @@ class DataMap
 
     constructor: ()->
 
-        @data   = {}
-        @types  = {}
-        @onSave = {}
+        @data     = {}
+        @types    = {}
+        @onSave   = {}
+        @objStore = {}
 
     ##|
     ##|  Returns a global instance of the data map
@@ -45,7 +46,71 @@ class DataMap
             dm.types[tableName] = new DataTypeCollection(tableName)
 
         dm.types[tableName].configureColumns columns
+
         true
+
+    ##|
+    ##|  Quickly import an entire array of objects into a table
+    ##|  clears the table first
+    @importDataFromObjects: (tableName, objects) =>
+
+        dm = DataMap.getDataMap()
+        dm.data[tableName] = {}
+
+        for i, o of objects
+            @addData tableName, i, o
+
+        true
+
+    ##|
+    ##|  Reset the columns for a table based on some object
+    @setDataTypesFromObject: (tableName, objects) =>
+
+        dm = DataMap.getDataMap()
+        dm.types[tableName] = new DataTypeCollection(tableName)
+
+        obj = null
+        minWidth = {}
+
+        for i, o of objects
+            if !obj?
+                obj = o
+                for dataName, dataValue of obj
+                    minWidth[dataName] = dataName.length
+
+            for dataName, dataValue of o
+                len = dataValue.toString().length
+                if len > minWidth[dataName]
+                    minWidth[dataName] = len
+
+        columns = []
+        reDate1 = /^[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]T00.00.00.000Z/
+        reDate2 = /^[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]T[0-9][0-9].[0-9][0-9].[0-9][0-9].[0-9][0-9][0-9]Z/
+
+        for i, o of obj
+            console.log "Check [#{i}] = ", o, " Type=", typeof o
+
+            dataType = "text"
+            if typeof o == "number"
+                dataType = "number"
+
+            else if reDate2.test o
+                dataType = "datetime"
+
+            else if reDate1.test o
+                dataType = "date"
+
+            col =
+                name     : i
+                source   : i
+                visible  : true
+                editable : false
+                type     : dataType
+
+            col.width = 20 + (10 * minWidth[i])
+            columns.push col
+
+        dm.types[tableName].configureColumns columns
 
     ##|
     ##|  Return the columns associated with a given table
@@ -225,6 +290,7 @@ class DataMap
         dm = DataMap.getDataMap()
         if !dm.data[tableName]? or !dm.data[tableName][keyValue]?
             return ""
+
         return dm.data[tableName][keyValue][fieldName]
 
     @renderField: (tagNam, tableName, fieldName, keyValue, extraClassName) =>

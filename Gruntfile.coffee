@@ -93,6 +93,7 @@ module.exports = (grunt) ->
 					"ninja/test/js/address_normalizer_1.js" : [ "test/js/address_normalizer_1.coffee" ]
 					"ninja/test/js/data_mapper_1.js"        : [ "test/js/data_mapper_1.coffee" ]
 					"ninja/test/js/dialog_1.js"             : [ "test/js/dialog_1.coffee" ]
+					"ninja/test/js/tabs_1.js"               : [ "test/js/tabs_1.coffee" ]
 					"ninja/test/js/globalval_1.js"          : [ "test/js/globalval_1.coffee" ]
 					"ninja/test/js/dynamic_data_1.js"       : [ "test/js/dynamic_data_1.coffee" ]
 					"ninja/test/js/dynamic_data_2.js"       : [ "test/js/dynamic_data_2.coffee" ]
@@ -101,6 +102,7 @@ module.exports = (grunt) ->
 					"ninja/test/js/popup_window_1.js"       : [ "test/js/popup_window_1.coffee" ]
 					"ninja/test/js/tables_1.js"             : [ "test/js/tables_1.coffee" ]
 					"ninja/test/js/tables_2.js"             : [ "test/js/tables_2.coffee" ]
+					"ninja/test/js/tables_3.js"             : [ "test/js/tables_3.coffee" ]
 					"ninja/test/js/table_editor.js"         : [ "test/js/table_editor.coffee" ]
 					"ninja/test/js/test_common.js"          : [ "test/js/test_common.coffee", "test/js/test_data/*coffee" ]
 
