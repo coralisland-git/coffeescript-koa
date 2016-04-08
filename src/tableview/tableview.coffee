@@ -448,6 +448,45 @@ class TableView
 	###
 	fixedHeaderAndScrollable: (@fixedHeader = true) ->
 
+
+	###	-------------------------------------------------------------------------------------------------------------------
+	function to make column filter as popup instead of plain text
+	@example
+		tableview.setColumnFilterAsPopup("sample") where sample is column name or source
+	@param colName [string] column name or source to be used in the filter
+	###
+	setColumnFilterAsPopup: (colName) ->
+		col = @colList.filter (column) =>
+				return column.col.name is colName
+		if ! col.length
+			col = @colList.filter (column) =>
+					return column.col.source is colName
+		if ! col.length
+			throw new Error "column with name or source #{colName} is not found"
+		col = col.pop()
+		@countNumberOfOccurenceOfPopup(col,true)
+
+	###
+	internal function to calculate the number of occurences for each value in options
+	###
+	countNumberOfOccurenceOfPopup: (col,initialize = false) =>
+
+		##| calculate occurances of unique values
+		_occurences = @rowData.map (r) => {key: r.key, value : DataMap.getDataField col.tableName, r.key, col.col.source}
+		_counts = {}
+		_occurences.forEach (v) =>
+			if $("#tbody#{@gid}").find("[data-id=#{v.key}]").is(":visible") or initialize
+				if _counts[v.value] then _counts[v.value]++ else _counts[v.value] = 1
+		_occurences = undefined
+		col.filterPopupData = _counts
+
+		if @filterAsPopupCols and typeof @filterAsPopupCols == 'object'
+			@filterAsPopupCols[col.col.source] = col
+		else
+			@filterAsPopupCols =
+				"#{col.col.source}" : col
+
+
 	### ------------------------------------------------------------------------------------------------------------------
 	function to render the added table inside the table holder element
 	@example
@@ -509,13 +548,17 @@ class TableView
 			if @showCheckboxes
 				html += "<th class='checkable'>&nbsp;</th>"
 
+			_popupCols = []
+			if typeof @filterAsPopupCols is 'object' then _popupCols = Object.keys @filterAsPopupCols
 			for i in @colList
 				if i.visible
-					html += "
-						<td class='dataFilterWrapper'>
-						<input class='dataFilter #{i.col.formatter.name}' data-path='/#{i.tableName}/#{i.col.source}'>
-						</td>
-					"
+					html += "<td class='dataFilterWrapper'>"
+					if _popupCols.indexOf(i.col.source) == -1
+						html += "<input class='dataFilter #{i.col.formatter.name}' data-path='/#{i.tableName}/#{i.col.source}'>"
+					else
+						html += "<a class='link filterPopupCol' data-source='#{i.col.source}' style='width:100%;height:100%;display:block;text-align:center;font-size:14px;border:1px solid #000' href='javascript:;'><span class='filtered_text'>Select</span></a><span class='caret pull-right' style='margin-top:-12px;margin-right:10px;'></span>"
+
+					html += "</td>"
 
 			html += "</tr>";
 
@@ -589,6 +632,9 @@ class TableView
 
 		if @showFilters
 			@elTheTable.find("input.dataFilter").on "keyup", @filterKeypress
+			@elTheTable.find("a.filterPopupCol").on "click", @filterPopupClick
+
+
 
 		if @inlineSorting
 			@bindInlineSortingEvents()
@@ -686,6 +732,28 @@ class TableView
 		return true
 
 	###
+	internal event handler for selected filter popup values
+	###
+	filterPopupClick: (e) =>
+		_source = $(e.target).data('source')
+		if @filterAsPopupCols[_source]
+			_options = @filterAsPopupCols[_source].filterPopupData
+			_menu = new PopupMenu("Filter", e);
+
+			if !@currentFilters[@filterAsPopupCols[_source].tableName]?
+				@currentFilters[@filterAsPopupCols[_source].tableName] = {}
+
+			Object.keys(_options).forEach (option) =>
+				_menu.addItem "#{option}   (#{_options[option]})", (data) =>
+					@currentFilters[@filterAsPopupCols[_source].tableName][@filterAsPopupCols[_source].col.source] = option
+					$(e.target).find('.filtered_text').text option
+					@applyFilters()
+			_menu.addItem "Clear filter", (data) =>
+				delete @currentFilters[@filterAsPopupCols[_source].tableName][@filterAsPopupCols[_source].col.source]
+				$(e.target).find('.filtered_text').text 'select'
+				@applyFilters()
+
+	###
   Apply the filters stored in "currentFilters" to each column and show/hide the rows
 	###
 	applyFilters: () =>
@@ -729,6 +797,13 @@ class TableView
 				@rowDataElements[counter].show()
 			else
 				@rowDataElements[counter].hide()
+
+		_popupCols = []
+		if typeof @filterAsPopupCols is 'object' then _popupCols = Object.keys @filterAsPopupCols
+		_popupCols.forEach (_c) =>
+			_column = @colList.filter (_column) => _column.col.source == _c
+			_column = _column.pop()
+			@countNumberOfOccurenceOfPopup _column
 
 		true
 
@@ -808,6 +883,3 @@ class TableView
 						$(this).find("th:eq(#{_index}),td:eq(#{_index})").addClass('hide')
 		_handleResize()
 		$(window).on 'resize', _handleResize
-
-
-

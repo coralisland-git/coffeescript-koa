@@ -12,8 +12,11 @@ $ ->
         table = new TableView $("#renderTest1")
         table.fixedHeaderAndScrollable();
         table.addTable "results"
-        # table.addInlineSortingSupport()
+        table.setColumnFilterAsPopup "T197_UNT_PAK_ID"
+        table.setColumnFilterAsPopup "T026_VEL_ID"
+        table.setColumnFilterAsPopup "T231_ITM_STS_CD"
         table.render()
+
 
         console.log "Done"
 
