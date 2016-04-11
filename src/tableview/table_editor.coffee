@@ -39,7 +39,7 @@ class TableEditor
 
   clear: ->
     @tableHolder.html ""
-    
+
   setDataTypes: () ->
     ##| These data type will be same for all the table editor
     DataMap.setDataTypes "_editor_#{@editedTableKey}", [
@@ -80,7 +80,7 @@ class TableEditor
         name: "Type"
         source: "type"
         visible: true,
-        type: "text"
+        type: "enum"
         editable:true
         required:true
         width:120,
@@ -183,4 +183,3 @@ class TableEditor
       new ModalDialog
           title:   "Table Configurations"
           content: "<textarea id='_pretty_print#{@editedTableKey}' cols='50' rows='50' class='form-control'>#{JSON.stringify(_currentConfig, undefined, 4);}</textarea>"
-

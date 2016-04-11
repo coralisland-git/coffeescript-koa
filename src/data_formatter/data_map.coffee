@@ -203,6 +203,9 @@ class DataMap
         fieldName = parts[3]
 
         existingValue = @data[tableName][keyValue][fieldName]
+        ##| check if the existing type is boolean
+        if typeof existingValue == 'boolean' and existingValue == Boolean(newValue) then return true
+
         if existingValue == newValue then return true
 
         @data[tableName][keyValue][fieldName] = newValue

@@ -334,6 +334,20 @@ class DataFormatBoolean extends DataFormatterType
 	name: "boolean"
 	width: 40
 
+	openEditor: (elParent, left, top, width, height, currentValue, path) =>
+
+		##|
+		##|  Show a popup menu
+		p = new PopupMenu "Options", left, top
+		p.addItem "Yes", (coords, data) =>
+			@saveValue data
+		, 1
+		p.addItem "No", (coords, data) =>
+			console.log data
+			@saveValue data
+		, 0
+		true
+
 	##|
 	##| Takes meters in, returns a formatted string
 	format: (data, options, path) =>
@@ -414,4 +428,3 @@ try
 
 catch e
 	console.log "Exception while registering global Data Formatter:", e
-
