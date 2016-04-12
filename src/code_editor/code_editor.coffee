@@ -29,7 +29,7 @@ class CodeEditor
     @param languageMode [String] the language mode of the editor default is mysql
     @return this [CodeEditor] returns instance
 	###
-	constructor: (@elementHolder, @languageMode) ->
+	constructor: (@elementHolder, @languageMode = "mysql") ->
 		if !@elementHolder.length
 			throw new Error "The specified element #{@elementHolder.selector} not found"
 
@@ -39,7 +39,7 @@ class CodeEditor
 
 		ace.require("ace/ext/language_tools");
 		@_editor = ace.edit @elementHolder.attr('id');
-		@_editor.session.setMode "ace/mode/mysql";
+		@setMode @languageMode;
 		this
 
 	###
