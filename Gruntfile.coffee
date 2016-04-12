@@ -49,6 +49,11 @@ module.exports = (grunt) ->
 					filter: 'isFile'
 					expand: true
 				,
+					cwd: 'test/vendor/ace/'
+					src: '**'
+					dest: 'ninja/test/vendor/ace/'
+					expand: true
+				,
 					cwd: 'test/js/test_data/'
 					src: '*.json'
 					dest: 'ninja/test/js/test_data/'
@@ -104,6 +109,7 @@ module.exports = (grunt) ->
 					"ninja/test/js/tables_2.js"             : [ "test/js/tables_2.coffee" ]
 					"ninja/test/js/tables_3.js"             : [ "test/js/tables_3.coffee" ]
 					"ninja/test/js/table_editor.js"         : [ "test/js/table_editor.coffee" ]
+					"ninja/test/js/code_editor.js"			: ["test/js/code_editor.coffee"]
 					"ninja/test/js/test_common.js"          : [ "test/js/test_common.coffee", "test/js/test_data/*coffee" ]
 
 		watch:
