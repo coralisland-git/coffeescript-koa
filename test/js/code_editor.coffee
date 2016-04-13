@@ -40,4 +40,29 @@ $ ->
 			$("#preview span").html content
 		true
 
+	addTestButton "Code Editor with histories", "Open", ()->
+		addHolder("renderHistories");
+		addHolder("renderTest1");
+		##| to make little bit space it should be done using css
+		$ "#renderTest1"
+			.css 'margin-top', '20px'
+
+		editor = new CodeEditor $("#renderTest1")
+		# make sure the js of the theme is included
+		editor.setTheme("tomorrow_night_eighties")
+		editor.addToHistory "select * from users"
+		editor.addToHistory "select * from abc"
+		editor.renderHistories $('#renderHistories'), (updatedValue,element) ->
+			editor.setContent updatedValue
+			element.val ''
+
+		$ "#renderTest1"
+			.after "<button id='add' class='btn btn-primary'>Add To History</button>"
+
+		$ "#add"
+			.on "click", () ->
+				editor.addToHistory editor.getContent()
+				editor.refreshHistories()
+		true
+
 	go()
