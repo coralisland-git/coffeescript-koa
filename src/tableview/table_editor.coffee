@@ -123,7 +123,7 @@ class TableEditor
         name: "Render"
         source: "render"
         visible: true,
-        type: "text"
+        type: "sourcecode"
         editable:true
         width:120
       }

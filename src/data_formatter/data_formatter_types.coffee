@@ -129,6 +129,42 @@ class DataFormatText extends DataFormatterType
 
 		return data
 
+class DataFormatSourceCode extends DataFormatText
+	name : "sourcecode"
+
+	openEditor: (elParent, left, top, width, height, currentValue, path) =>
+		##|
+		##|  Show a popup menu
+		popup = new PopupWindow("Source Code");
+		popup.windowScroll.append $("<div id='code_editor_#{elParent.index()}'></div>")
+		codeEditor = new CodeEditor popup.windowScroll.find "#code_editor_#{elParent.index()}"
+		codeEditor.setTheme "tomorrow_night_eighties"
+			.setMode "javascript"
+		if !currentValue
+			code = ''
+		else if typeof currentValue isnt 'string'
+			code = currentValue.toString()
+		else
+			code = currentValue
+		codeEditor.setContent code
+		buttons = """
+			<nav class='nav navbar-default'>
+				<div class='container-fluid'>
+					<button type='button' id='save_btn_#{elParent.index()}' class='btn btn-primary navbar-btn'>Save</button>
+					<button type='button' id='cancel_btn_#{elParent.index()}' class='btn btn-danger navbar-btn'>Cancel</button>
+				</div>
+			</nav>
+		"""
+		popup.windowScroll.append buttons
+		$("#save_btn_#{elParent.index()}").on "click", () =>
+			@saveValue codeEditor.getContent()
+			popup.destroy()
+		$("#cancel_btn_#{elParent.index()}").on "click", () =>
+			popup.destroy()
+		true
+
+
+
 class DataFormatInt extends DataFormatterType
 
 	name: "int"
@@ -425,6 +461,7 @@ try
 	globalDataFormatter.register(new DataFormatPercent())
 	globalDataFormatter.register(new DataFormatTimeAgo())
 	globalDataFormatter.register(new DataFormatSimpleObject())
+	globalDataFormatter.register(new DataFormatSourceCode())
 
 catch e
 	console.log "Exception while registering global Data Formatter:", e
