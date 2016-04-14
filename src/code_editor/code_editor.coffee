@@ -156,7 +156,7 @@ class CodeEditor
 	###
 	saveHistory: () ->
 		##| to save only 100 records
-		_histories = JSON.stringify @_histories.splice 0,100
+		_histories = JSON.stringify @_histories.slice(0,100)
 		localStorage.setItem "_histories_#{@gid}",_histories
 
 	###
