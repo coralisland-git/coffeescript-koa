@@ -41,6 +41,8 @@ class TableEditor
     @tableHolder.html ""
 
   setDataTypes: () ->
+    if DataMap.getDataMap().types["_editor_#{@editedTableKey}"]
+      return true
     ##| These data type will be same for all the table editor
     DataMap.setDataTypes "_editor_#{@editedTableKey}", [
       {
