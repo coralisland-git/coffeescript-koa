@@ -5,183 +5,204 @@
 
 class TableEditor
 
-  allowButtons : true
+	###
+    @property allowButtons [Boolean] weather buttons should appear
+	###
+	allowButtons: true
 
-  onCreate: false
+	###
+    @property onCreate [Function|Boolean] callback to call on creation of table row
+	###
+	onCreate: false
 
-  constructor: (@tableHolder,@editedTableKey) ->
+	###
+    @property render [Boolean] weather to render automatically or call externally
+	###
+	render: true
 
-    ##| add div for table inside @tableHolder
-    if !@tableHolder.length
-      console.error "The element with selector #{@tableHolder.selector} not found"
-    _dm = DataMap.getDataMap()
+	constructor: (@tableHolder, @editedTableKey, @render = true) ->
 
-    if !@editedTableKey or !_dm.types[@editedTableKey]
-      throw new Error "invalid table key #{@editedTableKey} is supplied"
+##| add div for table inside @tableHolder
+		if !@tableHolder.length and @render
+			console.error "The element with selector #{@tableHolder.selector} not found"
+		_dm = DataMap.getDataMap()
 
-    @rowsList = _dm.types[@editedTableKey].col
-    @gid = GlobalValueManager.NextGlobalID()
+		if !@editedTableKey or !_dm.types[@editedTableKey]
+			throw new Error "invalid table key #{@editedTableKey} is supplied"
 
-    _tableElement = $ "<div />"
-      .attr('id',"_editor#{@gid}")
-      .attr('data-id',"_editor#{@gid}")
+		@rowsList = _dm.types[@editedTableKey].col
+		@gid = GlobalValueManager.NextGlobalID()
 
-    @tableHolder.append _tableElement
+		_tableElement = $ "<div />"
+		.attr('id', "_editor#{@gid}")
+		.attr('data-id', "_editor#{@gid}")
 
-    @editorTable = new TableView _tableElement
-    @setDataTypes()
-    @editorTable.addTable "_editor_#{@editedTableKey}"
-    @editorTable.showFilters = false
-    @editorTable.render()
+		@tableHolder.append _tableElement
 
-    if @allowButtons
-      @createButtons()
+		@editorTable = new TableView _tableElement
+		@setDataTypes()
+		@editorTable.addTable "_editor_#{@editedTableKey}"
+		@editorTable.showFilters = false
+		if @render
+			@editorTable.render()
 
-  clear: ->
-    @tableHolder.html ""
+		if @allowButtons
+			@createButtons()
 
-  setDataTypes: () ->
-    if DataMap.getDataMap().types["_editor_#{@editedTableKey}"]
-      return true
-    ##| These data type will be same for all the table editor
-    DataMap.setDataTypes "_editor_#{@editedTableKey}", [
-      {
-        name: "Name"
-        source: "name"
-        visible: true,
-        type: "text"
-        editable:true
-        required:true
-        width:120
-      }
-      {
-        name: "Source"
-        source: "source"
-        visible: true,
-        type: "text"
-        editable:true
-        width:120
-      }
-      {
-        name: "Visible"
-        source: "visible"
-        visible: true,
-        type: "boolean"
-        editable:true
-        width:120
-      }
-      {
-        name: "Hideable"
-        source: "hideable"
-        visible: true,
-        type: "boolean"
-        editable:true
-        width:120
-      }
-      {
-        name: "Type"
-        source: "type"
-        visible: true,
-        type: "enum"
-        editable:true
-        required:true
-        width:120,
-        element:"select",
-        options: Object.keys globalDataFormatter.formats
-      }
-      {
-        name: "Width"
-        source: "width"
-        visible: true,
-        type: "text"
-        editable:true
-        width:120
-      }
-      {
-        name: "Tooltip"
-        source: "tooltip"
-        visible: true,
-        type: "text"
-        editable:true
-        width:120
-      }
-      {
-        name: "Sortable"
-        source: "sortable"
-        visible: true,
-        type: "boolean"
-        editable:true
-        width:120
-      }
-      {
-        name: "Required"
-        source: "required"
-        visible: true,
-        type: "boolean"
-        editable:true
-        width:120
-      }
-      {
-        name: "Render"
-        source: "render"
-        visible: true,
-        type: "sourcecode"
-        editable:true
-        width:120
-      }
-    ]
+	getTableInstance: ->
+		return @editorTable
 
-    ##| add row data to dataMap about current column configurations
+	clear: ->
+		@tableHolder.html ""
 
-    for key,_row of @rowsList
-      _preparedRow = @filterRowValues(_row)
-      DataMap.addData "_editor_#{@editedTableKey}", _row.source, _preparedRow
+	setDataTypes: () ->
+		if DataMap.getDataMap().types["_editor_#{@editedTableKey}"]
+			return true
+		##| These data type will be same for all the table editor
+		DataMap.setDataTypes "_editor_#{@editedTableKey}", [
+			{
+				name: "Name"
+				source: "name"
+				visible: true,
+				type: "text"
+				editable: true
+				required: true
+				width: 120
+			}
+			{
+				name: "Source"
+				source: "source"
+				visible: true,
+				type: "text"
+				editable: true
+				width: 120
+			}
+			{
+				name: "Visible"
+				source: "visible"
+				visible: true,
+				type: "boolean"
+				editable: true
+				width: 120
+			}
+			{
+				name: "Hideable"
+				source: "hideable"
+				visible: true,
+				type: "boolean"
+				editable: true
+				width: 120
+			}
+			{
+				name: "Type"
+				source: "type"
+				visible: true,
+				type: "enum"
+				editable: true
+				required: true
+				width: 120,
+				element: "select",
+				options: Object.keys globalDataFormatter.formats
+			}
+			{
+				name: "Width"
+				source: "width"
+				visible: true,
+				type: "text"
+				editable: true
+				width: 120
+			}
+			{
+				name: "Tooltip"
+				source: "tooltip"
+				visible: true,
+				type: "text"
+				editable: true
+				width: 120
+			}
+			{
+				name: "Sortable"
+				source: "sortable"
+				visible: true,
+				type: "boolean"
+				editable: true
+				width: 120
+			}
+			{
+				name: "Required"
+				source: "required"
+				visible: true,
+				type: "boolean"
+				editable: true
+				width: 120
+			}
+			{
+				name: "Render"
+				source: "render"
+				visible: true,
+				type: "sourcecode"
+				editable: true
+				width: 120
+			}
+		]
 
-  filterRowValues: (_row) ->
-    _preparedRow = {}
-    _rowElements = ["name","source","visible","hideable","type","width","tooltip","sortable","render"]
-    for _element in _rowElements
-      _preparedRow[_element] = _row[_element]
-    _preparedRow
+		##| add row data to dataMap about current column configurations
 
-  createButtons: ->
-    _button1 = $('<button />')
-      .addClass 'btn btn-success'
-      .text "Create New"
-      .attr 'id', "_editor_#{@editedTableKey}_create"
-    _button2 = $('<button />')
-      .addClass 'btn btn-primary'
-      .text "Save"
-      .attr 'id', "_editor_#{@editedTableKey}_save"
-      .css 'margin-left','10px'
+		for key,_row of @rowsList
+			_preparedRow = @filterRowValues(_row)
+			DataMap.addData "_editor_#{@editedTableKey}", _row.source, _preparedRow
 
-    @tableHolder.prepend _button2
-      .prepend _button1
+	filterRowValues: (_row) ->
+		_preparedRow = {}
+		_rowElements = ["name", "source", "visible", "hideable", "type", "width", "tooltip", "sortable", "render"]
+		for _element in _rowElements
+			_preparedRow[_element] = _row[_element]
+		_preparedRow
 
-    @setButtonEvents()
+	createButtons: ->
+		_button1 = $('<button />')
+		.addClass 'btn btn-success'
+		.text "Create New"
+		.attr 'id', "_editor_#{@editedTableKey}_create"
+		_button2 = $('<button />')
+		.addClass 'btn btn-primary'
+		.text "Save"
+		.attr 'id', "_editor_#{@editedTableKey}_save"
+		.css 'margin-left', '10px'
 
-  setButtonEvents: ->
-    _table = @editorTable
-    $("#_editor_#{@editedTableKey}_create").on "click", =>
-      p = new PopupForm("_editor_#{@editedTableKey}","source",null,null,{visible:1,hideable:1,required:0,sortable:1,type:"text"})
-      p.onCreateNew = (tableName, data) =>
-        ##| update data map data types if new inserted and add in rowList
-        DataMap.setDataTypes tableName,[data]
-        DataMap.setDataTypes @editedTableKey,[data]
-        @rowsList[data.source] = data
-        ##| apply filter or sorting to update the newly create row
-        setTimeout () ->
-          _table.applyFilters()
-        ,1
-        if @onCreate and typeof @onCreate is 'function'
-          @onCreate(data)
-        else
-          true
+		@tableHolder.prepend _button2
+		.prepend _button1
 
-    $("#_editor_#{@editedTableKey}_save").on "click", =>
-      _currentConfig = []
-      for key, _row of @rowsList
-        _currentConfig.push @filterRowValues(_row)
-      new ModalDialog
-          title:   "Table Configurations"
-          content: "<textarea id='_pretty_print#{@editedTableKey}' cols='50' rows='50' class='form-control'>#{JSON.stringify(_currentConfig, undefined, 4);}</textarea>"
+		@setButtonEvents()
+
+	setButtonEvents: ->
+		_table = @editorTable
+		$("#_editor_#{@editedTableKey}_create").on "click", =>
+			p = new PopupForm("_editor_#{@editedTableKey}", "source", null, null, {
+				visible: 1,
+				hideable: 1,
+				required: 0,
+				sortable: 1,
+				type: "text"
+			})
+			p.onCreateNew = (tableName, data) =>
+				##| update data map data types if new inserted and add in rowList
+				DataMap.setDataTypes tableName, [data]
+				DataMap.setDataTypes @editedTableKey, [data]
+				@rowsList[data.source] = data
+				##| apply filter or sorting to update the newly create row
+				setTimeout () ->
+					_table.applyFilters()
+				, 1
+				if @onCreate and typeof @onCreate is 'function'
+					@onCreate(data)
+				else
+					true
+
+		$("#_editor_#{@editedTableKey}_save").on "click", =>
+			_currentConfig = []
+			for key, _row of @rowsList
+				_currentConfig.push @filterRowValues(_row)
+			new ModalDialog
+				title: "Table Configurations"
+				content: "<textarea id='_pretty_print#{@editedTableKey}' cols='50' rows='50' class='form-control'>#{JSON.stringify(_currentConfig, undefined, 4);}</textarea>"

@@ -4,15 +4,21 @@
 #  popupTable = new PopupTable(zipcodeTable,'demoZipcodeTable')
 
 class PopupTable extends PopupWindow
-  popupWidth: 120
-  popupHeight: 500
+  popupWidth: 400
+  popupHeight: 300
   isVisible:   true
   allowHorizontalScroll: true
 
   constructor: (@mainTableObject, @popupName) ->
     _title = "popup Table"
     super _title
-    @windowScroll.html "<div id='#{@mainTableObject.elTableHolder.selector.substr 1}'></div>"
+    ##| check if virtual element or actual element given
+    if @mainTableObject.elTableHolder.attr('id')
+      _tableId = @mainTableObject.elTableHolder.attr('id')
+    else
+      _tableId = @mainTableObject.elTableHolder.selector.substr 1
+
+    @windowScroll.html "<div id='#{_tableId}'></div>"
     ##| assign tableHolder again to detect inside popup and render
-    @mainTableObject.elTableHolder = $ @mainTableObject.elTableHolder.selector
+    @mainTableObject.elTableHolder = $ "##{_tableId}"
     @mainTableObject.render()
