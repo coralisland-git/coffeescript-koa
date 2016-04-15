@@ -16,6 +16,6 @@ $ ->
 
 	addTestButton "create table column editor in popup", 'Open', () ->
 		##| not created holder because PopupTable will create holder for us in popup automatically
-		te = new TableEditor $('#renderTest1'), "geoset", false # give false as 3rd argument to stop automatic rendering
+		te = new TableEditor $('#popupTest'), "geoset", false # give false as 3rd argument to stop automatic rendering
 		popup = new PopupTable te.getTableInstance(), 'geosetColumnEditor'
 	go()
