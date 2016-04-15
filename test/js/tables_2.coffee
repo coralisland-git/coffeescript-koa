@@ -34,7 +34,6 @@ $ ->
 		table = new TableView $("#renderTest1")
 		table.addTable "zipcode"
 		table.render()
-		table.setupContextMenu()
 		true
 
 	addTestButton "inline sorting with icon in header according to DataType", "Open", ()->

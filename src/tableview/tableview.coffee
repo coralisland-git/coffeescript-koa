@@ -638,7 +638,9 @@ class TableView
 
 		if @inlineSorting
 			@bindInlineSortingEvents()
-
+		##| add default context menu for sorting as per #89 comment
+		@setupContextMenu @contextMenuCallbackFunction
+		
 		true
 
 
