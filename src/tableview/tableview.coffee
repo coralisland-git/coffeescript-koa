@@ -184,7 +184,7 @@ class TableView
   @return String html the html of the row as string
 	###
 	renderCheckable : (obj) =>
-
+		console.log obj
 		if typeof obj.rowOptionAllowCheck != "undefined" and obj.rowOptionAllowCheck == false
 			return "<td class='checkable'>&nbsp;</td>";
 
@@ -370,6 +370,15 @@ class TableView
 			_popupMenu.addItem "Sort Descending", () =>
 				_popupMenu.closeTimer()
 				@applySorting(_c,'DSC')
+		console.log @customizableColumns,_c.col.source
+		if @customizableColumns.length
+			if @customizableColumns.indexOf _c.col.source >= 0
+				_popupMenu.addItem "Customize", (coords, data) =>
+					_popupMenu.closeTimer()
+					@onConfigureColumns
+						x: coords.x
+						y: coords.y
+
 
 		if typeof @tableCacheName != "undefined" && @tableCacheName != null
 			if !_popupMenu
@@ -486,6 +495,18 @@ class TableView
 			@filterAsPopupCols =
 				"#{col.col.source}" : col
 
+	###
+	function to make column customizable in the the popup
+	@example
+		table.allowCustomize("code")
+	###
+	allowCustomize: (name) ->
+		if @customizableColumns and Array.isArray @customizableColumns
+			@customizableColumns.push name
+		else
+			@customizableColumns = [name]
+
+
 
 	### ------------------------------------------------------------------------------------------------------------------
 	function to render the added table inside the table holder element
@@ -578,7 +599,6 @@ class TableView
 		# counter = 0
 		if (typeof @sort == "function")
 			@rowData.sort @sort
-
 		##| if no row found then default message
 		if @rowData.length is 0
 			@addMessageRow "No results"
@@ -586,7 +606,6 @@ class TableView
 		for counter, i of @rowData
 
 			# if @filterFunction i then continue
-
 			if typeof i == "string"
 				html += "<tr class='messageRow'><td class='messageRow' colspan='#{@colList.length+1}'"
 				html += ">#{i}</td></tr>";
@@ -640,7 +659,7 @@ class TableView
 			@bindInlineSortingEvents()
 		##| add default context menu for sorting as per #89 comment
 		@setupContextMenu @contextMenuCallbackFunction
-		
+
 		true
 
 

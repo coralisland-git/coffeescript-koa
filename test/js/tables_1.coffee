@@ -61,6 +61,8 @@ $ ->
         addHolder("renderTest1");
         table = new TableView $("#renderTest1")
         table.addTable "zipcode"
+        table.allowCustomize "lat"
+        table.allowCustomize "lon"
         table.render()
 
         true
@@ -105,6 +107,3 @@ $ ->
 
         true
     go()
-
-
-

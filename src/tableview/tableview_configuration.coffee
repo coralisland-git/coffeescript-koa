@@ -7,9 +7,9 @@ class PopupWindowTableConfiguration extends PopupWindow
 
 	show: (refTable) =>
 
-		@resize 900, 700
-		@tableConfig = new TableView(@windowScroll, refTable.tableCacheName, "name")
-		@tableConfig.tableConfigDatabase = refTable.tableCacheName
+		#@resize 900, 700
+		@tableConfig = new TableView(@windowScroll, true)
+		@tableConfig.tableConfigDatabase = "#{refTable.primaryTableName}_#{refTable.gid}"
 
 		console.log "tableConfigDatabase=", @tableConfig.tableConfigDatabase
 
@@ -18,21 +18,25 @@ class PopupWindowTableConfiguration extends PopupWindow
 			name   : "Title"
 			source : "name"
 			type   : "text"
-			width  : "110px"
+			visible: true
 
 		columns.push
 			name   : "Additional Information"
 			source : "tooltip"
 			type   : "text"
+			visible: true
 
-		DataMap.setDataTypes "colConfig", columns
+		DataMap.setDataTypes "#{@tableConfig.tableConfigDatabase}", columns
 
-		for col in refTable.colList
-			console.log "COL=", col
+		# for col in refTable.colList
+		# 	console.log "COL=", col
+		for key,_row of refTable.customizableColumns
+			_column = (refTable.colList.filter (c) => c.col.source == _row).pop()
+			DataMap.addData "#{@tableConfig.tableConfigDatabase}", _row, {name:_column.col.name,tooltip:_column.col.tooltip,checked:_column.col.visible}
 			# col.checked = col.visible != false
 			# @tableConfig.addRow col
 
-		@tableConfig.addTable "colConfig"
+		@tableConfig.addTable "#{@tableConfig.tableConfigDatabase}"
 		@tableConfig.render()
 
 		@tableConfig.onSetCheckbox = (checkbox_key, value) =>
@@ -40,7 +44,3 @@ class PopupWindowTableConfiguration extends PopupWindow
 			user.tableConfigSetColumnVisible refTable.tableCacheName, checkbox_key, value
 
 		@open()
-
-
-
-
