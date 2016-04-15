@@ -744,7 +744,7 @@ class TableView
 				@currentFilters[@filterAsPopupCols[_source].tableName] = {}
 
 			Object.keys(_options).forEach (option) =>
-				_menu.addItem "#{option}   (#{_options[option]})", (data) =>
+				_menu.addItem "<div style='padding-left:10px;padding-right:10px;'>#{option}   <div class='badge pull-right' style='margin-top:12px;'> #{_options[option]} </div></div>", (data) =>
 					@currentFilters[@filterAsPopupCols[_source].tableName][@filterAsPopupCols[_source].col.source] = option
 					$(e.target).find('.filtered_text').text option
 					@applyFilters()
