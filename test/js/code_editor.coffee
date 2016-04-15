@@ -40,6 +40,13 @@ $ ->
 			$("#preview span").html content
 		true
 
+	addTestButton "Code Editor with mongoDB(javascript) mode", "Open", ()->
+		addHolder("renderTest1");
+		editor = new CodeEditor $("#renderTest1")
+		# make sure the js of the theme is included
+		editor.setTheme("tomorrow_night_eighties").setMode('javascript')
+		true
+
 	addTestButton "Code Editor with histories", "Open", ()->
 		addHolder("renderHistories");
 		addHolder("renderTest1");
