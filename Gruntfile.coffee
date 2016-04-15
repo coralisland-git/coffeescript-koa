@@ -111,6 +111,7 @@ module.exports = (grunt) ->
 					"ninja/test/js/table_editor.js"         : [ "test/js/table_editor.coffee" ]
 					"ninja/test/js/code_editor.js"			: ["test/js/code_editor.coffee"]
 					"ninja/test/js/test_common.js"          : [ "test/js/test_common.coffee", "test/js/test_data/*coffee" ]
+					"ninja/test/js/tables_detail.js"		: ["test/js/tables_detail.coffee"]
 
 		watch:
 
@@ -158,5 +159,3 @@ module.exports = (grunt) ->
 		grunt.registerTask 'dist', 		['coffee', 'copy', 'stylus', 'jade']
 		grunt.registerTask 'synclive', 	['buildnumber', 'coffee', 'copy', 'stylus:compile', 'jade:compile', 'shell:synclive']
 		grunt.registerTask 'default', 	['coffee', 'copy', 'stylus:compile', 'jade:compile', 'express', 'watch']
-
-

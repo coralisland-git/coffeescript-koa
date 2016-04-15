@@ -2,7 +2,23 @@ class TableViewDetailed extends TableView
 
 	leftWidth : 140
 
-	realRender : () =>
+	addTable: (tableName, @rowReduceFunction, @reduceFunction) =>
+
+		@primaryTableName = tableName
+
+		##|
+		##|  Find the columns for the specific table name
+		columns = DataMap.getColumnsFromTable(tableName, @rowReduceFunction)
+		for col in columns
+			c = new TableViewCol tableName, col
+			c.inlineSorting = @inlineSorting
+			@colList.push(c)
+		true
+
+	render : (@dataKey) =>
+
+		if !@dataKey or typeof DataMap.getDataMap().data[@primaryTableName][@dataKey] != 'object'
+			throw new Error "data with key #{@dataKey} not found"
 
 		##|
 		##|  Create a unique ID for the table, that doesn't change
@@ -10,7 +26,7 @@ class TableViewDetailed extends TableView
 		if typeof @gid == "undefined"
 			@gid = GlobalValueManager.NextGlobalID()
 
-		@processTableConfig()
+		# @processTableConfig()
 
 		##|
 		##|  draw the table header
@@ -20,36 +36,27 @@ class TableViewDetailed extends TableView
 		##|  Start adding the body
 		html += "<tbody id='tbody#{@gid}'>";
 
-		counter = 0
-		if (typeof @sort == "function")
-			@rowData.sort @sort
+		@rowData[@dataKey] = {}
 
-		for col in @colList
+		for column in @colList
 
-			col.styleFormat = ""
-			col.width       = ""
-			if !col.visible then continue
+			column.styleFormat = ""
+			column.width       = ""
+			if !column.visible then continue
 
 			##|
 			##|  Create the "TR" tag
-			html += "<tr class='trow' data-id='#{counter}' "
+			html += "<tr class='trow' data-id='#{@dataKey}' "
 			html += ">"
-
-			if @keyColumn and @tableName
+			@rowData[@dataKey][column.col.source] = DataMap.getDataField @primaryTableName,@dataKey,column.col.source
+			if @showCheckboxes and @primaryTableName
 				html += @renderCheckable(i)
-
-			if col.visible != false
+			if column.col.visible != false
 				html += "<th style='text-align: right; width: #{@leftWidth}px; '> "
-				html += col.title
+				html += column.col.name
 				html += "</th>"
+				html += DataMap.renderField "td", column.tableName, column.col.source, @dataKey, column.col.extraClassName
 
-			for i in @rowData
-
-				if @basePath != 0
-					col.setBasePath @basePath + "/" + i.id
-
-				col.formatter.styleFormat = "";
-				html += col.Render(counter, i)
 
 			html += "</tr>";
 
@@ -57,10 +64,6 @@ class TableViewDetailed extends TableView
 
 		@elTheTable = @elTableHolder.html(html);
 
-		setTimeout () =>
-			globalResizeScrollable();
-			setupSimpleTooltips();
-		, 100
 
 		@contextMenuCallSetup = 0
 		@setupContextMenuHeader()
