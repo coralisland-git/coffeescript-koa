@@ -1,12 +1,26 @@
+## -------------------------------------------------------------------------------------------------------------
+## class BusyDialog to show the processing block ui
+##
 class BusyDialog
 
+    # @property [String] content the content to show on the popup
     content:       "Processing please wait"
+
+    # @property [Boolean] showing the status if currenlty showing or not
     showing:       false
+
+    # @property [Array] busyStack information about all the stacks if nested dialogs are used
     busyStack:     []
+
+    # @property [Array] callbackStack stack of the callback to execute
     callbackStack: []
 
+    ## -------------------------------------------------------------------------------------------------------------
+    ## constructor
+    ##
     constructor:  () ->
 
+        # @property [String] template the template to use in the BusyDialog
         @template = Handlebars.compile '''
         <div class="hidex" id="pleaseWaitDialog">
             <div class="modal-header">
@@ -20,12 +34,20 @@ class BusyDialog
         </div>
         '''
 
+        # @property [String] pleaseWaitHolder the html for the holder
         @pleaseWaitHolder = $("body").append @template(this)
+
+        # @property [JQueryElement] elTitle the element in which the dialog is rendered
         @elTitle          = $("#pleaseWaitDialogTitle")
 
+        # @property [JQueryElement] modal the currently showing modal
         @modal = $("#pleaseWaitDialog")
+
         @modal.hide()
 
+    ## -------------------------------------------------------------------------------------------------------------
+    ## function to make the processing finish
+    ##
     finished: () =>
         @busyStack.pop()
         if @busyStack.length > 0
@@ -34,6 +56,12 @@ class BusyDialog
             @modal.hide()
             @showing = false
 
+    ## -------------------------------------------------------------------------------------------------------------
+    ## function to execute the dialog
+    ##
+    ## @param [String] strText text to show on the box
+    ## @param [Function] callbackFunction function to execute on the finished
+    ##
     exec: (strText, callbackFunction) =>
 
         @callbackStack.push callbackFunction
@@ -52,6 +80,12 @@ class BusyDialog
 
         , 0
 
+    ## -------------------------------------------------------------------------------------------------------------
+    ## function to show the busy dialog
+    ##
+    ## @param [String] strText text to show on the modal
+    ## @param [Object] options to handle the behaviour of the modal
+    ##
     showBusy: (strText, options) =>
 
         @busyStack.push strText
@@ -77,6 +111,11 @@ class BusyDialog
         @show
             position: "center"
 
+    ## -------------------------------------------------------------------------------------------------------------
+    ## function to show the modal at proper position
+    ##
+    ## @param [Object] options options to handle behaviour
+    ##
     show: (options) =>
 
         @modal.show()
@@ -90,4 +129,7 @@ class BusyDialog
 
 $ ->
 
+    ## -------------------------------------------------------------------------------------------------------------
+    ## on document ready creating global object of BusyDialog
+    ##
     window.globalBusyDialog = new BusyDialog()

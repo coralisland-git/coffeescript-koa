@@ -1,32 +1,34 @@
-##|
-##|  Universal class to translate from one value to another that
-##|  is designed to be human readable
-##|
-
-# create a namespace to export our public methods
+## -------------------------------------------------------------------------------------------------------------
+## Universal class to translate from one value to another
+## that is designed to be human readdable
+##
+##
+## create a namespace to export our public methods
 root = exports ? this
 root.DataFormatter = class DataFormatter
 
-	##|
-	##| Output:  Suggested width of the data to display in pixels
+	# @property [Object] formats
 	formats: {}
 
-	##|
-	##|  Given a string, return a number
+	## -------------------------------------------------------------------------------------------------------------
+	## given a string, return number
+	##
+	## @param [String] data data to be converted to number
+	## @return [Float] result equalent version of string in fload
 	@getNumber: (data) =>
 		if !data? then return 0
 		if typeof data == "number" then return data
 		result = data.toString().replace /[^0-9\.\-]/g, ""
 		result = parseFloat result
 
-	##|
-	##| Given a date in a human readable form, parse it and return the Moment
-	##| object (see momentjs) that represents the date/time.
-	##|
-	##| @param [string] date The date string to parse
-	##|
-	##| @note returns null if the date is invalid
-	##|
+	## -------------------------------------------------------------------------------------------------------------
+	## Given a date in a human readable form, parse it and return the Moment
+	## object (see momentjs) that represents the date/time.
+	##
+	## @param [string] date The date string to parse
+	## @note returns null if the date is invalid
+	## @return [Moment] moment object
+	##
 	@getMoment: (data) =>
 
 		if !data? then return null
@@ -48,10 +50,23 @@ root.DataFormatter = class DataFormatter
 
 		return null;
 
+	## -------------------------------------------------------------------------------------------------------------
+	## function to register the data formatter class
+	##
+	## @param [DataFormatterType] formattingClass
+	## @return null
+	##
 	register: (formattingClass) =>
 
 		@formats[formattingClass.name] = formattingClass
 
+	## -------------------------------------------------------------------------------------------------------------
+	## function to get the data formatter from registered formatter
+	##
+	## @param [String] dataTpe data type name of the desired formatter class
+	## @note fires error if formatter not found
+	## @return DataFormatterType
+	##
 	getFormatter: (dataType) =>
 
 		if !@formats[dataType]
@@ -60,11 +75,16 @@ root.DataFormatter = class DataFormatter
 
 		return @formats[dataType]
 
-
-	##|
-	##|  Format some data based on the type and
-	##|  return just the formatted value, not the style or other details.
-	##|
+	## -------------------------------------------------------------------------------------------------------------
+	## Format some data based on the type and
+	## return just the formatted value, not the style or other details.
+	##
+	## @param [String] dataType data type name for which formatter is running
+	## @param [Object] data data to be formatted
+	## @param [Object] options additional options to apply formatting
+	## @param [String] path the current path at which the formatter is running
+	## @return [Object] value formatted data using data type formatter
+	##
 	formatData: (dataType, data, options, path) =>
 
 		if !@formats[dataType]?
@@ -73,13 +93,23 @@ root.DataFormatter = class DataFormatter
 
 		value = @formats[dataType].format data, options, path
 
-	##|
-	##|  Convert visual data into a storable raw format
+	## -------------------------------------------------------------------------------------------------------------
+	## UnFormat some data based on the type and
+	## return just the unformatted value, not the style or other details.
+	##
+	## @param [String] dataType data type name for which formatter is running
+	## @param [Object] data data to be formatted
+	## @param [Object] options additional options to apply formatting
+	## @param [String] path the current path at which the formatter is running
+	## @return [Object] value unformatted data using data type formatter
+	##
 	unformatData: (dataType, data, options, path) =>
 
 		if !@formats[dataType]? then return "Invalid type [#{dataType}]"
 		value = @formats[dataType].unformat data, options, path
 
-
+	## -------------------------------------------------------------------------------------------------------------
+	## constructor
+	##
+	##
 	constructor: () ->
-

@@ -1,3 +1,9 @@
+## -------------------------------------------------------------------------------------------------------------
+## function to open globalEditor which is simple textbox
+##
+## @param [Element] e the element in which the editor to create
+## @return [Boolean]
+##
 globalOpenEditor = (e) ->
     ##|
     ##|  Clicked on an editable field
@@ -7,27 +13,50 @@ globalOpenEditor = (e) ->
 
 
 root = exports ? this
+
+## -------------------------------------------------------------------------------------------------------------
+## class DataMap
+## this is the class to handle and map the data into application including custom data types and data for that datatypes
+##
 class DataMap
 
-    constructor: ()->
-
+    ## -------------------------------------------------------------------------------------------------------------
+	## constructor
+	##
+	constructor: ()->
+        # @property [Object] data to save the data objects
         @data     = {}
+
+        # @property [Object] types to save datatypes for the column in table
         @types    = {}
+
+        # @property [Function] onSave function to be called when edited data is saved
         @onSave   = {}
+
+        # @property [Object] objStore object store
         @objStore = {}
 
-    ##|
-    ##|  Returns a global instance of the data map
+    ## -------------------------------------------------------------------------------------------------------------
+	## function to get singleton global instance of data map
+	##
+	## @return [DataMap] globalDataMap global instance of dataMap
+    ##
     @getDataMap: () =>
+        ##
         if !root.globalDataMap
             root.globalDataMap = new DataMap()
 
         return root.globalDataMap
 
-    ##|
-    ##|  Call this function to set a callback when an editable field changes
-    ##|  due to an inline editor.   The callback receives
-    ##|  Table Name, Key, Old Value, New Value
+    ## -------------------------------------------------------------------------------------------------------------
+	## Call this function to set a callback when an editable field changes
+	## due to an inline editor.   The callback receives
+	## Table Name, Key, Old Value, New Value
+    ##
+	## @param [String] tableName tableName to associate callback with
+	## @param [Function] callbackFunction funtion to execute on save
+	## @return [Boolean]
+	##
     @setSaveCallback: (tableName, callbackFunction) =>
 
         dm = DataMap.getDataMap()
@@ -35,9 +64,13 @@ class DataMap
 
         true
 
-    ##|
-    ##|  Set the data type for a given type of data
-    ##|  Called statically to
+    ## -------------------------------------------------------------------------------------------------------------
+	## Set the data type for a given type of data Called statically to
+	##
+    ## @param [String] tableName table name for which the new data type is being set
+    ## @param [Object] columns array of the columns to set as data type
+	## @return [Boolean]
+    ##
     @setDataTypes: (tableName, columns) =>
 
         dm = DataMap.getDataMap()
@@ -49,9 +82,13 @@ class DataMap
 
         true
 
-    ##|
-    ##|  Quickly import an entire array of objects into a table
-    ##|  clears the table first
+    ## -------------------------------------------------------------------------------------------------------------
+	## Quickly import an entire array of objects into table clears the table first
+	##
+    ## @param [String] tableName table name for which the new data type is being set
+    ## @param [Array] objects array of objects to set in the table in form of 2d array
+	## @return [Boolean]
+    ##
     @importDataFromObjects: (tableName, objects) =>
 
         dm = DataMap.getDataMap()
@@ -62,8 +99,12 @@ class DataMap
 
         true
 
-    ##|
-    ##|  Reset the columns for a table based on some object
+    ## -------------------------------------------------------------------------------------------------------------
+	## Reset the columns for a table based on some object
+	##
+    ## @param [String] tableName table name for which the new data type is being set
+    ## @param [Object] columns array of the columns to set as data type
+    ##
     @setDataTypesFromObject: (tableName, objects) =>
 
         dm = DataMap.getDataMap()
@@ -112,10 +153,14 @@ class DataMap
 
         dm.types[tableName].configureColumns columns
 
-    ##|
-    ##|  Return the columns associated with a given table
-    ##|  reduceFunction is called with every table name,
-    ##|  and return the columns that return true.
+    ## -------------------------------------------------------------------------------------------------------------
+	## Return the columns associated with a given table
+    ## reduceFunction is called with every table name and return the columns that return true
+	##
+    ## @param [String] tableName table name for which the new data type is being set
+    ## @param [Function] reduceFunction function to validate the column if returns true column will be included
+	## @return [Array] columns array of included columns
+    ##
     @getColumnsFromTable: (tableName, reduceFunction) =>
 
         dm = DataMap.getDataMap()
@@ -136,6 +181,13 @@ class DataMap
 
         return columns
 
+    ## -------------------------------------------------------------------------------------------------------------
+	## get the values of the columns which will be retured true by reduceFunction
+	##
+    ## @param [String] tableName table name for which the new data type is being set
+    ## @param [Function] reduceFunction function that will called on each column and if returns true then it will considered
+	## @return [Array] results the array of the data included using reduceFunction
+    ##
     @getValuesFromTable: (tableName, reduceFunction) =>
 
         dm = DataMap.getDataMap()
@@ -156,6 +208,13 @@ class DataMap
 
         return results
 
+    ## -------------------------------------------------------------------------------------------------------------
+	## initiate the edit of the data using editor defined in the data type
+	##
+    ## @param [String] path indicating the location of the data beign edited
+    ## @param [JqueryElement] el element in which to open editor
+	## @return [Boolean]
+    ##
     editValue: (path, el) =>
 
         ##| Split the path name
@@ -172,6 +231,14 @@ class DataMap
         formatter.editData el, existingValue, path, @updatePathValueEvent
         true
 
+    ## -------------------------------------------------------------------------------------------------------------
+	## update the occurence of the path value with the updated value on currently rendered screen
+	##
+    ## @param [String] path indicating the location of the data to be updated
+    ## @param [Object] newValue new value to be set instead of old data
+    ## @param [Boolean] didDataChange if data is different from the previous value
+	## @return [Boolean]
+    ##
     updateScreenPathValue: (path, newValue, didDataChange) =>
 
         parts     = path.split '/'
@@ -193,6 +260,14 @@ class DataMap
 
         true
 
+    ## -------------------------------------------------------------------------------------------------------------
+	## works as the event triggered at the update of the value
+	##
+    ## @param [String] path indicating the location of the data to be updated
+    ## @param [Object] newValue new value to be set instead of old data
+    ## @event updatePathValueEvent
+    ## @return [Boolean]
+    ##
     updatePathValueEvent: (path, newValue) =>
 
         ##|
@@ -216,6 +291,13 @@ class DataMap
 
         true
 
+    ## -------------------------------------------------------------------------------------------------------------
+	## update the occurence of the path value with the updated value in the internal data map
+	##
+    ## @param [String] path indicating the location of the data to be updated
+    ## @param [Object] newValue new value to be set instead of old data
+    ## @return [Boolean]
+    ##
     updatePathValue: (path, newValue) =>
 
         ##| Split the path name
@@ -233,12 +315,18 @@ class DataMap
 
         true
 
+    ## -------------------------------------------------------------------------------------------------------------
+	## save the current data state
+	##
     @stateSave: () =>
         # TODO: Figure out a better way to save and load state
         # dm = DataMap.getDataMap()
         # localStorage["DataMap"] = JSON.stringify(dm.data)
         return
 
+    ## -------------------------------------------------------------------------------------------------------------
+	## load the state
+	##
     @stateLoad: () =>
         # TODO: Figure out a better way to save state
         # jtext = localStorage["DataMap"]
@@ -252,6 +340,14 @@ class DataMap
 
         return
 
+    ## -------------------------------------------------------------------------------------------------------------
+	## add data to the dataMap and update the occurence on the currently rendered screen
+	##
+    ## @param [String] tableName name of the table in which the data is being added
+    ## @param [String] keyValue unique key to track the data row inside the DataMap
+    ## @param [Object] values values of the row in form of object
+	## @return [Boolean]
+    ##
     @addData: (tableName, keyValue, values) =>
 
         dm = DataMap.getDataMap()
@@ -275,6 +371,13 @@ class DataMap
 
         true
 
+    ## -------------------------------------------------------------------------------------------------------------
+	## delete row form the screen and dataMap using the keyvale
+	##
+    ## @param [String] tableName name of the table in which the data is being added
+    ## @param [String] keyValue unique key to track the data row inside the DataMap
+    ## @return [Boolean]
+    ##
     @deleteDataByKey: (tableName, keyValue) =>
         dm = DataMap.getDataMap()
 
@@ -288,6 +391,14 @@ class DataMap
 
         true
 
+    ## -------------------------------------------------------------------------------------------------------------
+	## get the single column|field value using the key and column name
+	##
+    ## @param [String] tableName name of the table in which the data is being added
+    ## @param [String] keyValue unique key to track the data row inside the DataMap
+    ## @param [String] fieldName name of the column to return the value of
+	## @return [String]
+    ##
     @getDataField: (tableName, keyValue, fieldName) =>
 
         dm = DataMap.getDataMap()
@@ -296,6 +407,16 @@ class DataMap
 
         return dm.data[tableName][keyValue][fieldName]
 
+    ## -------------------------------------------------------------------------------------------------------------
+	## return the html for the column to render including events and all
+	##
+    ## @param [String] tagNam tag name to be used for ex. li
+    ## @param [String] tableName tableName for which the current render is being done
+    ## @param [String] fieldName name of the column which is currently under render
+    ## @param [String] keyValue unique keyValue to track the current row
+    ## @param [String] extraClassName additional style class to inlude in the html
+	## @return [String] html
+    ##
     @renderField: (tagNam, tableName, fieldName, keyValue, extraClassName) =>
 
         dm = DataMap.getDataMap()

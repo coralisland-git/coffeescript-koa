@@ -1,25 +1,61 @@
+## -------------------------------------------------------------------------------------------------------------
+## Base class for DataFormatterType
+##
 class DataFormatterType
 
+	# @property [String] name to give the datatype name
 	name          : 	""
+
+	# @property [Integer] width
 	width         : null
+
+	# @property [Boolean] editorShowing if to show editor or not
 	editorShowing : false
+
+	# @property [String] editorPath suggests current path of the value being edited
 	editorPath    : ""
 
-	##|
-	##|  Text to add to the css for displaying
+	# @property [String] styleFormat to apply additional style
 	styleFormat: ""
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to get the formatted data fromt the datatype
+	##
+	## @param [Object] data data to be formatted
+	## @param [Object] options additional options to be used in the format for ex. options for select
+	## @param [String] path the path where the formatted data needs to be returned
+	## @return null
+	##
 	format: (data, options, path) =>
 		return null
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to remove formating applied and get raw data
+	##
+	## @param [Object] data data to be unformatted
+	## @param [String] path the path where the formatted data needs to be returned
+	## @return null
+	##
 	unformat: (data, path) =>
 		return null
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to allow specific key stroke on datatype
+	##
+	## @param [Integer] keycode keycode that is allowed
+	## @return [Boolean]
+	##
 	allowKey: (keyCode) =>
 		return true
 
-	##|
-	##|  Start editing an element
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to edit the data displayed using data type
+	##
+	## @param [JqueryElement] parentElement parent Element of the currently rendered data
+	## @param [Object] currentValue currentValue of the datatype
+	## @param [String] path the path where the data is being displayed
+	## @param [Function] onSaveCallback the function that should be called when data is updated
+	##
 	editData: (parentElement, currentValue, path, @onSaveCallback) =>
 
 		left     = 0
@@ -42,6 +78,12 @@ class DataFormatterType
 		@editorShowing = true
 		@openEditor(elParent, left, top, width, height, currentValue, path)
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to save the new value to the datatype holder element
+	##
+	## @param [Object] newValue new value that needs to be updateds to be returned
+	## @return [Boolean]
+	##
 	saveValue: (newValue) =>
 
 		console.log "Saving value", newValue
@@ -49,6 +91,9 @@ class DataFormatterType
 			@onSaveCallback @editorPath, newValue
 		true
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to append the editor html to the document
+	##
 	appendEditor: () =>
 
 		$("body").append(@elEditor)
@@ -89,8 +134,18 @@ class DataFormatterType
 			console.log "Click"
 
 
-	##|
-	##|  Open the dynamic text editor
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to open the dynamic default text editor
+	##
+	## @param [JqueryElement] elParent parent element where text editor needs to be displayed
+	## @param [Integer] left left position offset
+	## @param [Integer] top top position offset
+	## @param [Integer] width width of the editor
+	## @param [Integer] height height of the editor
+	## @param [Object] currentValue current value of the cell
+	## @param [String] path path where the value is being edited
+	## @return null
+	##
 	openEditor: (elParent, left, top, width, height, currentValue, path) =>
 
 		if !@elEditor
@@ -114,10 +169,24 @@ class DataFormatterType
 		@elEditor.focus()
 
 
+## -------------------------------------------------------------------------------------------------------------
+## class for Text datatype
+##
+## @extends [DataFormatterType
+##
 class DataFormatText extends DataFormatterType
 
+	# @property [String] name name of the data type
 	name: "text"
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to format the currently passed data
+	##
+	## @param [Object] data data to be formatted
+	## @param [Object] options additonal options defined for the datatype
+	## @param [String] path path where the value is being edited
+	## @return [Object] data formatted data
+	##
 	format: (data, options, path) =>
 
 		if !data?
@@ -125,13 +194,40 @@ class DataFormatText extends DataFormatterType
 
 		return data
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to unformat the currently formatted data
+	##
+	## @param [Object] data data to be unformatted
+	## @param [String] path path where the value is being edited
+	## @return [Object] data unformatted data
+	##
 	unformat: (data, path) =>
 
 		return data
 
+
+## -------------------------------------------------------------------------------------------------------------
+## class for SourceCode data type
+##
+## @extends [DataFormatText]
+##
 class DataFormatSourceCode extends DataFormatText
+
+	# @property [String] name name of the data type
 	name : "sourcecode"
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to open editor including ace code editor
+	##
+	## @param [JqueryObject] elParent parent element
+	## @param [Integer] left left position offset
+	## @param [Integer] top top position offset
+	## @param [Integer] width width of the editor
+	## @param [Integer] height height of the editor
+	## @param [Object] currentValue current value of the cell
+	## @param [String] path path where the value is being edited
+	## @return null
+	##
 	openEditor: (elParent, left, top, width, height, currentValue, path) =>
 		##|
 		##|  Show a popup menu
@@ -164,36 +260,98 @@ class DataFormatSourceCode extends DataFormatText
 		true
 
 
+## -------------------------------------------------------------------------------------------------------------
+## class for int data type
+##
+## @extends [DataFormatterType]
+##
 
 class DataFormatInt extends DataFormatterType
 
+	# @property [String] name name of the data type
 	name: "int"
+
+	# @property [String] styleFormat
 	styleFormat: "text-align: right;"
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to format the currently passed data
+	##
+	## @param [Object] data data to be formatted
+	## @param [Object] options additonal options defined for the datatype
+	## @param [String] path path where the value is being edited
+	## @return [Object] data formatted data
+	##
 	format: (data, options, path) =>
 		if options? and options != null
 			return numeral(DataFormatter.getNumber data).format(options)
 		return numeral(DataFormatter.getNumber data).format("#,###")
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to unformat the currently formatted data
+	##
+	## @param [Object] data data to be unformatted
+	## @param [String] path path where the value is being edited
+	## @return [Object] data unformatted data
+	##
 	unformat: (data, path) =>
 		return DataFormatter.getNumber data
 
+
+## -------------------------------------------------------------------------------------------------------------
+## class for number data type
+##
+## @extends [DataFormatterType]
+##
 class DataFormatNumber extends DataFormatterType
 
+	# @property [String] name name of the data type
 	name: "number"
+
+	# @property [String] styleFormat
 	styleFormat: "text-align: right;"
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to format the currently passed data
+	##
+	## @param [Object] data data to be formatted
+	## @param [Object] options additonal options defined for the datatype
+	## @param [String] path path where the value is being edited
+	## @return [Object] data formatted data
+	##
 	format: (data, options, path) =>
 		return numeral(DataFormatter.getNumber data).format("#,###.[##]")
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to unformat the currently formatted data
+	##
+	## @param [Object] data data to be unformatted
+	## @param [String] path path where the value is being edited
+	## @return [Object] data unformatted data
+	##
 	unformat: (data, path) =>
 		return DataFormatter.getNumber data
 
+
+## -------------------------------------------------------------------------------------------------------------
+## class for decimal data type
+##
+## @extends [DataFormatterType] data formatted data
+##
 class DataFormatFloat extends DataFormatterType
 
+	# @property [String] name name of the data type
 	name: "decimal"
+
+	# @property [String] styleFormat
 	styleFormat: "text-align: right;"
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to allow specific key code
+	##
+	## @param [Integer] keyCode keyCode to allow
+	## @return [Boolean]
+	##
 	allowKey: (keyCode) =>
 		return true
 
@@ -206,56 +364,162 @@ class DataFormatFloat extends DataFormatterType
 		console.log "Rejecting key:", keyCode
 		return false
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to format the currently passed data
+	##
+	## @param [Object] data data to be formatted
+	## @param [Object] options additonal options defined for the datatype
+	## @param [String] path path where the value is being edited
+	## @return [Object] data formatted data
+	##
 	format: (data, options, path) =>
 		return numeral(DataFormatter.getNumber data).format("#,###.##")
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to unformat the currently formatted data
+	##
+	## @param [Object] data data to be unformatted
+	## @param [String] path path where the value is being edited
+	## @return [Object] data unformatted data
+	##
 	unformat: (data, path) =>
 		return DataFormatter.getNumber data
 
+
+## -------------------------------------------------------------------------------------------------------------
+## class for money data type
+##
+## @extends [DataFormatterType]
+##
 class DataFormatCurrency extends DataFormatterType
 
+	# @property [String] name name of the data type
 	name: "money"
+
+	# @property [String] styleFormat
 	styleFormat: "text-align: right;"
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to format the currently passed data
+	##
+	## @param [Object] data data to be formatted
+	## @param [Object] options additonal options defined for the datatype
+	## @param [String] path path where the value is being edited
+	## @return [Object] data formatted data
+	##
 	format: (data, options, path) =>
 		if !data? or data == null or data == 0 or data == ""
 			return "&mdash;"
 
 		return numeral(DataFormatter.getNumber data).format('$ #,###.[##]')
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to unformat the currently formatted data
+	##
+	## @param [Object] data data to be unformatted
+	## @param [String] path path where the value is being edited
+	## @return [Object] data unformatted data
+	##
 	unformat: (data, path) =>
 		return DataFormatter.getNumber data
 
+
+## -------------------------------------------------------------------------------------------------------------
+## class for percent data type
+##
+## @extends [DataFormatterType]
+##
 class DataFormatPercent extends DataFormatterType
 
+	# @property [Strin] name name of the data type
 	name: "percent"
+
+	# @property [String] styleFormat
 	styleFormat: "text-align: right;"
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to format the currently passed data
+	##
+	## @param [Object] data data to be formatted
+	## @param [Object] options additonal options defined for the datatype
+	## @param [String] path path where the value is being edited
+	## @return [Object] data formatted data
+	##
 	format: (data, options, path) =>
 		return numeral(DataFormatter.getNumber data).format('#,###.[##] %')
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to unformat the currently formatted data
+	##
+	## @param [Object] data data to be unformatted
+	## @param [String] path path where the value is being edited
+	## @return [Object] data unformatted data
+	##
 	unformat: (data, path) =>
 		return DataFormatter.getNumber data/100.0
 
+
+## -------------------------------------------------------------------------------------------------------------
+## class for date data type
+##
+## @extends [DataFormatterType]
+##
 class DataFormatDate extends DataFormatterType
 
+	# @property [String] name name of the data type
 	name: "date"
+
+	# @property [Integer] width
 	width: 65
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to format the currently passed data
+	##
+	## @param [Object] data data to be formatted
+	## @param [Object] options additonal options defined for the datatype
+	## @param [String] path path where the value is being edited
+	## @return [Object] data formatted data
+	##
 	format: (data, options, path) =>
 		m = DataFormatter.getMoment data
 		if !m? then return ""
 		return m.format "MM/DD/YYYY"
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to unformat the currently formatted data
+	##
+	## @param [Object] data data to be unformatted
+	## @param [String] path path where the value is being edited
+	## @return [Object] data unformatted data
+	##
 	unformat: (data, path) =>
 		m = DataFormatter.getMoment data
 		if !m? then return ""
 		return m.format "YYYY-MM-DD HH:mm:ss"
 
+
+## -------------------------------------------------------------------------------------------------------------
+## class for datetime data type
+##
+## @extends [DataFormatterType]
+##
 class DataFormatDateTime extends DataFormatterType
 
+	# @property [String] name name of the data type
 	name: "datetime"
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to open editor including ace code editor
+	##
+	## @param [JqueryObject] elParent parent element
+	## @param [Integer] left left position offset
+	## @param [Integer] top top position offset
+	## @param [Integer] width width of the editor
+	## @param [Integer] height height of the editor
+	## @param [Object] currentValue current value of the cell
+	## @param [String] path path where the value is being edited
+	## @return null
+	##
 	openEditor: (elParent, left, top, width, height, currentValue, path) =>
 
 		##|
@@ -265,22 +529,56 @@ class DataFormatDateTime extends DataFormatterType
             @recordChange @name, newValue
 		true
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to format the currently passed data
+	##
+	## @param [Object] data data to be formatted
+	## @param [Object] options additonal options defined for the datatype
+	## @param [String] path path where the value is being edited
+	## @return [Object] data formatted data
+	##
 	format: (data, options, path) =>
 		m = DataFormatter.getMoment data
 		if !m? then return ""
 		return m.format "ddd, MMM Do, YYYY h:mm:ss a"
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to unformat the currently unformatted data
+	##
+	## @param [Object] data data to be unformatted
+	## @param [String] path path where the value is being edited
+	## @return [Object] data unformatted data
+	##
 	unformat: (data, path) =>
 		m = DataFormatter.getMoment data
 		if !m? then return ""
 		return m.format "YYYY-MM-DD HH:mm:ss"
 
+
+## -------------------------------------------------------------------------------------------------------------
+## class for age data type
+##
+## @extends [DataFormatterType]
+##
 class DataFormatDateAge extends DataFormatterType
 
+	# @property [String] name name of the data type
 	name: "age"
+
+	# @property [Integer] width
 	width: 135
+
+	# @property [String] styleFormat
 	styleFormat: "text-align: right;"
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to format the currently passed data
+	##
+	## @param [Object] data data to be formatted
+	## @param [Object] options additonal options defined for the datatype
+	## @param [String] path path where the value is being edited
+	## @return [Object] data formatted data
+	##
 	format: (data, options, path) =>
 		m = DataFormatter.getMoment data
 		if !m? then return "&mdash;"
@@ -299,15 +597,41 @@ class DataFormatDateAge extends DataFormatterType
 		html += "<span class='fage'>" + age + "</span>"
 		return html
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to unformat the currently formatted data
+	##
+	## @param [Object] data data to be unformatted
+	## @param [String] path path where the value is being edited
+	## @return [Object] data unformatted data
+	##
 	unformat: (data, path) =>
 		m = DataFormatter.getMoment data
 		if !m? then return ""
 		return m.format "YYYY-MM-DD HH:mm:ss"
 
+
+## -------------------------------------------------------------------------------------------------------------
+## class for enum data type
+##
+## @extends [DataFormatterType]
+##
 class DataFormatEnum extends DataFormatterType
 
+	# @property [String] name name of the data type
 	name: "enum"
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to open editor including ace code editor
+	##
+	## @param [JqueryObject] elParent parent element
+	## @param [Integer] left left position offset
+	## @param [Integer] top top position offset
+	## @param [Integer] width width of the editor
+	## @param [Integer] height height of the editor
+	## @param [Object] currentValue current value of the cell
+	## @param [String] path path where the value is being edited
+	## @return null
+	##
 	openEditor: (elParent, left, top, width, height, currentValue, path) =>
 
 		##|
@@ -325,9 +649,15 @@ class DataFormatEnum extends DataFormatterType
 
 		true
 
-	##|
-	##| In this case, the options is an array or a comma seperated list of values
-	##| data must be one of those values of a numeric index to those values.
+	## -------------------------------------------------------------------------------------------------------------
+	## In this case, the options is an array or a comma seperated list of values
+	## data must be one of those values of a numeric index to those values.
+	##
+	## @param [Object] data data to be formatted
+	## @param [Object] options additonal options defined for the datatype
+	## @param [String] path path where the value is being edited
+	## @return [Object] data formatted data
+	##
 	format: (data, @options, path) =>
 
 		if typeof @options == "string"
@@ -344,16 +674,38 @@ class DataFormatEnum extends DataFormatterType
 
 		return "[" + data + "]"
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to unformat the currently formatted data
+	##
+	## @param [Object] data data to be unformatted
+	## @param [String] path path where the value is being edited
+	## @return [Object] data unformatted data
+	##
 	unformat: (data, path) =>
 		return data
 
+
+## -------------------------------------------------------------------------------------------------------------
+## class for distance data type
+##
+## @extends [DataFormatterType]
+##
 class DataFormatDistance extends DataFormatterType
 
+	# @property [String] name name of the data type
 	name: "distance"
+
+	# @property [Integer] width
 	width: 80
 
-	##|
-	##| Takes meters in, returns a formatted string
+	## -------------------------------------------------------------------------------------------------------------
+	## Takes meters in, returns a formatted string
+	##
+	## @param [Object] data data to be formatted
+	## @param [Object] options additonal options defined for the datatype
+	## @param [String] path path where the value is being edited
+	## @return [Object] data formatted data
+	##
 	format: (data, options, path) =>
 		val = DataFormatter.getNumber data
 		ft = 3280.8 * val
@@ -361,15 +713,44 @@ class DataFormatDistance extends DataFormatterType
 		mi = 0.621371 * val
 		return numeral(mi).format("#,###.##") + " mi.";
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to unformat the currently formatted data
+	##
+	## @param [Object] data data to be unformatted
+	## @param [Object] options additonal options defined for the datatype
+	## @param [String] path path where the value is being edited
+	## @return [Object] data unformatted data
+	##
 	unformat: (data, path) =>
 		val = DataFormatter.getNumber(data)
 		return val * 3280.8
 
+
+## -------------------------------------------------------------------------------------------------------------
+## class for boolean data type
+##
+## @extends [DataFormatterType]
+##
 class DataFormatBoolean extends DataFormatterType
 
+	# @property [String] name name of the data type
 	name: "boolean"
+
+	# @property [Integer] width
 	width: 40
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to open editor including ace code editor
+	##
+	## @param [JqueryObject] elParent parent element
+	## @param [Integer] left left position offset
+	## @param [Integer] top top position offset
+	## @param [Integer] width width of the editor
+	## @param [Integer] height height of the editor
+	## @param [Object] currentValue current value of the cell
+	## @param [String] path path where the value is being edited
+	## @return null
+	##
 	openEditor: (elParent, left, top, width, height, currentValue, path) =>
 
 		##|
@@ -384,24 +765,55 @@ class DataFormatBoolean extends DataFormatterType
 		, 0
 		true
 
-	##|
-	##| Takes meters in, returns a formatted string
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to format the currently passed data
+	##
+	## @param [Object] data data to be formatted
+	## @param [Object] options additonal options defined for the datatype
+	## @param [String] path path where the value is being edited
+	## @return [Object] data formatted data
+	##
 	format: (data, options, path) =>
 		if !data? then return "No"
 		if data == null or data == 0 then return "No"
 		return "Yes"
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to unformat the currently formatted data
+	##
+	## @param [Object] data data to be unformatted
+	## @param [Object] options additonal options defined for the datatype
+	## @param [String] path path where the value is being edited
+	## @return [Object] data unformatted data
+	##
 	unformat: (data, path) =>
 		if !data? then return 0
 		if data == null or data == 0 then return 0
 		if data == "No" or data == "no" or data == "false" or data == "off" then return 0
 		return 1
 
+
+## -------------------------------------------------------------------------------------------------------------
+## class for timeago data type
+##
+## @extends [DataFormatterType]
+##
 class DataFormatTimeAgo extends DataFormatterType
 
+	# @property [String] name name of the data type
 	name: "timeago"
+
+	# @property [Integer] width
 	width: 135
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to format the currently passed data
+	##
+	## @param [Object] data data to be formatted
+	## @param [Object] options additonal options defined for the datatype
+	## @param [String] path path where the value is being edited
+	## @return [Object] data formatted data
+	##
 	format: (data, options, path) =>
 		stamp = DataFormatter.getMoment data
 		if stamp == null
@@ -430,20 +842,57 @@ class DataFormatTimeAgo extends DataFormatterType
 
 		return txt
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to format the currently passed data
+	##
+	## @param [Object] data data to be formatted
+	## @param [Object] options additonal options defined for the datatype
+	## @param [String] path path where the value is being edited
+	## @return [Object] data formatted data
+	##
 	unformat: (data, path) =>
 		m = DataFormatter.getMoment data
 		if !m? then return ""
 		return m.format "YYYY-MM-DD HH:mm:ss"
 
+
+## -------------------------------------------------------------------------------------------------------------
+## class for simpleobject data type
+##
+## @extends [DataFormatterType]
+##
 class DataFormatSimpleObject extends DataFormatterType
+
+	# @property [String] name name of the data type
 	name: "simpleobject"
 
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to format the currently passed data
+	##
+	## @param [Object] data data to be formatted
+	## @param [Object] options additonal options defined for the datatype
+	## @param [String] path path where the value is being edited
+	## @return [Object] data formatted data
+	##
 	format: (data,options,path) =>
 		if !options.compile
 			throw new Error "compilation template not defined inside options.compile"
 		return Handlebars.compile(options.compile)(data)
+
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to unformat the currently formatted data
+	##
+	## @param [Object] data data to be unformatted
+	## @param [String] path path where the value is being edited
+	## @return [Object] data unformatted data
+	##
 	unformat: (data,path) =>
 		return data
+
+
+## -------------------------------------------------------------------------------------------------------------
+## register all the data type with the globalDataFormatter
+##
 try
 	globalDataFormatter = new DataFormatter()
 

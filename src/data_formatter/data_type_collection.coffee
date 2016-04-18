@@ -1,44 +1,74 @@
-##|
-##|  A list of data types that go together such as columns in a table
-##|  or database columns.   The configName part of the constructor is used
-##|  to save or load the configuration if needed
-##|
-
+## -------------------------------------------------------------------------------------------------------------
+## A list of data types that go together such as columns in a table
+## or database columns.   The configName part of the constructor is used
+## to save or load the configuration if needed
+##
 class DataType
 
-    source        : ''       ##| Data source to copy from
-    visible       : false    ##| Visible (Used for tables)
-    editable      : false    ##| Editable (Inline edit for display)
-    hideable      : true     ##| Can be hidden
-    required      : false    ##| Used to create a new record
-    type          : ''       ##| Data type text
-    tooltip       : ''       ##| Tooltip text
+    # @property [String] source data source to copy from
+    source        : ''
+
+    # @property [Boolean] visible used for tables
+    visible       : false
+
+    # @property [Boolean] editable inline edit for display
+    editable      : false
+
+    # @property [Boolean] hideable can be hidden
+    hideable      : true
+
+    # @property [Boolean] required used to create a new record
+    required      : false
+
+    # @property [String] type data type text
+    type          : ''
+
+    # @property [String] tooltip tooltip text
+    tooltip       : ''
+
+    # @property [Function|null] formatter additional formatter to use for getting formatted value
     formatter     : null
+
+    # @property [null|Function] displayFormat formatter to display the data on screen
     displayFormat : null
 
+    ## -------------------------------------------------------------------------------------------------------------
+    ## constructor
+    ##
     constructor: () ->
 
+
+## -------------------------------------------------------------------------------------------------------------
+## class for DataTypeCollection
+##
 class DataTypeCollection
 
+    ## -------------------------------------------------------------------------------------------------------------
+    ## constructor
+    ##
+    ## @param [String] configName to identify the DataTypeCollection inside dataMap
+    ## @param [Object] cols the columns to include in the tables
+    ##
     constructor: (@configName, cols) ->
 
         @col = {}
         @colList = []
         if cols? then @configureColumns cols
 
-    ##|
-    ##|  Given an array of column configuration structures, create new
-    ##|  columns automatically based on the configuration.
-    ##|  Example:
-    ##|
-    ##|  name       : 'Create Date'
-    ##|  source     : 'create_date'
-    ##|  visible    : true
-    ##|  hideable   : true
-    ##|  editable   : true
-    ##|  type       : 'datetime'
-    ##|  required   : false
-    ##|
+    ## -------------------------------------------------------------------------------------------------------------
+    ## Given an array of column configuration structures, create new
+    ## columns automatically based on the configuration.
+    ##
+    ## @example
+    ##      dc.configureColumn
+    ##            name: 'Create Date'
+    ##            source: 'create_date'
+    ##            visible: true
+    ##            hideable: true
+    ##            editable: true
+    ##            type: 'datetime'
+    ##            required: false
+    ##
     configureColumn: (col) =>
 
         c = new DataType()
@@ -60,9 +90,12 @@ class DataTypeCollection
         @colList.push(c.source)
 
 
-    ##|
-    ##|  Same as configureColumn but allows and array to be passed in
-    ##|
+    ## -------------------------------------------------------------------------------------------------------------
+    ## function to configure more than one columns
+    ##
+    ## @param [Array] columns columns to configure
+    ## @return [Boolean]
+    ##
     configureColumns: (columns) =>
 
         for col in columns
@@ -91,6 +124,3 @@ class DataTypeCollection
         # $('head').append('<style type="text/css">body{font:normal 14pt Ar
 
         true
-
-
-

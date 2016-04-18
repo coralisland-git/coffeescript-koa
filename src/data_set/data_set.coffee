@@ -1,32 +1,41 @@
-###
-
-This class represents one set of data which means
-
-    b)  A source for the data
-
-###
-
+## -------------------------------------------------------------------------------------------------------------
+## class DataSet global class to handle all the data providing task
+## behaves as a source of data
+##
 root = exports ? this
 root.DataSet = class DataSet
 
-    ##|
-    ##|  Create a new data set
-    ##|  param @baseName - The name for this data set, used to map the set to a database
+    ## -------------------------------------------------------------------------------------------------------------
+    ## create a new data set
+    ##
+    ## @param [String] baseName the name for this data set, used to map the set to a database
+    ##
     constructor : (@baseName)->
-
+        # @property [Object] data the data to provide
         @data       = {}
+
+        # @property [Boolean] useDataMap weather to use dataMap or not
         @useDataMap = true
 
-
+    ## -------------------------------------------------------------------------------------------------------------
+    ## function to set the ajax as data source
+    ##
+    ## @param [String] url the url from where to fetch data
+    ## @param [String] subElement to look for the key in the response
+    ## @param [String] keyElement key name to track the data
+    ## @return [Boolean]
+    ##
     setAjaxSource: (url, @subElement, @keyElement) =>
 
         @dataSourceType = "ajax"
         @dataSourceUrl  = url
         true
 
-
-    ##|
-    ##|  Returns a promise that loads the data
+    ## -------------------------------------------------------------------------------------------------------------
+    ## Returns a promise that loads the data
+    ##
+    ## @return [Promise]
+    ##
     doLoadData: () =>
 
         new Promise (resolve, reject) =>
@@ -70,10 +79,3 @@ root.DataSet = class DataSet
             else
 
                 reject new Error "Unknown "
-
-
-
-
-
-
-
