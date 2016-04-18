@@ -1,5 +1,14 @@
+## -------------------------------------------------------------------------------------------------------------
+## class DataMapperBuilder to build datamap and perform common data related operation
+##
 class DataMapperBuilder
 
+	## -------------------------------------------------------------------------------------------------------------
+    ## deserialize the passed json string into javascript object
+	##
+	## @param [String] text string to parse must be valid json string
+    ## @return [Object] parsed javascript object from json string
+    ##
 	deserialize: (txt) =>
 
 		try
@@ -16,13 +25,25 @@ class DataMapperBuilder
 			# @serialize()
 		, 1500
 
+	## -------------------------------------------------------------------------------------------------------------
+    ## serialize the currently mapped data object and create string from that
+	##
+	## @return [String] converted json string
+    ##
 	serialize: () =>
 		text = JSON.stringify(@mapData)
 		console.log "TEXT=", text
 
-	##|
-	##|  Add a transformation rule to a given field
-	##|  if that rule already exists, update it.
+	## -------------------------------------------------------------------------------------------------------------
+    ## Add a transformation rule to a given field
+	## if that rule already exists, update it
+	##
+	## @param [String] clickName
+	## @param [String] ruleType
+	## @param [String] pattern
+	## @param [Object] dest
+    ## @return [Object] parsed javascript object from json string
+    ##
 	addTransformRule: (clickName, ruleType, pattern, dest) =>
 
 		console.log "addTransformRule('#{clickName}','#{ruleType}','#{pattern}','#{dest}');"
@@ -52,8 +73,12 @@ class DataMapperBuilder
 		true
 
 
-	##|
-	##|  Click the + sign to add a rule to an item
+	## -------------------------------------------------------------------------------------------------------------
+    ## click the + sign to add a rule to an item
+	##
+	## @param [Event] object of jquery Event
+    ## @return [Boolean]
+    ##
 	onClickMapPlus: (e) =>
 
 		e.stopPropagation()
@@ -86,6 +111,11 @@ class DataMapperBuilder
 
 		m.show()
 
+	## -------------------------------------------------------------------------------------------------------------
+    ## onclickmap to bind the click event
+	##
+	## @param [Event] object of jQuery Event
+    ##
 	onClickMap: (e) =>
 
 		e.stopPropagation()
@@ -117,6 +147,12 @@ class DataMapperBuilder
 					@onSelectMap info, clickName, "append"
 				, idx
 
+	## -------------------------------------------------------------------------------------------------------------
+    ## when single item is selected from popup
+	##
+	## @param [String] clickName item that is clicked
+    ## @return [Boolean]
+    ##
 	onSelectEdit: (clickName) =>
 
 		m = new ModalDialog
@@ -159,6 +195,13 @@ class DataMapperBuilder
 
 		m.show()
 
+	## -------------------------------------------------------------------------------------------------------------
+    ## onSelectMap
+	##
+	## @param [String] idx columns identifier
+	## @param [String] clickName the name of the click
+	## @param [String] action name of the action to be taken
+    ##
 	onSelectMap: (idx, clickName, action) =>
 
 		delete @KnownFields.colList[idx].isSelected
@@ -176,10 +219,14 @@ class DataMapperBuilder
 		@redrawDataTypes()
 		console.log "MAP=", @mapData
 
-	##|
-	##|  When someone clicks on one of the known map sources on the
-	##|  right, mark it as selected and remove the selection mark from
-	##|  all the other possible sources.
+
+	## -------------------------------------------------------------------------------------------------------------
+    ## when someone clicks on one of the known map sources on the
+	## right, mark it as selected and remove the selection mark from
+	## all the other possible sources
+	##
+	## @param [Event] jQuery Event object
+    ##
 	onSelectDatatype: (e) =>
 		e.stopPropagation()
 		e.preventDefault()
@@ -197,8 +244,11 @@ class DataMapperBuilder
 
 		# @removeAllSelected(idx)
 
-	##|
-	##|  Deselect any selected indexs on the right
+	## -------------------------------------------------------------------------------------------------------------
+    ## Deselect any selected indexes on the right
+	##
+	## @param [Integer] exceptedIndex index to Deselect
+    ##
 	removeAllSelected: (exceptedIndex) =>
 
 		##|
@@ -208,6 +258,12 @@ class DataMapperBuilder
 				dataType.el.removeClass "selected"
 				delete dataType.isSelected
 
+	## -------------------------------------------------------------------------------------------------------------
+    ## function to redrawTransformRules
+	##
+	## @param [String] name identifier of the table
+	## @param [String] field name of the column to consider
+    ##
 	redrawTransformRules: (name, field) =>
 
 		if !@mapData[name].transform? then return false
@@ -225,6 +281,10 @@ class DataMapperBuilder
 				row = $ @templateRuleLine(t)
 				field.elTransfromElements[t.name] = field.elTransformTable.append row
 
+	## -------------------------------------------------------------------------------------------------------------
+    ## function to redraw data types
+	## @return [Boolean]
+	##
 	redrawDataTypes: () =>
 
 		##
@@ -278,8 +338,9 @@ class DataMapperBuilder
 		@serialize()
 		true
 
-	##|
-	##|  Create the data in each field that holds the map configuration
+	## -------------------------------------------------------------------------------------------------------------
+    ## create the data in each field that holds the map configuration
+	##
 	setupKnownFields: () =>
 
 		for idx, dataType of @KnownFields.colList
@@ -287,6 +348,13 @@ class DataMapperBuilder
 				mapType : "none"
 
 
+	## -------------------------------------------------------------------------------------------------------------
+    ## constructor
+	##
+	## @param [Object] sourceObj
+	## @param [Array] knownFields
+	## @param [JQueryElement] holder element to render
+    ##
 	constructor: (sourceObj, knownFields, holder) ->
 
 		##
