@@ -4,6 +4,9 @@ $ ->
 
 	startTest = (data) ->
 
+		doLoadModule "data_mapper"
+		.then ()->
+
 			##|
 			##|  Data is a JSON record that we want to work with (test_data/DataRawRec1.json)
 			##|  TableConfigTest is the column collection loaded at compile time

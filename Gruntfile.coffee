@@ -3,6 +3,51 @@
 ##|  Created by Brian Pollack
 ##|
 
+fs = require 'fs'
+
+##|
+##|  Dynamic functions that return a list of files to build
+##|  this includes custom output for each module
+##|
+
+getModules = ()->
+	try
+		files = fs.readdirSync "module/"
+		return files
+	catch e
+		console.log "getModule error: ", e
+		process.exit(0)
+
+getStylusFiles = ()->
+
+	list =
+		'ninja/ninja.css'          : [ 'src/**/*styl' ]
+		'ninja/test/ninja.css'     : [ 'src/**/*styl' ]
+		'ninja/test/css/test.css'  : [ 'test/css/*styl' ]
+
+	for i in getModules()
+		list["ninja/module_#{i}.css"] = [ "module/#{i}/*styl"]
+
+	list
+
+getCoffeeFiles = ()->
+
+	list =
+		"ninja/ninja.js"               : [ 'src/**/*coffee' ]
+		"ninja/test/ninja.js"          : [ 'src/**/*coffee' ]
+		"ninja/test/js/test_common.js" : [ "test/js/test_common.coffee", "test/js/test_data/*coffee" ]
+
+	for i in fs.readdirSync "test/js/"
+		if ! /coffee/.test i then continue
+		if /test_common/.test i then continue
+		js = i.replace ".coffee", ".js"
+		list["ninja/test/js/#{js}"] = [ "test/js/#{i}" ]
+
+	for i in getModules()
+		list["ninja/module_#{i}.js"] = [ "module/#{i}/*coffee", "module/#{i}/*.js" ]
+
+	return list
+
 module.exports = (grunt) ->
 
 	grunt.initConfig
@@ -17,7 +62,7 @@ module.exports = (grunt) ->
 				options:
 					port: 9000
 					hostname: "0.0.0.0"
-					bases: [ "ninja/test","doc" ]
+					bases: [ "ninja/test", "doc", "." ]
 
 		##|
 		##|  Copy task, takes all the files in the different build folders
@@ -73,10 +118,7 @@ module.exports = (grunt) ->
 					use: [ require 'fluidity' ]
 					urlfunc: 'url'
 					compress: false
-				files:
-					'ninja/ninja.css'          : [ 'src/**/*styl' ]
-					'ninja/test/ninja.css'     : [ 'src/**/*styl' ]
-					'ninja/test/css/test.css'  : [ 'test/css/*styl' ]
+				files:	getStylusFiles()
 
 		jade:
 			compile:
@@ -92,26 +134,7 @@ module.exports = (grunt) ->
 				sourceMap:	true
 
 			compile:
-				files:
-					"ninja/ninja.js"                        : [ 'src/**/*coffee' ]
-					"ninja/test/ninja.js"                   : [ 'src/**/*coffee' ]
-					"ninja/test/js/address_normalizer_1.js" : [ "test/js/address_normalizer_1.coffee" ]
-					"ninja/test/js/data_mapper_1.js"        : [ "test/js/data_mapper_1.coffee" ]
-					"ninja/test/js/dialog_1.js"             : [ "test/js/dialog_1.coffee" ]
-					"ninja/test/js/tabs_1.js"               : [ "test/js/tabs_1.coffee" ]
-					"ninja/test/js/globalval_1.js"          : [ "test/js/globalval_1.coffee" ]
-					"ninja/test/js/dynamic_data_1.js"       : [ "test/js/dynamic_data_1.coffee" ]
-					"ninja/test/js/dynamic_data_2.js"       : [ "test/js/dynamic_data_2.coffee" ]
-					"ninja/test/js/dynamic_data_3.js"       : [ "test/js/dynamic_data_3.coffee" ]
-					"ninja/test/js/popup_menu_1.js"         : [ "test/js/popup_menu_1.coffee" ]
-					"ninja/test/js/popup_window_1.js"       : [ "test/js/popup_window_1.coffee" ]
-					"ninja/test/js/tables_1.js"             : [ "test/js/tables_1.coffee" ]
-					"ninja/test/js/tables_2.js"             : [ "test/js/tables_2.coffee" ]
-					"ninja/test/js/tables_3.js"             : [ "test/js/tables_3.coffee" ]
-					"ninja/test/js/table_editor.js"         : [ "test/js/table_editor.coffee" ]
-					"ninja/test/js/code_editor.js"			: ["test/js/code_editor.coffee"]
-					"ninja/test/js/test_common.js"          : [ "test/js/test_common.coffee", "test/js/test_data/*coffee" ]
-					"ninja/test/js/tables_detail.js"		: ["test/js/tables_detail.coffee"]
+				files: getCoffeeFiles()
 
 		watch:
 
@@ -119,11 +142,11 @@ module.exports = (grunt) ->
 				files:	['Gruntfile.coffee']
 
 			all:
-				files:	['src/css/*.styl', "test/css/*.styl"]
+				files:	['src/css/*.styl', "test/css/*.styl", "module/**/*.styl"]
 				tasks:	['stylus:compile']
 
 			coffeeFile:
-				files:	['src/**/*coffee', "test/js/*coffee", "test/js/test_data/*coffee" ]
+				files:	['src/**/*coffee', "test/js/*coffee", "test/js/test_data/*coffee", "module/**/*coffee", "module/**/*.js" ]
 				tasks:	['coffee']
 
 			jadefiles:
@@ -159,3 +182,4 @@ module.exports = (grunt) ->
 		grunt.registerTask 'dist', 		['coffee', 'copy', 'stylus', 'jade']
 		grunt.registerTask 'synclive', 	['buildnumber', 'coffee', 'copy', 'stylus:compile', 'jade:compile', 'shell:synclive']
 		grunt.registerTask 'default', 	['coffee', 'copy', 'stylus:compile', 'jade:compile', 'express', 'watch']
+
