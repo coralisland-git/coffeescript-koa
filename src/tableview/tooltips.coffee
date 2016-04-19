@@ -1,11 +1,9 @@
-##|
-##|  Implement tooltips on elements
-##|
-##|  Call the function "setupSimpleTooltips" to activate.   It can be called many
-##|  times.  It will find elements with the attribe tooltip='simple' and will
-##|  use data-title as the text for the tooltip.
-##|
-
+## -------------------------------------------------------------------------------------------------------------
+## Implement tooltips on elements
+## call the functin "setupSimpleTooltips" to activatte. it can be called many
+## times. It will find elements with the attribute tooltip="simple" and will
+## use data-title as the text for the tooltip.
+##
 window.globalHoverTimer   = 0
 window.globalHoverElement = 0
 window.elSimpleTooltip    = 0
@@ -74,4 +72,3 @@ setupSimpleTooltips = () ->
 				if window.globalHoverTimer then clearTimeout window.globalHoverTimer
 				window.elSimpleTooltip.hide()
 				true
-

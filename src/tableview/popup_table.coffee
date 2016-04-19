@@ -1,24 +1,40 @@
-##| PopupTable Widget to display table in popup with x,y scrolling
-##| usage:
-## TableView object, tablename
-#  popupTable = new PopupTable(zipcodeTable,'demoZipcodeTable')
-
+## -------------------------------------------------------------------------------------------------------------
+## popuptable widget to display table in popup with x,y scrolling
+##
+## @example
+##		popuptable = new PopupTable(zipcodeTable, 'demoZipcodeTable')
+## @extends [PopupWindow]
+##
 class PopupTable extends PopupWindow
-  popupWidth: 400
-  popupHeight: 300
-  isVisible:   true
-  allowHorizontalScroll: true
 
-  constructor: (@mainTableObject, @popupName) ->
-    _title = "popup Table"
-    super _title
-    ##| check if virtual element or actual element given
-    if @mainTableObject.elTableHolder.attr('id')
-      _tableId = @mainTableObject.elTableHolder.attr('id')
-    else
-      _tableId = @mainTableObject.elTableHolder.selector.substr 1
+	# @property [Integer] popupWidth the width of the popup
+    popupWidth: 400
 
-    @windowScroll.html "<div id='#{_tableId}'></div>"
-    ##| assign tableHolder again to detect inside popup and render
-    @mainTableObject.elTableHolder = $ "##{_tableId}"
-    @mainTableObject.render()
+	# @property [Integer] popupHeight the height of the popup
+    popupHeight: 300
+
+	# @property [Boolean] isVisible currently rendered on screen
+    isVisible: true
+
+	# @property [Boolean] allowHorizontalScroll if horizontal scroll is allowed
+    allowHorizontalScroll: true
+
+	## -------------------------------------------------------------------------------------------------------------
+	## constructor to create new popupTable
+	##
+	## @param [TableView] mainTableObject the tableview instance which will be rendered inside popup
+	## @param [String] popupName name of the popup to be rendered
+	##
+    constructor: (@mainTableObject, @popupName) ->
+        _title = "popup Table"
+        super _title
+        ##| check if virtual element or actual element given
+        if @mainTableObject.elTableHolder.attr('id')
+            _tableId = @mainTableObject.elTableHolder.attr('id')
+        else
+            _tableId = @mainTableObject.elTableHolder.selector.substr 1
+
+        @windowScroll.html "<div id='#{_tableId}'></div>"
+        ##| assign tableHolder again to detect inside popup and render
+        @mainTableObject.elTableHolder = $ "##{_tableId}"
+        @mainTableObject.render()

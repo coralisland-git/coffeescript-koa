@@ -1,7 +1,22 @@
+## -------------------------------------------------------------------------------------------------------------
+## class TableViewDetailed widget to display the table in vertical manner it mostly used to display single row
+## including all data for the single row
+##
+## @extends [TableView]
+##
 class TableViewDetailed extends TableView
 
+	# @property [Integer] leftWidth
 	leftWidth : 140
 
+	## -------------------------------------------------------------------------------------------------------------
+	## addTable function overriden from TableView
+	##
+	## @param [String] tableName name of the table to consider from datamap
+	## @param [Function] rowReduceFunction will be applied to each row and if returns true then only row will be included
+	## @param [Function] reduceFunction will be applied to each column and if returns true then only column will be included
+	## @return [Boolean]
+	##
 	addTable: (tableName, @rowReduceFunction, @reduceFunction) =>
 
 		@primaryTableName = tableName
@@ -15,6 +30,12 @@ class TableViewDetailed extends TableView
 			@colList.push(c)
 		true
 
+	## -------------------------------------------------------------------------------------------------------------
+	## render the table overriden from TableView
+	##
+	## @param [String] dataKey key to be considered from the datamap, the row with given key will be rendered
+	## @return [Boolean]
+	##
 	render : (@dataKey) =>
 
 		if !@dataKey or typeof DataMap.getDataMap().data[@primaryTableName][@dataKey] != 'object'

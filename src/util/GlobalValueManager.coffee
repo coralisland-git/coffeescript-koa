@@ -1,70 +1,68 @@
-##|
-##| Global values manager, providers a number of static functions that are designed
-##| to help in general purpose ways.   This is required by all components in the folder
-##|
 
-
-##|
-##|  Global variables
-
+## global date format for utc date
 reDateUtc = /\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ/
 
+## -------------------------------------------------------------------------------------------------------------
+## class GlobalValueManager
+## providers a number of static functions that are designed to help in general purpose ways.
+## this is required by all components in the folder
+##
+##
 class GlobalValueManager
 
+	# @property [Integer] globalCellID
     @globalCellID    : 0
+
+	# @property [Object] globalData
     @globalData      : {}
 
-
-    ##| Returns a sequential number unique across the app.   Used to
-    ##| generate id numbers for new html elements.
-    ##|
-    ##| @example
-    ##|    id = GlobalValueManager.NextGlobalID()
-    ##|
+	## -------------------------------------------------------------------------------------------------------------
+	## returns a sequential number unique across the app. used to generate id numbers
+	## for new html elements
+	##
+	## @return [Integer] gid the new id for the html
+	##
     @NextGlobalID = () ->
         gid = GlobalValueManager.globalCellID++
         return gid
 
-    ##|
-    ##| Set a global value given some unique key
-    ##|
-    ##| @param [mixed] gid The reference key
-    ##| @param [mixed] obj The value to store
-    ##|
-    ##| @example
-    ##|    GlobalValueManager.SetGlobal "key", "value"
-    ##|
+	## -------------------------------------------------------------------------------------------------------------
+	## set a global value given some unique key
+	##
+	## @param [mixed] gid the reference key
+	## @param [mixed] obj the value to store
+	## @return [Integer] gid the reference key
+	##
     @SetGlobal = (gid, obj) ->
         GlobalValueManager.globalData[gid] = obj
         return gid
 
-    ##|
-    ##| Get a global value given some unique key.  Returns undefined
-    ##| if nothing has been saved with that key.
-    ##|
-    ##| @param [mixed] gid The reference key
-    ##|
-    ##| @example
-    ##|    GlobalValueManager.GetGlobal "key"
-    ##|
+	## -------------------------------------------------------------------------------------------------------------
+	## Get a global value given some unique key. returns undefined
+	## if nothing has been saved with that key.
+	##
+	## @param [mixed] gid the reference key
+	## @return [mixed] the data saved at reference key
+	##
     @GetGlobal = (gid) ->
         return GlobalValueManager.globalData[gid];
 
-
-    ##|
-    ##|  Returns the HTML required to display a loading spinner.
-    ##|
+	## -------------------------------------------------------------------------------------------------------------
+	## returns the html required to display a loading spinner.
+	##
+	## @return [String] the html for spinner
+	##
     @GetLoading = () ->
         return "<i class='fa fa-3x fa-asterisk fa-spin'></i>"
 
-    ##|
-    ##|  Given an event object such as that received on a mouse over, find the
-    ##|  actual coordinates which may be adjusted depending on scroll position
-    ##|  and browser type.
-    ##|
-    ##|  @param [Event] e the event object
-    ##|  @return [Object] returns an object with x/y defined
-    ##|
+	## -------------------------------------------------------------------------------------------------------------
+	## given an event object such as that received on a moouse over, find the
+	## actual coordinates which may be adjusted depending on scroll position
+	## and browser type.
+	##
+	## @param [Event] e the event Object
+	## @return [Object] returns an object with x/y defined
+	##
     @GetCoordsFromEvent = (e) ->
 
         clickX = 0
@@ -87,20 +85,18 @@ class GlobalValueManager
         values.y = clickY
         return values
 
-
-    ##|
-    ##| Get a number from one of the values
-    ##| where we look at each value and if defined use
-    ##| that, but if not, use the next one
-    ##|
-    ##| @param [Number] a The first value to check
-    ##| @param [Number] b The second value to check
-    ##| @param [Number] c The third value to check
-    ##| @param [Number] d The forth value to check
-    ##|
-    ##| @example
-    ##|    price = GlobalValueManager.GetNumber possiblePrice1, possiblePrice2
-    ##|
+	## -------------------------------------------------------------------------------------------------------------
+	## Get a number from one of the values
+	## where we look at each value and if defined use
+	## that, but if not, use the next one
+	##
+	## @example
+    ##    price = GlobalValueManager.GetNumber possiblePrice1, possiblePrice2
+	## @param [Integer] a the first value to check
+    ## @param [Integer] b The second value to check
+    ## @param [Integer] c The third value to check
+    ## @param [Integer] d The forth value to check
+    ##
     @GetNumber = (a, b, c, d) ->
 
         if typeof a != "undefined" and a != null
@@ -121,14 +117,13 @@ class GlobalValueManager
 
         return 0
 
-    ##|
-    ##| Given a date in a human readable form, parse it and return the Moment
-    ##| object (see momentjs) that represents the date/time.
-    ##|
-    ##| @param [string] date The date string to parse
-    ##|
-    ##| @note returns null if the date is invalid
-    ##|
+	## -------------------------------------------------------------------------------------------------------------
+	## Given a date in a human readable form, parse it and return the Moment
+	## object (see momentjs) that represents the date/time.
+	##
+	## @param [String] date the date string to parse
+	## @return [Moment] return moment object and if invalid date then null
+	##
     @GetMoment = (date) ->
 
         if date == null
@@ -157,8 +152,12 @@ class GlobalValueManager
 
         return null;
 
-    ##|
-    ##| Days ago formatting
+	## -------------------------------------------------------------------------------------------------------------
+	## Days ago formatting
+	##
+	## @param [String] stamp date string
+	## @return [String] return the days ago formatted string
+	##
     @DaysAgo = (stamp) ->
 
         m = GlobalValueManager.GetMoment(stamp)
@@ -170,13 +169,13 @@ class GlobalValueManager
         if age == 1 then return "1 day"
         return age + " days"
 
-
-    ##|
-    ##| Given a date in a Moment object, return an HTML display
-    ##| This includes a span with the age of the date such as 32 days
-    ##|
-    ##| @param [Moment] date The date object
-    ##|
+	## -------------------------------------------------------------------------------------------------------------
+	## Given a date in a Moment object, return an html display
+	## This includes a span with the age of the date such as 32 days
+	##
+	## @param [Moment] date the date object
+	## @return [String] html span tag html with age in that
+	##
     @DateFormat = (stamp) ->
 
         if stamp == null
@@ -197,12 +196,13 @@ class GlobalValueManager
 
         html += "<span class='fage'>" + age + "</span>"
 
-    ##|
-    ##| Given a date in a Moment object, return an HTML display
-    ##| This includes a span with the age of the date such as 32 days
-    ##|
-    ##| @param [Moment] date The date object
-    ##|
+	## -------------------------------------------------------------------------------------------------------------
+	## given a date in a Moment object, return an html display
+	## this includes a span with age of the date such as 32 days
+	##
+	## @param [Moment] date the date object
+	## @return [String] html the span html string
+	##
     @DateTimeFormat = (stamp) ->
 
         if stamp == null
@@ -229,26 +229,33 @@ class GlobalValueManager
 
         html += "<span class='fage'>" + age + "</span>"
 
-    ##|
-    ##|  Give some text, returns a title version, for example
-    ##|  give "user_name" it returns User Name
-    ##|
+	## -------------------------------------------------------------------------------------------------------------
+	## give some text, returns a title version, for example
+	## give "user_name" it returns User Name
+	##
+	## @param [String] str the string in which title will be fixed
+	## @return [String] fixed title case string
+	##
     @Ucwords = (str) ->
         return (str + '').replace /^([a-z\u00E0-\u00FC])|\s+([a-z\u00E0-\u00FC])/g, ($1) ->
             return $1.toUpperCase();
 
-    ##|
-    ##|  Trigger an event and pass data to that event.   When combined with the
-    ##|  "Watch" function this is a simple form of "pub sub" within the global
-    ##|  app scope.
+	## -------------------------------------------------------------------------------------------------------------
+	## Trigger an event and pass data to that event. When combined with the
+	## "Watch" function this is a simple form of "pub sub" within the global
+	## app scope.
+	##
+	## @param [String] eventName name of the event
+	## @param [Object] dataObject
+	## @return [Boolean]
+	##
     @Trigger = (eventName, dataObject) ->
         $("body").trigger eventName, dataObject
         true
 
-    ##|
-    ##|  See Trigger for information on Watch/Trigger for global pub sub events.
-    @Watch = (eventName, delegate) ->
+	## -------------------------------------------------------------------------------------------------------------
+	## see Trigger for information on Watch/Trigger for global pub sub events
+	##
+	@Watch = (eventName, delegate) ->
         $("body").on eventName, delegate
         true
-
-

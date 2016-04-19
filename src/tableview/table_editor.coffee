@@ -1,61 +1,74 @@
-##| TableEditor Widget to render table column editor
-##| example usage:
-##| holder where table will be render, key which will be considered in data type
-##| te = new TableEditor($('#test'), "zipcode");
-
+## -------------------------------------------------------------------------------------------------------------
+## class TableEditor Widget to render table column editor
+##
+## @example
+##		te = new TableEditor($("#test"), "zipcode")
+##
 class TableEditor
 
-	###
-    @property allowButtons [Boolean] weather buttons should appear
-	###
+	# @property [Boolean] allowButtons weather buttons should appear
 	allowButtons: true
 
-	###
-    @property onCreate [Function|Boolean] callback to call on creation of table row
-	###
+	# @property [Function|Boolean] onCreate callback to call on creation of table row
 	onCreate: false
 
-	###
-    @property render [Boolean] weather to render automatically or call externally
-	###
+	# @property [Boolean] render weather to render automatically or call externally
 	render: true
 
+	## -------------------------------------------------------------------------------------------------------------
+	## constructor to create new tableEditor
+	##
+	## @param [JQueryElement] tableHolder jquery element in which the table will be rendered
+	## @param [String] editedTableKey the key column which will be used to track rows
+	## @param [Boolean] render render it automatically default true
+	##
 	constructor: (@tableHolder, @editedTableKey, @render = true) ->
 
-##| add div for table inside @tableHolder
+		##| add div for table inside @tableHolder
 		if !@tableHolder.length and @render
 			console.error "The element with selector #{@tableHolder.selector} not found"
-		_dm = DataMap.getDataMap()
+		dm = DataMap.getDataMap()
 
-		if !@editedTableKey or !_dm.types[@editedTableKey]
+		if !@editedTableKey or !dm.types[@editedTableKey]
 			throw new Error "invalid table key #{@editedTableKey} is supplied"
 
-		@rowsList = _dm.types[@editedTableKey].col
+		@rowsList = dm.types[@editedTableKey].col
 		@gid = GlobalValueManager.NextGlobalID()
 
-		_tableElement = $ "<div />"
+		tableElement = $ "<div />"
 		.attr('id', "_editor#{@gid}")
 		.attr('data-id', "_editor#{@gid}")
 
-		@tableHolder.append _tableElement
+		@tableHolder.append tableElement
 
-		@editorTable = new TableView _tableElement
-		@setDataTypes()
+		@editorTable = new TableView tableElement
+		@internalSetDataTypes()
 		@editorTable.addTable "_editor_#{@editedTableKey}"
 		@editorTable.showFilters = false
 		if @render
 			@editorTable.render()
 
 		if @allowButtons
-			@createButtons()
+			@internalCreateButtons()
 
+	## -------------------------------------------------------------------------------------------------------------
+	## function to get the created table instance
+	##
+	## @return [TableView] editorTable
+	##
 	getTableInstance: ->
 		return @editorTable
 
+	## -------------------------------------------------------------------------------------------------------------
+	## clears the html of the table used to remove the table
+	##
 	clear: ->
 		@tableHolder.html ""
 
-	setDataTypes: () ->
+	## -------------------------------------------------------------------------------------------------------------
+	## internal function to sets the data type in the the datamap for the editor table
+	##
+	internalSetDataTypes: () ->
 		if DataMap.getDataMap().types["_editor_#{@editedTableKey}"]
 			return true
 		##| These data type will be same for all the table editor
@@ -148,35 +161,46 @@ class TableEditor
 
 		##| add row data to dataMap about current column configurations
 
-		for key,_row of @rowsList
-			_preparedRow = @filterRowValues(_row)
-			DataMap.addData "_editor_#{@editedTableKey}", _row.source, _preparedRow
+		for key,row of @rowsList
+			preparedRow = @intenalFilterRowValues(row)
+			DataMap.addData "_editor_#{@editedTableKey}", row.source, preparedRow
 
-	filterRowValues: (_row) ->
-		_preparedRow = {}
-		_rowElements = ["name", "source", "visible", "hideable", "type", "width", "tooltip", "sortable", "render"]
-		for _element in _rowElements
-			_preparedRow[_element] = _row[_element]
-		_preparedRow
+	## -------------------------------------------------------------------------------------------------------------
+	## internal function to select only properties from the row
+	##
+	## @param [Object] row the object of row having dataType informations
+	##
+	intenalFilterRowValues: (row) ->
+		preparedRow = {}
+		rowElements = ["name", "source", "visible", "hideable", "type", "width", "tooltip", "sortable", "render"]
+		for element in rowElements
+			preparedRow[element] = row[element]
+		preparedRow
 
-	createButtons: ->
-		_button1 = $('<button />')
+	## -------------------------------------------------------------------------------------------------------------
+	## internal function to create buttons for the editor table
+	##
+	internalCreateButtons: ->
+		button1 = $('<button />')
 		.addClass 'btn btn-success'
 		.text "Create New"
 		.attr 'id', "_editor_#{@editedTableKey}_create"
-		_button2 = $('<button />')
+		button2 = $('<button />')
 		.addClass 'btn btn-primary'
 		.text "Save"
 		.attr 'id', "_editor_#{@editedTableKey}_save"
 		.css 'margin-left', '10px'
 
-		@tableHolder.prepend _button2
-		.prepend _button1
+		@tableHolder.prepend button2
+		.prepend button1
 
-		@setButtonEvents()
+		@internalSetButtonEvents()
 
-	setButtonEvents: ->
-		_table = @editorTable
+	## -------------------------------------------------------------------------------------------------------------
+	## internal function to sets event for the created button
+	##
+	internalSetButtonEvents: ->
+		table = @editorTable
 		$("#_editor_#{@editedTableKey}_create").on "click", =>
 			p = new PopupForm("_editor_#{@editedTableKey}", "source", null, null, {
 				visible: 1,
@@ -192,7 +216,7 @@ class TableEditor
 				@rowsList[data.source] = data
 				##| apply filter or sorting to update the newly create row
 				setTimeout () ->
-					_table.applyFilters()
+					table.applyFilters()
 				, 1
 				if @onCreate and typeof @onCreate is 'function'
 					@onCreate(data)
@@ -200,9 +224,9 @@ class TableEditor
 					true
 
 		$("#_editor_#{@editedTableKey}_save").on "click", =>
-			_currentConfig = []
-			for key, _row of @rowsList
-				_currentConfig.push @filterRowValues(_row)
+			currentConfig = []
+			for key, row of @rowsList
+				currentConfig.push @intenalFilterRowValues(row)
 			new ModalDialog
 				title: "Table Configurations"
-				content: "<textarea id='_pretty_print#{@editedTableKey}' cols='50' rows='50' class='form-control'>#{JSON.stringify(_currentConfig, undefined, 4);}</textarea>"
+				content: "<textarea id='_pretty_print#{@editedTableKey}' cols='50' rows='50' class='form-control'>#{JSON.stringify(currentConfig, undefined, 4);}</textarea>"

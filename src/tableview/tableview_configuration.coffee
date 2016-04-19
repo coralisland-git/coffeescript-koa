@@ -1,10 +1,14 @@
-##|
-##| Helper class for the TableView widget.   This is a popup window
-##| that takes a table and allows the columns to be selected.
-##|
-
+## -------------------------------------------------------------------------------------------------------------
+## Helper class for the TableView widget. This is a popup window
+## that takes a table and allows the columns to be selected.
+##
 class PopupWindowTableConfiguration extends PopupWindow
 
+	## -------------------------------------------------------------------------------------------------------------
+	## show the configurations for the reference tabel passed as arg
+	##
+	## @param [TableView] refTable the refernce table for which configuration is running
+	##
 	show: (refTable) =>
 
 		#@resize 900, 700

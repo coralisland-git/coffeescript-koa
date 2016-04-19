@@ -1,25 +1,29 @@
-##|
-##|  Popup menu manager class
-##|
-##|  This class creates a popup window that is managed like a list.  It's used
-##|  mainly for context menus.   Only one popup menu can be shown at a time.
-##|
-##|  @example
-##|      popup = new PopupMenu(title, x, y)
-##|      popup.addItem "Item Text", callbackFunction, callbackData
-##|
-
 window.popupMenuVisible = false
 window.popupMenuHolder  = null
 
+## -------------------------------------------------------------------------------------------------------------
+## popup menu manager class
+## This class creates a popup window that is managed like a list. It's used
+## mainly for context menus. Only one popup menu can be shown at a time.
+##
+## @example
+## 		popup = new PopupMenu(title, x, y)
+##		popup.addItem "Item Text", callbackFunction, callbackData
+##
+
 class PopupMenu
 
+	# @property [Integer] popupWidth width of the popup default 300
 	popupWidth:  300
+
+	# @property [Integer] popupHeight height of the popup default 0
 	popupHeight: 0
 
-	##|
-	##|  Change the width of the popup menu
-	##|  @param [int] popupWidth The new width
+	## -------------------------------------------------------------------------------------------------------------
+	## change the width of the popup menu
+	##
+	## @param [Integer] popupWidth the new width of the popup
+	##
 	resize: (@popupWidth) =>
 
 		@popupHeight = window.popupMenuHolder.height()
@@ -39,9 +43,9 @@ class PopupMenu
 		if @x + @popupWidth + 10> width
 			@x = width - @popupWidth - 10
 
-##| because of table context menu popup had to comment
-#		if @y + @popupHeight + 10 > height
-#			@y = height - @popupHeight - 10
+		##| because of table context menu popup had to comment
+		# if @y + @popupHeight + 10 > height
+		# 	@y = height - @popupHeight - 10
 
 		window.popupMenuHolder.css
 			left:  @x
@@ -52,14 +56,13 @@ class PopupMenu
 
 		true
 
-
-
-	##|
-	##|  Create a new popup menu
-	##|  @param [string] title The window title
-	##|  @param [int] x the adjusted X location to open
-	##|  @param [int] y the adjusted Y location to open
-	##|
+	## -------------------------------------------------------------------------------------------------------------
+	## constructor create new popup menu
+	##
+	## @param [String] title the window title
+	## @param [Integer] x the adjusted X location to open
+	## @param [Integer] y the adjusted Y location to open
+	##
 	constructor: (@title, @x, @y) ->
 
 		##|
@@ -115,8 +118,9 @@ class PopupMenu
 		@menuItems = {}
 		@menuData  = {}
 
-	##|
-	##|  Close the window after the mouse drifts away from it
+	## -------------------------------------------------------------------------------------------------------------
+	## close the window after the mouse drifts away from it
+	##
 	closeTimer: () =>
 		console.log "Popup Hide"
 		window.popupMenuHolder.hide()
@@ -124,19 +128,22 @@ class PopupMenu
 		window.popupMenuTimer = 0
 		false;
 
-	##|
-	##|  Enable multiple columns in the context menu
-	##|  @param colCount [int] the number of columns
+	## -------------------------------------------------------------------------------------------------------------
+	## Enable multiple columns in the context menu
+	##
+	## @param [Integer] colCount the number of columns
+	##
 	setMultiColumn: (@colCount) =>
 		@resize 600
 		window.popupMenuHolder.addClass("multicol")
 
-	##|
-	##|  Add a new menu item
-	##|  @param name [string] the name to display
-	##|  @param callbackFunction [function] A function called with the callback data when the item is selected
-	##|  @param callbackData [mixed] optional callback data to include in the callback function
-	##|
+	## -------------------------------------------------------------------------------------------------------------
+	## add new menu item to popup
+	##
+	## @param [String] name the name to display
+	## @param [Function] callbackFunction A function called with the callback data when the item is selected
+	## @param [mixed] callbackData optional callback data to include in the callback function
+	##
 	addItem: (name, callbackFunction, callbackData, className) =>
 
 		id = GlobalValueManager.NextGlobalID()
@@ -175,17 +182,19 @@ class PopupMenu
 
 $ ->
 
-	##|
-	##|  Setup an event to monitor all clicks, if someone clicks
-	##|  while the popup menu is open, close it.
+	## -------------------------------------------------------------------------------------------------------------
+	## setup an event to monitor all clicks, if someone clicks
+	## while the popup menu is open, close it
+	##
 	$(document).on "click", (e) =>
 		if window.popupMenuVisible
 			window.popupMenuHolder.hide()
 			window.popupMenuVisible = false
 		true
 
-	##|
-	##|  Close the popup with the escape key
+	## -------------------------------------------------------------------------------------------------------------
+	## close the popup with escape key
+	##
 	$(document).on "keypress", (e) =>
 		if e.keyCode == 13
 			if window.popupMenuVisible

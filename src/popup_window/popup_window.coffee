@@ -7,21 +7,38 @@
 ##|      popup = new PoupWindow(title, x, y)
 ##|
 
-
+## -------------------------------------------------------------------------------------------------------------
+## Popup window widget
+## this class creates a popup window that has a title and its dragable.
+##
+## @example popup = new PopupWindow(title, x, y)
+##
 class PopupWindow
 
+	# @property [Integer] popupWidth the width of the popup default 600
 	popupWidth:  600
+
+	# @property [Integer] popupHeight the height of the popup default 400
 	popupHeight: 400
+
+	# @property [Boolean] isVisible if popup is visible on current screen default false
 	isVisible:   false
+
+	# @property [Boolean] allowHorizontalScroll if horizontal scrollable default false
 	allowHorizontalScroll: false
+
+	# @property [Object] configurations the configurations about table and savable popup
 	configurations:
 		tableName: null
 		keyValue: null
 		windowName: null
 		resizable: true
 
-	##|
-	##|  Returns the available height for the body element
+	## -------------------------------------------------------------------------------------------------------------
+	## returns the available height for the body element
+	##
+	## @return [Integer] h the available height
+	##
 	getBodyHeight: () =>
 		h = @popupHeight
 		h -= 1 ## top padding
@@ -29,12 +46,17 @@ class PopupWindow
 		h -= @windowTitle.height()
 		return h
 
-	##|
-	##|  Update the display, must be called if the height of the body content changes
-	##|
+	## -------------------------------------------------------------------------------------------------------------
+	## update the display, must be called if the height of the body content changes
+	##
 	update: () =>
 		@myScroll.refresh();
 
+	## -------------------------------------------------------------------------------------------------------------
+	## makes popup visible and render on the current screen
+	##
+	## @return [Boolean]
+	##
 	open: () =>
 		setTimeout () =>
 			@update()
@@ -43,6 +65,13 @@ class PopupWindow
 		@isVisible = true
 		true
 
+	## -------------------------------------------------------------------------------------------------------------
+	## closes the popup and make it invisible in the current screen
+	##
+	## @param [Event] jquery event object
+	## @event close
+	## @return [Boolean]
+	##
 	close: (e) =>
 		if typeof e != "undefined" and e != null
 			e.preventDefault()
@@ -52,12 +81,20 @@ class PopupWindow
 		@isVisible = false
 		false
 
+	## -------------------------------------------------------------------------------------------------------------
+	## destroy the popup menu which will remove the associated html also
+	##
+	## @return [Boolean]
+	##
 	destroy: () =>
 
 		@close()
 		@popupWindowHolder.remove()
 		true
 
+	## -------------------------------------------------------------------------------------------------------------
+	## aligns the popup in the center of the screen it calculates current screen height and width
+	##
 	center: () =>
 		width  = $(window).width()
 		height = $(window).height()
@@ -67,12 +104,13 @@ class PopupWindow
 			left:   @x
 			top:    @y
 
-	##|
-	##|  Resize the window to a new size
-	##|
-	##|  @param popupWidth [int] the new width
-	##|  @param popupHeight [int] the new height
-	##|
+	## -------------------------------------------------------------------------------------------------------------
+	## resize the window to a new size
+	##
+	## @param [Integer] popupWidth the new width
+	## @param [Integer] popupHeight the new height
+	## @return [Boolean]
+	##
 	resize: (@popupWidth, @popupHeight) =>
 
 		width  = $(window).width()
@@ -114,11 +152,12 @@ class PopupWindow
 
 		true
 
-	##|
-	##|  Check to see if there is a saved location and move to it
-	checkSavedLocation: () =>
+	## -------------------------------------------------------------------------------------------------------------
+	## internal function to check to see if there is a saved location and move to it
+	##
+	internalCheckSavedLocation: () =>
 
-#		location = user.get "PopupLocation_#{@title}", 0
+		# location = user.get "PopupLocation_#{@title}", 0
 		if @configurations.tableName and @configurations.tableName.length
 			location = localStorage.getItem "PopupLocation_#{@configurations.tableName}"
 			if location != null
@@ -129,8 +168,10 @@ class PopupWindow
 				@popupHeight = location.h
 				@popupWidth = location.w
 
-	##| function to save the position of the current window
-	savePosition: () =>
+	## -------------------------------------------------------------------------------------------------------------
+	## internal function to save position of the current popup window
+	##
+	internalSavePosition: () =>
 		if @configurations.tableName != null and @configurations.tableName.length
 			localStorage.setItem "PopupLocation_#{@configurations.tableName}",
 				JSON.stringify
@@ -140,7 +181,9 @@ class PopupWindow
 					w: @popupWidth
 
 
-	##| function to initialize all members of class from keyValue
+	## -------------------------------------------------------------------------------------------------------------
+	## function to initialize all members of class from keyValue
+	##
 	initializeFromKeyValue: () =>
 		@popupWindowHolder = $ "[data-key=#{@configurations.keyValue}]"
 		@windowTitle = @popupWindowHolder.find ".title"
@@ -156,7 +199,9 @@ class PopupWindow
 			freeScroll: @allowHorizontalScroll
 			scrollX: @allowHorizontalScroll
 
-	##| function to create popup window holder only if keyValue is not defined
+	## -------------------------------------------------------------------------------------------------------------
+	## function to create popup window holder only if keyValue is not defined
+	##
 	createPopupHolder: () =>
 		id   = GlobalValueManager.NextGlobalID()
 		html = $ "<div />",
@@ -243,7 +288,7 @@ class PopupWindow
 
 			@x = @dragabilly.position.x
 			@y = @dragabilly.position.y
-			@savePosition()
+			@internalSavePosition()
 
 			return false
 
@@ -269,7 +314,7 @@ class PopupWindow
 		stopMove = (e) =>
 			$(document).unbind "mousemove", doMove
 			$(document).unbind "mouseup", stopMove
-			@savePosition()
+			@internalSavePosition()
 
 		@resizable.on "mousedown", (e) =>
 			startX = e.clientX
@@ -280,12 +325,14 @@ class PopupWindow
 			$(document).on "mouseup", stopMove
 
 
-	##|
-	##|  Create a new window
-	##|  @param title [stirng] the window title
-	##|  @param x [int] upper left corner
-	##|  @param y [int] top left corner
-	##|	 @param configurations [object] the configurations for the popup window
+	## -------------------------------------------------------------------------------------------------------------
+	## constructor create new popup window
+	##
+	## @param [String] title the window title
+	## @param [Integer] x the adjusted X location to open
+	## @param [Integer] y the adjusted Y location to open
+	## @param [Object] configurations the configurations about the table if popup is savable
+	##
 	constructor: (@title, @x, @y, configurations) ->
 
 		if typeof @x == "undefined" or @x < 0 then @x = 0
@@ -299,7 +346,7 @@ class PopupWindow
 		if @configurations.w and @configurations.w > 0 then @popupWidth = @configurations.w
 		if @configurations.h and @configurations.h > 0 then @popupHeight = @configurations.h
 
-		@checkSavedLocation();
+		@internalCheckSavedLocation();
 
 		##| if keyValue popup is available then get only reference else create new popupHolder
 		if @configurations.keyValue and $("[data-key=#{@configurations.keyValue}]").length

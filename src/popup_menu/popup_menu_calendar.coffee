@@ -1,28 +1,36 @@
-##|
-##|  Popup calendar
-##|
-##|  This class creates a popup window that is managed like a list.  It's used
-##|  mainly for context menus.   Only one popup menu can be shown at a time.
-##|
-##|  @example
-##|      popup = new PopupMenuCalendar value, x, y
-##|
-
 window.popupCalendarVisible = false
 window.popupCalendarHolder  = null
 
+
+## -------------------------------------------------------------------------------------------------------------
+## class PopupMenuCalendar to handle calendar in popup
+## This class creates a popup window that is managed like a list.  It's used
+## mainly for context menus.   Only one popup menu can be shown at a time.
+##
+## @example popup = new PopupMenuCalendar value, x, y
+##
 class PopupMenuCalendar
 
+	# @property [Integer] popupWidth the width of the popup default 350
 	popupWidth:  350
+
+	# @property [Integer] popupHeight the height of the popup default 398
 	popupHeight: 350 + 24 + 24
 
+	## -------------------------------------------------------------------------------------------------------------
+	## function to call when date is changed
+	##
+	## @event onChange
+	## @param [Date] newDate the newly selected date
+	##
 	onChange: (newDate) =>
 		console.log "Unhandled onChange in PopupMenuCalendar for date=", newDate
 
-
-	##|
-	##|  Change the width of the popup menu
-	##|  @param [int] popupWidth The new width
+	## -------------------------------------------------------------------------------------------------------------
+	## change the width of the popup menu
+	##
+	## @param [Integer] popupWidth new width of popup
+	##
 	resize: (@popupWidth) =>
 
 		width  = $(window).width()
@@ -53,12 +61,13 @@ class PopupMenuCalendar
 
 		true
 
-	##|
-	##|  Create a new popup menu
-	##|  @param [string] value The current value if set
-	##|  @param [int] x the adjusted X location to open
-	##|  @param [int] y the adjusted Y location to open
-	##|
+	## -------------------------------------------------------------------------------------------------------------
+	## constructor create new popup
+	##
+	## @param [String] value The current value if set
+	## @param [Integer] x the adjusted X location to open
+	## @param [Integer] y the adjusted Y location to open
+	##
 	constructor: (@value, @x, @y) ->
 
 		##|
@@ -116,8 +125,11 @@ class PopupMenuCalendar
 		@menuItems = {}
 		@menuData  = {}
 
-	##|
-	##|  Close the window after the mouse drifts away from it
+	## -------------------------------------------------------------------------------------------------------------
+	## close the window after the mouse drifts away from it
+	##
+	## @return [Boolean]
+	##
 	closeTimer: () =>
 		console.log "Popup Hide"
 		if typeof window.popupCalendarHolder != "undefined" and window.popupCalendarHolder != null
@@ -128,8 +140,9 @@ class PopupMenuCalendar
 		window.popupMenuTimer = 0
 		false;
 
-	##|
-	##|  Calculate and update the html based on the dates
+	## -------------------------------------------------------------------------------------------------------------
+	## calculate and update the html based on the dates
+	##
 	recalcDays: () =>
 
 		today = moment()
@@ -173,6 +186,9 @@ class PopupMenuCalendar
 			@elDay[n].attr("date-value", now.format("YYYY-MM-DD"))
 			now.add(1, "day")
 
+	## -------------------------------------------------------------------------------------------------------------
+	## sets up the month including date and navigation between the months
+	##
 	setupMonth: () =>
 
 		calTemplate = '''
@@ -313,17 +329,19 @@ class PopupMenuCalendar
 
 $ ->
 
-	##|
-	##|  Setup an event to monitor all clicks, if someone clicks
-	##|  while the popup menu is open, close it.
+	## -------------------------------------------------------------------------------------------------------------
+	## setup and event to monitor all clicks, if someone clicks
+	## while the popup menu is open, close it.
+	##
 	$(document).on "click", (e) =>
 		if window.popupCalendarVisible
 			window.popupCalendarHolder.remove()
 			window.popupCalendarVisible = false
 		true
 
-	##|
-	##|  Close the popup with the escape key
+	## -------------------------------------------------------------------------------------------------------------
+	## close the popup with escape key
+	##
 	$(document).on "keypress", (e) ->
 		if e.keyCode == 27
 			if window.popupCalendarVisible

@@ -19,41 +19,38 @@ getModules = ()->
 		process.exit(0)
 
 getStylusFiles = ()->
-
 	list =
-		'ninja/ninja.css'          : [ 'src/**/*styl' ]
-		'ninja/test/ninja.css'     : [ 'src/**/*styl' ]
-		'ninja/test/css/test.css'  : [ 'test/css/*styl' ]
+		'ninja/ninja.css': ['src/**/*styl']
+		'ninja/test/ninja.css': ['src/**/*styl']
+		'ninja/test/css/test.css': ['test/css/*styl']
 
 	for i in getModules()
-		list["ninja/module_#{i}.css"] = [ "module/#{i}/*styl"]
+		list["ninja/module_#{i}.css"] = ["module/#{i}/*styl"]
 
 	list
 
 getCoffeeFiles = ()->
-
 	list =
-		"ninja/ninja.js"               : [ 'src/**/*coffee' ]
-		"ninja/test/ninja.js"          : [ 'src/**/*coffee' ]
-		"ninja/test/js/test_common.js" : [ "test/js/test_common.coffee", "test/js/test_data/*coffee" ]
+		"ninja/ninja.js": ['src/**/*coffee']
+		"ninja/test/ninja.js": ['src/**/*coffee']
+		"ninja/test/js/test_common.js": ["test/js/test_common.coffee", "test/js/test_data/*coffee"]
 
 	for i in fs.readdirSync "test/js/"
-		if ! /coffee/.test i then continue
+		if !/coffee/.test i then continue
 		if /test_common/.test i then continue
 		js = i.replace ".coffee", ".js"
-		list["ninja/test/js/#{js}"] = [ "test/js/#{i}" ]
+		list["ninja/test/js/#{js}"] = ["test/js/#{i}"]
 
 	for i in getModules()
-		list["ninja/module_#{i}.js"] = [ "module/#{i}/*coffee", "module/#{i}/*.js" ]
+		list["ninja/module_#{i}.js"] = ["module/#{i}/*coffee", "module/#{i}/*.js"]
 
 	return list
 
 module.exports = (grunt) ->
-
 	grunt.initConfig
 
-		##|
-		##|  Here is a task for a clean build of everything
+##|
+##|  Here is a task for a clean build of everything
 		clean:
 			build: ['build']
 
@@ -62,17 +59,16 @@ module.exports = (grunt) ->
 				options:
 					port: 9000
 					hostname: "0.0.0.0"
-					bases: [ "ninja/test", "doc", "." ]
+					bases: ["ninja/test", "doc", "."]
 
-		##|
-		##|  Copy task, takes all the files in the different build folders
-		##|  produces the final "public" version for consumption
-		##|  merging resources from different frameworks
-		##|
+##|
+##|  Copy task, takes all the files in the different build folders
+##|  produces the final "public" version for consumption
+##|  merging resources from different frameworks
+##|
 		copy:
-
 			images:
-				files : [
+				files: [
 					cwd: 'test/images/'
 					src: '*'
 					dest: 'ninja/test/images/'
@@ -108,67 +104,67 @@ module.exports = (grunt) ->
 				]
 
 
-		##|
-		##|  Compile the stylus templates, jade templates, and coffeescript files.
-		##|
+##|
+##|  Compile the stylus templates, jade templates, and coffeescript files.
+##|
 		stylus:
 			compile:
 				options:
 					paths: ['src/css/', 'test/css/']
-					use: [ require 'fluidity' ]
+					use: [require 'fluidity']
 					urlfunc: 'url'
 					compress: false
-				files:	getStylusFiles()
+				files: getStylusFiles()
 
 		jade:
 			compile:
 				options:
 					pretty: true
 				files:
-					"ninja/test/index.html"                : [ "test/views/index.jade" ]
-					"ninja/test/error.html"                : [ "test/views/error.jade" ]
+					"ninja/test/index.html": ["test/views/index.jade"]
+					"ninja/test/error.html": ["test/views/error.jade"]
 
 		coffee:
 			options:
-				bare:		true
-				sourceMap:	true
+				bare: true
+				sourceMap: true
 
 			compile:
 				files: getCoffeeFiles()
 
 		watch:
-
 			grunt:
-				files:	['Gruntfile.coffee']
+				files: ['Gruntfile.coffee']
 
 			all:
-				files:	['src/css/*.styl', "test/css/*.styl", "module/**/*.styl"]
-				tasks:	['stylus:compile']
+				files: ['src/css/*.styl', "test/css/*.styl", "module/**/*.styl"]
+				tasks: ['stylus:compile']
 
 			coffeeFile:
-				files:	['src/**/*coffee', "test/js/*coffee", "test/js/test_data/*coffee", "module/**/*coffee", "module/**/*.js" ]
-				tasks:	['coffee']
+				files: ['src/**/*coffee', "test/js/*coffee", "test/js/test_data/*coffee", "module/**/*coffee",
+					"module/**/*.js"]
+				tasks: ['coffee']
 
 			jadefiles:
-				files:	['test/views/*.jade']
-				tasks:	['jade:compile']
+				files: ['test/views/*.jade']
+				tasks: ['jade:compile']
 				options:
 					livereload: true
 
 			cssfiles:
-				files:	['ninja/ninja.css']
+				files: ['ninja/ninja.css']
 				options:
 					livereload: true
 
 			combined:
-				files:	['ninja/ninja.js']
+				files: ['ninja/ninja.js']
 				options:
 					livereload: true
 
 
-		##|
-		##|  External modules
-		##|
+##|
+##|  External modules
+##|
 		grunt.loadNpmTasks 'grunt-contrib-coffee'
 		grunt.loadNpmTasks 'grunt-contrib-jade'
 		grunt.loadNpmTasks 'grunt-contrib-watch'
@@ -178,8 +174,9 @@ module.exports = (grunt) ->
 		grunt.loadNpmTasks 'grunt-express'
 
 
-		grunt.registerTask "server",  	['express', 'watch']
-		grunt.registerTask 'dist', 		['coffee', 'copy', 'stylus', 'jade']
-		grunt.registerTask 'synclive', 	['buildnumber', 'coffee', 'copy', 'stylus:compile', 'jade:compile', 'shell:synclive']
-		grunt.registerTask 'default', 	['coffee', 'copy', 'stylus:compile', 'jade:compile', 'express', 'watch']
+		grunt.registerTask "server", ['express', 'watch']
+		grunt.registerTask 'dist', ['coffee', 'copy', 'stylus', 'jade']
+		grunt.registerTask 'synclive', ['buildnumber', 'coffee', 'copy', 'stylus:compile', 'jade:compile',
+			'shell:synclive']
+		grunt.registerTask 'default', ['coffee', 'copy', 'stylus:compile', 'jade:compile', 'express', 'watch']
 

@@ -1,5 +1,17 @@
+## -------------------------------------------------------------------------------------------------------------
+## class to create tabs dynamically
+##
+## @example
+##      tabs = new DynamicTabs("#elementId")
+##      tabs.addTab("Tab Title", "Tab Content")
+##
 class DynamicTabs
 
+    ## -------------------------------------------------------------------------------------------------------------
+	## constructor new tab instance
+	##
+	## @param [String] the id of the element in which tab should be rendered
+	##
     constructor :(holderElement)->
 
         @elHolder   = $ "<div class='block' />"
@@ -17,12 +29,13 @@ class DynamicTabs
 
         @tabCount = 0
 
-    ##|
-    ##| Add a tab
-    ##| @param tabName [string] The name of the tab to be adding
-    ##| @param defaultHtml [string] Optional html for the tab content
-    ##| @return the element
-    ##|
+    ## -------------------------------------------------------------------------------------------------------------
+	## Add a new tab to current instance
+	##
+	## @param [String] tabName the name of the tab to be adding
+	## @param [String] defaultHtml optional html for the tab content
+	## @return [JQueryElement] the new tab element which is created
+	##
     addTab: (tabName, defaultHtml) =>
 
         tabid = "tab#{@tabCount}"
