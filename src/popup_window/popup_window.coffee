@@ -311,6 +311,7 @@ class PopupWindow
 			@windowWrapper.width @popupWidth
 			@popupWindowHolder.height @popupHeight
 			@windowWrapper.height @popupHeight - @windowTitle.height() - 1
+			@windowScroll.trigger('resize')
 		stopMove = (e) =>
 			$(document).unbind "mousemove", doMove
 			$(document).unbind "mouseup", stopMove

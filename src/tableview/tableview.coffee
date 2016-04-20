@@ -923,6 +923,7 @@ class TableView
 			@elTableHolder.find("thead tr:first th").each () ->
 				if $(this).outerWidth() < width
 					headerHideIndexes.push($(this).index())
+
 			##| make sure to have hide left columns first
 			while headerHideIndexes.length
 				index = headerHideIndexes.pop();
@@ -930,4 +931,5 @@ class TableView
 					@elTableHolder.find("tr").each () ->
 						$(this).find("th:eq(#{index}),td:eq(#{index})").addClass('hide')
 		handleResize()
+		@elTableHolder.parent().on 'resize', handleResize
 		$(window).on 'resize', handleResize
