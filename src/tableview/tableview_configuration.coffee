@@ -14,7 +14,7 @@ class PopupWindowTableConfiguration extends PopupWindow
 		#@resize 900, 700
 		@tableConfig = new TableView(@windowScroll, true)
 		@tableConfig.tableConfigDatabase = "#{refTable.primaryTableName}_#{refTable.gid}"
-
+		@tableConfig.showFilters = false
 		console.log "tableConfigDatabase=", @tableConfig.tableConfigDatabase
 
 		columns = []
@@ -34,17 +34,29 @@ class PopupWindowTableConfiguration extends PopupWindow
 
 		# for col in refTable.colList
 		# 	console.log "COL=", col
-		for key,_row of refTable.customizableColumns
-			_column = (refTable.colList.filter (c) => c.col.source == _row).pop()
-			DataMap.addData "#{@tableConfig.tableConfigDatabase}", _row, {name:_column.col.name,tooltip:_column.col.tooltip,checked:_column.col.visible}
-			# col.checked = col.visible != false
-			# @tableConfig.addRow col
+		for key,row of refTable.customizableColumns
+			column = (refTable.colList.filter (c) => c.col.source == row).pop()
+			DataMap.addData "#{@tableConfig.tableConfigDatabase}", row, {name:column.col.name,tooltip:column.col.tooltip}
 
 		@tableConfig.addTable "#{@tableConfig.tableConfigDatabase}"
+
+		for index,row of @tableConfig.rowData
+			column = (refTable.colList.filter (c) => c.col.source == row.key).pop()
+			row.checked = column.col.visible
 		@tableConfig.render()
 
 		@tableConfig.onSetCheckbox = (checkbox_key, value) =>
 			console.log "HERE", checkbox_key, value
-			user.tableConfigSetColumnVisible refTable.tableCacheName, checkbox_key, value
+			source = checkbox_key.split('_')[checkbox_key.split('_').length-1]
+			column = (refTable.colList.filter (c) => c.col.source == source).pop()
+			## setting up in the datamap
+			column.visible = value
+			DataMap.getDataMap().types[refTable.primaryTableName].configureColumn column.col
+
+			## setting up in the current table instance
+			i = refTable.colList.indexOf(column);
+			refTable.colList[i].col.visible = value
+			localStorage.setItem("tableConfigSetColumnVisible", refTable.primaryTableName, checkbox_key, value)
+			refTable.render()
 
 		@open()
