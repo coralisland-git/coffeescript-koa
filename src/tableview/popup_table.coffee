@@ -25,7 +25,7 @@ class PopupTable extends PopupWindow
 	## @param [TableView] mainTableObject the tableview instance which will be rendered inside popup
 	## @param [String] popupName name of the popup to be rendered
 	##
-    constructor: (@mainTableObject, @popupName) ->
+    constructor: (@mainTableObject, @popupName, renderParam = null) ->
         _title = "popup Table"
         super _title
         ##| check if virtual element or actual element given
@@ -37,4 +37,4 @@ class PopupTable extends PopupWindow
         @windowScroll.html "<div id='#{_tableId}'></div>"
         ##| assign tableHolder again to detect inside popup and render
         @mainTableObject.elTableHolder = $ "##{_tableId}"
-        @mainTableObject.render()
+        @mainTableObject.render(renderParam)
