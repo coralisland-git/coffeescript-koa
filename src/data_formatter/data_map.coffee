@@ -44,6 +44,9 @@ class DataMap
     @getDataMap: () =>
         ##
         if !root.globalDataMap
+            #dbObject = new loki('sandbox.db')
+            #dbObject.addCollection('types')
+            #root.globalDataMap = dbObject
             root.globalDataMap = new DataMap()
 
         return root.globalDataMap
@@ -74,12 +77,16 @@ class DataMap
     @setDataTypes: (tableName, columns) =>
 
         dm = DataMap.getDataMap()
+        #collection = dm.getCollection('types')
+        #dataTypeCollection = new DataTypeCollection(tableName)
 
+        #dataTypeCollection.configureColumn columns.pop()
+        #collection.insert({tableName: dataTypeCollection})
         if !dm.types[tableName]?
-            dm.types[tableName] = new DataTypeCollection(tableName)
+           dm.types[tableName] = new DataTypeCollection(tableName)
 
+        #collection.types[tableName].configureColumns columns
         dm.types[tableName].configureColumns columns
-
         true
 
     ## -------------------------------------------------------------------------------------------------------------
