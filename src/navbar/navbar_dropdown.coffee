@@ -38,7 +38,7 @@ class NavDropDown
 	## function to add element to the navForm
 	##
 	## @example
-	##		dd.addItem({"Visit Link": "http://sample.com"}) where key is display value and value is the link set in href
+	##		dd.addItem({type:"link", text:"Action", link: "#"}) where type can be link|divider
 	## @param [Object] element a valid defined navbar object which must implement getHtml() method
 	##
 	addItem: (item) ->
