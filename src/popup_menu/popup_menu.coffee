@@ -146,7 +146,7 @@ class PopupMenu
 	## @param [Integer] x the adjusted X location to open
 	## @param [Integer] y the adjusted Y location to open
 	##
-	constructor: (@title, @x, @y, @autoshow = true) ->
+	constructor: (@title, @x, @y) ->
 
 		# @property [Array] linkObjects to store all the objects of link
 		@linkObjects = []
