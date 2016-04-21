@@ -384,14 +384,14 @@ class TableView
 			popupMenu.addItem "Sort Descending", () =>
 				popupMenu.closeTimer()
 				@internalApplySorting(selectedColumn,'DSC')
-		console.log @customizableColumns,selectedColumn.col.source
-		if @customizableColumns.length
-			if @customizableColumns.indexOf selectedColumn.col.source >= 0
-				popupMenu.addItem "Customize", (coords, data) =>
-					popupMenu.closeTimer()
-					@onConfigureColumns
-						x: coords.x
-						y: coords.y
+		if @customizableColumns
+			if !popupMenu
+				popupMenu = new PopupMenu "Column: #{column}", coords.x-150, coords.y
+			popupMenu.addItem "Customize", (coords, data) =>
+				popupMenu.closeTimer()
+				@onConfigureColumns
+					x: coords.x
+					y: coords.y
 
 
 		if typeof @tableCacheName != "undefined" && @tableCacheName != null
@@ -514,14 +514,10 @@ class TableView
 	## function to make column customizable in the popup
 	##
 	## @example
-	##		table.allowCustomize('code')
-	## @param [String] name name of the column to make customizable
+	##		table.allowCustomize()
+	## @param [Boolean] customizableColumns
 	##
-	allowCustomize: (name) ->
-		if @customizableColumns and Array.isArray @customizableColumns
-			@customizableColumns.push name
-		else
-			@customizableColumns = [name]
+	allowCustomize: (@customizableColumns = true) ->
 
 
 	## -------------------------------------------------------------------------------------------------------------

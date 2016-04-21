@@ -11,7 +11,7 @@ class PopupWindowTableConfiguration extends PopupWindow
 	##
 	show: (refTable) =>
 
-		#@resize 900, 700
+		@popupWidth = 300
 		@tableConfig = new TableView(@windowScroll, true)
 		@tableConfig.tableConfigDatabase = "#{refTable.primaryTableName}_#{refTable.gid}"
 		@tableConfig.showFilters = false
@@ -23,25 +23,31 @@ class PopupWindowTableConfiguration extends PopupWindow
 			source : "name"
 			type   : "text"
 			visible: true
+			width: 120
 
 		columns.push
 			name   : "Additional Information"
 			source : "tooltip"
 			type   : "text"
 			visible: true
+			width: 150
 
 		DataMap.setDataTypes "#{@tableConfig.tableConfigDatabase}", columns
 
 		# for col in refTable.colList
 		# 	console.log "COL=", col
-		for key,row of refTable.customizableColumns
-			column = (refTable.colList.filter (c) => c.col.source == row).pop()
-			DataMap.addData "#{@tableConfig.tableConfigDatabase}", row, {name:column.col.name,tooltip:column.col.tooltip}
+		for row in refTable.colList
+			console.log row.col.name, row.col.hideable
+			if row.col.hideable
+				DataMap.addData "#{@tableConfig.tableConfigDatabase}", row.col.source, {name:row.col.name,tooltip:row.col.tooltip}
 
 		@tableConfig.addTable "#{@tableConfig.tableConfigDatabase}"
 
-		for index,row of @tableConfig.rowData
-			column = (refTable.colList.filter (c) => c.col.source == row.key).pop()
+		for key,row of @tableConfig.rowData
+			column = refTable.colList.filter (c) =>
+				console.log c, row
+				c.col.source == row.key
+			column = column.pop();
 			row.checked = column.col.visible
 		@tableConfig.render()
 
@@ -58,5 +64,5 @@ class PopupWindowTableConfiguration extends PopupWindow
 			refTable.colList[i].col.visible = value
 			localStorage.setItem("tableConfigSetColumnVisible", refTable.primaryTableName, checkbox_key, value)
 			refTable.render()
-
+		@center()
 		@open()

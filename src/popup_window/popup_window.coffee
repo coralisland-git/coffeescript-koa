@@ -100,6 +100,7 @@ class PopupWindow
 		height = $(window).height()
 		@x = (width - @popupWidth) / 2
 		@y = (height - @popupHeight) / 2
+		@y += $(window).scrollTop()
 		@popupWindowHolder.css
 			left:   @x
 			top:    @y
