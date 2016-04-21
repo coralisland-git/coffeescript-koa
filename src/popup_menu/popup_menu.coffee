@@ -2,6 +2,86 @@ window.popupMenuVisible = false
 window.popupMenuHolder  = null
 
 ## -------------------------------------------------------------------------------------------------------------
+## popup menu item class to manage single popup menu item
+## @example
+## 		popup = new PopupMenu(title, x, y)
+##		popup.addItem "Item Text", callbackFunction, callbackData
+##			.setBadge(3)
+##			.setIcon('fa fa-home')
+##			.setClass('primary')
+##
+class PopupMenuItem
+
+	## -------------------------------------------------------------------------------------------------------------
+	## constructor create new popup menu
+	##
+	## @param [String] name the name of the popup menu to display
+	## @param [String] className the class to be applied on the popup menu li
+	##
+	constructor: (@name,@className,id)->
+		# @property [String] iconClass to store the class of icon
+		@iconClass = "fa fa-fw"
+
+		# @property [String] textClass to store class of text
+		@textClass = ""
+
+		# @property [Integer] badge to store the counter of badge
+		@badge = null
+
+		@link = $ "<li />",
+			'data-id' : id
+			'class'	  : @className
+			'html'	  : @name
+
+	## -------------------------------------------------------------------------------------------------------------
+	## function to get the html element including badge and icon and classes
+	##
+	## @return [JqueryElement] jquery element including badge icons and applied settings
+	##
+	getRenderedElement: ->
+		spanBadge = if @badge then "<div class='badge pull-right bg-#{@textClass}' style='margin-top:12px;'>#{@badge}</div>" else ""
+		iconElement = if @iconClass.length then "<i class='#{@iconClass} pull-right text-#{@textClass}' style='margin-top: 14px;margin-left:10px;font-size:14'></i>" else ""
+		if @textClass.length
+			@link.addClass "text-#{@textClass}"
+		@link.html "#{@name} #{iconElement} #{spanBadge}"
+
+	## -------------------------------------------------------------------------------------------------------------
+	## getLink function to get the link of the currently created li
+	##
+	## @return [JqueryElement] link jquery element
+	##
+	getLink: ->
+		return @link
+
+	## -------------------------------------------------------------------------------------------------------------
+	## setBadge function to set the badge
+	##
+	## @param [Integer] number to set as the badge
+	## @return [PopupMenuItem] this current instance
+	##
+	setBadge: (@badge) ->
+		this
+
+	## -------------------------------------------------------------------------------------------------------------
+	## setIcon function to set the icon on menu item
+	##
+	## @param [String] iconClass to set the class name
+	## @return [PopupMenuItem] this current instance
+	##
+	setIcon: (@iconClass) ->
+		this
+
+	## -------------------------------------------------------------------------------------------------------------
+	## setClass to set the classes on li itself
+	##
+	## @param [String] textClass
+	## @return [PopupMenuItem] this current instance
+	##
+	setClass: (@textClass) ->
+		this
+
+
+## -------------------------------------------------------------------------------------------------------------
 ## popup menu manager class
 ## This class creates a popup window that is managed like a list. It's used
 ## mainly for context menus. Only one popup menu can be shown at a time.
@@ -10,7 +90,6 @@ window.popupMenuHolder  = null
 ## 		popup = new PopupMenu(title, x, y)
 ##		popup.addItem "Item Text", callbackFunction, callbackData
 ##
-
 class PopupMenu
 
 	# @property [Integer] popupWidth width of the popup default 300
@@ -52,6 +131,10 @@ class PopupMenu
 			top:   @y
 			width: @popupWidth
 
+		## append all the popupMenuItems to the holder
+		for linkObject in @linkObjects
+			window.popupMenuHolder.append linkObject.getRenderedElement()
+
 		window.popupMenuHolder.show()
 
 		true
@@ -63,7 +146,10 @@ class PopupMenu
 	## @param [Integer] x the adjusted X location to open
 	## @param [Integer] y the adjusted Y location to open
 	##
-	constructor: (@title, @x, @y) ->
+	constructor: (@title, @x, @y, @autoshow = true) ->
+
+		# @property [Array] linkObjects to store all the objects of link
+		@linkObjects = []
 
 		##|
 		##| if the 2nd parameter is an event, use that event to open the popup
@@ -153,10 +239,9 @@ class PopupMenu
 		if typeof className == "undefined"
 			className = "item"
 
-		link = $ "<li />",
-			'data-id' : id
-			'class'	  : className
-			'html'	  : name
+		linkObject = new PopupMenuItem(name,className,id)
+		@linkObjects.push linkObject
+		link = linkObject.link
 
 		if @colCount > 0
 			link.addClass "multicol"
@@ -177,8 +262,8 @@ class PopupMenu
 
 			true
 
-		window.popupMenuHolder.append link
 		@resize @popupWidth
+		linkObject
 
 $ ->
 
