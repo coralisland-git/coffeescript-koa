@@ -36,9 +36,19 @@ $ ->
 
         ## populate dropdown
         dd = new NavDropDown("Brian P.","right") # constructor arg is title and alignment left|right
-        dd.addItem({type:"link", text:"Action", link: "#"})
+        dd.addItem
+            type:"link"
+            text:"Action"
+            callback: (e) ->
+                console.log e
+                alert "Action is clicked"
         dd.addItem({type: "divider"}) # by setting type to divider it will add divider
-        dd.addItem({type:'link',text:"Sample",link:"#"})
+        dd.addItem
+            type:'link'
+            text:"Sample"
+            callback: (e) ->
+                console.log e
+                alert "sample is clicked"
 
         ## add populate dropdown to navbar
         navBar.addElement(dd)

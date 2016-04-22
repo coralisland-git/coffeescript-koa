@@ -12,6 +12,7 @@ class NavDropDown
 	constructor: (@title,@align = 'left') ->
 		# @property [Array] formElement to store the added form element
 		@dropdownItems = []
+		@gid = GlobalValueManager.NextGlobalID()
 
 
 	## -------------------------------------------------------------------------------------------------------------
@@ -21,13 +22,19 @@ class NavDropDown
 	##
 	getHtml: () ->
 		itemsHtml = "";
-		for element in @dropdownItems
+		for element,key in @dropdownItems
 			if element.type isnt 'divider'
-				itemsHtml += "<li><a href='#{element.link}'>#{element.text}</a></li>"
+				anchor  = $ "<a />",
+					id: "dd#{@gid}_#{key}"
+					href: "#"
+					html: element.text
+				li = $ "<li	/>"
+				.append anchor
+				itemsHtml += $("<div>").append(li).html()
 			else
 				itemsHtml += "<li role='separator' class='divider'></li>"
 
-		$template = "<ul class='nav navbar-nav navbar-{{align}}'>
+		$template = "<ul id='##{@gid}' class='nav navbar-nav navbar-{{align}}'>
 				<li class='dropdown'>
 				<a href='#' class='dropdown-toggle' data-toggle='dropdown' role='button' aria-haspopup='true' aria-expanded='false'>#{@title} <span class='caret'></span></a>
 				<ul class='dropdown-menu'>#{itemsHtml}</ul>
@@ -38,7 +45,7 @@ class NavDropDown
 	## function to add element to the navForm
 	##
 	## @example
-	##		dd.addItem({type:"link", text:"Action", link: "#"}) where type can be link|divider
+	##		dd.addItem({type:"link", text:"Action", callback: function}) where type can be link|divider
 	## @param [Object] element a valid defined navbar object which must implement getHtml() method
 	##
 	addItem: (item) ->

@@ -12,17 +12,20 @@ class DynamicNav
 	## -------------------------------------------------------------------------------------------------------------
 	## constructor to create dynamic nav
 	##
-	## @param [String] holderElement the id of the element in which the nav bar should be rendered
+	## @param [String|JQueryElement] holderElement the id of the element in which the nav bar should be rendered
 	##
 	constructor: (holderElement) ->
-		if !$(holderElement).length
+		if typeof holderElement == 'string' and !$(holderElement).length
 			throw new Error "Element with selector #{holderElement} not found for nav"
+
+		if typeof holderElement == 'string'
+			holderElement = $ holderElement
 
 		@gid = GlobalValueManager.NextGlobalID()
 
 		@navElements = []
 
-		@elementHolder = $ holderElement
+		@elementHolder = holderElement
 
 		## create nav element
 		@navBarHolder = $ "<nav />",
@@ -46,7 +49,7 @@ class DynamicNav
 				console.log "The element #{e.constructor.name} has not implemented getHtml() method"
 		## prepare nav element
 		@navBarHolder.html @navBarBody
-		@navBarHolder.addClass "#{if @staticTop then 'navbar-static-top'} #{if @inverse then 'navbar-inverse' }"
+		@navBarHolder.addClass "#{if @staticTop then 'navbar-static-top' else ''} #{if @inverse then 'navbar-inverse' else '' }"
 
 	## -------------------------------------------------------------------------------------------------------------
 	## render function to display the navbar that is built programatically
@@ -54,6 +57,14 @@ class DynamicNav
 	render: ->
 		@internalProcessElements()
 		@elementHolder.append @navBarHolder
+
+		## bind the NavDropDown events once all elements are rendered
+		dropdownElements = @navElements.filter (e) -> e.constructor.name == 'NavDropDown'
+		if dropdownElements.length
+			for element,key in dropdownElements
+				for item,key in element.dropdownItems
+					@elementHolder.find "#dd#{element.gid}_#{key}"
+						.on "click", item.callback
 
 	## -------------------------------------------------------------------------------------------------------------
 	## function to add element to the navbar
@@ -64,3 +75,4 @@ class DynamicNav
 		if !(element.__proto__.hasOwnProperty("getHtml") and typeof element.__proto__.getHtml == 'function')
 			console.log "element #{element.constructor.name} has not implemented .getHtml method";
 		@navElements.push(element)
+		this

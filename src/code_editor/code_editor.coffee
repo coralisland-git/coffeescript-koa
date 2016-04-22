@@ -36,9 +36,10 @@ class CodeEditor
 		if typeof ace == "undefined"
 			throw new Error "Ace editor is not loaded this component depends on ace, so ace editor must be loaded first"
 
-		ace.require("ace/ext/language_tools");
-		@_editor = ace.edit @elementHolder.attr('id');
-		@setMode @languageMode;
+		ace.require("ace/ext/language_tools")
+		@_editor = ace.edit @elementHolder.attr('id')
+		@_editor.session.setUseWrapMode(true)
+		@setMode @languageMode
 		@gid = GlobalValueManager.NextGlobalID()
 		@_histories = []
 		this
@@ -80,6 +81,27 @@ class CodeEditor
 		@_editor.setOptions @_options
 		this
 
+	## -------------------------------------------------------------------------------------------------------------
+	## make the editor in popup mode to handle tooltip and resize adjustment
+	##
+	## @example ce.popupMode()
+	## @param [Boolean] popupMode
+	## @return [CodeEditor] this returns the current instance
+	##
+	popupMode:(@popupMode = true) ->
+		## handles resize
+		@elementHolder.parents('.scrollcontent').on "resize", (e) =>
+			@_editor.resize()
+
+		@setOptions
+			tooltipFollowsMouse: false
+		@_editor.addEventListener "guttermousemove",(e) =>
+			console.log e.clientX - @elementHolder.offset().left
+			setTimeout () =>
+				@elementHolder.find(".ace_tooltip").offset({left: 0, top:0})
+			,0
+
+		this
 	## -------------------------------------------------------------------------------------------------------------
     ## to get the raw ace editor instance
 	##

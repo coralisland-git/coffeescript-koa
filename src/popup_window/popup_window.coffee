@@ -129,6 +129,9 @@ class PopupWindow
 		if @x + @popupWidth + 10> width
 			@x = width - @popupWidth - 10
 
+		## adjustment of 24px for the resize handle so resize handle doesn't overlap
+		@popupHeight += 24
+
 		if @y + @popupHeight + 10 > height
 			@y = height - @popupHeight - 10
 
