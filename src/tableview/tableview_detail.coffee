@@ -7,7 +7,7 @@
 class TableViewDetailed extends TableView
 
 	# @property [Integer] leftWidth
-	leftWidth : 140
+	leftWidth : 180
 
 	## -------------------------------------------------------------------------------------------------------------
 	## addTable function overriden from TableView
@@ -73,7 +73,7 @@ class TableViewDetailed extends TableView
 			if @showCheckboxes and @primaryTableName
 				html += @renderCheckable(i)
 			if column.col.visible != false
-				html += "<th style='text-align: right; width: #{@leftWidth}px; '> "
+				html += "<th style='text-align: right;width: #{@leftWidth}px; '> "
 				html += column.col.name
 				html += "</th>"
 				html += DataMap.renderField "td", column.tableName, column.col.source, @dataKey, column.col.extraClassName
