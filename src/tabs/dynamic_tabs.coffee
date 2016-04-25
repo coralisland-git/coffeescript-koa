@@ -40,12 +40,15 @@ class Tab
 	## function to set the badge on the tab
 	##
 	## @param [Integer] number the number to show inside badge
-	setBadge: (number) ->
+	## @param [String] type the type of badge can be success|danger|warning|primary
+	## @param [String] direction the direction of the badge to display front or back
+	##
+	setBadge: (number, type = null, direction = 'front') ->
+		badgeHtml = "<span class='badge #{if type then 'badge-'+type else ''} #{if direction isnt 'front' then 'badge-right'}'>#{number}</span>"
 		@tabLink = $ "<a />",
 			"data-toggle": "tab"
 			href: "##{@tabId}"
-			html: "<span class='badge'>#{number}</span>#{@tabName}"
-		console.log @listElement.find("[href=##{@tabId}]"), "[href=##{@tabId}]"
+			html: "#{if direction == 'front' then badgeHtml + @tabName else @tabName + badgeHtml}"
 		@listElement.find("[href=##{@tabId}]").replaceWith(@tabLink)
 		@tabLink.click ()->
 			$(this).tab('show')
