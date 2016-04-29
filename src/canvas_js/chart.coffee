@@ -78,12 +78,14 @@ class Chart
     ##
     ## @param [String] type any valid canvas js chart type
     ## @param [Array] data the datapoints array to render inside chart
+    ## @param [Object] additonalOptions options to pass in data series
     ## @return this [Chart] returns instance
     ##
-    withData: (data, type = 'line') ->
+    withData: (data, type = 'line', addtionalOptions = {}) ->
         dataObject =
             type: type
             dataPoints: data
+        $.extend dataObject,addtionalOptions
         @_options.data.push(dataObject)
         this
 
