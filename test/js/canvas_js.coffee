@@ -52,7 +52,7 @@ $ ->
         Chart.loadJs()
             .then () ->
                 ##| here on creation of object it will try to load canvas js if not available
-                chart = new Chart("renderTest1","Another EarthQuake Chart")
+                chart = new LineChart("renderTest1","Another EarthQuake Chart")
                 chart
                     .setOptions
                         backgroundColor: "#f5f5f5"
@@ -62,7 +62,7 @@ $ ->
                         intervalType: "month"
                     .yAxis
                         includeZero: false
-                    .withData earthQuakeData
+                    .setCalculated(earthQuakeData)
                     .render()
         ## withData can be called multiple times it will push each type in the data array of chart
         true
