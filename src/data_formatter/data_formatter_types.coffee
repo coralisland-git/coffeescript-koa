@@ -232,7 +232,7 @@ class DataFormatSourceCode extends DataFormatText
 		##|
 		##|  Show a popup menu
 		popup = new PopupWindow("Source Code");
-		popup.windowScroll.append $("<div id='code_editor_#{elParent.index()}' style='position:relative;'><div id='editor'></div></div>")
+		popup.windowScroll.append $("<div id='action_bar'></div><div id='code_editor_#{elParent.index()}' style='position:relative;padding-bottom:30px;'><div id='editor'></div></div>")
 		codeEditor = new CodeEditor popup.windowScroll.find "#code_editor_#{elParent.index()} #editor"
 		codeEditor.popupMode().setTheme "tomorrow_night_eighties"
 			.setMode "javascript"
@@ -243,12 +243,13 @@ class DataFormatSourceCode extends DataFormatText
 		else
 			code = currentValue
 		codeEditor.setContent code
-		buttonNav = new DynamicNav(popup.windowScroll)
+		buttonNav = new DynamicNav(popup.windowScroll.find('#action_bar'))
 		buttonNav.inverse
 		saveButton = new NavButton("Save","btn btn-primary navbar-btn", id: "save_btn_#{elParent.index()}")
 		cancelButton = new NavButton("Cancel", "btn btn-danger navbar-btn cancel-btn", id: "cancel_btn_#{elParent.index()}")
-		buttonNav.addElement(saveButton).addElement(cancelButton)
+		buttonNav.addElement(cancelButton).addElement(saveButton)
 		buttonNav.render()
+		popup.resize(600,425)
 		popup.center()
 
 		$("#save_btn_#{elParent.index()}").on "click", () =>
