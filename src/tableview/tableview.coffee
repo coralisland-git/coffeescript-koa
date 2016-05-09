@@ -173,10 +173,10 @@ class TableView
 		for i, o of @rowData
 			o.checked = false
 			for x, y of bookmarkArray
-				if y.key == o.checkbox_key
+				if y.id == o.checkbox_key
 					o.checked = true
 
-			key = o.key
+			key = o.id
 			if o.checked
 				$("#check_#{@gid}_#{key}").html @imgChecked
 			else
@@ -201,7 +201,7 @@ class TableView
 		if @tableName == "property" and key == window.currentProperty.id
 			html = "<td class='checkable'> &nbsp; </td>"
 		else
-			html = "<td class='checkable' id='check_#{@gid}_#{obj.key}'>" + img + "</td>"
+			html = "<td class='checkable' id='check_#{@gid}_#{obj.id}'>" + img + "</td>"
 
 		return html
 
@@ -248,7 +248,7 @@ class TableView
 				##| Check to see if it's a checkbox row
 				if data? and data.checked?
 					data.checked = !data.checked
-					key = data.key
+					key = data.id
 					if data.checked
 						$("#check_#{@gid}_#{key}").html @imgChecked
 					else
@@ -330,7 +330,7 @@ class TableView
 			@updateRowData()
 			for counter, i of @rowData
 				##| if row is not present for that data, render new row
-				if !@elTheTable.find("tr [data-path^='/#{@primaryTableName}/#{i.key}/']").length
+				if !@elTheTable.find("tr [data-path^='/#{@primaryTableName}/#{i.id}/']").length
 					@elTheTable.find('tbody').prepend(@internalRenderRow(counter++,i,true))
 
 		##| define sorter function using jquery tr switching
@@ -434,7 +434,7 @@ class TableView
 		data = DataMap.getValuesFromTable @primaryTableName, @reduceFunction
 		for row in data
 			if @showCheckboxes
-				row.checkbox_key = @primaryTableName + "_" + row.key
+				row.checkbox_key = @primaryTableName + "_" + row.id
 				row.checked = false
 
 			@rowData.push row
@@ -496,10 +496,10 @@ class TableView
 	internalCountNumberOfOccurenceOfPopup: (col,initialize = false) =>
 
 		##| calculate occurances of unique values
-		occurences = @rowData.map (r) => {key: r.key, value : DataMap.getDataField col.tableName, r.key, col.col.source}
+		occurences = @rowData.map (r) => {key: r.id, value : DataMap.getDataField col.tableName, r.id, col.col.source}
 		counts = {}
 		occurences.forEach (v) =>
-			if $("#tbody#{@gid}").find("[data-id=#{v.key}]").is(":visible") or initialize
+			if $("#tbody#{@gid}").find("[data-id=#{v.id}]").is(":visible") or initialize
 				if counts[v.value] then counts[v.value]++ else counts[v.value] = 1
 		occurences = undefined
 		col.filterPopupData = counts
@@ -684,6 +684,9 @@ class TableView
 	## @return [String] html the html of the row
 	##
 	internalRenderRow: (counter,i,isNewRow = false) =>
+
+		# console.log "Render #{counter} i=", i
+
 		##|
 		##|  Create the "TR" tag
 		html = "<tr class='trow #{if isNewRow then 'newDataRow' else ''}' data-id='#{counter}' "
@@ -698,10 +701,10 @@ class TableView
 		for col in @colList
 			if col.visible
 				if col.joinKey?
-					val = DataMap.getDataField col.joinTable, i.key, col.joinKey
+					val = DataMap.getDataField col.joinTable, i.id, col.joinKey
 					str = DataMap.renderField "td", col.tableName, col.col.source, val, col.col.extraClassName
 				else
-					str = DataMap.renderField "td", col.tableName, col.col.source, i.key, col.col.extraClassName
+					str = DataMap.renderField "td", col.tableName, col.col.source, i.id, col.col.extraClassName
 
 				html += str
 
@@ -813,7 +816,7 @@ class TableView
 					if !filters[i.table+col.col.source]
 						filters[i.table+col.col.source] = new RegExp( @currentFilters[i.table][col.col.source] , "i");
 
-					aa = DataMap.getDataField(i.table, i.key, col.col.source)
+					aa = DataMap.getDataField(i.table, i.id, col.col.source)
 					if !filters[i.table+col.col.source].test aa
 						keepRow = false
 
@@ -824,7 +827,7 @@ class TableView
 				,3000
 
 			##| if row is not present for that data, render new row
-			if !@elTheTable.find("tr [data-path^='/#{@primaryTableName}/#{i.key}/']").length
+			if !@elTheTable.find("tr [data-path^='/#{@primaryTableName}/#{i.id}/']").length
 				html = @internalRenderRow(previousRowsCount,i,true)
 				@elTheTable.find('tbody').prepend(html)
 				removeNewRowClass html
