@@ -84,13 +84,16 @@ go = () ->
 		try
 			result = allTests[0].callback()
 
+			if typeof result == "function"
+				result = result()
+
 			if typeof result != "object"
 				$(allTests[0].tag).html result
 				goNext()
 			else
+
 				if result.constructor.toString().match /Promise/
 
-					console.log "Waiting on promise"
 					result.then (trueResult) ->
 						$(allTests[0].tag).append trueResult
 						goNext()

@@ -38,56 +38,55 @@ class TableViewDetailed extends TableView
 	##
 	render : (@dataKey) =>
 
-		if !@dataKey or typeof DataMap.getDataMap().data[@primaryTableName][@dataKey] != 'object'
-			throw new Error "data with key #{@dataKey} not found"
+		newPromise ()=>
 
-		##|
-		##|  Create a unique ID for the table, that doesn't change
-		##|  even if the table is re-drawn
-		if typeof @gid == "undefined"
-			@gid = GlobalValueManager.NextGlobalID()
+			yield @clearPendingPromises()
 
-		# @processTableConfig()
-
-		##|
-		##|  draw the table header
-		html = "<table class='detailview' id='table#{@gid}'>"
-
-		##|
-		##|  Start adding the body
-		html += "<tbody id='tbody#{@gid}'>";
-
-		@rowData[@dataKey] = {}
-
-		for column in @colList
-
-			column.styleFormat = ""
-			column.width       = ""
-			if !column.visible then continue
+			if !@dataKey?
+				throw new Error "data with key #{@dataKey} not found"
 
 			##|
-			##|  Create the "TR" tag
-			html += "<tr class='trow' data-id='#{@dataKey}' "
-			html += ">"
-			@rowData[@dataKey][column.col.source] = DataMap.getDataField @primaryTableName,@dataKey,column.col.source
-			if @showCheckboxes and @primaryTableName
-				html += @renderCheckable(i)
-			if column.col.visible != false
-				html += "<th style='text-align: right;width: #{@leftWidth}px; '> "
-				html += column.col.name
-				html += "</th>"
-				html += DataMap.renderField "td", column.tableName, column.col.source, @dataKey, column.col.extraClassName
+			##|  Create a unique ID for the table, that doesn't change
+			##|  even if the table is re-drawn
+			if typeof @gid == "undefined"
+				@gid = GlobalValueManager.NextGlobalID()
 
+			##|
+			##|  draw the table header
+			html = "<table class='detailview' id='table#{@gid}'>"
 
-			html += "</tr>";
+			##|
+			##|  Start adding the body
+			html += "<tbody id='tbody#{@gid}'>";
 
-		html += "</tbody></table>";
+			@rowData[@dataKey] = {}
 
-		@elTheTable = @elTableHolder.html(html);
+			for column in @colList
 
+				column.styleFormat = ""
+				column.width       = ""
+				if !column.visible then continue
 
-		@contextMenuCallSetup = 0
-		@setupContextMenuHeader()
-		@internalSetupMouseEvents()
+				##|
+				##|  Create the "TR" tag
+				html += "<tr class='trow' data-id='#{@dataKey}' "
+				html += ">"
+				@rowData[@dataKey][column.col.source] = yield DataMap.getDataField @primaryTableName,@dataKey,column.col.source
+				if @showCheckboxes and @primaryTableName
+					html += @renderCheckable(i)
+				if column.col.visible != false
+					html += "<th style='text-align: right;width: #{@leftWidth}px; '> "
+					html += column.col.name
+					html += "</th>"
+					html += yield DataMap.renderField "td", column.tableName, column.col.source, @dataKey, column.col.extraClassName
 
-		true
+				html += "</tr>";
+
+			html += "</tbody></table>";
+
+			@elTheTable = @elTableHolder.html(html);
+			@contextMenuCallSetup = 0
+			@setupContextMenuHeader()
+			@internalSetupMouseEvents()
+
+			true

@@ -10,6 +10,7 @@
     "express-livereload": "0.0.24",
     "fluidity": "^0.2.3",
     "grunt": "^0.4.5",
+    "grunt-bower": "^0.21.1",
     "grunt-build-number": "^1.0.0",
     "grunt-contrib-coffee": "^0.13.0",
     "grunt-contrib-copy": "^0.8.2",
@@ -27,5 +28,9 @@
     "nib": "^1.1.0",
     "serve-favicon": "^2.3.0",
     "stylus": "^0.52.4"
+  },
+  "devDependencies": {
+    "grunt-bower-concat": "^1.0.0",
+    "load-grunt-tasks": "^3.5.0"
   }
 }

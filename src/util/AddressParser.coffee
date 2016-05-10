@@ -168,14 +168,15 @@ class AddressParser
 	##
 	##
 	getZipCode: ->
+
 		if !@response.zipcode and (@response.city or @response.state)
-			_zipObj = DataMap.getValuesFromTable 'zipcode', (obj) =>
+
+			DataMap.getValuesFromTable 'zipcode', (obj) =>
 				return obj.city is @response.city or obj.state is @response.state
-			.pop()
-			if _zipObj.hasOwnProperty 'key'
-				if !@response.state
-					@response.state = DataMap.getDataMap().data['zipcode'][_zipObj.key].state;
-				@response.zipcode = _zipObj.key
+			.then (results) =>
+				_zipObj = results.pop()
+				if _zipObj.hasOwnProperty 'key'
+					@response.zipcode = _zipObj.key
 
 	## -------------------------------------------------------------------------------------------------------------
 	## return true if the given address is valid

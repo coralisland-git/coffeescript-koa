@@ -1,6 +1,12 @@
 reDate2           = /[0-9\-]+T[0-9\:\.]+Z$/
 checkForNumber    = /^[\d\-\.]+$/
 
+##| -------------------------------------------------------------------------------------------------------------
+##|
+##| This class is a basic memory map that stores data for a collection in an array
+##| then you can get data out using some key comparison, usually "id" values
+##| for a fast lookup.
+##|
 class DataMapMemoryCollection
 
     ##|
@@ -18,17 +24,19 @@ class DataMapMemoryCollection
     ##|
     findAll: (filterFunction) =>
 
-        allResults = []
-        for key, obj of @data
-            if filterFunction?
-                result = filterFunction(obj)
-            else
-                result = true
+        new Promise (resolve, reject) =>
 
-            if result
-                allResults.push $.extend(true, {}, obj)
+            allResults = []
+            for key, obj of @data
+                if filterFunction?
+                    result = filterFunction(obj)
+                else
+                    result = true
 
-        return allResults
+                if result
+                    allResults.push $.extend(true, {}, obj)
+
+            resolve(allResults)
 
     ##|
     ##|  Search for a condition
@@ -37,38 +45,43 @@ class DataMapMemoryCollection
 
     find: (condition) =>
 
-        # console.log "Finding [", condition, "] in ", @data
+        new Promise (resolve, reject) =>
 
-        if !@index? and condition? and condition.id? and Object.keys(condition).length == 1
+            if !@index? and condition? and condition.id? and Object.keys(condition).length == 1
 
-            ##|
-            ##| Fast search by id
-            if !@data[condition.id]?
-                return null
+                ##|
+                ##| Fast search by id
+                if !@data[condition.id]?
+                    resolve null
+                    return
 
-            doc = $.extend(true, {}, @data[condition.id])
-            return doc
+                doc = $.extend(true, {}, @data[condition.id])
+                resolve doc
 
-        else
+            else
 
-            ##|
-            ##| Complex search
-            allResult = []
-            for key, obj of @data
-                found = false
-                for i, o of condition
-                    if obj[i] != o then found = false
-                if found
-                    allResult.push $.extend(true, {}, o)
+                ##|
+                ##| Complex search
+                allResult = []
+                for key, obj of @data
+                    found = false
+                    for i, o of condition
+                        if obj[i] != o then found = false
+                    if found
+                        allResult.push $.extend(true, {}, o)
 
-            return allResult
+                resolve allResult
 
     ##|
     ##|  Find a single record for read-online
     findFast: (idValue, subKey) =>
-        if idValue? and @data[idValue]?
-            return @data[idValue][subKey]
-        return null
+
+        new Promise (resolve, reject) =>
+
+            if idValue? and @data[idValue]?
+                resolve @data[idValue][subKey]
+            else
+                resolve null
 
     ##|
     ##|  Fully update the document in memory
@@ -76,31 +89,33 @@ class DataMapMemoryCollection
 
     upsert: (doc) =>
 
-        strKey = @getDocumentKey(doc)
+        new Promise (resolve, reject) =>
 
-        # console.log "Before Doc=", doc
-        @data[strKey] = $.extend(true, {}, doc);
-        # console.log "Upsert Key=#{strKey} to ", @data[strKey]
-
-        @count = Object.keys(@data).length
-        return @data[strKey]
-
+            strKey = @getDocumentKey(doc)
+            @data[strKey] = $.extend(true, {}, doc);
+            @count = Object.keys(@data).length
+            resolve @data[strKey]
 
     ##|
     ##|  Remove a key
     remove: (condition) =>
 
-        allResults = @find condition
-        if !allResults? then remove
-        if allResults? and allResults[0]?
-            for i, obj of allResults
-                strKey = @getDocumentKey[obj]
-                delete @data[strKey]
-        else
-            delete @data[@getDocumentKey allResults]
+        new Promise (resolve, reject) =>
 
-        true
+            allResults = @find condition
+            if !allResults? then remove
+            if allResults? and allResults[0]?
+                for i, obj of allResults
+                    strKey = @getDocumentKey[obj]
+                    delete @data[strKey]
+            else
+                delete @data[@getDocumentKey allResults]
 
+            resolve(true)
+
+    ##|
+    ##|  Internal function to convert a document to it's key
+    ##|  depending on the indexes available
     getDocumentKey: (doc) =>
 
         if !@index? then return doc.id
@@ -113,29 +128,109 @@ class DataMapMemoryCollection
 
         return strKey
 
+##|
+##|  A version of the data store that sits over the memory version and
+##|  loads/saves records to a database using IndexDB
+##|
+class DataMapDatabaseCollection
+
+    ##|
+    ##|  In memory storage for a simple table
+    ##|
+
+    constructor: (@dataSetName, @name, @index) ->
+
+        ##|
+        ##|  Generic initializer
+        indexedDB      = window.indexedDB || window.webkitIndexedDB || window.msIndexedDB;
+        IDBKeyRange    = window.IDBKeyRange || window.webkitIDBKeyRange;
+        openCopy       = indexedDB && indexedDB.open;
+        IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction;
+
+        if IDBTransaction
+            IDBTransaction.READ_WRITE = IDBTransaction.READ_WRITE || 'readwrite';
+            IDBTransaction.READ_ONLY = IDBTransaction.READ_ONLY || 'readonly';
+
+        ##|
+        ##|  Create our own access point
+        request = indexedDB.open @dataSetName
+        request.onupgradeneeded = @indexdbOnUpgradeNeeded
+
+        request.onsuccess = @indexdbOnSuccess
+        request.onerror   = @indexdbOnError
+
+        ##|
+        ##|  Memory cache
+        @memdb = new DataMapMemoryCollection(@name, @index)
+
+    indexdbOnSuccess: (e) =>
+        console.log "INDEX onSuccess:", e
+        return true
+
+    indexdbOnError: (e) =>
+        console.log "INDEX onError:", e
+        return true
+
+
+    ##|
+    ##|  Internal event from Indexed DB - Upgrade needed
+    indexdbOnUpgradeNeeded: (e) =>
+
+        idb = e.target.result
+        if !idb.objectStore.contains @name
+            @store = idb.createObjectStore @name,
+                keyPath: 'id'
+                autoIncrement: true
+
+            @store.createIndex 'i_id', @name,
+                unique: true
+                multiEntry: false
+
+    ##| -------------------------------------------------------------------------------------------------------------
+    ##|
+    ##|  Search for a condition
+    ##|  current support is an array of possible values
+    ##|  Example: { id: 10 }
+    ##|
+    find: (condition) =>
+        return false
 
 class DataMapEngine
 
     constructor: (@dataSetName) ->
-        # console.log "DataMapEngine INIT [#{@dataSetName}]"
 
         if !@dataSetName?
             @dataSetName = "globalds"
 
+        @emitter = new EvEmitter();
         @memData = {}
+
+    on: (eventName, callbackFunction) =>
+        @emitter.on eventName, callbackFunction
+
+    off: (eventName, callbackFunction) =>
+        @emitter.off eventName, callbackFunction
 
     delete: (pathText) =>
 
-        path = @parsePath pathText
-        c    = @internalGetCollection path.collection
-        c.remove path.condition
+        new Promise (resolve, reject) =>
+
+            path = @parsePath pathText
+            c    = @internalGetCollection path.collection
+            c.remove path.condition
+            .then ()=>
+                resolve(true)
 
     ##|
     ##|  Find all the records in a given collection
     find: (collectionName, filterFunction) =>
 
-        c = @internalGetCollection collectionName
-        return c.findAll filterFunction
+        new Promise (resolve, reject) =>
+
+            c = @internalGetCollection collectionName
+            c.findAll filterFunction
+            .then (results) =>
+                resolve(results)
 
     ##|
     ##|  Return the end value from a stored value
@@ -146,83 +241,142 @@ class DataMapEngine
         ##|
         ##|  Path should already be parsed into an object.
 
-        if !collectionName? then return null
+        new Promise (resolve, reject) =>
 
-        c = @internalGetCollection collectionName
-        doc = c.findFast keyValue, subPath
-        return doc
+            if !collectionName? then reject new Error "Missing collection name"
 
+            numValue = parseInt keyValue
+            if isNaN numValue then numValue = keyValue
 
+            c = @internalGetCollection collectionName
+            c.findFast numValue, subPath
+            .then (doc) =>
+                resolve(doc)
+
+    ##| -------------------------------------------------------------------------------------------------------------
+    ##|
+    ##|  Get data from the engine using a given path
+    ##|  create the record if needed which is generally used when you want to lock
+    ##|  the data and them insert the record later.
+    ##|
     get: (pathText, insertIfNeeded) =>
 
-        path = @parsePath pathText
-        c    = @internalGetCollection path.collection
-        # console.log "Collection, Count=#{c.count}"
-        doc  = c.find path.condition
-        # console.log "get ", path
+        new Promise (resolve, reject) =>
 
-        if insertIfNeeded? and !doc?
-            doc = {}
-            for i, o of path.condition
-                doc[i] = o
+            path = @parsePath pathText
+            c    = @internalGetCollection path.collection
+            c.find path.condition
+            .then (doc) =>
 
-            doc = c.upsert path.condition
+                if insertIfNeeded? and !doc?
+                    doc = $.extend true, {}, path.condition
 
-        if path.subPath? and path.subPath.length > 0 and doc?
+                    c.upsert doc
+                    .then (insertedDoc) =>
+                        ##|
+                        ##|  not needed
 
-            basePointer = doc
-            # console.log "BEFORE=", doc
-            for name in path.subPath
-                # console.log "sub #{name} in ", basePointer
-                if !basePointer[name]?
-                    basePointer[name] = {}
-                basePointer = basePointer[name]
+                if path.subPath? and path.subPath.length > 0 and doc?
 
-            # console.log "Search Sub [", path, "]=", basePointer
-            # basePointer._path = path
-            return basePointer
+                    basePointer = doc
+                    for name in path.subPath
+                        if !basePointer[name]?
+                            basePointer[name] = {}
+                        basePointer = basePointer[name]
 
-        # console.log "Search [", path, "]=", doc
-        return doc
+                    resolve(basePointer)
+
+                resolve(doc)
+
+    ##| -------------------------------------------------------------------------------------------------------------
+    ##|  Identifies changes in the src object compared to the target
+    ##|
+    deepDiff: (src, target, basePath) =>
+
+        if !src?
+            src = {}
+
+        diffs = []
+        for i, o of target
+            if typeof o == "Object"
+                results = @deepDiff src[i], o, basePath + "/" + i
+                for d in results
+                    diffs.push d
+            else if !src[i]?
+                diffs.push
+                    path : basePath + "/#{i}"
+                    kind : "N"
+                    rhs  : o
+            else if src[i] != o
+                diffs.push
+                    path : basePath + "/#{i}"
+                    kind : "E"
+                    lhs  : src[i]
+                    rhs  : o
+
+        for i, o of src
+            if !target[i]?
+                diffs.push
+                    path : basePath + "/#{i}"
+                    kind : "D"
+                    lhs  : o
+
+        return diffs
+
 
     ##| -------------------------------------------------------------------------------------------------------------
     ##|
     ##|  Save data to the engine
     set: (pathText, newData) =>
 
-        path = @parsePath(pathText)
-        # console.log "Set [collection=#{path.collection}] [condition=", path.condition, "]"
+        new Promise (resolve, reject) =>
 
-        ##|
-        ##|  Get the full document, no subpath
-        doc = @get
-            condition: path.condition
-            collection: path.collection
-        , true
+            path = @parsePath(pathText)
 
-        basePointer = doc
-        # console.log "[#{pathText}] SUBPATH=", path.subPath, " DOC=", doc
-        if path.subPath? and path.subPath.length > 0 and doc?
+            ##|
+            ##|  Get the full document, no subpath
+            @get
+                condition: path.condition
+                collection: path.collection
+            , true
+            .then (doc) =>
 
-            for name in path.subPath
-                # console.log "name=", name, " base=", basePointer
-                if !basePointer[name]?
-                    basePointer[name] = {}
-                basePointer = basePointer[name]
+                ##|
+                ##|  Unmodified version for change tracking
+                origDoc = $.extend true, {}, doc
 
-        DataMapEngine.deepMergeObject basePointer, newData
+                basePointer = doc
+                if path.subPath? and path.subPath.length > 0 and doc?
 
-        # console.log "UPDATING:", doc
-        c = @internalGetCollection path.collection
-        return c.upsert(doc)
+                    for name in path.subPath
+                        # console.log "name=", name, " base=", basePointer
+                        if !basePointer[name]?
+                            basePointer[name] = {}
+                        basePointer = basePointer[name]
+
+                DataMapEngine.deepMergeObject basePointer, newData
+
+                ##|
+                ##|  Insert saved document
+                c = @internalGetCollection path.collection
+                c.upsert(doc)
+                .then (insertedDoc)=>
+
+                    ##|
+                    ##|  Events when data changed
+                    diffs = @deepDiff origDoc, doc, "/#{path.collection}/#{path.condition.id}"
+                    for d in diffs
+                        @emitter.emitEvent 'change', [ d ]
+
+                    ##|
+                    ##|
+                    resolve(insertedDoc)
 
 
     ##| -------------------------------------------------------------------------------------------------------------
     ##|
     ##|  Internally Loki stores data in collections that are like tables within the database.
     internalGetCollection: (tableName, indexList) =>
-
-        # console.log "internalGetCollection[#{tableName}] in " + Object.keys(@memData)
 
         if !@memData[tableName]?
             @memData[tableName] = new DataMapMemoryCollection(tableName, indexList)

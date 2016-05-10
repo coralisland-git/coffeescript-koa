@@ -31,3 +31,5 @@ node_modules
 
 #build generated folder
 ninja
+
+bower_components

@@ -49,8 +49,8 @@ getCoffeeFiles = ()->
 module.exports = (grunt) ->
 	grunt.initConfig
 
-##|
-##|  Here is a task for a clean build of everything
+		##|
+		##|  Here is a task for a clean build of everything
 		clean:
 			build: ['build']
 
@@ -61,11 +61,11 @@ module.exports = (grunt) ->
 					hostname: "0.0.0.0"
 					bases: ["ninja/test", "doc", "."]
 
-##|
-##|  Copy task, takes all the files in the different build folders
-##|  produces the final "public" version for consumption
-##|  merging resources from different frameworks
-##|
+		##|
+		##|  Copy task, takes all the files in the different build folders
+		##|  produces the final "public" version for consumption
+		##|  merging resources from different frameworks
+		##|
 		copy:
 			images:
 				files: [
@@ -103,10 +103,9 @@ module.exports = (grunt) ->
 					expand: true
 				]
 
-
-##|
-##|  Compile the stylus templates, jade templates, and coffeescript files.
-##|
+		##|
+		##|  Compile the stylus templates, jade templates, and coffeescript files.
+		##|
 		stylus:
 			compile:
 				options:
@@ -141,8 +140,7 @@ module.exports = (grunt) ->
 				tasks: ['stylus:compile']
 
 			coffeeFile:
-				files: ['src/**/*coffee', "test/js/*coffee", "test/js/test_data/*coffee", "module/**/*coffee",
-					"module/**/*.js"]
+				files: ['src/**/*coffee', "test/js/*coffee", "test/js/test_data/*coffee", "module/**/*coffee", "module/**/*.js"]
 				tasks: ['coffee']
 
 			jadefiles:
@@ -161,22 +159,24 @@ module.exports = (grunt) ->
 				options:
 					livereload: true
 
-
-##|
-##|  External modules
-##|
-		grunt.loadNpmTasks 'grunt-contrib-coffee'
-		grunt.loadNpmTasks 'grunt-contrib-jade'
-		grunt.loadNpmTasks 'grunt-contrib-watch'
-		grunt.loadNpmTasks 'grunt-contrib-copy'
-		grunt.loadNpmTasks 'grunt-contrib-stylus'
-		grunt.loadNpmTasks 'grunt-notify'
-		grunt.loadNpmTasks 'grunt-express'
+		bower_concat:
+			all:
+				dest: 'ninja/bower.js'
+				exclude: [
+					'jquery'
+				]
 
 
+		##|
+		##|  Load all available modules
+		require('load-grunt-tasks')(grunt);
+
+		##|
+		##|  Build options
+		##|
+		grunt.registerTask "bower", ['bower_concat']
 		grunt.registerTask "server", ['express', 'watch']
 		grunt.registerTask 'dist', ['coffee', 'copy', 'stylus', 'jade']
-		grunt.registerTask 'synclive', ['buildnumber', 'coffee', 'copy', 'stylus:compile', 'jade:compile',
-			'shell:synclive']
-		grunt.registerTask 'default', ['coffee', 'copy', 'stylus:compile', 'jade:compile', 'express', 'watch']
+		grunt.registerTask 'synclive', ['buildnumber', 'coffee', 'copy', 'stylus:compile', 'jade:compile', 'shell:synclive']
+		grunt.registerTask 'default', ['bower_concat', 'coffee', 'copy', 'stylus:compile', 'jade:compile', 'express', 'watch']
 

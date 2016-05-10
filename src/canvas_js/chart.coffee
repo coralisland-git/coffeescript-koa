@@ -96,13 +96,27 @@ class Chart
         this
 
     ## ----------------------------------------------------------------------------------------------------------------
-    ## render function to create chart instance
+    ## render placeholder
     ##
     ## @return this [Chart] returns instance
     ##
     render: ->
+
+        newPromise ()=>
+
+            yield DataMap.clearPendingPromises()
+            @realRender()
+
+    ## ----------------------------------------------------------------------------------------------------------------
+    ## render function to create chart instance
+    ##
+    ## @return this [Chart] returns instance
+    ##
+    realRender: ()=>
+
         @_chartInstance = new CanvasJS.Chart @elHolderId,
             @_options
+
         console.log @_chartInstance, @_options
         @_chartInstance.render()
 
@@ -167,12 +181,17 @@ class Chart
     ## @return [LineChart] this the current instance
     ##
     addTable: (@tableName) ->
-        dm = DataMap.getDataMap()
-        if !dm.types[@tableName] or !dm.data[@tableName]
-            throw new Error "table with name #{@tableName} is not found"
-        ##| converting the data to array for better access
-        @tableRows = $.map dm.data[@tableName],(value) ->
-            value
+
+        DataMap.addPendingPromise ()=>
+
+            dm = DataMap.getDataMap()
+            if !dm.types[@tableName]
+                throw new Error "table with name #{@tableName} is not found"
+
+            @tableRows = yield DataMap.getValuesFromTable @tableName
+            console.log "ROWS=", @tableRows
+            return @tableRows
+
         this
 
     ## ----------------------------------------------------------------------------------------------------------------
@@ -184,13 +203,23 @@ class Chart
     ## @return [LineChart] this the current instance
     ##
     calculate: (@calculateCallback) ->
-        @calculatedData = []
-        for row in @tableRows
-            calculation = @calculateCallback(row,@calculatedData)
-            # if !calculation.x or !calculation.y
-            #     throw new Error "the returning object has not x and y value"
-            ##| update new result set
-            @calculatedData = calculation
+
+        DataMap.addPendingPromise ()=>
+
+            console.log "Clearing pending first..."
+            yield DataMap.clearPendingPromises()
+
+            console.log "HERE Calculate:", @tableRows
+            @calculatedData = []
+            for row in @tableRows
+                calculation = @calculateCallback(row, @calculatedData)
+                # if !calculation.x or !calculation.y
+                #     throw new Error "the returning object has not x and y value"
+                ##| update new result set
+                @calculatedData = calculation
+
+            return true
+
         this
 
     ## ----------------------------------------------------------------------------------------------------------------
@@ -200,6 +229,7 @@ class Chart
     ## @return [LineChart] this the current instance
     ##
     setCalculated: (@calculatedData) ->
+
         this
 
     ## ----------------------------------------------------------------------------------------------------------------
@@ -210,9 +240,11 @@ class Chart
     ## @return [LineChart] this the current instance
     ##
     filter: (@filterCallback) ->
+
         filteredResults = [];
         for row in @tableRows
             if @filterCallback row
                 filteredResults.push row
+
         @tableRows = filteredResults
         this

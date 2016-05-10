@@ -11,9 +11,11 @@ class LineChart extends Chart
     ## function to render the chart using the calculated data
     ##
     ##
-    render: () ->
+    realRender: () ->
+
         if !@calculatedData.length
             throw new Error "calculated data not found! please perform calculation to provide chart data"
+
         ##| the type of chart is specified
         @withData @calculatedData, 'line'
         super()
