@@ -171,7 +171,7 @@ class DataMap
 
 			dm = DataMap.getDataMap()
 
-			if /^[0-9]+$/.test keyValue
+			if typeof keyValue == "string" and /^[0-9]+$/.test keyValue
 				keyValue = parseInt(keyValue)
 
 			path = "/" + tableName + "/" + keyValue + "/" + fieldName
@@ -381,7 +381,7 @@ class DataMap
 	## >>> RETURNS A PROMISE
 	@addData: (tableName, keyValue, newData) =>
 
-		new Promise (resolve, reject) =>
+		p = new Promise (resolve, reject) =>
 
 			path = "/#{tableName}/#{keyValue}"
 			DataMap.getDataMap().engine.set path, newData
@@ -390,6 +390,9 @@ class DataMap
 			.catch (e)=>
 				console.log "Error adding data:", e
 				resolve(null)
+
+		DataMap.addPendingPromise p
+		return p
 
 	## -------------------------------------------------------------------------------------------------------------
 	## delete row form the screen and dataMap using the keyvale
@@ -421,8 +424,21 @@ class DataMap
 	## >>> RETURNS A PROMISE
 	@getDataField: (tableName, keyValue, fieldName) =>
 
+		newPromise ()=>
+
+			yield DataMap.clearPendingPromises()
+			dm = DataMap.getDataMap()
+			return dm.engine.getFast tableName, keyValue, fieldName
+
+
+	## -------------------------------------------------------------------------------------------------------------
+	## Erase all the data in a table
+	##
+	## >>> RETURNS A PROMISE
+	@eraseCollection: (tableName) =>
+
 		dm  = DataMap.getDataMap()
-		return dm.engine.getFast tableName, keyValue, fieldName
+		return dm.engine.eraseCollection tableName
 
 	##| -------------------------------------------------------------------------------------------------------------
 	##|
@@ -461,6 +477,11 @@ class DataMap
 		if newFunction && newFunction.constructor && 'GeneratorFunction' == newFunction.constructor.name
 
 			# console.log "Adding pending ", newFunction
+			dm.internalPendingPromise.push newFunction
+
+		else if newFunction && 'function' == typeof newFunction.then
+
+			# console.log "Adding promise"
 			dm.internalPendingPromise.push newFunction
 
 		else

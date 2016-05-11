@@ -817,7 +817,6 @@ class DataFormatTimeAgo extends DataFormatterType
 	format: (data, options, path) =>
 		stamp = DataFormatter.getMoment data
 		if stamp == null
-			if val then return val
 			return "&mdash;"
 
 		age  = moment().diff(stamp) / 1000

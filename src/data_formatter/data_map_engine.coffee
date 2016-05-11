@@ -128,6 +128,16 @@ class DataMapMemoryCollection
 
         return strKey
 
+    ##|
+    ##|  Erase the data from the colleciton
+    eraseCollection: ()=>
+
+        new Promise (resolve, reject) =>
+
+            @data = {}
+            @count = 0
+            resolve(true)
+
 ##|
 ##|  A version of the data store that sits over the memory version and
 ##|  loads/saves records to a database using IndexDB
@@ -211,6 +221,17 @@ class DataMapEngine
     off: (eventName, callbackFunction) =>
         @emitter.off eventName, callbackFunction
 
+    ##|
+    ##|  Erase all the data in a given table
+    eraseCollection: (collectionName) =>
+
+        new Promise (resolve, reject) =>
+
+            c = @internalGetCollection collectionName
+            c.eraseCollection()
+            .then ()=>
+                resolve(true)
+
     delete: (pathText) =>
 
         new Promise (resolve, reject) =>
@@ -245,11 +266,11 @@ class DataMapEngine
 
             if !collectionName? then reject new Error "Missing collection name"
 
-            numValue = parseInt keyValue
-            if isNaN numValue then numValue = keyValue
+            if typeof keyValue == "string" and /^[0-9]+$/.test keyValue
+                keyValue = parseInt keyValue
 
             c = @internalGetCollection collectionName
-            c.findFast numValue, subPath
+            c.findFast keyValue, subPath
             .then (doc) =>
                 resolve(doc)
 
