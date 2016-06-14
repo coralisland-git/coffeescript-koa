@@ -90,6 +90,12 @@ class DataMap
 
 			existingValue = yield @engine.getFast tableName, keyValue, fieldName
 			formatter     = @types[tableName].col[fieldName].formatter
+
+			##|
+			##|  Fix the options in the global formatter object
+			if @types[tableName].col[fieldName].options?
+				formatter.options = @types[tableName].col[fieldName].options
+
 			formatter.editData el, existingValue, path, @updatePathValueEvent
 			return true
 
@@ -139,6 +145,12 @@ class DataMap
 		tableName = parts[1]
 		keyValue  = parts[2]
 		fieldName = parts[3]
+
+		if !@data[tableName]?
+			@data[tableName] = {}
+
+		if !@data[tableName][keyValue]?
+			@data[tableName][keyValue] = {}
 
 		existingValue = @data[tableName][keyValue][fieldName]
 		##| check if the existing type is boolean

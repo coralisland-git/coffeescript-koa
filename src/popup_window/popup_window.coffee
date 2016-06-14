@@ -203,10 +203,43 @@ class PopupWindow
 			freeScroll: @allowHorizontalScroll
 			scrollX: @allowHorizontalScroll
 
+	##|
+	##|
+	addToolbar: (buttonList)=>
+
+		@toolbarHeight = 42
+
+		gid = "pnav" + GlobalValueManager.NextGlobalID()
+		@navBar = $ "<div />",
+			id: gid
+			class : 'popupNavBar'
+
+		@navBar.css
+			position: "absolute"
+			top: @windowTitle.height()+6
+			left: 0
+			height: @toolbarHeight
+			width: "100%"
+
+		@popupWindowHolder.append @navBar
+
+		@toolbar = new DynamicNav("#" + gid)
+		for button in buttonList
+			@toolbar.addElement button
+		@toolbar.render()
+
+		@windowBodyWrapperTop.css "top", @windowTitle.height() + 2 + @toolbarHeight
+		@windowWrapper.height @popupHeight - @windowTitle.height() - 1 - @toolbarHeight
+
+		true
+
 	## -------------------------------------------------------------------------------------------------------------
 	## function to create popup window holder only if keyValue is not defined
 	##
 	createPopupHolder: () =>
+
+		@toolbarHeight = 0
+
 		id   = GlobalValueManager.NextGlobalID()
 		html = $ "<div />",
 			class: "PopupWindow"
@@ -230,7 +263,7 @@ class PopupWindow
 		@windowClose = $ "<div />",
 			class: "closebutton"
 			id: "windowclose"
-		.html "X"
+		.html "<i class='fa fa-close'></i>"
 		@windowTitle.append @windowClose
 		@windowClose.on "click", () =>
 			if @configurations and @configurations.keyValue then @close() else @destroy()
@@ -314,8 +347,9 @@ class PopupWindow
 			@popupWindowHolder.width @popupWidth
 			@windowWrapper.width @popupWidth
 			@popupWindowHolder.height @popupHeight
-			@windowWrapper.height @popupHeight - @windowTitle.height() - 1
+			@windowWrapper.height @popupHeight - @windowTitle.height() - 1 - @toolbarHeight
 			@windowScroll.trigger('resize')
+
 		stopMove = (e) =>
 			$(document).unbind "mousemove", doMove
 			$(document).unbind "mouseup", stopMove

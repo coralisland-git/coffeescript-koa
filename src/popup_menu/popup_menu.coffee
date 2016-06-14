@@ -219,9 +219,14 @@ class PopupMenu
 	##
 	## @param [Integer] colCount the number of columns
 	##
-	setMultiColumn: (@colCount) =>
-		@resize 600
+	setMultiColumn: (@colCount, colWidth) =>
+		if !colWidth? then colWidth = 300
+		@resize (@colCount*colWidth)
 		window.popupMenuHolder.addClass("multicol")
+		$(".multicol").css "columnCount", @colCount
+		$(window.popupMenuHolder).find(".title").css "columnSpan", "all"
+		console.log "FIND:", $(".title")
+
 
 	## -------------------------------------------------------------------------------------------------------------
 	## add new menu item to popup

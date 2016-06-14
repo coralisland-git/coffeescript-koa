@@ -491,7 +491,6 @@ class DataMapEngine
                 if !objTarget[i]
                     objTarget[i] = {}
 
-                console.log "Going deeper, i=", i, "o=", o
                 DataMapEngine.deepMergeObject objTarget[i], o, addAttributes, deleteAttributes, counter+1
 
             if flagFound and addAttributes?

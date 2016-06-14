@@ -75,6 +75,14 @@ class DataFormatterType
 			width	 = elParent.outerWidth(false)
 			height	 = elParent.outerHeight(false)
 
+			console.log "PARENT=", parentElement
+			console.log "POS=", pos
+			console.log "W=", width, height
+			console.log "offset=", elParent.offset()
+
+			left = elParent.offset().left
+			top  = elParent.offset().top
+
 		@editorShowing = true
 		@openEditor(elParent, left, top, width, height, currentValue, path)
 

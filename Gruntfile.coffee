@@ -126,7 +126,7 @@ module.exports = (grunt) ->
 		coffee:
 			options:
 				bare: true
-				sourceMap: true
+				sourceMap: false
 
 			compile:
 				files: getCoffeeFiles()

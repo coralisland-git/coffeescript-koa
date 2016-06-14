@@ -54,7 +54,7 @@ class DynamicNav
 	## -------------------------------------------------------------------------------------------------------------
 	## render function to display the navbar that is built programatically
 	##
-	render: ->
+	render: =>
 		@internalProcessElements()
 		@elementHolder.append @navBarHolder
 
@@ -65,6 +65,24 @@ class DynamicNav
 				for item,key in element.dropdownItems
 					@elementHolder.find "#dd#{element.gid}_#{key}"
 						.on "click", item.callback
+
+		for element in @navElements
+			if element.gid?
+				@elementHolder.find "##{element.gid}"
+					.on "click", (e)=>
+						@handleClick(e)
+
+	##|
+	##|  click on one of the buttons
+	handleClick : (e) =>
+		the_gid = $(e.target).attr("id")
+		for element in @navElements
+			if element.gid == the_gid
+				if element.onClick? and typeof element.onClick == "function" and element.onClick(e)
+					e.stopPropagation()
+					e.preventDefault()
+
+  		true
 
 	## -------------------------------------------------------------------------------------------------------------
 	## function to add element to the navbar

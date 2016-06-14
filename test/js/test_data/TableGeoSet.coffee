@@ -25,17 +25,12 @@ TableGeoset.push
     visible : true
 
 TableGeoset.push
-    name   : "County"
-    source : "county"
-    type   : "text"
-    width  : 100
-    visible  : true
-
-TableGeoset.push
-    name   : "Dataset Type"
-    source : "dataset_type"
-    type   : "text"
-    width  : 100
+    name     : "Dataset Type"
+    source   : "dataset_type"
+    type     : "enum"
+    width    : 100
+    editable : true
+    options  : [ "Parcel", "Flood Plane", "Rail", "Utilitiy", "Other" ]
     visible  : true
 
 TableGeoset.push

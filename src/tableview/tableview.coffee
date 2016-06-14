@@ -229,6 +229,7 @@ class TableView
 			e.stopPropagation()
 
 			data = @findRowFromElement e.target
+
 			if !data?
 				return false
 
@@ -462,6 +463,12 @@ class TableView
 		if width > 0
 			@elTableHolder.find(".inner-container").width(width)
 
+		if !@resizeHolderEvent?
+			@resizeHolderEvent = true
+			$(window).on "resize", ()=>
+				@setHolderToBottom()
+				true
+
 		true
 
 	## -------------------------------------------------------------------------------------------------------------
@@ -607,7 +614,7 @@ class TableView
 			html += "</thead>"
 			if @fixedHeader
 				html += """</table>
-	            		</div>
+						</div>
 						<div class="table-body">
 							<table id='table#{@gid}' class="tableview">"""
 
@@ -919,7 +926,9 @@ class TableView
 	## @param [Integer] width default is 32 so column having width less than 32 will be hidden if space is not enough
 	##
 	setAutoHideColumn: (width=32) =>
+
 		handleResize = =>
+
 			headerHideIndexes = [];
 			##| reset table to calculate based on updated width
 			@elTableHolder.find("tr").each () ->
