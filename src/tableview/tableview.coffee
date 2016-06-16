@@ -933,7 +933,6 @@ class TableView
 			##| reset table to calculate based on updated width
 			@elTableHolder.find("tr").each () ->
 				$(this).find("th,td").removeClass('hide')
-
 			@elTableHolder.find("thead tr:first th").each () ->
 				if $(this).outerWidth() < width
 					headerHideIndexes.push($(this).index())

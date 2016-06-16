@@ -6,10 +6,10 @@ html.no-focus
 
         link(rel='stylesheet', href='/ninja.css')
 
-        link#css-local(rel='stylesheet', href='/vendor/oneui.min.css')
+        link(rel='stylesheet', href='/vendor/bootstrap.min.css')
         link(rel='stylesheet', href='/css/test.css')
-
-        script(src='/vendor/oneui.min.js')
+        script(src='/vendor/jquery-3.0.0.min.js')
+        script(src='/vendor/bootstrap.min.js')
         script(src='/ninja/bower.js')
 
         script(src='/vendor/handlebars-v3.0.3.js')
@@ -18,7 +18,8 @@ html.no-focus
         script(src='/vendor/ace/ace.js')
         script(src='/vendor/ace/ext-language_tools.js')
         script(src='/vendor/lokijs.min.js')
-
+        script(src='/vendor/setImmediate.js')
+        script(src='/vendor/co.js')
         script(src='/ninja.js')
         script(src='/js/test_common.js')
 
@@ -31,114 +32,104 @@ html.no-focus
     //|  http://pixelcave.com/demo/oneui/
     //|
 
-    #page-container.sidebar-l.sidebar-o.side-scroll
+    .container-fluid
+        #wrapper
+            #sidebar-wrapper
 
-        nav#sidebar
+                nav#spy
 
-            #sidebar-scroll
+                    ul.sidebar-nav.nav
+                        li.sidebar-brand
+                            a(href='#')
+                                span.fa.fa-home.solo Test Cases
+                        li
+                            a#linkMakeOutline(href='/index.html?page=globalval_1')
+                                i.si.si-arrow-right
+                                span GlobalValueManager
 
-                .sidebar-content
+                        li
+                            a#linkMakeOutline(href='/index.html?page=dynamic_data_1')
+                                i.si.si-arrow-right
+                                span Dynamic Data
 
-                    .side-header.side-content.bg-white-op
+                        li
+                            a#linkMakeOutline(href='/index.html?page=dynamic_data_2')
+                                i.si.si-arrow-right
+                                span Dynamic Data 2
 
-                        button.btn.btn-link.text-gray.pull-right.hidden-md.hidden-lg(type='button', data-toggle='layout', data-action='sidebar_close')
-                            i.fa.fa-times
+                        li
+                            a#linkMakeOutline(href='/index.html?page=dynamic_data_3')
+                                i.si.si-arrow-right
+                                span Data Searching
 
-                        a.h5.text-white(href='/')
-                            span.h4.font-w600.sidebar-mini-hide Test Cases
+                        li
+                            a#linkMakeOutline(href='/index.html?page=database_1')
+                                i.si.si-arrow-right
+                                span Database 1
 
-                    .side-content
+                        li
+                            a#linkMakeOutline(href='/index.html?page=dialog_1')
+                                i.si.si-arrow-right
+                                span Dialog Boxes
 
-                        ul.nav-main
+                        li
+                            a#linkAddress(href='/index.html?page=address_normalizer_1')
+                                i.si.si-arrow-right
+                                span Address Data
 
-                            li
-                                a#linkMakeOutline(href='/index.html?page=globalval_1')
-                                    i.si.si-arrow-right
-                                    span GlobalValueManager
+                        li
+                            a#linkAddress(href='/index.html?page=popup_menu_1')
+                                i.si.si-arrow-right
+                                span Popup menus
 
-                            li
-                                a#linkMakeOutline(href='/index.html?page=dynamic_data_1')
-                                    i.si.si-arrow-right
-                                    span Dynamic Data
+                        li
+                            a#linkAddress(href='/index.html?page=popup_window_1')
+                                i.si.si-arrow-right
+                                span Popup window
 
-                            li
-                                a#linkMakeOutline(href='/index.html?page=dynamic_data_2')
-                                    i.si.si-arrow-right
-                                    span Dynamic Data 2
+                        li
+                            a#linkMakeOutline(href='/index.html?page=tabs_1')
+                                i.si.si-arrow-right
+                                span Tabs
+                        li
+                            a#linkMakeOutline(href='/index.html?page=navbar')
+                                i.si.si-arrow-right
+                                span Navbar
 
-                            li
-                                a#linkMakeOutline(href='/index.html?page=dynamic_data_3')
-                                    i.si.si-arrow-right
-                                    span Data Searching
+                        li
+                            a#linkMakeOutline(href='/index.html?page=tables_1')
+                                i.si.si-arrow-right
+                                span Tables
+                        li
+                            a#linkMakeOutline(href='/index.html?page=tables_detail')
+                                i.si.si-arrow-right
+                                span Table Vertical
+                        li
+                            a#linkMakeOutline(href='/index.html?page=tables_2')
+                                i.si.si-arrow-right
+                                span Tables Advanced
+                        li
+                            a#linkMakeOutline(href='/index.html?page=tables_3')
+                                i.si.si-arrow-right
+                                span Tables Automatic
+                        li
+                            a#linkMakeOutline(href='/index.html?page=table_editor')
+                                i.si.si-arrow-right
+                                span Table Editor
+                        li
+                            a#linkMakeOutline(href='/index.html?page=code_editor')
+                                i.si.si-arrow-right
+                                span Code Editor
+                        li
+                            a#linkMakeOutline(href='/index.html?page=canvas_js')
+                                i.si.si-arrow-right
+                                span Canvas Js
 
-                            li
-                                a#linkMakeOutline(href='/index.html?page=database_1')
-                                    i.si.si-arrow-right
-                                    span Database 1
+                        li
+                            a#linkMakeOutline(href='/index.html?page=gridboard_1')
+                                i.si.si-arrow-right
+                                span GridBoard 1
 
-                            li
-                                a#linkMakeOutline(href='/index.html?page=dialog_1')
-                                    i.si.si-arrow-right
-                                    span Dialog Boxes
-
-                            li
-                                a#linkAddress(href='/index.html?page=address_normalizer_1')
-                                    i.si.si-arrow-right
-                                    span Address Data
-
-                            li
-                                a#linkAddress(href='/index.html?page=popup_menu_1')
-                                    i.si.si-arrow-right
-                                    span Popup menus
-
-                            li
-                                a#linkAddress(href='/index.html?page=popup_window_1')
-                                    i.si.si-arrow-right
-                                    span Popup window
-
-                            li
-                                a#linkMakeOutline(href='/index.html?page=tabs_1')
-                                    i.si.si-arrow-right
-                                    span Tabs
-                            li
-                                a#linkMakeOutline(href='/index.html?page=navbar')
-                                    i.si.si-arrow-right
-                                    span Navbar
-
-                            li
-                                a#linkMakeOutline(href='/index.html?page=tables_1')
-                                    i.si.si-arrow-right
-                                    span Tables
-                            li
-                                a#linkMakeOutline(href='/index.html?page=tables_detail')
-                                    i.si.si-arrow-right
-                                    span Table Vertical
-                            li
-                                a#linkMakeOutline(href='/index.html?page=tables_2')
-                                    i.si.si-arrow-right
-                                    span Tables Advanced
-                            li
-                                a#linkMakeOutline(href='/index.html?page=tables_3')
-                                    i.si.si-arrow-right
-                                    span Tables Automatic
-                            li
-                                a#linkMakeOutline(href='/index.html?page=table_editor')
-                                    i.si.si-arrow-right
-                                    span Table Editor
-                            li
-                                a#linkMakeOutline(href='/index.html?page=code_editor')
-                                    i.si.si-arrow-right
-                                    span Code Editor
-                            li
-                                a#linkMakeOutline(href='/index.html?page=canvas_js')
-                                    i.si.si-arrow-right
-                                    span Canvas Js
-
-                            li
-                                a#linkMakeOutline(href='/index.html?page=gridboard_1')
-                                    i.si.si-arrow-right
-                                    span GridBoard 1
-
-        main#main-container.main
-
-            #testCase
+            #page-content-wrapper
+                .page-content
+                    #testCase
