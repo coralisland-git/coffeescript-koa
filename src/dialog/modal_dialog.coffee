@@ -271,20 +271,14 @@ class ModalDialog
 			<div class="modal" id="modal{{gid}}" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
 				<div class="modal-dialog">
 					<div class="modal-content">
-						<div class="block block-themed block-transparent remove-margin-b">
-							<div class="block-header bg-primary-dark">
-								<ul class="block-options">
-									<li>
-										<button data-dismiss="modal" type="button"><i class="si si-close"></i></button>
-									</li>
-								</ul>
-								<h3 class="block-title">{{title}}</h3>
-							</div>
-							<div class="block-content">
-								<p>
-								{{{content}}}
-								</p>
-							</div>
+						<div class="modal-header bg-primary">
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        					<h4 class="modal-title">{{title}}</h4>
+						</div>
+						<div class="modal-body">
+							<p>
+							{{{content}}}
+							</p>
 						</div>
 
 						{{#if showFooter}}

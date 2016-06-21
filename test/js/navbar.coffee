@@ -23,7 +23,7 @@ $ ->
         navForm.addElement new NavInput('password', null,
             placeholder: 'Password'
             type: 'password')
-        navForm.addElement new NavButton("Login")
+        navForm.addElement new NavButton("Login", "navbar-btn btn-success btn")
 
         ## add populated form to navbar
         navBar.addElement(navForm)

@@ -259,11 +259,10 @@ class DataFormatSourceCode extends DataFormatText
 		buttonNav.render()
 		popup.resize(600,425)
 		popup.center()
-
-		$("#save_btn_#{elParent.index()}").on "click", () =>
+		$("##{saveButton.gid}").on "click", () =>
 			@saveValue codeEditor.getContent()
 			popup.destroy()
-		$("#cancel_btn_#{elParent.index()}").on "click", () =>
+		$("##{cancelButton.gid}").on "click", () =>
 			popup.destroy()
 		true
 

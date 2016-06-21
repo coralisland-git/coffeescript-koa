@@ -263,7 +263,7 @@ class PopupWindow
 		@windowClose = $ "<div />",
 			class: "closebutton"
 			id: "windowclose"
-		.html "<i class='fa fa-close'></i>"
+		.html "<i class='glyphicon glyphicon-remove'></i>"
 		@windowTitle.append @windowClose
 		@windowClose.on "click", () =>
 			if @configurations and @configurations.keyValue then @close() else @destroy()

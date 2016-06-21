@@ -193,9 +193,9 @@ class PopupMenuCalendar
 
 		calTemplate = '''
 			<table class='PopupCalendar'>
-				<tr><td class='prev' id='calPrevious'> <i class='fa fa-angle-left'></i> </td>
+				<tr><td class='prev' id='calPrevious'> <i class='glyphicon glyphicon-chevron-left'></i> </td>
 					<td colspan='5' id='calTitle'> Something </td>
-					<td class='next' id='calNext'><i class='fa fa-angle-right'></i> </td>
+					<td class='next' id='calNext'><i class='glyphicon glyphicon-chevron-right'></i> </td>
 				</tr>
 
 				<tr>

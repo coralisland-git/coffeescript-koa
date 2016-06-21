@@ -49,7 +49,7 @@ class Tab
 			"data-toggle": "tab"
 			href: "##{@tabId}"
 			html: "#{if direction == 'front' then badgeHtml + @tabName else @tabName + badgeHtml}"
-		@listElement.find("[href=##{@tabId}]").replaceWith(@tabLink)
+		@listElement.find("[href='##{@tabId}']").replaceWith(@tabLink)
 		@tabLink.click ()->
 			$(this).tab('show')
 

@@ -40,7 +40,7 @@ class TableViewDetailed extends TableView
 
 		newPromise ()=>
 
-			yield @clearPendingPromises()
+			yield DataMap.clearPendingPromises()
 
 			if !@dataKey?
 				throw new Error "data with key #{@dataKey} not found"

@@ -35,7 +35,7 @@ class PopupTable extends PopupWindow
             _tableId = @mainTableObject.elTableHolder.selector.substr 1
         ##| assign the prefix popup so elements get seperated from direct body elements
         _tableId += "popup_#{_tableId}"
-        
+
         @windowScroll.html "<div id='#{_tableId}'></div>"
         ##| assign tableHolder again to detect inside popup and render
         @mainTableObject.elTableHolder = $ "##{_tableId}"

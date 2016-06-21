@@ -146,8 +146,8 @@ $ ->
 				true
 
 		table.rowCallback = (data,e) ->
-			if data.key
-				new PopupForm('zipcode','code',data.key)
+			if data.id
+				new PopupForm('zipcode','code',data.id)
 		true
 
 	addTestButton "editable popup on click with custom columns", "Open", ()->
@@ -172,13 +172,15 @@ $ ->
 		true
 
 	addTestButton "popup table", "Open", ()->
-		zipCodeTable = new TableView $("#_popupTable")
+		addHolder('renderTest1')
+		zipCodeTable = new TableView $("#renderTest1")
 		zipCodeTable.addTable "zipcode"
 		popup = new PopupTable zipCodeTable, 'zipCodeDemoTable'
+		$('#renderTest1').remove()
 		true
 
 	addTestButton "table with fixed header and scrollable", "Open", ()->
-		addHolder("renderTest1");
+		addHolder("renderTest1")
 		$('#renderTest1').height(350); ##| to add scroll the height is fix
 		table = new TableView $("#renderTest1")
 		table.addTable "zipcode"
