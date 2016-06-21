@@ -119,7 +119,7 @@ $ ->
 	##|
 	##|  Add a table to hold the results
 	window.elTestCase = $("#testCase")
-	window.elTestCase.html "<table id='testTable' class='testTable'></table>"
+	window.elTestCase.html "<div class='table-responsive'><table id='testTable' class='testTable table'></table></div>"
 
 	##|  save a reference to the results table
 	window.elTestTable = $("#testTable")

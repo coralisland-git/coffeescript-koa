@@ -476,7 +476,9 @@ class TableView
 	##
 	## @param [Boolean] fixedHeader if header is fixed or not
 	##
-	fixedHeaderAndScrollable: (@fixedHeader = true) ->
+	fixedHeaderAndScrollable: (@fixedHeader = true) =>
+		$(window).on 'resize', () =>
+			@elTableHolder.find('.table-header .tableview').width(@elTableHolder.find('.table-body .tableview').width())
 
 	## -------------------------------------------------------------------------------------------------------------
 	## function to make column filter as popup instead of plain text
@@ -931,8 +933,7 @@ class TableView
 
 			headerHideIndexes = [];
 			##| reset table to calculate based on updated width
-			@elTableHolder.find("tr").each () ->
-				$(this).find("th,td").removeClass('hide')
+			@elTableHolder.find("col,tr th,td").removeClass('hide')
 			@elTableHolder.find("thead tr:first th").each () ->
 				if $(this).outerWidth() < width
 					headerHideIndexes.push($(this).index())
@@ -941,8 +942,13 @@ class TableView
 			while headerHideIndexes.length
 				index = headerHideIndexes.pop();
 				if @elTableHolder.find("tr th:eq(#{index})").outerWidth() < width
-					@elTableHolder.find("tr").each () ->
-						$(this).find("th:eq(#{index}),td:eq(#{index})").addClass('hide')
+					@elTableHolder.find("tr th:eq(#{index}),td:eq(#{index})").addClass('hide')
+					@elTableHolder.find("col:eq(#{index})").addClass('hide')
+
+			##| set the appropriate <col> width to sync the width with header
+			if @fixedHeader
+				@elTableHolder.find('.table-header tr:first th').each (i,th) =>
+					$(th).outerWidth(@elTableHolder.find(".table-body table col:eq(#{i})").outerWidth())
 		handleResize()
 		@elTableHolder.parent().on 'resize', handleResize
 		$(window).on 'resize', handleResize

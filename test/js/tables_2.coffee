@@ -182,7 +182,6 @@ $ ->
 		$('#renderTest1').height(350); ##| to add scroll the height is fix
 		table = new TableView $("#renderTest1")
 		table.addTable "zipcode"
-		table.setAutoHideColumn()
 		table.fixedHeaderAndScrollable()
 		table.render()
 		true
