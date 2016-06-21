@@ -47,12 +47,12 @@ $ ->
         newPromise ()->
 
             html  = "<br>6 fields, last 2 are editable:<br><div>";
-            html += yield DataMap.renderField "div", "zipcode", "code", "03105"
-            html += yield DataMap.renderField "div", "zipcode", "city", "03105"
-            html += yield DataMap.renderField "div", "zipcode", "state", "03105"
-            html += yield DataMap.renderField "div", "zipcode", "county", "03105"
-            html += yield DataMap.renderField "div", "zipcode", "lat", "03105"
-            html += yield DataMap.renderField "div", "zipcode", "lon", "03105"
+            html += DataMap.renderField "div", "zipcode", "code", "03105"
+            html += DataMap.renderField "div", "zipcode", "city", "03105"
+            html += DataMap.renderField "div", "zipcode", "state", "03105"
+            html += DataMap.renderField "div", "zipcode", "county", "03105"
+            html += DataMap.renderField "div", "zipcode", "lat", "03105"
+            html += DataMap.renderField "div", "zipcode", "lon", "03105"
             html += "</div>";
             console.log "HTML=", html
             $("#testCase").append($ html)
@@ -68,9 +68,9 @@ $ ->
                 pool: "Yes"
 
             html  = "<br>Three property table fields, id, address, pool <br><table><tr>";
-            html += yield DataMap.renderField "td", "property", "id", 1234
-            html += yield DataMap.renderField "td", "property", "address", 1234
-            html += yield DataMap.renderField "td", "property", "pool", 1234
+            html += DataMap.renderField "td", "property", "id", 1234
+            html += DataMap.renderField "td", "property", "address", 1234
+            html += DataMap.renderField "td", "property", "pool", 1234
             html += "</tr></table>";
 
             $("#testCase").append($ html)

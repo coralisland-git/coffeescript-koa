@@ -36,17 +36,17 @@ root.DataFormatter = class DataFormatter
 		if data? and data._isAMomentObject? and data._isAMomentObject
 			return data
 
-		if typeof date != "string"
+		if typeof data == "object" and data.getTime?
 			return moment(data)
 
-		if date.match /\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d/
-			return moment(date, "YYYY-MM-DD HH:mm:ss")
+		if data.match /\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d/
+			return moment(data, "YYYY-MM-DD HH:mm:ss")
 
-		if date.match /\d\d\d\d.\d\d.\d\d/
-			return moment(date, "YYYY-MM-DD")
+		if data.match /\d\d\d\d.\d\d.\d\d/
+			return moment(data, "YYYY-MM-DD")
 
-		if date.match /\d\d-\d\d-\d\d\d\d/
-			return moment(date, "MM-DD-YYYY")
+		if data.match /\d\d-\d\d-\d\d\d\d/
+			return moment(data, "MM-DD-YYYY")
 
 		return null;
 

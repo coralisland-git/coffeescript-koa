@@ -136,7 +136,7 @@ module.exports = (grunt) ->
 				files: ['Gruntfile.coffee']
 
 			all:
-				files: ['src/css/*.styl', "test/css/*.styl", "module/**/*.styl"]
+				files: getStylusFiles()
 				tasks: ['stylus:compile']
 
 			coffeeFile:

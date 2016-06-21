@@ -102,10 +102,7 @@ class Chart
     ##
     render: ->
 
-        newPromise ()=>
-
-            yield DataMap.clearPendingPromises()
-            @realRender()
+        @realRender()
 
     ## ----------------------------------------------------------------------------------------------------------------
     ## render function to create chart instance
@@ -188,7 +185,7 @@ class Chart
             if !dm.types[@tableName]
                 throw new Error "table with name #{@tableName} is not found"
 
-            @tableRows = yield DataMap.getValuesFromTable @tableName
+            @tableRows = DataMap.getValuesFromTable @tableName
             console.log "ROWS=", @tableRows
             return @tableRows
 
@@ -204,21 +201,17 @@ class Chart
     ##
     calculate: (@calculateCallback) ->
 
-        DataMap.addPendingPromise ()=>
+        console.log "Clearing pending first..."
+        DataMap.clearPendingPromises()
 
-            console.log "Clearing pending first..."
-            yield DataMap.clearPendingPromises()
-
-            console.log "HERE Calculate:", @tableRows
-            @calculatedData = []
-            for row in @tableRows
-                calculation = @calculateCallback(row, @calculatedData)
-                # if !calculation.x or !calculation.y
-                #     throw new Error "the returning object has not x and y value"
-                ##| update new result set
-                @calculatedData = calculation
-
-            return true
+        console.log "HERE Calculate:", @tableRows
+        @calculatedData = []
+        for row in @tableRows
+            calculation = @calculateCallback(row, @calculatedData)
+            # if !calculation.x or !calculation.y
+            #     throw new Error "the returning object has not x and y value"
+            ##| update new result set
+            @calculatedData = calculation
 
         this
 

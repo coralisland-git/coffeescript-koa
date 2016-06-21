@@ -51,7 +51,7 @@
 	cursor:           arrow
 	box-sizing:       content-box
 	opacity: 		  1.0
-	background-color: rgba(30, 30, 30, 1.0)
+	background-color: #E3DFDA
 
 	touch-callout:       none
 	tap-highlight-color: rgb(0,0,0)
@@ -62,17 +62,22 @@
 	box-shadow:          6px 6px 18px 4px rgba(0,0,0,0.75);
 	border:              1px solid rgba(40,40,40,0.75)
 
+	.outer-container
+
+		padding-top: 0px
+
 	.title
 
-		width:            100%
-		background-color: #D2EACE
-		color:            #303030
-		line-height:      26px
-		font-size:        16px
-		padding-left:     6px
-		padding-right:    6px
-		padding-top:      4px
-		padding-bottom:   4px
+		width            : 100%
+		background-color : #535250
+		color            : #E5E1DC
+		line-height      : 26px
+		font-size        : 16px
+		padding-left     : 6px
+		padding-right    : 6px
+		padding-top      : 4px
+		padding-bottom   : 4px
+		cursor           : move
 
 		.closebutton
 			float: right
@@ -89,6 +94,7 @@
 		padding-bottom: 4px
 
 		.tableview
+
 			tbody tr:hover td
 				background-color: rgba(237, 192, 80, 1.0)
 				cursor: pointer
@@ -100,21 +106,22 @@
 				background: #f8f8f8;
 
 			td
-				border-top: 1px dotted rgba(62, 62, 62, 1.0)
-				border-bottom: 1px dotted rgba(62, 62, 62, 1.0)
-				background-color: rgba(55, 56, 54, 1.0)
-				color: rgba(230, 230, 230, 1.0)
+				border-top: 1px dotted rgba(200, 200, 200, 0.3)
+				border-bottom: 1px dotted rgba(200, 200, 200, 0.3)
+				color: #101010
 				overflow: hidden;
+				font-size: 11px
 
 			td.checkable
 				width: 24px
 				padding: 8px
 
 			th
-				background-color: rgba(70,70,70,1.0)
+				background-color: #FDFAF3
 				vertical-align: baseline
 				padding-top: 6px
-				color: #eeeeee
+				color: #3E270D
+				font-size: 12px
 
 .scrollable
 	position:         absolute
@@ -130,12 +137,12 @@
 	color:            #000000
 
 	.resizeHandle
-		background: #f8f8f8 url(http://merchantmomphotoeditor.com/pixenate/docs/resize_handle2.gif) 100% 100% no-repeat
+		background: url(resize-handle.png) 100% 100% no-repeat
 		position: absolute
 		right:0
 		bottom:0
-		height:24px
-		width:24px
+		height:16px
+		width:16px
 		cursor: se-resize
 		z-index: 9999999999
 

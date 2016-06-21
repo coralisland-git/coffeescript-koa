@@ -24,19 +24,17 @@ class DataMapMemoryCollection
     ##|
     findAll: (filterFunction) =>
 
-        new Promise (resolve, reject) =>
+        allResults = []
+        for key, obj of @data
+            if filterFunction?
+                result = filterFunction(obj)
+            else
+                result = true
 
-            allResults = []
-            for key, obj of @data
-                if filterFunction?
-                    result = filterFunction(obj)
-                else
-                    result = true
+            if result
+                allResults.push $.extend(true, {}, obj)
 
-                if result
-                    allResults.push $.extend(true, {}, obj)
-
-            resolve(allResults)
+        return allResults
 
     ##|
     ##|  Search for a condition
@@ -45,43 +43,39 @@ class DataMapMemoryCollection
 
     find: (condition) =>
 
-        new Promise (resolve, reject) =>
+        if !@index? and condition? and condition.id? and Object.keys(condition).length == 1
 
-            if !@index? and condition? and condition.id? and Object.keys(condition).length == 1
+            ##|
+            ##| Fast search by id
+            if !@data[condition.id]?
+                return null
 
-                ##|
-                ##| Fast search by id
-                if !@data[condition.id]?
-                    resolve null
-                    return
+            # doc = $.extend(true, {}, @data[condition.id])
+            return @data[condition.id]
 
-                doc = $.extend(true, {}, @data[condition.id])
-                resolve doc
+        else
 
-            else
+            ##|
+            ##| Complex search
+            allResult = []
+            for key, obj of @data
+                found = false
+                for i, o of condition
+                    if obj[i] != o then found = false
+                if found
+                    # allResult.push $.extend(true, {}, o)
+                    allResult.push o
 
-                ##|
-                ##| Complex search
-                allResult = []
-                for key, obj of @data
-                    found = false
-                    for i, o of condition
-                        if obj[i] != o then found = false
-                    if found
-                        allResult.push $.extend(true, {}, o)
-
-                resolve allResult
+            return allResult
 
     ##|
     ##|  Find a single record for read-online
     findFast: (idValue, subKey) =>
 
-        new Promise (resolve, reject) =>
-
-            if idValue? and @data[idValue]?
-                resolve @data[idValue][subKey]
-            else
-                resolve null
+        if idValue? and @data[idValue]?
+            return @data[idValue][subKey]
+        else
+            return null
 
     ##|
     ##|  Fully update the document in memory
@@ -89,29 +83,25 @@ class DataMapMemoryCollection
 
     upsert: (doc) =>
 
-        new Promise (resolve, reject) =>
-
-            strKey = @getDocumentKey(doc)
-            @data[strKey] = $.extend(true, {}, doc);
-            @count = Object.keys(@data).length
-            resolve @data[strKey]
+        strKey = @getDocumentKey(doc)
+        @data[strKey] = $.extend(true, {}, doc);
+        @count = Object.keys(@data).length
+        return @data[strKey]
 
     ##|
     ##|  Remove a key
     remove: (condition) =>
 
-        new Promise (resolve, reject) =>
+        allResults = @find condition
+        if !allResults? then remove
+        if allResults? and allResults[0]?
+            for i, obj of allResults
+                strKey = @getDocumentKey[obj]
+                delete @data[strKey]
+        else
+            delete @data[@getDocumentKey allResults]
 
-            allResults = @find condition
-            if !allResults? then remove
-            if allResults? and allResults[0]?
-                for i, obj of allResults
-                    strKey = @getDocumentKey[obj]
-                    delete @data[strKey]
-            else
-                delete @data[@getDocumentKey allResults]
-
-            resolve(true)
+        return true
 
     ##|
     ##|  Internal function to convert a document to it's key
@@ -132,78 +122,9 @@ class DataMapMemoryCollection
     ##|  Erase the data from the colleciton
     eraseCollection: ()=>
 
-        new Promise (resolve, reject) =>
-
-            @data = {}
-            @count = 0
-            resolve(true)
-
-##|
-##|  A version of the data store that sits over the memory version and
-##|  loads/saves records to a database using IndexDB
-##|
-class DataMapDatabaseCollection
-
-    ##|
-    ##|  In memory storage for a simple table
-    ##|
-
-    constructor: (@dataSetName, @name, @index) ->
-
-        ##|
-        ##|  Generic initializer
-        indexedDB      = window.indexedDB || window.webkitIndexedDB || window.msIndexedDB;
-        IDBKeyRange    = window.IDBKeyRange || window.webkitIDBKeyRange;
-        openCopy       = indexedDB && indexedDB.open;
-        IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction;
-
-        if IDBTransaction
-            IDBTransaction.READ_WRITE = IDBTransaction.READ_WRITE || 'readwrite';
-            IDBTransaction.READ_ONLY = IDBTransaction.READ_ONLY || 'readonly';
-
-        ##|
-        ##|  Create our own access point
-        request = indexedDB.open @dataSetName
-        request.onupgradeneeded = @indexdbOnUpgradeNeeded
-
-        request.onsuccess = @indexdbOnSuccess
-        request.onerror   = @indexdbOnError
-
-        ##|
-        ##|  Memory cache
-        @memdb = new DataMapMemoryCollection(@name, @index)
-
-    indexdbOnSuccess: (e) =>
-        console.log "INDEX onSuccess:", e
+        @data  = {}
+        @count = 0
         return true
-
-    indexdbOnError: (e) =>
-        console.log "INDEX onError:", e
-        return true
-
-
-    ##|
-    ##|  Internal event from Indexed DB - Upgrade needed
-    indexdbOnUpgradeNeeded: (e) =>
-
-        idb = e.target.result
-        if !idb.objectStore.contains @name
-            @store = idb.createObjectStore @name,
-                keyPath: 'id'
-                autoIncrement: true
-
-            @store.createIndex 'i_id', @name,
-                unique: true
-                multiEntry: false
-
-    ##| -------------------------------------------------------------------------------------------------------------
-    ##|
-    ##|  Search for a condition
-    ##|  current support is an array of possible values
-    ##|  Example: { id: 10 }
-    ##|
-    find: (condition) =>
-        return false
 
 class DataMapEngine
 
@@ -225,33 +146,21 @@ class DataMapEngine
     ##|  Erase all the data in a given table
     eraseCollection: (collectionName) =>
 
-        new Promise (resolve, reject) =>
-
-            c = @internalGetCollection collectionName
-            c.eraseCollection()
-            .then ()=>
-                resolve(true)
+        c = @internalGetCollection collectionName
+        return c.eraseCollection()
 
     delete: (pathText) =>
 
-        new Promise (resolve, reject) =>
-
-            path = @parsePath pathText
-            c    = @internalGetCollection path.collection
-            c.remove path.condition
-            .then ()=>
-                resolve(true)
+        path = @parsePath pathText
+        c    = @internalGetCollection path.collection
+        return c.remove path.condition
 
     ##|
     ##|  Find all the records in a given collection
     find: (collectionName, filterFunction) =>
 
-        new Promise (resolve, reject) =>
-
-            c = @internalGetCollection collectionName
-            c.findAll filterFunction
-            .then (results) =>
-                resolve(results)
+        c = @internalGetCollection collectionName
+        return c.findAll filterFunction
 
     ##|
     ##|  Return the end value from a stored value
@@ -262,17 +171,14 @@ class DataMapEngine
         ##|
         ##|  Path should already be parsed into an object.
 
-        new Promise (resolve, reject) =>
+        if !collectionName?
+            throw new Error "Missing collection name"
 
-            if !collectionName? then reject new Error "Missing collection name"
+        if typeof keyValue == "string" and /^[0-9]+$/.test keyValue
+            keyValue = parseInt keyValue
 
-            if typeof keyValue == "string" and /^[0-9]+$/.test keyValue
-                keyValue = parseInt keyValue
-
-            c = @internalGetCollection collectionName
-            c.findFast keyValue, subPath
-            .then (doc) =>
-                resolve(doc)
+        c = @internalGetCollection collectionName
+        return c.findFast keyValue, subPath
 
     ##| -------------------------------------------------------------------------------------------------------------
     ##|
@@ -282,32 +188,26 @@ class DataMapEngine
     ##|
     get: (pathText, insertIfNeeded) =>
 
-        new Promise (resolve, reject) =>
+        path = @parsePath pathText
+        c    = @internalGetCollection path.collection
+        doc  = c.find path.condition
 
-            path = @parsePath pathText
-            c    = @internalGetCollection path.collection
-            c.find path.condition
-            .then (doc) =>
+        if insertIfNeeded? and !doc?
+            doc = $.extend true, {}, path.condition
 
-                if insertIfNeeded? and !doc?
-                    doc = $.extend true, {}, path.condition
+            insertedDoc = c.upsert doc
 
-                    c.upsert doc
-                    .then (insertedDoc) =>
-                        ##|
-                        ##|  not needed
+        if path.subPath? and path.subPath.length > 0 and doc?
 
-                if path.subPath? and path.subPath.length > 0 and doc?
+            basePointer = doc
+            for name in path.subPath
+                if !basePointer[name]?
+                    basePointer[name] = {}
+                basePointer = basePointer[name]
 
-                    basePointer = doc
-                    for name in path.subPath
-                        if !basePointer[name]?
-                            basePointer[name] = {}
-                        basePointer = basePointer[name]
+            return basePointer
 
-                    resolve(basePointer)
-
-                resolve(doc)
+        return doc
 
     ##| -------------------------------------------------------------------------------------------------------------
     ##|  Identifies changes in the src object compared to the target
@@ -350,48 +250,44 @@ class DataMapEngine
     ##|  Save data to the engine
     set: (pathText, newData) =>
 
-        new Promise (resolve, reject) =>
+        path = @parsePath(pathText)
 
-            path = @parsePath(pathText)
+        ##|
+        ##|  Get the full document, no subpath
+        doc = @get
+            condition: path.condition
+            collection: path.collection
+        , true
 
-            ##|
-            ##|  Get the full document, no subpath
-            @get
-                condition: path.condition
-                collection: path.collection
-            , true
-            .then (doc) =>
+        ##|
+        ##|  Unmodified version for change tracking
+        origDoc = $.extend true, {}, doc
 
-                ##|
-                ##|  Unmodified version for change tracking
-                origDoc = $.extend true, {}, doc
+        basePointer = doc
+        if path.subPath? and path.subPath.length > 0 and doc?
 
-                basePointer = doc
-                if path.subPath? and path.subPath.length > 0 and doc?
+            for name in path.subPath
+                # console.log "name=", name, " base=", basePointer
+                if !basePointer[name]?
+                    basePointer[name] = {}
+                basePointer = basePointer[name]
 
-                    for name in path.subPath
-                        # console.log "name=", name, " base=", basePointer
-                        if !basePointer[name]?
-                            basePointer[name] = {}
-                        basePointer = basePointer[name]
+        DataMapEngine.deepMergeObject basePointer, newData
 
-                DataMapEngine.deepMergeObject basePointer, newData
+        ##|
+        ##|  Insert saved document
+        c = @internalGetCollection path.collection
+        insertedDoc = c.upsert(doc)
 
-                ##|
-                ##|  Insert saved document
-                c = @internalGetCollection path.collection
-                c.upsert(doc)
-                .then (insertedDoc)=>
+        ##|
+        ##|  Events when data changed
+        diffs = @deepDiff origDoc, doc, "/#{path.collection}/#{path.condition.id}"
+        for d in diffs
+            @emitter.emitEvent 'change', [ d ]
 
-                    ##|
-                    ##|  Events when data changed
-                    diffs = @deepDiff origDoc, doc, "/#{path.collection}/#{path.condition.id}"
-                    for d in diffs
-                        @emitter.emitEvent 'change', [ d ]
-
-                    ##|
-                    ##|
-                    resolve(insertedDoc)
+        ##|
+        ##|
+        return insertedDoc
 
 
     ##| -------------------------------------------------------------------------------------------------------------

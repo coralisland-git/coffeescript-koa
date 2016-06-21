@@ -81,23 +81,21 @@ class DataMap
 	##
 	editValue: (path, el) =>
 
-		newPromise ()=>
+		parts     = path.split '/'
+		tableName = parts[1]
+		keyValue  = parts[2]
+		fieldName = parts[3]
 
-			parts     = path.split '/'
-			tableName = parts[1]
-			keyValue  = parts[2]
-			fieldName = parts[3]
+		existingValue = @engine.getFast tableName, keyValue, fieldName
+		formatter     = @types[tableName].col[fieldName].formatter
 
-			existingValue = yield @engine.getFast tableName, keyValue, fieldName
-			formatter     = @types[tableName].col[fieldName].formatter
+		##|
+		##|  Fix the options in the global formatter object
+		if @types[tableName].col[fieldName].options?
+			formatter.options = @types[tableName].col[fieldName].options
 
-			##|
-			##|  Fix the options in the global formatter object
-			if @types[tableName].col[fieldName].options?
-				formatter.options = @types[tableName].col[fieldName].options
-
-			formatter.editData el, existingValue, path, @updatePathValueEvent
-			return true
+		formatter.editData el, existingValue, path, @updatePathValueEvent
+		return true
 
 	## -------------------------------------------------------------------------------------------------------------
 	## update the occurence of the path value with the updated value on currently rendered screen
@@ -179,52 +177,49 @@ class DataMap
 	## >>> RETURNS A PROMISE
 	@renderField: (tagNam, tableName, fieldName, keyValue, extraClassName) =>
 
-		new Promise (resolve, reject) =>
+		dm = DataMap.getDataMap()
 
-			dm = DataMap.getDataMap()
+		if typeof keyValue == "string" and /^[0-9]+$/.test keyValue
+			keyValue = parseInt(keyValue)
 
-			if typeof keyValue == "string" and /^[0-9]+$/.test keyValue
-				keyValue = parseInt(keyValue)
+		path = "/" + tableName + "/" + keyValue + "/" + fieldName
+		className = "data"
 
-			path = "/" + tableName + "/" + keyValue + "/" + fieldName
-			className = "data"
+		currentValue = DataMap.getDataField tableName, keyValue, fieldName
 
-			DataMap.getDataField tableName, keyValue, fieldName
-			.then (currentValue) =>
+		##|
+		##|  Other modification to the HTML such as edit events
+		otherhtml = ""
 
-				##|
-				##|  Other modification to the HTML such as edit events
-				otherhtml = ""
+		##|
+		##|  See if there is a formatter attached
+		if dm.types[tableName]? and dm.types[tableName].col[fieldName]?
 
-				##|
-				##|  See if there is a formatter attached
-				if dm.types[tableName]? and dm.types[tableName].col[fieldName]?
+			formatter = dm.types[tableName].col[fieldName].formatter
 
-					formatter = dm.types[tableName].col[fieldName].formatter
+			if formatter? and formatter
+				currentValue = formatter.format currentValue, dm.types[tableName].col[fieldName].options, path
+				className += " dt_" + formatter.name
 
-					if formatter? and formatter
-						currentValue = formatter.format currentValue, dm.types[tableName].col[fieldName].options, path
-						className += " dt_" + formatter.name
+			if dm.types[tableName].col[fieldName].render? and typeof dm.types[tableName].col[fieldName].render == "function"
+				currentValue = dm.types[tableName].col[fieldName].render(currentValue, path)
 
-					if dm.types[tableName].col[fieldName].render? and typeof dm.types[tableName].col[fieldName].render == "function"
-						currentValue = dm.types[tableName].col[fieldName].render(currentValue, path)
+			if dm.types[tableName].col[fieldName].editable
+				otherhtml += " onClick='globalOpenEditor(this);' "
+				className += " editable"
 
-					if dm.types[tableName].col[fieldName].editable
-						otherhtml += " onClick='globalOpenEditor(this);' "
-						className += " editable"
+		if extraClassName? and extraClassName.length > 0
+			className += " #{extraClassName}"
 
-				if extraClassName? and extraClassName.length > 0
-					className += " #{extraClassName}"
+		if !currentValue? or currentValue == null
+			currentValue = ""
 
-				if !currentValue? or currentValue == null
-					currentValue = ""
+		# console.log "path=", path, dm.types[tableName].col[fieldName]
 
-				# console.log "path=", path, dm.types[tableName].col[fieldName]
+		html = "<#{tagNam} data-path='#{path}' class='#{className}' #{otherhtml}>" +
+			currentValue + "</#{tagNam}>"
 
-				html = "<#{tagNam} data-path='#{path}' class='#{className}' #{otherhtml}>" +
-					currentValue + "</#{tagNam}>"
-
-				resolve(html)
+		return html
 
 	## ===[ Events ]===
 
@@ -256,15 +251,10 @@ class DataMap
 	@setDataTypes: (tableName, columns) =>
 
 		dm = DataMap.getDataMap()
-		#collection = dm.getCollection('types')
-		#dataTypeCollection = new DataTypeCollection(tableName)
 
-		#dataTypeCollection.configureColumn columns.pop()
-		#collection.insert({tableName: dataTypeCollection})
 		if !dm.types[tableName]?
 		   dm.types[tableName] = new DataTypeCollection(tableName)
 
-		#collection.types[tableName].configureColumns columns
 		dm.types[tableName].configureColumns columns
 		true
 
@@ -393,18 +383,9 @@ class DataMap
 	## >>> RETURNS A PROMISE
 	@addData: (tableName, keyValue, newData) =>
 
-		p = new Promise (resolve, reject) =>
-
-			path = "/#{tableName}/#{keyValue}"
-			DataMap.getDataMap().engine.set path, newData
-			.then (doc)=>
-				resolve(doc)
-			.catch (e)=>
-				console.log "Error adding data:", e
-				resolve(null)
-
-		DataMap.addPendingPromise p
-		return p
+		path = "/#{tableName}/#{keyValue}"
+		doc = DataMap.getDataMap().engine.set path, newData
+		return doc
 
 	## -------------------------------------------------------------------------------------------------------------
 	## delete row form the screen and dataMap using the keyvale
@@ -436,11 +417,8 @@ class DataMap
 	## >>> RETURNS A PROMISE
 	@getDataField: (tableName, keyValue, fieldName) =>
 
-		newPromise ()=>
-
-			yield DataMap.clearPendingPromises()
-			dm = DataMap.getDataMap()
-			return dm.engine.getFast tableName, keyValue, fieldName
+		dm = DataMap.getDataMap()
+		return dm.engine.getFast tableName, keyValue, fieldName
 
 
 	## -------------------------------------------------------------------------------------------------------------
@@ -451,58 +429,5 @@ class DataMap
 
 		dm  = DataMap.getDataMap()
 		return dm.engine.eraseCollection tableName
-
-	##| -------------------------------------------------------------------------------------------------------------
-	##|
-	##|  Utilities to help with waiting for data to load
-	##|  Clears any pending promises, generators, or functions
-	##|  which is used to gather data, render, calculate, etc.
-	##|
-	@clearPendingPromises: ()=>
-
-		newPromise ()=>
-
-			dm = DataMap.getDataMap()
-
-			if !dm.internalPendingPromise?
-				return true
-
-			while dm.internalPendingPromise.length > 0
-
-				p = dm.internalPendingPromise.shift()
-				yield p
-
-			dm.internalPendingPromise = []
-			return true
-
-	##|
-	##|  Adds a pending promise which is a promise that must complete
-	##|  prior to the table rendering itself.
-	##|
-	@addPendingPromise: (newFunction)=>
-
-		dm = DataMap.getDataMap()
-
-		if !dm.internalPendingPromise?
-			dm.internalPendingPromise = []
-
-		if newFunction && newFunction.constructor && 'GeneratorFunction' == newFunction.constructor.name
-
-			# console.log "Adding pending ", newFunction
-			dm.internalPendingPromise.push newFunction
-
-		else if newFunction && 'function' == typeof newFunction.then
-
-			# console.log "Adding promise"
-			dm.internalPendingPromise.push newFunction
-
-		else
-
-			# console.log "Adding function ", newFunction
-			dm.internalPendingPromise.push new Promise (resolve, reject) =>
-				result = newFunction()
-				resolve(result)
-
-		return true
 
 

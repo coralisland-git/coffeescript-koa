@@ -334,7 +334,7 @@ class PopupWindow
 			return false
 
 		@dragabilly.on "dragEnd", (e) =>
-			@popupWindowHolder.css "opacity", "0.95"
+			@popupWindowHolder.css "opacity", "1.0"
 			return false
 
 		startX = 0

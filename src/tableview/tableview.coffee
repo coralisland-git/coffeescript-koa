@@ -128,23 +128,21 @@ class TableView
 	##
 	addTable: (tableName, @columnReduceFunction, @reduceFunction) =>
 
-		DataMap.addPendingPromise ()=>
+		@primaryTableName = tableName
 
-			@primaryTableName = tableName
-
-			##|
-			##|  Find the columns for the specific table name
-			columns = yield DataMap.getColumnsFromTable(tableName, @columnReduceFunction)
-			for col in columns
-				c = new TableViewCol tableName, col
-				c.inlineSorting = @inlineSorting
-				@colList.push(c)
+		##|
+		##|  Find the columns for the specific table name
+		columns = DataMap.getColumnsFromTable(tableName, @columnReduceFunction)
+		for col in columns
+			c = new TableViewCol tableName, col
+			c.inlineSorting = @inlineSorting
+			@colList.push(c)
 
 
-			##|
-			##|  Get the data from that table
-			yield @updateRowData()
-			true
+		##|
+		##|  Get the data from that table
+		@updateRowData()
+		true
 
 	## -------------------------------------------------------------------------------------------------------------
 	## add support for inline sorting when clicking on the column header
@@ -429,18 +427,17 @@ class TableView
 	##
 	updateRowData: () =>
 
-		newPromise ()=>
+		##|
+		##|  Get latest data from that table using dataMap
+		@shadowMap = null
+		@rowData = []
+		data = DataMap.getValuesFromTable @primaryTableName, @reduceFunction
+		for row in data
+			if @showCheckboxes
+				row.checkbox_key = @primaryTableName + "_" + row.id
+				row.checked = false
 
-			##|
-			##|  Get latest data from that table using dataMap
-			@rowData = []
-			data = yield DataMap.getValuesFromTable @primaryTableName, @reduceFunction
-			for row in data
-				if @showCheckboxes
-					row.checkbox_key = @primaryTableName + "_" + row.id
-					row.checked = false
-
-				@rowData.push row
+			@rowData.push row
 
 	## -------------------------------------------------------------------------------------------------------------
 	## set the holder element to go to the bottom of the screen
@@ -539,155 +536,149 @@ class TableView
 	##
 	render: () =>
 
-		newPromise ()=>
+		@rowDataElements = {}
 
-			yield DataMap.clearPendingPromises()
+		##|
+		##|  Create a unique ID for the table, that doesn't change
+		##|  even if the table is re-drawn
+		if !@gid?
+			@gid = GlobalValueManager.NextGlobalID()
 
-			@rowDataElements = {}
+		html = "";
+		##| if fixed header and resizable
+		if @fixedHeader
+
+			if !@showHeaders
+				throw new Error "fixed header can't be done without header"
+
+			html += """
+				<div class='table-wrapper' id='tableWrapper#{@gid}'><div class='outer-container'>
+					<div class='inner-container'>
+						<div class='table-header'>
+							<table id="tableheader#{@gid}" class="tableview">
+				"""
+
+		else
 
 			##|
-			##|  Create a unique ID for the table, that doesn't change
-			##|  even if the table is re-drawn
-			if !@gid?
-				@gid = GlobalValueManager.NextGlobalID()
+			##|  draw the table header
+			html += "<div class='tableviewSimpleWrapper'>"
+			html += "<table class='tableview' id='table#{@gid}'>"
 
+		##|
+		##|  Add headers
+		if @showHeaders
+
+			html += "<thead><tr>";
+
+			##|
+			##|  Add a checkbox to the table that is persistant
+			if @showCheckboxes
+				html += "<th class='checkable'>&nbsp;</th>"
+
+			for i in @colList
+				html += i.RenderHeader(i.extraClassName);
+
+			html += "</tr>";
+
+		if @showFilters
+
+			html += "<thead><tr>";
+
+			##|
+			##|  Add a checkbox to the table that is persistant
+			if @showCheckboxes
+				html += "<th class='checkable'>&nbsp;</th>"
+
+			popupCols = []
+			if typeof @filterAsPopupCols is 'object' then popupCols = Object.keys @filterAsPopupCols
+			for i in @colList
+				if i.visible
+					html += "<td class='dataFilterWrapper'>"
+					if popupCols.indexOf(i.col.source) == -1
+						html += "<input class='dataFilter #{i.col.formatter.name}' data-path='/#{i.tableName}/#{i.col.source}'>"
+					else
+						html += "<a class='link filterPopupCol' data-source='#{i.col.source}' style='width:100%;height:100%;display:block;text-align:center;font-size:14px;border:1px solid #000' href='javascript:;'><span class='filtered_text'>Select</span></a><span class='caret pull-right' style='margin-top:-12px;margin-right:10px;'></span>"
+
+					html += "</td>"
+
+			html += "</tr>";
+
+		##|
+		##|  Start adding the body
+		html += "</thead>"
+		if @fixedHeader
+			html += """</table>
+					</div>
+					<div class="table-body">
+						<table id='table#{@gid}' class="tableview">"""
+
+		html += "<tbody id='tbody#{@gid}'>";
+
+		# counter = 0
+		if (typeof @sort == "function")
+			@rowData.sort @sort
+
+		##| if no row found then default message
+		if @rowData.length is 0
+			@addMessageRow "No results"
+
+		for counter, i of @rowData
+
+			# if @filterFunction i then continue
+			if typeof i == "string"
+				html += "<tr class='messageRow'><td class='messageRow' colspan='#{@colList.length+1}'"
+				html += ">#{i}</td></tr>";
+			else
+				html += @internalRenderRow(counter,i)
+
+		html += "</tbody></table>";
+		if @fixedHeader
+			html += "</div></div></div></div>"
+			#| add width to individual td
+		else
+			html += "</div>"
+
+		@elTheTable = @elTableHolder.html(html);
+
+		##|
+		##|  If the holder element has no height defined and we have a fixed header
+		##|  set the holder element to fill to bottom
+		if @elTableHolder.height() == 0 and @fixedHeader
+			@setHolderToBottom()
+
+		##| if the fixed header add the width to first row td
+		if @fixedHeader
 			html = "";
-			##| if fixed header and resizable
-			if @fixedHeader
+			$("#tableheader#{@gid} tr:first th").each (index,e) =>
+				html += "<col width='"+$(e).outerWidth()+"px' />"
+			$("#table#{@gid}").append html
+			tableHolder = @elTableHolder
+			@elTableHolder.find(".table-body").scroll (e)->
+				tableHolder.find(".table-header").css('left',(-1*this.scrollLeft) + 'px')
 
-				if !@showHeaders
-					throw new Error "fixed header can't be done without header"
+		setTimeout () =>
+			# globalResizeScrollable();
+			if setupSimpleTooltips?
+				setupSimpleTooltips();
+		, 1
 
-				html += """
-					<div class='table-wrapper' id='tableWrapper#{@gid}'><div class='outer-container'>
-						<div class='inner-container'>
-							<div class='table-header'>
-								<table id="tableheader#{@gid}" class="tableview">
-					"""
+		##|
+		##|  This is a new render which means we need to re-establish any context menu
+		@contextMenuCallSetup = 0
+		# @setupContextMenuHeader()
+		@internalSetupMouseEvents()
 
-			else
+		if @showFilters
+			@elTheTable.find("input.dataFilter").on "keyup", @onFilterKeypress
+			@elTheTable.find("a.filterPopupCol").on "click", @onFilterPopupClick
 
-				##|
-				##|  draw the table header
-				html += "<div class='tableviewSimpleWrapper'>"
-				html += "<table class='tableview' id='table#{@gid}'>"
+		if @inlineSorting
+			@internalBindInlineSortingEvents()
 
-			##|
-			##|  Add headers
-			if @showHeaders
-
-				html += "<thead><tr>";
-
-				##|
-				##|  Add a checkbox to the table that is persistant
-				if @showCheckboxes
-					html += "<th class='checkable'>&nbsp;</th>"
-
-				for i in @colList
-					html += i.RenderHeader(i.extraClassName);
-
-				html += "</tr>";
-
-			if @showFilters
-
-				html += "<thead><tr>";
-
-				##|
-				##|  Add a checkbox to the table that is persistant
-				if @showCheckboxes
-					html += "<th class='checkable'>&nbsp;</th>"
-
-				popupCols = []
-				if typeof @filterAsPopupCols is 'object' then popupCols = Object.keys @filterAsPopupCols
-				for i in @colList
-					if i.visible
-						html += "<td class='dataFilterWrapper'>"
-						if popupCols.indexOf(i.col.source) == -1
-							html += "<input class='dataFilter #{i.col.formatter.name}' data-path='/#{i.tableName}/#{i.col.source}'>"
-						else
-							html += "<a class='link filterPopupCol' data-source='#{i.col.source}' style='width:100%;height:100%;display:block;text-align:center;font-size:14px;border:1px solid #000' href='javascript:;'><span class='filtered_text'>Select</span></a><span class='caret pull-right' style='margin-top:-12px;margin-right:10px;'></span>"
-
-						html += "</td>"
-
-				html += "</tr>";
-
-			##|
-			##|  Start adding the body
-			html += "</thead>"
-			if @fixedHeader
-				html += """</table>
-						</div>
-						<div class="table-body">
-							<table id='table#{@gid}' class="tableview">"""
-
-			html += "<tbody id='tbody#{@gid}'>";
-
-			# counter = 0
-			if (typeof @sort == "function")
-				@rowData.sort @sort
-
-			##| if no row found then default message
-			if @rowData.length is 0
-				@addMessageRow "No results"
-
-			for counter, i of @rowData
-
-				# if @filterFunction i then continue
-				if typeof i == "string"
-					html += "<tr class='messageRow'><td class='messageRow' colspan='#{@colList.length+1}'"
-					html += ">#{i}</td></tr>";
-				else
-					html += yield @internalRenderRow(counter,i)
-
-			html += "</tbody></table>";
-			if @fixedHeader
-				html += "</div></div></div></div>"
-				#| add width to individual td
-			else
-				html += "</div>"
-
-			@elTheTable = @elTableHolder.html(html);
-
-			##|
-			##|  If the holder element has no height defined and we have a fixed header
-			##|  set the holder element to fill to bottom
-			if @elTableHolder.height() == 0 and @fixedHeader
-				@setHolderToBottom()
-
-			##| if the fixed header add the width to first row td
-			if @fixedHeader
-				html = "";
-				$("#tableheader#{@gid} tr:first th").each (index,e) =>
-					html += "<col width='"+$(e).outerWidth()+"px' />"
-				$("#table#{@gid}").append html
-				tableHolder = @elTableHolder
-				@elTableHolder.find(".table-body").scroll (e)->
-					tableHolder.find(".table-header").css('left',(-1*this.scrollLeft) + 'px')
-
-			setTimeout () =>
-				# globalResizeScrollable();
-				if setupSimpleTooltips?
-					setupSimpleTooltips();
-			, 1
-
-			##|
-			##|  This is a new render which means we need to re-establish any context menu
-			@contextMenuCallSetup = 0
-			# @setupContextMenuHeader()
-			@internalSetupMouseEvents()
-
-			if @showFilters
-				@elTheTable.find("input.dataFilter").on "keyup", @onFilterKeypress
-				@elTheTable.find("a.filterPopupCol").on "click", @onFilterPopupClick
-
-
-
-			if @inlineSorting
-				@internalBindInlineSortingEvents()
-			##| add default context menu for sorting as per #89 comment
-			@setupContextMenu @contextMenuCallbackFunction
-
-			true
+		##| add default context menu for sorting as per #89 comment
+		@setupContextMenu @contextMenuCallbackFunction
+		true
 
 
 	## -------------------------------------------------------------------------------------------------------------
@@ -699,31 +690,29 @@ class TableView
 	##
 	internalRenderRow: (counter,i,isNewRow = false) =>
 
-		newPromise ()=>
+		##|
+		##|  Create the "TR" tag
+		html = "<tr class='trow #{if isNewRow then 'newDataRow' else ''}' data-id='#{counter}' "
+		html += ">"
 
-			##|
-			##|  Create the "TR" tag
-			html = "<tr class='trow #{if isNewRow then 'newDataRow' else ''}' data-id='#{counter}' "
-			html += ">"
+		##|
+		##|  Add a checkbox column possibly and then render the
+		##|  column using the column object.
+		if @showCheckboxes
+			html += @renderCheckable(i)
 
-			##|
-			##|  Add a checkbox column possibly and then render the
-			##|  column using the column object.
-			if @showCheckboxes
-				html += @renderCheckable(i)
+		for col in @colList
+			if col.visible
+				if col.joinKey?
+					val = DataMap.getDataField col.joinTable, i.id, col.joinKey
+					str = DataMap.renderField "td", col.tableName, col.col.source, val, col.col.extraClassName
+				else
+					str = DataMap.renderField "td", col.tableName, col.col.source, i.id, col.col.extraClassName
 
-			for col in @colList
-				if col.visible
-					if col.joinKey?
-						val = yield DataMap.getDataField col.joinTable, i.id, col.joinKey
-						str = yield DataMap.renderField "td", col.tableName, col.col.source, val, col.col.extraClassName
-					else
-						str = yield DataMap.renderField "td", col.tableName, col.col.source, i.id, col.col.extraClassName
+				html += str
 
-					html += str
-
-			html += "</tr>";
-			return html
+		html += "</tr>";
+		return html
 
 	## -------------------------------------------------------------------------------------------------------------
 	## function to sort the table base on column and type
@@ -807,55 +796,118 @@ class TableView
 					@currentFilters[@filterAsPopupCols[source].tableName][@filterAsPopupCols[source].col.source] = option
 					$(e.target).find('.filtered_text').text option
 					@applyFilters()
+
 			menu.addItem "Clear filter", (data) =>
 				delete @currentFilters[@filterAsPopupCols[source].tableName][@filterAsPopupCols[source].col.source]
 				$(e.target).find('.filtered_text').text 'select'
 				@applyFilters()
+
+	##|
+	##|  Build a "Shadow Map" for the table by caching the TR/TD Values
+	##|  The result is a map will all data rows and a reference to the element
+	##|  that holds that row / col and it's current value.
+	##|
+	buildShadowMap: ()=>
+
+		if @shadowMap? then return
+
+		@shadowMap = {}
+
+		list = @elTheTable.find "tr.trow"
+		for el in list
+			rec = {}
+			rec.el = $(el)
+			rec.children = {}
+			rec.visible = rec.el.is(':visible')
+
+			children = rec.el.find "td"
+			for td in children
+				child = {}
+				child.el = $(td)
+				child.path = child.el.attr "data-path"
+				child.value = child.el.text()
+
+				if not child.path? then continue
+
+				##|
+				##| Cache the "keyPath" which is the collection and field without the id
+				parts   = child.path.split '/'
+				keyPath = parts[1] + "." + parts[3]
+
+				rec.children[keyPath] = child
+
+			rec_id = rec.el.attr "data-id"
+			@shadowMap[rec_id] = rec
+
+		console.log "SH=", @shadowMap
+		true
 
 	## -------------------------------------------------------------------------------------------------------------
 	## Apply filters stored in "currentFilters" to each column and show/hide the rows
 	##
 	applyFilters: () =>
 
-		filters = {}
-		if( @rowData.length != DataMap.getValuesFromTable(@primaryTableName).length)
-			previousRowsCount = @rowData.length
-			@updateRowData()
-		for counter, i of @rowData
-			keepRow = true
+		@buildShadowMap()
 
-			if @currentFilters[i.table]
-				for col in @colList
-					if !@currentFilters[i.table][col.col.source]? then continue
+		console.log "@filterAsPopupCols=", @filterAsPopupCols
 
-					if !filters[i.table+col.col.source]
-						filters[i.table+col.col.source] = new RegExp( @currentFilters[i.table][col.col.source] , "i");
+		##|
+		##| Build the filters
 
-					aa = DataMap.getDataField(i.table, i.id, col.col.source)
-					if !filters[i.table+col.col.source].test aa
-						keepRow = false
+		filters = []
+		for tableName, fieldList of @currentFilters
+			for fieldName, filterValue of fieldList
+				filters.push
+					keyName: tableName + "." + fieldName
+					filter : new RegExp filterValue, "i"
 
-			removeNewRowClass = (html) =>
-				setTimeout () =>
-					key = $(html).data 'id'
-					@elTheTable.find("tr[data-id=#{key}]").removeClass 'newDataRow'
-				,3000
+		for i, row of @shadowMap
 
-			##| if row is not present for that data, render new row
-			if !@elTheTable.find("tr [data-path^='/#{@primaryTableName}/#{i.id}/']").length
-				html = @internalRenderRow(previousRowsCount,i,true)
-				@elTheTable.find('tbody').prepend(html)
-				removeNewRowClass html
-				previousRowsCount++
+			##|
+			##| Each row has the element (el) and the children TD nodes in children
+			keepRow = false
+			for f in filters
+				if keepRow then continue
+				if not row.children[f.keyName]? then continue
+				if f.filter.test row.children[f.keyName].value
+					keepRow = true
+
+			if keepRow and not row.visible
+				row.visible = true
+				row.el.show()
+			else if not keepRow and row.visible
+				row.visible = false
+				row.el.hide()
+
+		return
 
 
-			if !@rowDataElements[counter]
-				@rowDataElements[counter] = @elTheTable.find("tr[data-id='#{counter}']")
+		##|
+		##| TODO:  Check for new rows being added, but not here.
+		##| it should be done in a manually called function such as updateRowData?
+		##|
+		# if (@rowData.length != DataMap.getValuesFromTable(@primaryTableName).length)
+		# 	previousRowsCount = @rowData.length
+		# 	@updateRowData()
 
-			if keepRow
-				@rowDataElements[counter].show()
-			else
-				@rowDataElements[counter].hide()
+		##
+		##  TODO:
+		##  Re-add the new row effect except here isn't the right place
+		##  it takes too long to check for new rows every time you press a key in the filter
+
+		# removeNewRowClass = (html) =>
+		# 	setTimeout () =>
+		# 		key = $(html).data 'id'
+		# 		@elTheTable.find("tr[data-id=#{key}]").removeClass 'newDataRow'
+		# 	,3000
+
+		# ##| if row is not present for that data, render new row
+		# if !@elTheTable.find("tr [data-path^='/#{@primaryTableName}/#{i.id}/']").length
+		# 	html = @internalRenderRow(previousRowsCount,i,true)
+		# 	@elTheTable.find('tbody').prepend(html)
+		# 	removeNewRowClass html
+		# 	previousRowsCount++
+
 
 		popupCols = []
 		if typeof @filterAsPopupCols is 'object' then popupCols = Object.keys @filterAsPopupCols

@@ -28,7 +28,7 @@ addTest = (label, fnCall, code) ->
 	html = "
 		<tr><td class='test_label'> #{label} </td>
 			<td class='test_result'> <div id='result#{counter}'></div> </td>
-			<td class='test_code'> <code><pre>#{code}</pre></code> </td>
+			<td class='test_code'> <pre><code class='language-javascript'>#{code}</code></pre> </td>
 		</tr>
 	"
 
@@ -82,6 +82,8 @@ go = () ->
 	else
 
 		try
+			Prism.highlightAll()
+
 			result = allTests[0].callback()
 
 			if typeof result == "function"
