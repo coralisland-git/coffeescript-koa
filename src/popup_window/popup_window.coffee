@@ -29,10 +29,10 @@ class PopupWindow
 
 	# @property [Object] configurations the configurations about table and savable popup
 	configurations:
-		tableName: null
-		keyValue: null
-		windowName: null
-		resizable: true
+		tableName  : null
+		keyValue   : null
+		windowName : null
+		resizable  : true
 
 	## -------------------------------------------------------------------------------------------------------------
 	## returns the available height for the body element
@@ -154,6 +154,7 @@ class PopupWindow
 		@popupWindowHolder.show()
 		@isVisible = true
 
+		@emitEvent "resize", [ @popupWidth, @popupHeight ]
 		true
 
 	## -------------------------------------------------------------------------------------------------------------
@@ -350,6 +351,10 @@ class PopupWindow
 			@windowWrapper.height @popupHeight - @windowTitle.height() - 1 - @toolbarHeight
 			@windowScroll.trigger('resize')
 
+			console.log "emit [resize]", @popupWidth, @popupHeight, this
+			@emitEvent "resize", [ @popupWidth, @popupHeight ]
+			true
+
 		stopMove = (e) =>
 			$(document).unbind "mousemove", doMove
 			$(document).unbind "mouseup", stopMove
@@ -377,6 +382,7 @@ class PopupWindow
 		if typeof @x == "undefined" or @x < 0 then @x = 0
 		if typeof @y == "undefined" or @y < 0 then @y = 0
 
+		GlobalClassTools.addEventManager(this)
 
     	##| check the new passed configurations object and extract values from it
 		if !configurations && typeof configuration != 'object'

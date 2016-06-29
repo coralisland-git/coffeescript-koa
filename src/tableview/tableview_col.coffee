@@ -18,61 +18,79 @@ class TableViewCol
 		if !@visible? then @visible = true
 		if !@width? then @width = ""
 
+	##|
+	##|  Returns the name of the source field in the datamap
+	getSource : ()=>
+		return @col.source
+
+	##|
+	##|  returns true if the field is editable
+	getEditable: ()=>
+		return @col.editable
+
+	##|
+	##|  Returns the name of the foramtter for this field
+	getFormatterName: ()=>
+		return @col.formatter.name
+
+	getAlign: ()=>
+		return @col.align
+
+	calculateWidth: ()=>
+
+		##| if width is 0 then consider as auto width = left padding + max length text width + right padding
+		if (@width is 0 || @width is '0px' || @width is "" )
+			return null
+
+		if typeof @width == "string"
+			return parseInt(@width)
+
+		return @width
+
 	## -------------------------------------------------------------------------------------------------------------
 	## RenderHeader function to render the header for the column
 	##
 	## @param [String] extraClassName extra class name that will be included in the th
 	## @return [String] html the html for the th
 	##
-	RenderHeader: (extraClassName) =>
-		if @visible == false then return ""
+	RenderHeader: (extraClassName, parent) =>
 
-		html = "<th style='";
-		##| if width is 0 then consider as auto width = left padding + max length text width + right padding
-		if(@width is 0 || @width is '0px' || @width is "" )
-			@width = 2 + 4 # 4 is left padding 2 is right padding
-			##| get the max length value from all data values
-			currentWord = ''
-			DataMap.getValuesFromTable @tableName, (obj) =>
-				currentWord = if obj[@col.source]? and obj[@col.source].length > currentWord.length then obj[@col.source] else currentWord
-			rulerElement = $("<span id='ruler'>#{currentWord}</span>").appendTo('body')
-			@width += parseInt(rulerElement.width())
-			rulerElement.remove()
-		if (@width)
-			if typeof @width == "string"
-				html += "width: " + @width + ";"
-			else
-				html += "width: " + @width + "px;"
-
-		html += "'"
+		if @visible == false then return
 
 		if !@col.extraClassName?
 			@col.extraClassName = ""
 
-		html += "class='data " + @col.extraClassName
+		if extraClassName
+			if @col.extraClassName.length then @col.extraClassName += " "
+			@col.extraClassName += extraClassName
 
-		if @col.formatter?
-			html += " dt_" + @col.formatter.name
-
-		html += "'"
+		tag = parent.addDiv "#{@col.formatter.name} tableHeaderField " + @col.extraClassName
 
 		if @col.tooltip? and @col.tooltip.length > 0
-			html += " tooltip='simple' data-title='#{@col.tooltip}'"
+			tag.setAttribute "tooltip", "simple"
+			tag.setAttribute "data-title", @col.tooltip
 
-		html += ">";
-		html += @col.name;
-		##| sorting icon if inline sorting
-		if @inlineSorting
-			html += "<i class='fa fa-sort table-sorter pull-right'></i>"
-		html += "</th>";
+		tag.setDataPath "/#{@tableName}/Header/#{@col.source}"
+		tag.html @col.name
 
-		return html
+		@tagSort = tag.add "i", "fa fa-sort table-sorter pull-right"
+		@sort    = 0
 
-	## -------------------------------------------------------------------------------------------------------------
-	## function to execute when the link is clicked
-	##
-	## @event onClickLink
-	##
-	onClickLink: ()=>
+		return tag
 
-		window.open(@link, "showWindow", "height=800,width=1200,menubar=no,toolbar=no,location=no,status=no,resizable=yes")
+	UpdateSortIcon: (newSort) =>
+
+		console.log "newSort = ", newSort, @sort
+
+		@sort = newSort
+		@tagSort.removeClass "fa-sort"
+		@tagSort.removeClass "fa-sort-up"
+		@tagSort.removeClass "fa-sort-down"
+
+		if @sort == -1
+			@tagSort.addClass "fa-sort-down"
+		else if @sort == 1
+			@tagSort.addClass "fa-sort-up"
+
+		true
+

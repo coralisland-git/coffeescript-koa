@@ -13,129 +13,121 @@ span#ruler
 .tableview
     width: 100%
     border-inside: 1px solid #909090
-    white-space:  nowrap;
-    table-layout:fixed;
+    white-space: nowrap;
+    table-layout: fixed;
+    position: absolute
+    left: 0
+    right: 0
+    top: 0
+    bottom: 0
 
-    th
-        font-family: 'San Francisco Text', "Segoe UI", "Tahoma", "Arial";
-        color: black
-        font-weight: 500
-        font-size: 0.8vw
-        padding: 4px
-        border-left: 1px dotted rgba(0,0,0, 0.1)
-        overflow: hidden;
+    .header
+        border: 1px solid blue
 
-        .hide
-            display:none;
+    div.int,
+    div.decimal
+        text-align: right
+        padding-right: 4px
 
-    tbody tr:hover td
-        background-color: rgba(237, 192, 80, 1.0)
+    div.last
+        border-right : 1px dotted rgba(0,0,0, 0.1)
+
+    div.clickable
+        color: #0000BB
         cursor: pointer
 
-    tbody tr:nth-child(even)
-        background: #ffffff;
+    div.clickable:hover
+        border: 1px solid #000080
+        background-color: #eeeeff
 
-    tbody tr:nth-child(odd)
-        background: #f8f8f8;
+    div
+        position    : absolute
+        display     : block
+        font-family : 'San Francisco Text', "Segoe UI", "Tahoma", "Arial";
+        color       : black
+        font-weight : 300
+        font-size   : 12px
+        padding     : 4px
+        border-left : 1px dotted rgba(0,0,0, 0.1)
+        overflow    : hidden;
+        background  : #ffffff;
 
-        td
-            border-top: 1px dotted #dddddd
-            border-bottom: 1px dotted #dddddd
-
-    td
-        font-family: 'San Francisco Text', "Segoe UI", "Tahoma", "Arial";
-        padding-left: 4px
-        padding-right: 2px
-        padding-top: 6px
-        padding-bottom: 6px
+    div.tableHeaderField
+        background-color: #EEEEEE
+        background-image: linear-gradient(to bottom, #ffffff, #f2f2f2);
         font-size: 12px
-        color: #101010
-        font-weight: 400
-        border-left: 1px dotted rgba(0,0,0, 0.1)
-        overflow: hidden;
-        transition: background 1s ease;
+        font-weight: 400px
+        line-height: 20px
 
-        .hide
-            display: none;
-    th:last-child,
-    td:last-child
-        padding-right: 20px
+    div.tableHeaderField i
+        font-size: 10px
+        padding-top: 6px
 
-    th:first-child,
-    td:first-child
-        padding-left: 20px
+    div.even
+        background: #f8f8f8;
+        border-top: 1px dotted #dddddd
+        border-bottom: 1px dotted #dddddd
 
-    th.checkable
-    td.checkable
-    td:first-child.checkable
+    div.checkable
         width: 26px
         margin-left: 0px
         padding-left: 4px
         padding-right: 4px
 
-    tbody tr.selected td
+    div.selected td
         background-color: rgba(237, 192, 80, 1.0)
-        // background-color: red
-        // border: 2px solid green
 
-    td.messageRow
-        background-color: rgba(162, 165, 147, 0.7)
-        line-height: 18px
-        font-weight: 600
-        color: rgba(76, 79, 56, 1.0)
-        text-align: center
-
-    tr.newDataRow
-        td
-            background-color: lightblue;
-
-    td.editable:hover
+    div.editable:hover
         background-color: #eebbbb
         cursor: text
 
-    td.editable
-
+    div.editable
         padding-left: 4px
         padding-right: 4px
         padding-top: 2px
         padding-top: 2px
-        // border-bottom: 1px solid #bbccbb
         color: #106010
 
-    td.editing
+    div.dataFilterWrapper
+        margin: 0px
+        padding: 0px
 
-        padding-left: 0px
-        padding-right: 0px
+    .dynamic_edit
+        border: 0px
+        width: 100%
+        height: 100%
+        padding-left: 4px
+        padding-right: 4px
         padding-top: 0px
         padding-top: 0px
+        margin: 0px
+        background-color: rgba(204, 228, 240, 1.0)
 
-        .dynamic_edit
-            border: 0px
-            width: 100%
-            height: 100%
-            padding-left: 4px
-            padding-right: 4px
-            padding-top: 0px
-            padding-top: 0px
-            margin: 0px
-            background-color: rgba(204, 228, 240, 1.0)
+    div:hover
+        background-color: rgba(237, 192, 80, 1.0)
+        // cursor: pointer
+
+input.dataFilter
+    width         : 100%
+    border        : 0px
+    border-top    : 1px solid #D6D6D6
+    border-bottom : 1px solid #D6D6D6
+    height        : 20px
+    padding       : 0px
+    margin        : 0px
+    color         : #205020
+
+input.editing
+    padding-left: 0px
+    padding-right: 0px
+    padding-top: 0px
+    padding-top: 0px
 
 span.fage
     text-align: right
     float: right
     color: #606060
     padding-right: 8px
-
-.tableview td.dataFilterWrapper
-    margin: 0px
-    padding: 0px
-
-
-.dataFilter
-    width: 100%
-    border: 0px
-    border-top: 1px solid #D6D6D6
-    border-bottom: 1px solid #D6D6D6
 
 .dataFilter.decimal
     text-align: right
@@ -152,11 +144,13 @@ span.fage
     height      : 100%
     bottom      : 0px
     padding-top : 10px
-    width: 100%
+    width       : 100%
+    overflow    : hidden
 
 .inner-container
-    height: 100%
-    overflow: hidden
+    height   : 100%
+    width    : 100%
+    overflow : hidden
 
 .table-header
     height: 40px

@@ -40,7 +40,6 @@ $ ->
 		addHolder("renderTest1");
 		table = new TableView $("#renderTest1")
 		table.addTable "zipcode"
-		table.addInlineSortingSupport()
 		table.render()
 		$('#renderTest1').prepend "<input type='button' id='sortByCity' class='btn btn-info' style='margin-bottom:15px;' value='Sort By City DESC' />"
 		$('#sortByCity').on 'click', ()->
@@ -175,6 +174,9 @@ $ ->
 		addHolder('renderTest1')
 		zipCodeTable = new TableView $("#renderTest1")
 		zipCodeTable.addTable "zipcode"
+		zipCodeTable.on "click_city", (row, e) =>
+			console.log "You clicked on something in City:", row
+
 		popup = new PopupTable zipCodeTable, 'zipCodeDemoTable'
 		$('#renderTest1').remove()
 		true
@@ -184,7 +186,7 @@ $ ->
 		$('#renderTest1').height(350); ##| to add scroll the height is fix
 		table = new TableView $("#renderTest1")
 		table.addTable "zipcode"
-		table.fixedHeaderAndScrollable()
+		table.setFixedHeaderAndScrollable()
 		table.render()
 		true
 	go()

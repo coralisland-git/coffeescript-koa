@@ -164,6 +164,42 @@ class DataMap
 
 		true
 
+	@putFormattedValueToCell: (widgetCell, tableName, fieldName, keyValue) =>
+
+		dm = DataMap.getDataMap()
+
+		if typeof keyValue == "string" and /^[0-9]+$/.test keyValue
+			keyValue = parseInt(keyValue)
+
+		path = "/" + tableName + "/" + keyValue + "/" + fieldName
+		widgetCell.setDataPath path
+		currentValue = DataMap.getDataField tableName, keyValue, fieldName
+
+		##|
+		##|  See if there is a formatter attached
+		if dm.types[tableName]? and dm.types[tableName].col[fieldName]?
+
+			formatter = dm.types[tableName].col[fieldName].formatter
+
+			if formatter? and formatter
+				currentValue = formatter.format currentValue, dm.types[tableName].col[fieldName].options, path
+
+			if dm.types[tableName].col[fieldName].render? and typeof dm.types[tableName].col[fieldName].render == "function"
+				currentValue = dm.types[tableName].col[fieldName].render(currentValue, path)
+
+			if dm.types[tableName].col[fieldName].editable
+				widgetCell.addClass "editable"
+			else
+				widgetCell.removeClass "editable"
+
+		if !currentValue? or currentValue == null
+			currentValue = ""
+
+		widgetCell.text currentValue
+		return
+
+				# otherhtml += " onClick='globalOpenEditor(this);' "
+
 	## -------------------------------------------------------------------------------------------------------------
 	## return the html for the column to render including events and all
 	##
@@ -288,7 +324,7 @@ class DataMap
 		reDate2 = /^[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]T[0-9][0-9].[0-9][0-9].[0-9][0-9].[0-9][0-9][0-9]Z/
 
 		for i, o of obj
-			console.log "Check [#{i}] = ", o, " Type=", typeof o
+			# console.log "Check [#{i}] = ", o, " Type=", typeof o
 
 			dataType = "text"
 			if typeof o == "number"
@@ -396,15 +432,20 @@ class DataMap
 	##
 	## >>> RETURNS A PROMISE
 	@deleteDataByKey: (tableName, keyValue) =>
-
-		##| remove table row if found
-		if $("[data-path^='/#{tableName}/#{keyValue}/']").length
-			$("[data-path^='/#{tableName}/#{keyValue}/']").parent('tr').remove()
-
-		$("[data-path^='/#{tableName}/#{keyValue}/']").html ""
-
 		dm = DataMap.getDataMap()
 		return dm.engine.delete "/#{tableName}/#{keyValue}"
+
+	## -------------------------------------------------------------------------------------------------------------
+	## get the data for a given key
+	##
+	## @param [String] tableName name of the table in which the data is being added
+	## @param [String] keyValue unique key to track the data row inside the DataMap
+	## @return [String]
+	##
+	@getDataForKey: (tableName, keyValue) =>
+
+		dm = DataMap.getDataMap()
+		return dm.engine.getFastRow tableName, keyValue
 
 	## -------------------------------------------------------------------------------------------------------------
 	## get the single column|field value using the key and column name
@@ -420,6 +461,28 @@ class DataMap
 		dm = DataMap.getDataMap()
 		return dm.engine.getFast tableName, keyValue, fieldName
 
+	@getDataFieldFormatted: (tableName, keyValue, fieldName) =>
+
+		path = "/" + tableName + "/" + keyValue + "/" + fieldName
+		currentValue = DataMap.getDataField tableName, keyValue, fieldName
+
+		##|
+		##|  See if there is a formatter attached
+		dm = DataMap.getDataMap()
+		if dm.types[tableName]? and dm.types[tableName].col[fieldName]?
+
+			formatter = dm.types[tableName].col[fieldName].formatter
+
+			if formatter? and formatter
+				currentValue = formatter.format currentValue, dm.types[tableName].col[fieldName].options, path
+
+			if dm.types[tableName].col[fieldName].render? and typeof dm.types[tableName].col[fieldName].render == "function"
+				currentValue = dm.types[tableName].col[fieldName].render(currentValue, path)
+
+		if !currentValue? or currentValue == null
+			currentValue = ""
+
+		return currentValue
 
 	## -------------------------------------------------------------------------------------------------------------
 	## Erase all the data in a table

@@ -84,6 +84,12 @@ $ ->
 	addTest "Boolean simple false", ()->
 		globalDataFormatter.formatData "boolean", null
 
+	addTest "Boolean simple false", ()->
+		globalDataFormatter.formatData "boolean", false
+
+	addTest "Boolean simple true", ()->
+		globalDataFormatter.formatData "boolean", true
+
 	addTest "Create a new data formatting class dynamically", () ->
 
 		globalDataFormatter.register

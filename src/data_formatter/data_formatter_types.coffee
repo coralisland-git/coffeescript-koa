@@ -66,6 +66,9 @@ class DataFormatterType
 
 		@editorPath = path
 
+		console.log "parentElement=", parentElement
+		console.log "currentValue=", currentValue
+
 		if parentElement?
 
 			elParent = $(parentElement)
@@ -782,7 +785,7 @@ class DataFormatBoolean extends DataFormatterType
 	##
 	format: (data, options, path) =>
 		if !data? then return "No"
-		if data == null or data == 0 then return "No"
+		if data == null or data == 0 or data == false then return "No"
 		return "Yes"
 
 	## -------------------------------------------------------------------------------------------------------------

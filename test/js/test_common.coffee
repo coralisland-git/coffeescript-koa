@@ -100,16 +100,20 @@ go = () ->
 						$(allTests[0].tag).append trueResult
 						goNext()
 					.catch (e)  ->
-						$(allTests[0].tag).append "Exception:" + e
+						strText = e.toString()
+						strText += "<br>" + e.stack
+
+						$(allTests[0].tag).append "Exception:" + strText
 
 				else
 
 					$(allTests[0].tag).append result
-					console.log "P=", result.constructor.toString()
 					goNext()
 
 		catch e
+
 			console.log "Exception:", e
+			console.log "Stack:", e.stack
 
 			$(allTests[0].tag).html "<div class='exception'>Exception: " + e + "</div>"
 

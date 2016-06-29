@@ -1,8 +1,22 @@
-## -------------------------------------------------------------------------------------------------------------
-## A Table manager class that is designed to quickly build scrollable tables
-##
-## @example new TableView $(".tableHolder")
-##
+###
+
+ Class:  TableView
+ =====================================================================================
+
+ This is a multi-purpose table view that handles many aspects of a fast display and
+ edit table/grid.
+
+ @example:
+ new TableView $(".tableHolder")
+
+ Events:
+ =====================================================================================
+
+ "click_col" : will trigger when a row is clicked with the name "col", for example
+ @example: table.on "click_zipcode", (row, e) =>
+
+###
+
 class TableView
 
 	# @property [String] imgChecked html to be used when checkbox is checked
@@ -10,6 +24,22 @@ class TableView
 
 	# @property [String] imgNotChecked html to be used when checkbox is not checked
 	imgNotChecked  : "<img src='images/checkbox_no.png' width='16' height='16' alt='Selected' />"
+
+	##|
+	##| ******************************[ Events and event related functions or notes ]*******************************
+	##|
+
+	## -------------------------------------------------------------------------------------------------------------
+	## to add the default table row click event
+	##
+	## @param [Object] row the data of row in form object that is clicked
+	## @param [Event] the clicked jquery event object
+	## @event defaultRowClick
+	## @return [Boolean]
+	##
+	defaultRowClick: (row, e) =>
+		# console.log "DEF ROW CLICK=", row, e
+		false
 
 	## -------------------------------------------------------------------------------------------------------------
 	## function to execute when one of the checkbox is checked
@@ -22,6 +52,64 @@ class TableView
 		##|  By default this is a property
 		# api.SetCheckbox window.currentProperty.id, checkbox_key, value
 		console.log "onSetCheckbox(", checkbox_key, ",", value, ")"
+
+	## -------------------------------------------------------------------------------------------------------------
+	## function called when the right click context menu event on a header column.
+	##
+	## @event onContextMenuHeader
+	## @param [Object] coords coordinates {x:300,y:500}
+	## @param [Object] column the current column which is clicked
+	##
+	onContextMenuHeader: (coords, column) =>
+
+		console.log "COORDS=", coords
+		selectedColumn = @colList.filter (columnObj) =>
+			return columnObj.col.name is column
+		.pop()
+
+		##| if column is sortable in dataTypes
+		if selectedColumn.col.sortable
+			popupMenu = new PopupMenu "Column: #{column}", coords.x-150, coords.y
+
+			##| add sorting menu item
+			popupMenu.addItem "Sort Ascending", () =>
+				popupMenu.closeTimer()
+				@internalApplySorting()
+			popupMenu.addItem "Sort Descending", () =>
+				popupMenu.closeTimer()
+				@internalApplySorting()
+
+		if @customizableColumns
+			if !popupMenu
+				popupMenu = new PopupMenu "Column: #{column}", coords.x-150, coords.y
+			popupMenu.addItem "Customize", (coords, data) =>
+				popupMenu.closeTimer()
+				@onConfigureColumns
+					x: coords.x
+					y: coords.y
+
+
+		if typeof @tableCacheName != "undefined" && @tableCacheName != null
+			if !popupMenu
+				popupMenu = new PopupMenu "Column: #{column}", coords.x-150, coords.y
+			popupMenu.addItem "Configure Columns", (coords, data) =>
+				@onConfigureColumns
+					x: coords.x
+					y: coords.y
+
+	## -------------------------------------------------------------------------------------------------------------
+	## Display a popup to adjust the column of the table
+	##
+	## @param [Object] coords coordinates including x and y
+	## @event onConfigureColumns
+	##
+	onConfigureColumns: (coords) =>
+		popup = new PopupWindowTableConfiguration "Configure Columns", coords.x-150, coords.y
+		popup.show(this)
+
+	##|
+	##| ******************************[ Get certain properties and information from table ]*************************
+	##|
 
 	## -------------------------------------------------------------------------------------------------------------
 	## get the count of rows inside the table
@@ -66,9 +154,6 @@ class TableView
 		# @property [Boolean] to show textbox to filter data
 		@showFilters	= true
 
-		# @property [Boolean] to enable inline sorting clicking on column
-		@inlineSorting = false
-
 		# @property [Object] currentFilters current applied filters to the table
 		@currentFilters  = {}
 
@@ -94,6 +179,21 @@ class TableView
 		#@property [Object] table database configuration
 		@tableConfigDatabase = null
 
+		#@property [int] the offset from the top to start showing
+		@offsetShowingTop = 0
+
+		##|
+		##|  The height of each cell to draw
+		##|
+		@dataCellHeight   = 24
+		@headerCellHeight = 24
+		@filterCellHeight = 20
+
+		##|
+		##|  Event manager for Event Emitter style events
+		GlobalClassTools.addEventManager(this)
+		@on "added_event", @onAddedEvent
+
 	## -------------------------------------------------------------------------------------------------------------
 	## to add the join table with current rendered table
 	##
@@ -109,13 +209,12 @@ class TableView
 		for col in columns
 			if col.source != sourceField
 				c = new TableViewCol tableName, col
+				console.log "Setting joinKey ", sourceField
 				c.joinKey = sourceField
 				c.joinTable = @primaryTableName
-				c.inlineSorting = @inlineSorting
 				@colList.push(c)
 
 		true
-
 
 	## -------------------------------------------------------------------------------------------------------------
 	## to add the table in the view from datamap
@@ -131,37 +230,67 @@ class TableView
 		@primaryTableName = tableName
 
 		##|
+		##|  Add a checkbox column if needed
+		if @showCheckboxes
+			c = new TableViewColCheckbox(tableName)
+			@colList.push c
+
+		##|
 		##|  Find the columns for the specific table name
 		columns = DataMap.getColumnsFromTable(tableName, @columnReduceFunction)
 		for col in columns
 			c = new TableViewCol tableName, col
-			c.inlineSorting = @inlineSorting
 			@colList.push(c)
 
-
-		##|
-		##|  Get the data from that table
-		@updateRowData()
 		true
 
 	## -------------------------------------------------------------------------------------------------------------
-	## add support for inline sorting when clicking on the column header
+	## Table cache name is set, this allows saving/loading table configuration
 	##
-	addInlineSortingSupport: () =>
-		@inlineSorting = true
-		@colList.map (column) -> column.inlineSorting = true
+	## @param [String] tableCacheName the cache name to attach with table
+	##
+	setTableCacheName: (@tableCacheName) =>
 
 	## -------------------------------------------------------------------------------------------------------------
-	## to add the default table row click event
+	## add custom filter function which will be called on the key press of filter field
 	##
-	## @param [Object] row the data of row in form object that is clicked
-	## @param [Event] the clicked jquery event object
-	## @event defaultRowClick
-	## @return [Boolean]
+	## @param [Function] filterFunction to be called in keypress
 	##
-	defaultRowClick: (row, e) =>
-		console.log "DEF ROW CLICK=", row, e
-		false
+	setFilterFunction: (filterFunction) =>
+
+		@filterFunction = filterFunction
+
+		##|
+		##|  Force the table to redraw with a global "redrawTables" command
+		GlobalValueManager.Watch "redrawTables", () =>
+			@applyFilters()
+
+	## -------------------------------------------------------------------------------------------------------------
+	## make the table with fixed header and scrollable
+	##
+	## @param [Boolean] fixedHeader if header is fixed or not
+	##
+	setFixedHeaderAndScrollable: (@fixedHeader = true) =>
+		$(window).on 'resize', () =>
+			@elTableHolder.find('.table-header .tableview').width(@elTableHolder.find('.table-body .tableview').width())
+
+	## -------------------------------------------------------------------------------------------------------------
+	## function to make column filter as popup instead of plain text
+	##
+	## @example
+	##		tableview.setColumnFilterAsPopup("sample") where sample is column name or source
+	## @param [String] colName column name or source to be used in the filter
+	##
+	setColumnFilterAsPopup: (colName) ->
+		col = @colList.filter (column) =>
+				return column.col.name is colName
+		if ! col.length
+			col = @colList.filter (column) =>
+					return column.getSource() is colName
+		if ! col.length
+			throw new Error "column with name or source #{colName} is not found"
+		col = col.pop()
+		@internalCountNumberOfOccurenceOfPopup(col,true)
 
 	## -------------------------------------------------------------------------------------------------------------
 	## remove the checkbox for all items except those included in the bookmark array that comes from the server
@@ -185,92 +314,88 @@ class TableView
 
 		false
 
-	## -------------------------------------------------------------------------------------------------------------
-	## render the checkable row with checkbox as first column
-	##
-	## @return [String] html the html of the row as string
-	##
-	renderCheckable : (obj) =>
-		console.log obj
-		if typeof obj.rowOptionAllowCheck != "undefined" and obj.rowOptionAllowCheck == false
-			return "<td class='checkable'>&nbsp;</td>";
+	scrollUp: (amount)=>
 
-		img = @imgNotChecked
-		if obj.checked
-			img = @imgChecked
+		@offsetShowingTop += amount
 
-		if @tableName == "property" and key == window.currentProperty.id
-			html = "<td class='checkable'> &nbsp; </td>"
-		else
-			html = "<td class='checkable' id='check_#{@gid}_#{obj.id}'>" + img + "</td>"
+		if @offsetShowingTop + @shadowRows.length > @rowData.length
+			@offsetShowingTop = @rowData.length - @shadowRows.length
 
-		return html
+		if @offsetShowingTop < 0
+			@offsetShowingTop = 0
 
-	## -------------------------------------------------------------------------------------------------------------
-	## set up events callback
-	##
-	## @example
-	## 		tableview.setupEvents (rowData,e) -> , (rowData,eventType) ->
-	## @param [Function] rowCallback callback to execute at the row click
-	## @param [Function] rowMouseover callback to execute at the mouse over|out event
-	##
-	setupEvents: (@rowCallback, @rowMouseover) =>
+		@updateVisibleText()
+
+		##|
+		##|  Set the vertical scroll position
+		@virtualScrollV.setPos @offsetShowingTop
+		true
+
+	scrollRight: (amount)=>
+
+		if amount < 0 then amount = 0
+		if amount + @virtualScrollH.width > @virtualScrollH.max
+			amount = @virtualScrollH.max - @virtualScrollH.width
+
+		console.log "SETTING LEFT:", amount * -1
+
+		@elTheTable.el.css "left", -1 * amount
+		@virtualScrollH.setPos amount
+		true
 
 	## -------------------------------------------------------------------------------------------------------------
 	## to setup event internally for the table
 	##
 	internalSetupMouseEvents: () =>
 
+		@virtualScrollV.on "scroll_y", (amount)=>
+			@scrollUp(amount)
+			true
+
+		@virtualScrollV.on "scroll_to", (amount)=>
+			@offsetShowingTop = amount
+			@scrollUp(0)
+			true
+
+		@virtualScrollH.on "scroll_x", (amount)=>
+			# console.log "SCROLL X = ", amount
+			true
+
+		@virtualScrollH.on "scroll_to", (amount)=>
+			@scrollRight(amount)
+			true
+
 		@elTheTable.bind "click touchbegin", (e) =>
 
 			e.preventDefault()
 			e.stopPropagation()
 
-			data = @findRowFromElement e.target
+			data = @findRowFromPath e.path
+			col  = @findColFromPath e.path
 
 			if !data?
 				return false
 
-			result = false
-			if not e.target.constructor.toString().match(/Image/)
-
-				defaultResult = @defaultRowClick data, e
-				if defaultResult == false
-
-					##|
-					##|  Don't call a row click callback for the image which
-					##|  is the checkbox column
-					if typeof @rowCallback == "function"
-						result = @rowCallback data, e
-
-				else
-
-					return false
-
-			if result == false
-
+			if data == "Filter"
 				##|
-				##| Check to see if it's a checkbox row
-				if data? and data.checked?
-					data.checked = !data.checked
-					key = data.id
-					if data.checked
-						$("#check_#{@gid}_#{key}").html @imgChecked
-					else
-						$("#check_#{@gid}_#{key}").html @imgNotChecked
+				##|  Don't do anything here for filter columns
+				return false
 
-					# console.log "CHECKED BOX gid=", @gid, " key=", key, " table_key=", data.checkbox_key, " checked=", data.checked
-					@onSetCheckbox data.checkbox_key, data.checked
+			if data == "Header"
+				##|
+				##|  TODO: Add sorting here
+				return false
 
-			false
+			##|
+			##|  Use the new event manager
+			@emitEvent "click_#{col}", [ data, e ]
 
-		## to test the mouseover callback
-		@elTheTable.bind "mouseover mouseout", (e) =>
-			e.preventDefault()
-			e.stopPropagation()
-			if typeof @rowMouseover == "function"
-				data = @findRowFromElement e.target
-				@rowMouseover data, if e.type is "mouseover" then "over" else "out"
+			for c in @colList
+				if c.getSource() == col
+					if c.getEditable()
+						console.log "EDIT:", data, e
+						DataMap.getDataMap().editValue e.path, e.target
+
 			false
 
 	## -------------------------------------------------------------------------------------------------------------
@@ -286,10 +411,7 @@ class TableView
 		if @contextMenuCallSetup == 1 then return true
 		@contextMenuCallSetup = 1
 
-		@elTableHolder.on "contextmenu", (e) =>
-
-			e.preventDefault()
-			e.stopPropagation()
+		@elTableHolder.bind "contextmenu", (e) =>
 
 			coords    = GlobalValueManager.GetCoordsFromEvent(e)
 			data      = @findRowFromElement e.target
@@ -311,18 +433,7 @@ class TableView
 
 		true
 
-	## -------------------------------------------------------------------------------------------------------------
-	## function to set context menu on header
-	##
-	setupContextMenuHeader: =>
-		@setupContextMenu @contextMenuCallbackFunction
 
-	## -------------------------------------------------------------------------------------------------------------
-	## Table cache name is set, this allows saving/loading table configuration
-	##
-	## @param [String] tableCacheName the cache name to attach with table
-	##
-	setTableCacheName: (@tableCacheName) =>
 
 	## -------------------------------------------------------------------------------------------------------------
 	## internal function to apply sorting on table with column and sorting type
@@ -330,114 +441,74 @@ class TableView
 	## @param [Object] column column on which sorting should be applied
 	## @param [String] type it can be ASC|DESC
 	##
-	internalApplySorting: (column, type = 'ASC' ) =>
+	internalApplySorting: () =>
 
-		##| define sorter function using jquery tr switching
-		sorter = (conditions) =>
-			table = $("#table#{@gid}")
-			rows = table.find('tbody tr')
-			rows.sort (a, b) ->
-				keyA = $(a).find(".#{column.col.extraClassName}").text()
-				keyB = $(b).find(".#{column.col.extraClassName}").text()
-				if $(a).find(".#{column.col.extraClassName}").hasClass("dt_decimal")
-					keyA = parseFloat keyA
-					keyB = parseFloat keyB
-				return conditions keyA,keyB
-			$.each rows, (index, row) ->
-				table.children("tbody").append(row)
+		console.log "Apply sorting"
 
-		if type == 'ASC'
-			sorter (a,b) ->
-				if a > b then return 1;
-				if a < b then return -1;
-				return 0
-		else
-			sorter (a,b) ->
-				if a < b then return 1;
-				if a > b then return -1;
-				return 0
+		@rowData.sort (a, b)=>
 
-	## -------------------------------------------------------------------------------------------------------------
-	## function called when the right click context menu event on a header column.
-	##
-	## @event onContextMenuHeader
-	## @param [Object] coords coordinates {x:300,y:500}
-	## @param [Object] column the current column which is clicked
-	##
-	onContextMenuHeader: (coords, column) =>
+			for c in @colList
 
-		console.log "COORDS=", coords
-		selectedColumn = @colList.filter (columnObj) =>
-			return columnObj.col.name is column
-		.pop()
+				if c.sort? and c.sort == 1
+					console.log "CHECKING 1:", c.getSource()
+					if a[c.getSource()] < b[c.getSource()] then return 1
+					if a[c.getSource()] > b[c.getSource()] then return -1
 
-		##| if column is sortable in dataTypes
-		if selectedColumn.col.sortable
-			popupMenu = new PopupMenu "Column: #{column}", coords.x-150, coords.y
+				else if c.sort? and c.sort == -1
+					console.log "CHECKING -1:", c.getSource()
+					if a[c.getSource()] < b[c.getSource()] then return -1
+					if a[c.getSource()] > b[c.getSource()] then return 1
 
-			##| add sorting menu item
-			popupMenu.addItem "Sort Ascending", () =>
-				popupMenu.closeTimer()
-				@internalApplySorting(selectedColumn)
-			popupMenu.addItem "Sort Descending", () =>
-				popupMenu.closeTimer()
-				@internalApplySorting(selectedColumn,'DSC')
-		if @customizableColumns
-			if !popupMenu
-				popupMenu = new PopupMenu "Column: #{column}", coords.x-150, coords.y
-			popupMenu.addItem "Customize", (coords, data) =>
-				popupMenu.closeTimer()
-				@onConfigureColumns
-					x: coords.x
-					y: coords.y
+			return 0
 
+		@updateVisibleText()
 
-		if typeof @tableCacheName != "undefined" && @tableCacheName != null
-			if !popupMenu
-				popupMenu = new PopupMenu "Column: #{column}", coords.x-150, coords.y
-			popupMenu.addItem "Configure Columns", (coords, data) =>
-				@onConfigureColumns
-					x: coords.x
-					y: coords.y
-
-
-	## -------------------------------------------------------------------------------------------------------------
-	## Display a popup to adjust the column of the table
-	##
-	## @param [Object] coords coordinates including x and y
-	## @event onConfigureColumns
-	##
-	onConfigureColumns: (coords) =>
-
-		popup = new PopupWindowTableConfiguration "Configure Columns", coords.x-150, coords.y
-		popup.show(this)
-
-
-	## -------------------------------------------------------------------------------------------------------------
-	## function to filter rows if return's true, then the row is skipped
-	##
-	## @param [Object] row the current row for which the funciton is called
-	## @return [Boolean]
-	##
-	filterFunction : (row) =>
-		return false
+		true
 
 	## -------------------------------------------------------------------------------------------------------------
 	## function to update row data on the screen if new data has been added in datamapper they can be considered
 	##
 	updateRowData: () =>
 
-		##|
-		##|  Get latest data from that table using dataMap
-		@shadowMap = null
 		@rowData = []
-		data = DataMap.getValuesFromTable @primaryTableName, @reduceFunction
-		for row in data
-			if @showCheckboxes
-				row.checkbox_key = @primaryTableName + "_" + row.id
-				row.checked = false
+		@rowDataRaw = []
 
-			@rowData.push row
+		# for col in @colList
+			# console.log "COL=", col
+
+		allData = DataMap.getValuesFromTable @primaryTableName, @reduceFunction
+		for keyName, obj of allData
+
+			obj.visible = true
+
+			objRaw = {}
+			colNum = 0
+			for col in @colList
+
+				if !col.visible
+					continue
+
+				if col.joinKey?
+					val = DataMap.getDataField col.joinTable, obj.id, col.joinKey
+					obj[col.getSource()] = DataMap.getDataFieldFormatted col.tableName, val, col.getSource()
+					objRaw[col.getSource()] = DataMap.getDataField col.tableName, val, col.getSource()
+				else
+					obj[col.getSource()] = DataMap.getDataFieldFormatted col.tableName, obj.id, col.getSource()
+					objRaw[col.getSource()] = DataMap.getDataField col.tableName, obj.id, col.getSource()
+
+				colNum++
+
+			##|
+			##|  Values for the bookmark / selected checkbox
+			obj.row_selected = @imgNotChecked
+			objRaw.row_selected = false
+
+			# console.log "ADDING ROW", obj
+			@rowData.push obj
+			@rowDataRaw.push objRaw
+
+		return true
+
 
 	## -------------------------------------------------------------------------------------------------------------
 	## set the holder element to go to the bottom of the screen
@@ -449,51 +520,30 @@ class TableView
 
 		newHeight = height - pos.top
 		@elTableHolder.height(newHeight)
-		# console.log "Window Height=", height, " Pos=", pos, "NewHeight=", newHeight
 
 		##|
 		##|  If the width of the table scrolls, this fixes it
-		width = @elTableHolder.width()
-		console.log "W=", width
-		console.log "I=", @elTableHolder.find(".inner-container")
-		console.log "W2=", @elTableHolder.find(".inner-container").width()
-		if width > 0
-			@elTableHolder.find(".inner-container").width(width)
+		newWidth = @elTableHolder.width()
 
-		if !@resizeHolderEvent?
+		if @resizeHolderEvent?
+
+			if newWidth != @lastNewWidth or newHeight != @lastNewHeight
+				console.log "setHolderToBottom, WindowHeight=#{height}, Table Position=", pos, " newHeight=#{newHeight}, newWidth=#{newWidth}"
+				@render()
+			return true
+
+		else
+
 			@resizeHolderEvent = true
 			$(window).on "resize", ()=>
+				##|
+				##|  Automatically adjust the position if the screen size changes
 				@setHolderToBottom()
 				true
 
+		@lastNewHeight = newHeight
+		@lastNewWidth  = newWidth
 		true
-
-	## -------------------------------------------------------------------------------------------------------------
-	## make the table with fixed header and scrollable
-	##
-	## @param [Boolean] fixedHeader if header is fixed or not
-	##
-	fixedHeaderAndScrollable: (@fixedHeader = true) =>
-		$(window).on 'resize', () =>
-			@elTableHolder.find('.table-header .tableview').width(@elTableHolder.find('.table-body .tableview').width())
-
-	## -------------------------------------------------------------------------------------------------------------
-	## function to make column filter as popup instead of plain text
-	##
-	## @example
-	##		tableview.setColumnFilterAsPopup("sample") where sample is column name or source
-	## @param [String] colName column name or source to be used in the filter
-	##
-	setColumnFilterAsPopup: (colName) ->
-		col = @colList.filter (column) =>
-				return column.col.name is colName
-		if ! col.length
-			col = @colList.filter (column) =>
-					return column.col.source is colName
-		if ! col.length
-			throw new Error "column with name or source #{colName} is not found"
-		col = col.pop()
-		@internalCountNumberOfOccurenceOfPopup(col,true)
 
 	## -------------------------------------------------------------------------------------------------------------
 	## internal function to calculate the number of occurences for each value in options
@@ -504,7 +554,7 @@ class TableView
 	internalCountNumberOfOccurenceOfPopup: (col,initialize = false) =>
 
 		##| calculate occurances of unique values
-		occurences = @rowData.map (r) => {key: r.id, value : DataMap.getDataField col.tableName, r.id, col.col.source}
+		occurences = @rowData.map (r) => {key: r.id, value : DataMap.getDataField col.tableName, r.id, col.getSource()}
 		counts = {}
 		occurences.forEach (v) =>
 			if $("#tbody#{@gid}").find("[data-id=#{v.id}]").is(":visible") or initialize
@@ -513,10 +563,10 @@ class TableView
 		col.filterPopupData = counts
 
 		if @filterAsPopupCols and typeof @filterAsPopupCols == 'object'
-			@filterAsPopupCols[col.col.source] = col
+			@filterAsPopupCols[col.getSource()] = col
 		else
 			@filterAsPopupCols =
-				"#{col.col.source}" : col
+				"#{col.getSource()}" : col
 
 	## -------------------------------------------------------------------------------------------------------------
 	## function to make column customizable in the popup
@@ -527,6 +577,226 @@ class TableView
 	##
 	allowCustomize: (@customizableColumns = true) ->
 
+	updateVisibleText: ()=>
+
+		if @offsetShowingTop < 0
+			@offsetShowingTop = 0
+
+		rowNum       = @offsetShowingTop
+		shadowRowNum = 0
+
+		while shadowRowNum < @shadowRows.length
+
+			row = @shadowRows[shadowRowNum]
+
+			if rowNum >= @rowData.length
+				##|
+				##|  Special case, no values left to show
+				colNum = 0
+				for col in @colList
+					if !col.visible then continue
+					row[colNum].text ""
+					row[colNum].removeClass "dataChanged"
+					row[colNum].setDataPath ""
+					colNum++
+
+				shadowRowNum++
+				continue
+
+			if @rowData[rowNum].visible? and not @rowData[rowNum].visible
+				rowNum++
+				continue
+
+			colNum = 0
+			for col in @colList
+				if !col.visible
+					continue
+
+				row[colNum].html @rowData[rowNum][col.getSource()]
+				row[colNum].removeClass "dataChanged"
+				row[colNum].setDataPath "/#{col.tableName}/#{@rowData[rowNum].id}/#{col.getSource()}"
+				colNum++
+
+			rowNum++
+			shadowRowNum++
+
+		strStatus = "Showing " + (@offsetShowingTop+1) + " - " + (rowNum) + " of " + @rowData.length
+		true
+
+	getMaxVisibleRows: ()=>
+
+		##|
+		##|  Determine how many rows are visible based on scroll area.   If it's not scrollable then
+		##|  all rows are visible
+
+		if not @fixedHeader
+			return @rowData.length
+
+		maxHeight  = @elTableHolder.height()
+
+		##|
+		##|  Remove space for bottom scrollbar
+		maxHeight -= @virtualScrollH.height
+
+		if @showFilters
+			maxHeight -= @filterCellHeight
+
+		if @showHeaders
+			maxHeight -= @headerCellHeight
+
+		##|
+		##|  Should we account for headers / filters and scroll area?
+		maxRows = maxHeight / @dataCellHeight
+		console.log "Height=", maxHeight, " MaxRows=", maxRows
+		return Math.ceil(maxRows)
+
+	layoutShadow: ()=>
+
+		maxWidth   = @elTableHolder.width()
+		maxHeight  = @elTableHolder.height()
+
+		##|
+		##|  If the horizontal scrollbar is showing then don't
+		##|  let the vertical go all the way to the bottom
+		##|
+		if @virtualScrollH.visible
+			@virtualScrollV.bottomPadding = @virtualScrollH.height-1
+
+		if !@fixedHeader
+			@virtualScrollV.hide()
+			@virtualScrollH.hide()
+		else
+			@virtualScrollV.resize()
+			@virtualScrollH.resize()
+
+		##|
+		##|  Max room for the scrollbars
+		maxWidth -= @virtualScrollV.width
+
+		##|
+		##|  Look at all the columns, determine the likely width
+		widthLimit   = maxWidth
+		missingCount = 0
+		colNum       = 0
+
+		for i in @colList
+			calcWidth = i.calculateWidth()
+			if not i.visible
+				i.actualWidth = -1
+			else
+
+				if !calcWidth? or calcWidth < 0
+					missingCount++
+					i.actualWidth = null
+				else
+					maxWidth -= calcWidth
+					i.actualWidth = calcWidth
+
+			colNum++
+
+		##|
+		##|  Split the remaining space
+		if missingCount > 0
+			unallocatedSpace = Math.ceil(maxWidth / missingCount)
+			if unallocatedSpace < 60 then unallocatedSpace = 60
+
+		totalWidth = 0
+		totalColCount = 0
+		for i in @colList
+
+			if not i.visible then continue
+
+			if x == colNum-1 and !i.actualWidth?
+				i.actualWidth = widthLimit - totalWidth
+				if i.actualWidth < 60
+					i.actualWidth = 60
+
+			if !i.actualWidth?
+				i.actualWidth = unallocatedSpace
+
+			totalWidth += i.actualWidth
+			# console.log "COL ", i.getSource(), " = ", i.actualWidth, " [", totalWidth, "]"
+
+		# console.log "Actual=", widthLimit, "Total Width = ", totalWidth
+
+		##|
+		##|  Remove or add a pixel until we have the exact amount
+		##|  but only if we are smaller than available size or very close to it
+		if totalWidth - 50 < widthLimit
+			while totalWidth != widthLimit
+
+				found = false
+				for i in @colList
+					if not i.visible then continue
+					if i.getSource() == "row_selected" then continue
+					if i.getFormatterName() != "text" then continue
+					found = true
+					if totalWidth > widthLimit
+						i.actualWidth--
+						totalWidth--
+					else if totalWidth < widthLimit
+						i.actualWidth++
+						totalWidth++
+
+				if not found then break
+
+				# console.log "Actual=", widthLimit, "Total Width = ", totalWidth
+
+		if @fixedHeader
+			##|
+			##|  Set the scrollbar range on the hscroll
+			setTimeout ()=>
+
+				if totalWidth == widthLimit
+					@virtualScrollH.hide()
+				else
+					@virtualScrollH.setRange 0, totalWidth, widthLimit
+					@virtualScrollH.setPos 0
+
+				@virtualScrollV.setRange 0, @rowData.length, @shadowRows.length
+				@virtualScrollV.setPos 0
+
+			, 10
+
+			@elTheTable.el.width totalWidth
+
+		x = 0
+		y = 0
+
+		drawRow = (rowList, rowHeight, dataPathPrefix)=>
+
+			colNum = 0
+			x      = 0
+			for i in @colList
+				if not i.visible then continue
+				cell = rowList[colNum]
+				cell.move x, y, i.actualWidth, rowHeight
+				x += i.actualWidth
+				colNum++
+
+			y += rowHeight
+			true
+
+
+		##|
+		##|  Place the header rows
+		if @showHeaders
+			drawRow @shadowHeader, @headerCellHeight, "Header"
+
+		##|
+		##|  Place the filter rows
+		if @showFilters
+			drawRow @shadowFilter, @filterCellHeight, "Filter"
+
+		##|
+		##|  Place the data cells
+		for row in @shadowRows
+			drawRow row, @dataCellHeight, "last"
+
+		if !@fixedHeader or maxHeight == 0
+			@elTableHolder.height(y)
+
+		true
 
 	## -------------------------------------------------------------------------------------------------------------
 	## function to render the added table inside the table holder element
@@ -536,6 +806,9 @@ class TableView
 	##
 	render: () =>
 
+		##|
+		##|  Get the data from that table
+		@updateRowData()
 		@rowDataElements = {}
 
 		##|
@@ -545,117 +818,76 @@ class TableView
 			@gid = GlobalValueManager.NextGlobalID()
 
 		html = "";
-		##| if fixed header and resizable
-		if @fixedHeader
 
-			if !@showHeaders
-				throw new Error "fixed header can't be done without header"
+		@elTableHolder.html("")
+		@widgetBase = new WidgetBase()
 
-			html += """
-				<div class='table-wrapper' id='tableWrapper#{@gid}'><div class='outer-container'>
-					<div class='inner-container'>
-						<div class='table-header'>
-							<table id="tableheader#{@gid}" class="tableview">
-				"""
+		tableWrapper   = @widgetBase.addDiv "table-wrapper", "tableWrapper#{@gid}"
+		outerContainer = tableWrapper.addDiv "outer-container"
+		@elTheTable    = outerContainer.addDiv "inner-container tableview"
 
-		else
+		@virtualScrollV = new VirtualScrollArea outerContainer, true
+		@virtualScrollH = new VirtualScrollArea outerContainer, false
 
-			##|
-			##|  draw the table header
-			html += "<div class='tableviewSimpleWrapper'>"
-			html += "<table class='tableview' id='table#{@gid}'>"
+		@shadowHeader  = []
+		@shadowFilter  = []
+		@shadowRows    = []
 
-		##|
 		##|  Add headers
 		if @showHeaders
 
-			html += "<thead><tr>";
-
-			##|
-			##|  Add a checkbox to the table that is persistant
-			if @showCheckboxes
-				html += "<th class='checkable'>&nbsp;</th>"
-
 			for i in @colList
-				html += i.RenderHeader(i.extraClassName);
-
-			html += "</tr>";
+				if !i.visible then continue
+				@shadowHeader.push i.RenderHeader(i.extraClassName, @elTheTable)
 
 		if @showFilters
 
-			html += "<thead><tr>";
-
-			##|
-			##|  Add a checkbox to the table that is persistant
-			if @showCheckboxes
-				html += "<th class='checkable'>&nbsp;</th>"
-
-			popupCols = []
-			if typeof @filterAsPopupCols is 'object' then popupCols = Object.keys @filterAsPopupCols
 			for i in @colList
-				if i.visible
-					html += "<td class='dataFilterWrapper'>"
-					if popupCols.indexOf(i.col.source) == -1
-						html += "<input class='dataFilter #{i.col.formatter.name}' data-path='/#{i.tableName}/#{i.col.source}'>"
-					else
-						html += "<a class='link filterPopupCol' data-source='#{i.col.source}' style='width:100%;height:100%;display:block;text-align:center;font-size:14px;border:1px solid #000' href='javascript:;'><span class='filtered_text'>Select</span></a><span class='caret pull-right' style='margin-top:-12px;margin-right:10px;'></span>"
-
-					html += "</td>"
-
-			html += "</tr>";
-
-		##|
-		##|  Start adding the body
-		html += "</thead>"
-		if @fixedHeader
-			html += """</table>
-					</div>
-					<div class="table-body">
-						<table id='table#{@gid}' class="tableview">"""
-
-		html += "<tbody id='tbody#{@gid}'>";
-
-		# counter = 0
-		if (typeof @sort == "function")
-			@rowData.sort @sort
+				if !i.visible then continue
+				tag = @elTheTable.addDiv 'dataFilterWrapper'
+				filter = tag.add "input", "dataFilter #{i.getFormatterName()}"
+				filter.setDataPath "/#{i.tableName}/Filter/#{i.getSource()}"
+				filter.bind "keyup", @onFilterKeypress
+				@shadowFilter.push tag
 
 		##| if no row found then default message
 		if @rowData.length is 0
+			console.log "TODO: Add empty results"
 			@addMessageRow "No results"
 
-		for counter, i of @rowData
-
-			# if @filterFunction i then continue
-			if typeof i == "string"
-				html += "<tr class='messageRow'><td class='messageRow' colspan='#{@colList.length+1}'"
-				html += ">#{i}</td></tr>";
-			else
-				html += @internalRenderRow(counter,i)
-
-		html += "</tbody></table>";
-		if @fixedHeader
-			html += "</div></div></div></div>"
-			#| add width to individual td
-		else
-			html += "</div>"
-
-		@elTheTable = @elTableHolder.html(html);
-
 		##|
-		##|  If the holder element has no height defined and we have a fixed header
-		##|  set the holder element to fill to bottom
-		if @elTableHolder.height() == 0 and @fixedHeader
-			@setHolderToBottom()
+		##| TODO CHECK FOR FILTER
+		if @fixedHeader?
+			console.log "Fixed header found,", @getMaxVisibleRows()
 
-		##| if the fixed header add the width to first row td
-		if @fixedHeader
-			html = "";
-			$("#tableheader#{@gid} tr:first th").each (index,e) =>
-				html += "<col width='"+$(e).outerWidth()+"px' />"
-			$("#table#{@gid}").append html
-			tableHolder = @elTableHolder
-			@elTableHolder.find(".table-body").scroll (e)->
-				tableHolder.find(".table-header").css('left',(-1*this.scrollLeft) + 'px')
+		maxRows = @getMaxVisibleRows()
+		if maxRows > @rowData.length
+			@virtualScrollV.hide()
+			maxRows = @rowData.length
+
+		for rowNum in [0...maxRows]
+
+			row = []
+			for i in @colList
+				if !i.visible then continue
+
+				editable = ""
+				if i.getEditable() then editable = " editable"
+				if rowNum % 2 == 0 then editable += " even"
+				if i.getAlign() == "right" then editable += " text-right"
+				if i.getAlign() == "center" then editable += " text-center"
+				editable += " col_" + i.getSource()
+				colTag = @elTheTable.addDiv "#{i.getFormatterName()} #{editable}"
+				colTag.text "r=#{rowNum},#{i.getSource()}"
+				row.push colTag
+
+			@shadowRows.push row
+
+		@layoutShadow()
+		@updateVisibleText()
+		@internalSetupMouseEvents()
+		@elTableHolder.append tableWrapper.el
+		return
 
 		setTimeout () =>
 			# globalResizeScrollable();
@@ -666,15 +898,11 @@ class TableView
 		##|
 		##|  This is a new render which means we need to re-establish any context menu
 		@contextMenuCallSetup = 0
-		# @setupContextMenuHeader()
-		@internalSetupMouseEvents()
 
-		if @showFilters
-			@elTheTable.find("input.dataFilter").on "keyup", @onFilterKeypress
-			@elTheTable.find("a.filterPopupCol").on "click", @onFilterPopupClick
 
-		if @inlineSorting
-			@internalBindInlineSortingEvents()
+		##|
+		##|  Setup context menu on the header
+		@setupContextMenu @contextMenuCallbackFunction
 
 		##| add default context menu for sorting as per #89 comment
 		@setupContextMenu @contextMenuCallbackFunction
@@ -682,77 +910,23 @@ class TableView
 
 
 	## -------------------------------------------------------------------------------------------------------------
-	## internal function to get the html of a single row
-	##
-	## @param [Integer] counter the position of the row
-	## @param [Object] dataElement the data element with key as property retrived from the data map
-	## @return [String] html the html of the row
-	##
-	internalRenderRow: (counter,i,isNewRow = false) =>
-
-		##|
-		##|  Create the "TR" tag
-		html = "<tr class='trow #{if isNewRow then 'newDataRow' else ''}' data-id='#{counter}' "
-		html += ">"
-
-		##|
-		##|  Add a checkbox column possibly and then render the
-		##|  column using the column object.
-		if @showCheckboxes
-			html += @renderCheckable(i)
-
-		for col in @colList
-			if col.visible
-				if col.joinKey?
-					val = DataMap.getDataField col.joinTable, i.id, col.joinKey
-					str = DataMap.renderField "td", col.tableName, col.col.source, val, col.col.extraClassName
-				else
-					str = DataMap.renderField "td", col.tableName, col.col.source, i.id, col.col.extraClassName
-
-				html += str
-
-		html += "</tr>";
-		return html
-
-	## -------------------------------------------------------------------------------------------------------------
 	## function to sort the table base on column and type
 	##
 	## @param [String] name name of the column to apply sorting on
 	## @param [String] type it can be ASC|DESC
 	##
-	sortByColumn: (name,type = 'ASC') =>
-		that = this
-		table = $("#table#{@gid}")
-		sorters = table.find '.table-sorter'
-		th = table.find("th:contains(#{name})").first()
-		sorters.each () ->
-			$(this).parent().attr('data-current-sorting','none')
-			$(this).removeClass('fa-sort-asc fa-sort-desc').addClass('fa-sort')
-		col = @colList.filter (col) ->
-			col.col.name == name
-		.pop()
-		if type is 'ASC'
-			th.attr('data-current-sorting','ASC')
-			th.find('.fa').removeClass('fa-sort fa-sort-desc').addClass('fa-sort-asc')
-		else
-			th.attr('data-current-sorting','DSC')
-			th.find('.fa').removeClass('fa-sort fa-sort-asc').addClass('fa-sort-desc')
-		that.internalApplySorting(col,type)
+	sortByColumn: (name) =>
 
-	## -------------------------------------------------------------------------------------------------------------
-	## internal function to bind the table header row click event which are called withing inlineSortingSupport
-	##
-	internalBindInlineSortingEvents: () =>
-		table = $("#table#{@gid}")
-		sorters = table.find '.table-sorter'
-		that = this
-		sorters.each () ->
-			th = $(this).parent()
-			th.attr('data-current-sorting','none').css('cursor','pointer')
-			th.on 'click', () ->
-				currentSorting = $(this).attr('data-current-sorting')
-				type = if currentSorting is 'ASC' then 'DSC' else 'ASC'
-				that.sortByColumn($(this).text(),type)
+		for col in @colList
+			if col.getSource() == name
+				if col.sort == -1
+					col.UpdateSortIcon(1)
+				else
+					col.UpdateSortIcon(-1)
+
+		@internalApplySorting()
+		true
+
 
 	## -------------------------------------------------------------------------------------------------------------
 	## intenal event key press in a filter field, that executes during the filter text box keypress event
@@ -763,9 +937,10 @@ class TableView
 	##
 	onFilterKeypress: (e) =>
 
-		parts      = $(e.target).attr("data-path").split /\//
+		parts      = e.path.split '/'
 		tableName  = parts[1]
-		columnName = parts[2]
+		keyValue   = parts[2]
+		columnName = parts[3]
 
 		if !@currentFilters[tableName]?
 			@currentFilters[tableName] = {}
@@ -793,63 +968,19 @@ class TableView
 
 			Object.keys(options).forEach (option) =>
 				menu.addItem "<div style='padding-left:10px;padding-right:10px;'>#{option}   <div class='badge pull-right' style='margin-top:12px;'> #{options[option]} </div></div>", (data) =>
-					@currentFilters[@filterAsPopupCols[source].tableName][@filterAsPopupCols[source].col.source] = option
+					@currentFilters[@filterAsPopupCols[source].tableName][@filterAsPopupCols[source].getSource()] = option
 					$(e.target).find('.filtered_text').text option
 					@applyFilters()
 
 			menu.addItem "Clear filter", (data) =>
-				delete @currentFilters[@filterAsPopupCols[source].tableName][@filterAsPopupCols[source].col.source]
+				delete @currentFilters[@filterAsPopupCols[source].tableName][@filterAsPopupCols[source].getSource()]
 				$(e.target).find('.filtered_text').text 'select'
 				@applyFilters()
-
-	##|
-	##|  Build a "Shadow Map" for the table by caching the TR/TD Values
-	##|  The result is a map will all data rows and a reference to the element
-	##|  that holds that row / col and it's current value.
-	##|
-	buildShadowMap: ()=>
-
-		if @shadowMap? then return
-
-		@shadowMap = {}
-
-		list = @elTheTable.find "tr.trow"
-		for el in list
-			rec = {}
-			rec.el = $(el)
-			rec.children = {}
-			rec.visible = rec.el.is(':visible')
-
-			children = rec.el.find "td"
-			for td in children
-				child = {}
-				child.el = $(td)
-				child.path = child.el.attr "data-path"
-				child.value = child.el.text()
-
-				if not child.path? then continue
-
-				##|
-				##| Cache the "keyPath" which is the collection and field without the id
-				parts   = child.path.split '/'
-				keyPath = parts[1] + "." + parts[3]
-
-				rec.children[keyPath] = child
-
-			rec_id = rec.el.attr "data-id"
-			@shadowMap[rec_id] = rec
-
-		console.log "SH=", @shadowMap
-		true
 
 	## -------------------------------------------------------------------------------------------------------------
 	## Apply filters stored in "currentFilters" to each column and show/hide the rows
 	##
 	applyFilters: () =>
-
-		@buildShadowMap()
-
-		console.log "@filterAsPopupCols=", @filterAsPopupCols
 
 		##|
 		##| Build the filters
@@ -858,26 +989,34 @@ class TableView
 		for tableName, fieldList of @currentFilters
 			for fieldName, filterValue of fieldList
 				filters.push
-					keyName: tableName + "." + fieldName
+					keyName: fieldName
 					filter : new RegExp filterValue, "i"
 
-		for i, row of @shadowMap
+		rowNum  = 0
+		needRefresh = false
+		for row in @rowData
+
+			if !row.visible?
+				row.visible = true
 
 			##|
 			##| Each row has the element (el) and the children TD nodes in children
-			keepRow = false
+
+			keepRow = true
 			for f in filters
-				if keepRow then continue
-				if not row.children[f.keyName]? then continue
-				if f.filter.test row.children[f.keyName].value
-					keepRow = true
+				if not keepRow then continue
+				if not f.filter.test row[f.keyName]
+					keepRow = false
 
 			if keepRow and not row.visible
 				row.visible = true
-				row.el.show()
+				needRefresh = true
 			else if not keepRow and row.visible
 				row.visible = false
-				row.el.hide()
+				needRefresh = true
+
+		if needRefresh
+			@updateVisibleText()
 
 		return
 
@@ -912,7 +1051,7 @@ class TableView
 		popupCols = []
 		if typeof @filterAsPopupCols is 'object' then popupCols = Object.keys @filterAsPopupCols
 		popupCols.forEach (columnObj) =>
-			column = @colList.filter (c) => c.col.source == columnObj
+			column = @colList.filter (c) => c.getSource() == columnObj
 			column = column.pop()
 			@internalCountNumberOfOccurenceOfPopup column
 
@@ -943,18 +1082,34 @@ class TableView
 		true
 
 	## -------------------------------------------------------------------------------------------------------------
-	## add custom filter function which will be called on the key press of filter field
-	##
-	## @param [Function] filterFunction to be called in keypress
-	##
-	setFilterFunction: (filterFunction) =>
+	##|
+	##|  Called when an even has been added using the event manager
+	onAddedEvent: (eventName, callback)=>
 
-		@filterFunction = filterFunction
+		m = eventName.match /click_(.*)/
+		if m? and m[1]?
+			##|
+			##|  Added a click event to a column named m[1]
+			##|
+			$(".col_#{m[1]}").css "cursor", "pointer"
+			$(".col_#{m[1]}").addClass "clickable"
 
-		##|
-		##|  Force the table to redraw with a global "redrawTables" command
-		GlobalValueManager.Watch "redrawTables", () =>
-			@render()
+		true
+
+	## -------------------------------------------------------------------------------------------------------------
+	## internal function to find the col name from the event object
+	##
+	## @param [Event] e the jquery Event object
+	## @param [Integer] stackCount number of checking round
+	##
+	findColFromPath: (path) =>
+
+		if !path? then return null
+		parts     = path.split '/'
+		tableName = parts[1]
+		keyValue  = parts[2]
+		colName   = parts[3]
+		return colName
 
 	## -------------------------------------------------------------------------------------------------------------
 	## internal function to find the row element from the event object
@@ -962,45 +1117,28 @@ class TableView
 	## @param [Event] e the jquery Event object
 	## @param [Integer] stackCount number of checking round
 	##
-	findRowFromElement: (e, stackCount) =>
+	findRowFromPath: (path) =>
 
-		# console.log "FindRowFromElement:", e, stackCount
+		if !path? then return null
+		parts     = path.split '/'
+		tableName = parts[1]
+		keyValue  = parts[2]
+		colName   = parts[3]
 
-		if typeof stackCount == "undefined" then stackCount = 0
-		if stackCount > 4 then return null
-		data_id = $(e).attr("data-id")
-		if data_id then return @rowData[data_id]
-		parent = $(e).parent()
-		if parent then return @findRowFromElement(parent, stackCount + 1)
-		return null
+		if keyValue == "Filter"
+			return "Filter"
 
-	## -------------------------------------------------------------------------------------------------------------
-	## add responsive capabilities by adding auto hide columns having width less than passed thresold
-	##
-	## @param [Integer] width default is 32 so column having width less than 32 will be hidden if space is not enough
-	##
-	setAutoHideColumn: (width=32) =>
+		if keyValue == "Header"
+			@sortByColumn colName
+			return "Header"
 
-		handleResize = =>
+		data = {}
+		colNum = 0
+		for col in @colList
 
-			headerHideIndexes = [];
-			##| reset table to calculate based on updated width
-			@elTableHolder.find("col,tr th,td").removeClass('hide')
-			@elTableHolder.find("thead tr:first th").each () ->
-				if $(this).outerWidth() < width
-					headerHideIndexes.push($(this).index())
+			fieldName = col.getSource()
+			fieldValue = DataMap.getDataField col.tableName, keyValue, fieldName
+			data[fieldName] = fieldValue
 
-			##| make sure to have hide left columns first
-			while headerHideIndexes.length
-				index = headerHideIndexes.pop();
-				if @elTableHolder.find("tr th:eq(#{index})").outerWidth() < width
-					@elTableHolder.find("tr th:eq(#{index}),td:eq(#{index})").addClass('hide')
-					@elTableHolder.find("col:eq(#{index})").addClass('hide')
-
-			##| set the appropriate <col> width to sync the width with header
-			if @fixedHeader
-				@elTableHolder.find('.table-header tr:first th').each (i,th) =>
-					$(th).outerWidth(@elTableHolder.find(".table-body table col:eq(#{i})").outerWidth())
-		handleResize()
-		@elTableHolder.parent().on 'resize', handleResize
-		$(window).on 'resize', handleResize
+		data["id"] = keyValue
+		return data

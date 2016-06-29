@@ -78,6 +78,15 @@ class DataMapMemoryCollection
             return null
 
     ##|
+    ##|  Find a single record for read-online
+    findFastRow: (idValue) =>
+
+        if idValue? and @data[idValue]?
+            return @data[idValue]
+        else
+            return null
+
+    ##|
     ##|  Fully update the document in memory
     ##|
 
@@ -179,6 +188,22 @@ class DataMapEngine
 
         c = @internalGetCollection collectionName
         return c.findFast keyValue, subPath
+
+    ##|
+    ##|  Return all the values for a given table row
+    getFastRow: (collectionName, keyValue) =>
+
+        ##|
+        ##|  Path should already be parsed into an object.
+
+        if !collectionName?
+            throw new Error "Missing collection name"
+
+        if typeof keyValue == "string" and /^[0-9]+$/.test keyValue
+            keyValue = parseInt keyValue
+
+        c = @internalGetCollection collectionName
+        return c.findFastRow keyValue, subPath
 
     ##| -------------------------------------------------------------------------------------------------------------
     ##|

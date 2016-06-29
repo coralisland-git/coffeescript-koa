@@ -32,7 +32,7 @@ class PopupTable extends PopupWindow
         if @mainTableObject.elTableHolder.attr('id')
             _tableId = @mainTableObject.elTableHolder.attr('id')
         else
-            _tableId = @mainTableObject.elTableHolder.selector.substr 1
+            _tableId = "tabletemp"
         ##| assign the prefix popup so elements get seperated from direct body elements
         _tableId += "popup_#{_tableId}"
 
