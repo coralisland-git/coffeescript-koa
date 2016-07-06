@@ -243,32 +243,41 @@ class DataFormatSourceCode extends DataFormatText
 		##|
 		##|  Show a popup menu
 		popup = new PopupWindow("Source Code");
-		popup.windowScroll.append $("<div id='action_bar'></div><div id='code_editor_#{elParent.index()}' style='position:relative;padding-bottom:30px;'><div id='editor'></div></div>")
-		codeEditor = new CodeEditor popup.windowScroll.find "#code_editor_#{elParent.index()} #editor"
+		popup.resize 600, 400
+
+		navButtonSave = new NavButton "Save", "toolbar-btn navbar-btn btn-primary"
+		navButtonSave.onClick = (e)=>
+			@saveValue codeEditor.getContent()
+			popup.destroy()
+
+		navButtonCancel = new NavButton "Cancel", "toolbar-btn navbar-btn btn-danger cancel-btn"
+		navButtonCancel.onClick = (e)=>
+			popup.destroy()
+
+		popup.addToolbar [ navButtonSave, navButtonCancel ]
+
+		tag = $ "<div />",
+			id: "editor_" + GlobalValueManager.NextGlobalID()
+
+		popup.windowScroll.append tag
+
+		codeEditor = new CodeEditor tag
 		codeEditor.popupMode().setTheme "tomorrow_night_eighties"
 			.setMode "javascript"
+
+		console.log "CURRENT=", currentValue
+
 		if !currentValue
 			code = ''
 		else if typeof currentValue isnt 'string'
 			code = currentValue.toString()
 		else
 			code = currentValue
-		codeEditor.setContent code
-		buttonNav = new DynamicNav(popup.windowScroll.find('#action_bar'))
-		buttonNav.inverse
-		saveButton = new NavButton("Save","btn btn-primary navbar-btn", id: "save_btn_#{elParent.index()}")
-		cancelButton = new NavButton("Cancel", "btn btn-danger navbar-btn cancel-btn", id: "cancel_btn_#{elParent.index()}")
-		buttonNav.addElement(cancelButton).addElement(saveButton)
-		buttonNav.render()
-		popup.resize(600,425)
-		popup.center()
-		$("##{saveButton.gid}").on "click", () =>
-			@saveValue codeEditor.getContent()
-			popup.destroy()
-		$("##{cancelButton.gid}").on "click", () =>
-			popup.destroy()
-		true
 
+		codeEditor.setContent code
+
+		popup.update()
+		true
 
 ## -------------------------------------------------------------------------------------------------------------
 ## class for int data type

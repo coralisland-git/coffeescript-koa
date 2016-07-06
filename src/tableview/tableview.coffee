@@ -450,12 +450,10 @@ class TableView
 			for c in @colList
 
 				if c.sort? and c.sort == 1
-					console.log "CHECKING 1:", c.getSource()
 					if a[c.getSource()] < b[c.getSource()] then return 1
 					if a[c.getSource()] > b[c.getSource()] then return -1
 
 				else if c.sort? and c.sort == -1
-					console.log "CHECKING -1:", c.getSource()
 					if a[c.getSource()] < b[c.getSource()] then return -1
 					if a[c.getSource()] > b[c.getSource()] then return 1
 
@@ -528,8 +526,9 @@ class TableView
 		if @resizeHolderEvent?
 
 			if newWidth != @lastNewWidth or newHeight != @lastNewHeight
-				console.log "setHolderToBottom, WindowHeight=#{height}, Table Position=", pos, " newHeight=#{newHeight}, newWidth=#{newWidth}"
+				# console.log "setHolderToBottom, WindowHeight=#{height}, Table Position=", pos, " newHeight=#{newHeight}, newWidth=#{newWidth}"
 				@render()
+
 			return true
 
 		else
@@ -647,7 +646,7 @@ class TableView
 		##|
 		##|  Should we account for headers / filters and scroll area?
 		maxRows = maxHeight / @dataCellHeight
-		console.log "Height=", maxHeight, " MaxRows=", maxRows
+		# console.log "Height=", maxHeight, " MaxRows=", maxRows
 		return Math.ceil(maxRows)
 
 	layoutShadow: ()=>
@@ -857,8 +856,6 @@ class TableView
 
 		##|
 		##| TODO CHECK FOR FILTER
-		if @fixedHeader?
-			console.log "Fixed header found,", @getMaxVisibleRows()
 
 		maxRows = @getMaxVisibleRows()
 		if maxRows > @rowData.length

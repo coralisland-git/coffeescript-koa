@@ -278,6 +278,38 @@ class DataMap
 	## ===[ Dealing with Schema (column definitions) ]===
 
 	## -------------------------------------------------------------------------------------------------------------
+	## Import the given data types from a saved selection
+	##
+	## @param [String] tableName table name for which the new data type is being set
+	## @param [Object] columns containing data types
+	##
+	@importDataTypes: (tableName, savedConfig) =>
+
+		dm = DataMap.getDataMap()
+		dm.types[tableName] = new DataTypeCollection(tableName)
+
+		for sourceName, obj of savedConfig
+
+			if obj.render and typeof obj.render == "string" and obj.render.length > 1
+				##|
+				##| Convert to a function
+				try
+					fun = obj.render.replace /function[^\)]+\)/, ""
+					fun = fun.replace /^ /g, ""
+					if fun.charAt(0) == '{'
+						fun = fun.replace /^\{/, ""
+						fun = fun.replace /\{$/, ""
+
+					obj.render = Function("val","obj", fun)
+				catch e
+					console.log "Error creating function:", e
+
+
+			dm.types[tableName].configureColumns [ obj ]
+
+		true
+
+	## -------------------------------------------------------------------------------------------------------------
 	## Set the data type for a given type of data Called statically to
 	##
 	## @param [String] tableName table name for which the new data type is being set

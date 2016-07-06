@@ -101,6 +101,17 @@ class PopupWindow
 		@x = (width - @popupWidth) / 2
 		@y = (height - @popupHeight) / 2
 		@y += $(window).scrollTop()
+
+		while @x < 0
+			@x++
+			@popupWidth--
+
+		while @y < 0
+			@y++
+			@popupHeight--
+
+		console.log "Center: #{@x}, #{@y} (#{@popupWidth}, #{@popupHeight})"
+
 		@popupWindowHolder.css
 			left:   @x
 			top:    @y
@@ -116,6 +127,8 @@ class PopupWindow
 
 		width  = $(window).width()
 		height = $(window).height()
+
+		console.log "popupWindow width=#{width} height=#{height} : #{@popupWidth} x #{@popupHeight}"
 
 		if @x == 0 and @y == 0
 			@center()
@@ -135,6 +148,16 @@ class PopupWindow
 		if @y + @popupHeight + 10 > height
 			@y = height - @popupHeight - 10
 
+		while @x < 10
+			@x++
+			@popupWidth--
+
+		while @y < 10
+			@y++
+			@popupHeight--
+
+		console.log "popupWindow x=#{@x} y=#{@y}"
+
 		@popupWindowHolder.css
 			left:   @x
 			top:    @y
@@ -142,10 +165,10 @@ class PopupWindow
 			height: @popupHeight
 
 		@windowWrapper.css
-			left: 0
-			top: 4
-			width: @popupWidth
-			height: @popupHeight - 26 - 5
+			left   : 0
+			top    : 4
+			width  : @popupWidth
+			height : @popupHeight - 26 - 5
 
 		setTimeout () =>
 			@myScroll.refresh()
@@ -165,6 +188,7 @@ class PopupWindow
 		# location = user.get "PopupLocation_#{@title}", 0
 		if @configurations.tableName and @configurations.tableName.length
 			location = localStorage.getItem "PopupLocation_#{@configurations.tableName}"
+			console.log "Loaded saved PopupLocation_#{@configurations.tableName}: ", location
 			if location != null
 				location = JSON.parse location
 			if location != 0 && location != null
@@ -216,11 +240,11 @@ class PopupWindow
 			class : 'popupNavBar'
 
 		@navBar.css
-			position: "absolute"
-			top: @windowTitle.height()+6
-			left: 0
-			height: @toolbarHeight
-			width: "100%"
+			position : "absolute"
+			top      : @windowTitle.height()+6
+			left     : 0
+			height   : @toolbarHeight
+			width    : "100%"
 
 		@popupWindowHolder.append @navBar
 
@@ -396,10 +420,6 @@ class PopupWindow
 		##| if keyValue popup is available then get only reference else create new popupHolder
 		if @configurations.keyValue and $("[data-key=#{@configurations.keyValue}]").length
 			##| check if the x,y,w,h is good for current window
-			if @x > $(window).width() then @x = $(window).width()
-			if @y > $(window).height() then @y = $(window).height()
-			if (@x + @popupWidth) > $(window).width() then @popupWidth = $(window).width()
-			if (@y + @popupHeight) > $(window).height() then @popupHeight = $(window).height()
 			@initializeFromKeyValue()
 		else
 			@createPopupHolder()
