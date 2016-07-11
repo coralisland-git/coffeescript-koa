@@ -674,7 +674,7 @@ class TableView
 
 		##|
 		##|  Look at all the columns, determine the likely width
-		widthLimit   = maxWidth
+		widthLimit   = Math.trunc(maxWidth)
 		missingCount = 0
 		colNum       = 0
 
@@ -722,7 +722,11 @@ class TableView
 		##|  Remove or add a pixel until we have the exact amount
 		##|  but only if we are smaller than available size or very close to it
 		if totalWidth - 50 < widthLimit
-			while totalWidth != widthLimit
+
+			attemptCounter = 0
+			while Math.ceil(totalWidth) != Math.ceil(widthLimit) and attemptCounter++ < 1500
+
+				console.log "Trying to fix, totalWidth=#{totalWidth}, widthLimit=#{widthLimit}"
 
 				found = false
 				for i in @colList
@@ -741,6 +745,7 @@ class TableView
 
 				# console.log "Actual=", widthLimit, "Total Width = ", totalWidth
 
+		console.log "Here @fixedHeader"
 		if @fixedHeader
 			##|
 			##|  Set the scrollbar range on the hscroll
@@ -807,6 +812,7 @@ class TableView
 
 		##|
 		##|  Get the data from that table
+
 		@updateRowData()
 		@rowDataElements = {}
 

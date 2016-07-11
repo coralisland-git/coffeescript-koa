@@ -84,6 +84,7 @@ class WidgetTag
         return this
 
     html: (str) =>
+
         if @currentValue != str
             @currentValue = str
             @el.html(str)
@@ -104,11 +105,16 @@ class WidgetTag
             @y = y
             @w = w
             @h = h
-            @el.css
-                left   : @x
-                top    : @y
-                width  : @w
-                height : @h
+            @el[0].style.left   = @x + "px"
+            @el[0].style.top    = @y + "px"
+            @el[0].style.width  = @w + "px"
+            @el[0].style.height = @h + "px"
+
+            # @el.css
+            #     left   : @x
+            #     top    : @y
+            #     width  : @w
+            #     height : @h
 
         return this
 

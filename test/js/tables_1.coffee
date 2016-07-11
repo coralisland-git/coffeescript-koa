@@ -1,5 +1,4 @@
 $ ->
-
     ##|
     ##|  This is just for diagnostics,  you don't need to verify the data map is
     ##|  loaded normally.  The data types should be loaded upon startup.
@@ -34,7 +33,6 @@ $ ->
         table = new TableView $("#renderTest1")
         table.addTable "zipcode"
         table.render()
-
         true
 
     addTestButton "Render table 2", "Open", ()->
