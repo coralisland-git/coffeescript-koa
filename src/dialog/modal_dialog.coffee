@@ -77,16 +77,16 @@ class FormField
 			@el.bind "typeahead:select", (ev, suggestion) =>
 				console.log "DID CHANGE:", suggestion
 
-			@el.bind "keypress", (e) =>
-				if e.keyCode == 13
-					@onPressEnter(e)
-					return false
+		@el.bind "keypress", (e) =>
+			if e.keyCode == 13
+				@onPressEnter(e)
+				return false
 
-				if e.keyCode == 27
-					@onPressEscape(e)
-					return false
+			if e.keyCode == 27
+				@onPressEscape(e)
+				return false
 
-				return true
+			return true
 
 
 ## -------------------------------------------------------------------------------------------------------------
@@ -107,14 +107,15 @@ class FormWrapper
 		# @property [String] templateFormFieldText template to use in the render of form
 		@templateFormFieldText = Handlebars.compile '''
 			<div class="form-group">
-				<label for="{{fieldName}}"> {{label}} </label>
-				<input class="form-control" type="{{type}}" id="{{fieldName}}" value="{{value}}" name="{{fieldName}}"
-				{{#each attrs}}
-    			{{@key}}="{{this}}"
-				{{/each}}
-				/>
-				<br>
-				<div id="{{fieldName}}error" class="text-danger"></div>
+				<label for="{{fieldName}}" class='control-label col-sm-2'> {{label}} </label>
+				<div class='col-sm-10'>
+					<input class="form-control" type="{{type}}" id="{{fieldName}}" value="{{value}}" name="{{fieldName}}"
+					{{#each attrs}}
+	    			{{@key}}="{{this}}"
+					{{/each}}
+					/>
+					<div id="{{fieldName}}error" class="text-danger"></div>
+				</div>
 			</div>
 		'''
 
@@ -129,6 +130,35 @@ class FormWrapper
 	##
 	addTextInput: (fieldName, label, value,attrs, fnValidate) =>
 		@addInput(fieldName,label,value,"text",attrs,fnValidate)
+
+	## -------------------------------------------------------------------------------------------------------------
+	## Add a text input field
+	##
+	## @param [String] fieldName name of the input field
+	## @param [String] label label to be displayed infornt of text input
+	## @param [String] value default value to be filled
+	## @param [Object] attrs object as attributes that will be included in the html
+	## @param [Function] fnValidate a validation function can be passed if it returns true value will be valid else invalid
+	##
+	addTagsInput: (fieldName, label, value, attrs, fnValidate) =>
+
+		field = @addInput(fieldName, label, value, "text", attrs, fnValidate)
+
+		field.superAfterShow = field.onAfterShow
+		field.onAfterShow = ()->
+
+			@el.selectize
+	            plugins: ['remove_button']
+	            delimiter: ','
+	            persist: false
+	            create: (input) ->
+	                console.log "Adding[#{input}]"
+	                return { value: input, text: input }
+
+	        @superAfterShow()
+
+		field
+
 
 	## -------------------------------------------------------------------------------------------------------------
 	## Add a general input field
@@ -156,7 +186,7 @@ class FormWrapper
 	##
 	getHtml: () =>
 
-		content = "<form id='#{@gid}'>"
+		content = "<form id='#{@gid}' class='form-horizontal' role='form'>"
 
 		for field in @fields
 			content += @templateFormFieldText(field)
@@ -199,12 +229,14 @@ class FormWrapper
 		firstField = null
 		for field in @fields
 			field.el = @elForm.find("##{field.fieldName}")
+			console.log "Calling onAfterShow for field:", field
 			field.onAfterShow()
 			if !firstField
 				firstField = field
 				firstField.el.focus()
 
 			field.onPressEnter = (e)=>
+				console.log "field.onPressEnter:", e
 				@onSubmitAction(e)
 
 		@elForm.on "submit", @onSubmitAction

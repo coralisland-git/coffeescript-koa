@@ -159,14 +159,6 @@ module.exports = (grunt) ->
 				options:
 					livereload: true
 
-		bower_concat:
-			all:
-				dest: 'ninja/bower.js'
-				exclude: [
-					'jquery'
-				]
-
-
 		##|
 		##|  Load all available modules
 		require('load-grunt-tasks')(grunt);
@@ -174,10 +166,9 @@ module.exports = (grunt) ->
 		##|
 		##|  Build options
 		##|
-		grunt.registerTask "bower", ['bower_concat']
 		grunt.registerTask "server", ['express', 'watch']
 		grunt.registerTask 'dist', ['coffee', 'copy', 'stylus', 'jade']
 		grunt.registerTask 'synclive', ['buildnumber', 'coffee', 'copy', 'stylus:compile', 'jade:compile', 'shell:synclive']
-		grunt.registerTask 'default', ['bower_concat', 'coffee', 'copy', 'stylus:compile', 'jade:compile', 'express', 'watch']
-		grunt.registerTask 'build', ['bower_concat', 'coffee', 'copy', 'stylus:compile', 'jade:compile' ]
+		grunt.registerTask 'default', ['coffee', 'copy', 'stylus:compile', 'jade:compile', 'express', 'watch']
+		grunt.registerTask 'build', ['coffee', 'copy', 'stylus:compile', 'jade:compile' ]
 

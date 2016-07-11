@@ -128,8 +128,7 @@ class PopupWindow
 		width  = $(window).width()
 		height = $(window).height()
 
-		console.log "popupWindow width=#{width} height=#{height} : #{@popupWidth} x #{@popupHeight}"
-
+		console.log "popupWindow #{@title}, width=#{width} height=#{height} : #{@popupWidth} x #{@popupHeight} (x=#{@x}, y=#{@y})"
 		if @x == 0 and @y == 0
 			@center()
 
@@ -140,6 +139,7 @@ class PopupWindow
 			@y = 0
 
 		if @x + @popupWidth + 10> width
+			console.log "popupWindow #{@title}, moving because #{@x} + #{@popupWidth} + 10 > #{width}"
 			@x = width - @popupWidth - 10
 
 		## adjustment of 24px for the resize handle so resize handle doesn't overlap
@@ -412,7 +412,7 @@ class PopupWindow
 		if !configurations && typeof configuration != 'object'
 			configuration = {}
 		@configurations = $.extend(@configurations,configurations);
-		if @configurations.w and @configurations.w > 0 then @popupWidth = @configurations.w
+		if @configurations.w and @configurations.w > 0 then @popupWidth  = @configurations.w
 		if @configurations.h and @configurations.h > 0 then @popupHeight = @configurations.h
 
 		@internalCheckSavedLocation();
@@ -430,3 +430,19 @@ class PopupWindow
 		@colCount  = 1
 		@menuItems = {}
 		@menuData  = {}
+
+	## -------------------------------------------------------------------------------------------------------------
+	## Set the contents of the window
+	##
+	## @param [String] new html contents
+	html: (strHtml) =>
+		@windowScroll.html strHtml
+		setTimeout @update, 10
+		true
+
+	## -------------------------------------------------------------------------------------------------------------
+	## Set the background color for the scrollable window area
+	## @param [String] color css text
+	setBackgroundColor: (colorCss) =>
+		@windowWrapper.css "backgroundColor", colorCss
+

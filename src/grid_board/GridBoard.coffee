@@ -37,8 +37,6 @@ class GridBoard
         totalWidth  = @elHolder.parent().width()
         totalHeight = @elHolder.parent().height()
 
-        console.log "Available space = #{totalWidth} x #{totalHeight}"
-
         gridItems = @elHolder.find(".gridItem")
         rows = {}
         for el in gridItems

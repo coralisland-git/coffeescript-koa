@@ -98,6 +98,21 @@ $ ->
 
 		m.show()
 
+	addTestButton "Tags Input (Selectize)", "Open", () ->
+
+		m = new ModalDialog
+			showOnCreate: false
+			content:      "Fill out this example form"
+			title:        "Form Title"
+			ok:           "Go"
+
+		m.getForm().addTagsInput "input1", "Example Input 1"
+
+		m.getForm().onSubmit = (form) =>
+			console.log "Submitted form, test value 1=", form.input1
+			m.hide()
+		m.show()
+
 	states = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia',
 	'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts',
 	'Michigan', 'Minnesota','Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico',
