@@ -78,10 +78,10 @@ class DataFormatterType
 			width	 = elParent.outerWidth(false)
 			height	 = elParent.outerHeight(false)
 
-			console.log "PARENT=", parentElement
-			console.log "POS=", pos
-			console.log "W=", width, height
-			console.log "offset=", elParent.offset()
+			# console.log "PARENT=", parentElement
+			# console.log "POS=", pos
+			# console.log "W=", width, height
+			# console.log "offset=", elParent.offset()
 
 			left = elParent.offset().left
 			top  = elParent.offset().top
@@ -97,6 +97,7 @@ class DataFormatterType
 	##
 	saveValue: (newValue) =>
 
+		newValue = @unformat(newValue, @editorPath)
 		console.log "Saving value", newValue
 		if @onSaveCallback?
 			@onSaveCallback @editorPath, newValue
@@ -261,9 +262,12 @@ class DataFormatSourceCode extends DataFormatText
 
 		popup.windowScroll.append tag
 
+		codeMode = "javacript"
+		if typeof @options == "string" then codeMode = @options
+
 		codeEditor = new CodeEditor tag
 		codeEditor.popupMode().setTheme "tomorrow_night_eighties"
-			.setMode "javascript"
+			.setMode codeMode
 
 		console.log "CURRENT=", currentValue
 
@@ -314,7 +318,7 @@ class DataFormatInt extends DataFormatterType
 	## @return [Object] data unformatted data
 	##
 	unformat: (data, path) =>
-		return DataFormatter.getNumber data
+		return Math.round(DataFormatter.getNumber data)
 
 
 ## -------------------------------------------------------------------------------------------------------------
@@ -475,7 +479,8 @@ class DataFormatPercent extends DataFormatterType
 	## @return [Object] data unformatted data
 	##
 	unformat: (data, path) =>
-		return DataFormatter.getNumber data/100.0
+		num = DataFormatter.getNumber data
+		return num
 
 
 ## -------------------------------------------------------------------------------------------------------------
@@ -516,6 +521,74 @@ class DataFormatDate extends DataFormatterType
 		if !m? then return ""
 		return m.format "YYYY-MM-DD HH:mm:ss"
 
+## -------------------------------------------------------------------------------------------------------------
+## class for datetime data type
+##
+## @extends [DataFormatterType]
+##
+class DataFormatTags extends DataFormatterType
+
+	# @property [String] name name of the data type
+	name: "tags"
+
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to open editor including ace code editor
+	##
+	## @param [JqueryObject] elParent parent element
+	## @param [Integer] left left position offset
+	## @param [Integer] top top position offset
+	## @param [Integer] width width of the editor
+	## @param [Integer] height height of the editor
+	## @param [Object] currentValue current value of the cell
+	## @param [String] path path where the value is being edited
+	## @return null
+	##
+	openEditor: (elParent, left, top, width, height, currentValue, path) =>
+
+		m = new ModalDialog
+			showOnCreate : false
+			content      : "Enter the list of items"
+			title        : "Edit options"
+			ok           : "Save"
+
+		if typeof currentValue == "string"
+			currentValue = currentValue.split ','
+
+		m.getForm().addTagsInput "input1", "Value", currentValue.join(',')
+
+		m.getForm().onSubmit = (form) =>
+			@saveValue form.input1.split(",")
+			m.hide()
+
+		m.show()
+
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to format the currently passed data
+	##
+	## @param [Object] data data to be formatted
+	## @param [Object] options additonal options defined for the datatype
+	## @param [String] path path where the value is being edited
+	## @return [Object] data formatted data
+	##
+	format: (currentValue, options, path) =>
+
+		if typeof currentValue == "string"
+			currentValue = currentValue.split ','
+
+		return currentValue.join(", ")
+
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to unformat the currently unformatted data
+	##
+	## @param [Object] data data to be unformatted
+	## @param [String] path path where the value is being edited
+	## @return [Object] data unformatted data
+	##
+	unformat: (currentValue, path) =>
+		if typeof currentValue == "string"
+			currentValue = currentValue.split ','
+		return currentValue
+
 
 ## -------------------------------------------------------------------------------------------------------------
 ## class for datetime data type
@@ -545,7 +618,7 @@ class DataFormatDateTime extends DataFormatterType
 		##|  Show a popup menu
         @picker = new PopupMenuCalendar currentValue, top, left
         @picker.onChange = (newValue) =>
-            @recordChange @name, newValue
+        	@saveValue newValue
 		true
 
 	## -------------------------------------------------------------------------------------------------------------
@@ -806,10 +879,10 @@ class DataFormatBoolean extends DataFormatterType
 	## @return [Object] data unformatted data
 	##
 	unformat: (data, path) =>
-		if !data? then return 0
-		if data == null or data == 0 then return 0
-		if data == "No" or data == "no" or data == "false" or data == "off" then return 0
-		return 1
+		if !data? then return false
+		if data == null or data == 0 then return false
+		if data == "No" or data == "no" or data == "false" or data == "off" then return false
+		return true
 
 
 ## -------------------------------------------------------------------------------------------------------------
@@ -929,6 +1002,7 @@ try
 	globalDataFormatter.register(new DataFormatTimeAgo())
 	globalDataFormatter.register(new DataFormatSimpleObject())
 	globalDataFormatter.register(new DataFormatSourceCode())
+	globalDataFormatter.register(new DataFormatTags())
 
 catch e
 	console.log "Exception while registering global Data Formatter:", e

@@ -18,6 +18,11 @@ root.DataFormatter = class DataFormatter
 	@getNumber: (data) =>
 		if !data? then return 0
 		if typeof data == "number" then return data
+		console.log "Checking number [", data, "]"
+		if m = data.toString().match(/(\d+)\s*%/)
+			console.log "M1=", m[1]
+			return parseFloat(m[1])/100.0
+
 		result = data.toString().replace /[^0-9\.\-]/g, ""
 		result = parseFloat result
 

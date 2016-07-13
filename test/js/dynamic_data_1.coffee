@@ -90,6 +90,12 @@ $ ->
 	addTest "Boolean simple true", ()->
 		globalDataFormatter.formatData "boolean", true
 
+	addTest "Tags as string", ()->
+		globalDataFormatter.formatData "tags", "Apple,Grape,Watermellon"
+
+	addTest "Tags as array", ()->
+		globalDataFormatter.formatData "tags", ["Apple","Grape","Watermellon"]
+
 	addTest "Create a new data formatting class dynamically", () ->
 
 		globalDataFormatter.register

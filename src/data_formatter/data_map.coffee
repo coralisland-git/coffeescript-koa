@@ -150,7 +150,7 @@ class DataMap
 		if !@data[tableName][keyValue]?
 			@data[tableName][keyValue] = {}
 
-		existingValue = @data[tableName][keyValue][fieldName]
+		existingValue = @engine.getFast tableName, keyValue, fieldName
 		##| check if the existing type is boolean
 		if typeof existingValue == 'boolean' and existingValue == Boolean(newValue) then return true
 
