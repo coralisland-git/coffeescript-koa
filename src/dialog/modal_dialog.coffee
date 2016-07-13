@@ -111,7 +111,7 @@ class FormWrapper
 				<div class='col-sm-10'>
 					<input class="form-control" type="{{type}}" id="{{fieldName}}" value="{{value}}" name="{{fieldName}}"
 					{{#each attrs}}
-	    			{{@key}}="{{this}}"
+					{{@key}}="{{this}}"
 					{{/each}}
 					/>
 					<div id="{{fieldName}}error" class="text-danger"></div>
@@ -148,17 +148,16 @@ class FormWrapper
 		field.onAfterShow = ()->
 
 			@el.selectize
-	            plugins: ['remove_button']
-	            delimiter: ','
-	            persist: false
-	            create: (input) ->
-	                console.log "Adding[#{input}]"
-	                return { value: input, text: input }
+				plugins: ['remove_button']
+				delimiter: ','
+				persist: false
+				create: (input) ->
+					console.log "Adding[#{input}]"
+					return { value: input, text: input }
 
-	        @superAfterShow()
+			@superAfterShow()
 
 		field
-
 
 	## -------------------------------------------------------------------------------------------------------------
 	## Add a general input field
@@ -305,7 +304,7 @@ class ModalDialog
 					<div class="modal-content">
 						<div class="modal-header bg-primary">
 							<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        					<h4 class="modal-title">{{title}}</h4>
+							<h4 class="modal-title">{{title}}</h4>
 						</div>
 						<div class="modal-body">
 							<p>

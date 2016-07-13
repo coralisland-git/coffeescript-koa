@@ -59,6 +59,12 @@ $ ->
 			h: 500
 		popup.windowScroll.append $ "<div> Hello World </div>"
 
+	addTestButton "Popup Modal", "Open", (e) ->
+
+		popup = new PopupWindow "Test Window"
+		popup.modal(500, 400)
+		popup.html "Testing"
+
 	addTestButton "Hide Popup with keyValue Test", "Open", (e) ->
 
 		popup = new PopupWindow "Test Window",50,50,

@@ -92,6 +92,31 @@ class PopupWindow
 		@popupWindowHolder.remove()
 		true
 
+	##|
+	##|  Do our best to center the window on a given point, however, don't go offscreen
+	centerToPoint: (x, y)=>
+
+		width  = $(window).width()
+		height = $(window).height()
+
+		if @popupWidth > width
+			@popupWidth = width
+
+		if @popupHeight > height
+			@popupHeight = height
+
+		px = x - (@popupWidth / 2)
+		py = y - (@popupHeight / 2)
+
+		if px < 0 then px = 0
+		if py < 0 then py = 0
+		if px + @popupWidth > width then px = width - @popupWidth
+		if py + @popupHeight > height then py = height - @popupHeight
+
+		@popupWindowHolder.css
+			left:   @x
+			top:    @y
+
 	## -------------------------------------------------------------------------------------------------------------
 	## aligns the popup in the center of the screen it calculates current screen height and width
 	##
@@ -115,6 +140,28 @@ class PopupWindow
 		@popupWindowHolder.css
 			left:   @x
 			top:    @y
+
+	## -------------------------------------------------------------------------------------------------------------
+	## Makes this popup window modal
+	##
+	modal: (@popupWidth, @popupHeight) =>
+
+		@shield = $ "<div />"
+		@shield.css
+			zIndex          : parseInt(@popupWindowHolder.css "zIndex") - 10
+			position        : "absolute"
+			left            : 0
+			top             : 0
+			right           : 0
+			bottom          : 0
+			backgroundColor : "rgba(0,0,0,0.6)"
+
+		$(document).on "keypress", (e)=>
+			console.log "KEY=", e
+			false
+
+		@center()
+		$("body").append @shield
 
 	## -------------------------------------------------------------------------------------------------------------
 	## resize the window to a new size
@@ -291,6 +338,7 @@ class PopupWindow
 		.html "<i class='glyphicon glyphicon-remove'></i>"
 		@windowTitle.append @windowClose
 		@windowClose.on "click", () =>
+			if @shield? then @shield.remove()
 			if @configurations and @configurations.keyValue then @close() else @destroy()
 
 		##|

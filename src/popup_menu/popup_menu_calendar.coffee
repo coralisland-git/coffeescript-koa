@@ -347,4 +347,6 @@ $ ->
 			if window.popupCalendarVisible
 				window.popupCalendarHolder.remove()
 				window.popupCalendarVisible = false
+			else
+				return false
 		true

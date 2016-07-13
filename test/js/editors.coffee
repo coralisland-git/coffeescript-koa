@@ -94,9 +94,16 @@ $ ->
     addExample "sourcecode"   , "var name='Brian';"
     addExample "tags"         , "Apple,Grape,Orange", "Tags as text"
     addExample "tags"         , ["Apple","Grape","Orange"], "Tags as array"
+    addExample "memo"         , 'This is a test\nHaving two lines"', "Popup Editor"
 
     html += "</table>"
     html += "<div id='results'>Click a cell in the Test Value column.</div>"
 
+
+    # html += "<p><textarea id='edit123' style='width:600px; height: 400px;'></textarea>"
+
     addHolder "editors"
     $("#editors").html html
+
+
+    # $("#edit123").trumbowyg()

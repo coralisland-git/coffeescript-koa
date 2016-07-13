@@ -217,6 +217,105 @@ class DataFormatText extends DataFormatterType
 
 		return data
 
+## -------------------------------------------------------------------------------------------------------------
+## class for Text datatype - Edit as HTML/Popup
+##
+## @extends [DataFormatterType
+##
+class DataFormatMemo extends DataFormatterType
+
+	# @property [String] name name of the data type
+	name: "memo"
+
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to format the currently passed data
+	##
+	## @param [Object] data data to be formatted
+	## @param [Object] options additonal options defined for the datatype
+	## @param [String] path path where the value is being edited
+	## @return [Object] data formatted data
+	##
+	format: (data, options, path) =>
+
+		if !data?
+			return ""
+
+		return data
+
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to unformat the currently formatted data
+	##
+	## @param [Object] data data to be unformatted
+	## @param [String] path path where the value is being edited
+	## @return [Object] data unformatted data
+	##
+	unformat: (data, path) =>
+
+		return data
+
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to open editor including ace code editor
+	##
+	## @param [JqueryObject] elParent parent element
+	## @param [Integer] left left position offset
+	## @param [Integer] top top position offset
+	## @param [Integer] width width of the editor
+	## @param [Integer] height height of the editor
+	## @param [Object] currentValue current value of the cell
+	## @param [String] path path where the value is being edited
+	## @return null
+	##
+	openEditor: (elParent, left, top, width, height, currentValue, path) =>
+
+		cx = left + (width / 2)
+		cy = top  - 10
+
+		##|
+		##|  Show a popup menu
+		popup = new PopupWindow("Text Editor");
+		popup.resize 600, 400
+		popup.centerToPoint cx, cy-(popup.popupHeight/2)
+
+		navButtonSave = new NavButton "Save", "toolbar-btn navbar-btn btn-primary"
+		navButtonSave.onClick = (e)=>
+			@saveValue codeEditor.getContent()
+			popup.destroy()
+
+		navButtonCancel = new NavButton "Cancel", "toolbar-btn navbar-btn btn-danger cancel-btn"
+		navButtonCancel.onClick = (e)=>
+			popup.destroy()
+
+		popup.addToolbar [ navButtonSave, navButtonCancel ]
+
+		tag = $ "<div />",
+			id: "editor_" + GlobalValueManager.NextGlobalID()
+			height: popup.windowWrapper.height()
+
+		popup.on "resize", (ww, hh)=>
+			tag.css "height", popup.windowWrapper.height()
+
+		popup.windowScroll.append tag
+
+		codeMode = "markdown"
+		if typeof @options == "string" then codeMode = @options
+
+		codeEditor = new CodeEditor tag
+		# codeEditor.popupMode().setMode codeMode
+
+		if !currentValue
+			code = ''
+		else if typeof currentValue isnt 'string'
+			code = currentValue.toString()
+		else
+			code = currentValue
+
+		codeEditor.setContent code
+
+		popup.update()
+		true
+
+
+
 
 ## -------------------------------------------------------------------------------------------------------------
 ## class for SourceCode data type
@@ -259,6 +358,7 @@ class DataFormatSourceCode extends DataFormatText
 
 		tag = $ "<div />",
 			id: "editor_" + GlobalValueManager.NextGlobalID()
+			height: popup.windowWrapper.height()
 
 		popup.windowScroll.append tag
 
@@ -1003,6 +1103,7 @@ try
 	globalDataFormatter.register(new DataFormatSimpleObject())
 	globalDataFormatter.register(new DataFormatSourceCode())
 	globalDataFormatter.register(new DataFormatTags())
+	globalDataFormatter.register(new DataFormatMemo())
 
 catch e
 	console.log "Exception while registering global Data Formatter:", e

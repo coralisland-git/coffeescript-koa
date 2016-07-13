@@ -90,6 +90,11 @@ module.exports = (grunt) ->
 					filter: 'isFile'
 					expand: true
 				,
+					cwd: 'test/vendor/trumbowyg/'
+					src: '**'
+					dest: 'ninja/test/vendor/trumbowyg/'
+					expand: true
+				,
 					cwd: 'test/vendor/ace/'
 					src: '**'
 					dest: 'ninja/test/vendor/ace/'
