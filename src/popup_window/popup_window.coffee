@@ -7,6 +7,8 @@
 ##|      popup = new PoupWindow(title, x, y)
 ##|
 
+globalOpenWindowList = []
+
 ## -------------------------------------------------------------------------------------------------------------
 ## Popup window widget
 ## this class creates a popup window that has a title and its dragable.
@@ -77,6 +79,7 @@ class PopupWindow
 			e.preventDefault()
 			e.stopPropagation()
 
+		@
 		@popupWindowHolder.hide()
 		@isVisible = false
 		false
@@ -87,6 +90,13 @@ class PopupWindow
 	## @return [Boolean]
 	##
 	destroy: () =>
+
+		##|
+		##| Remove this from the global open window list
+		list = globalOpenWindowList
+		globalOpenWindowList = []
+		for l in list
+			if l != this then globalOpenWindowList.push l
 
 		@close()
 		@popupWindowHolder.remove()
@@ -310,6 +320,8 @@ class PopupWindow
 	##
 	createPopupHolder: () =>
 
+		globalOpenWindowList.push this
+
 		@toolbarHeight = 0
 
 		id   = GlobalValueManager.NextGlobalID()
@@ -494,3 +506,12 @@ class PopupWindow
 	setBackgroundColor: (colorCss) =>
 		@windowWrapper.css "backgroundColor", colorCss
 
+
+$ ->
+
+	$(document).on "keyup", (e)=>
+		if e.keyCode == 27
+			if globalOpenWindowList? and globalOpenWindowList.length > 0
+				win = globalOpenWindowList.pop()
+				console.log "Escape closing window:", win
+				win.destroy()

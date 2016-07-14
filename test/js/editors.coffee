@@ -72,6 +72,10 @@ $ ->
     addExample "int"          , 10.05, "Float cast to int"
     addExample "number"       , 50, "Simple Int as Number"
     addExample "number"       , 50.50, "Float as Number"
+
+    addExample "int"       , null, "Empty Value"
+    addExample "int"       , "", "Empty Value"
+
     addExample "number"       , "150.0005", "Text Float as Number"
     addExample "decimal"      , 100.12, "Simple Decimal"
     addExample "decimal"      , 100.1234, "Simple Decimal, 4 digits"

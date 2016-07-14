@@ -726,7 +726,7 @@ class TableView
 			attemptCounter = 0
 			while Math.ceil(totalWidth) != Math.ceil(widthLimit) and attemptCounter++ < 1500
 
-				console.log "Trying to fix, totalWidth=#{totalWidth}, widthLimit=#{widthLimit}"
+				# console.log "Trying to fix, totalWidth=#{totalWidth}, widthLimit=#{widthLimit}"
 
 				found = false
 				for i in @colList
@@ -745,7 +745,6 @@ class TableView
 
 				# console.log "Actual=", widthLimit, "Total Width = ", totalWidth
 
-		console.log "Here @fixedHeader"
 		if @fixedHeader
 			##|
 			##|  Set the scrollbar range on the hscroll
@@ -871,6 +870,8 @@ class TableView
 		for rowNum in [0...maxRows]
 
 			row = []
+			rowTag = @elTheTable.add "row"
+
 			for i in @colList
 				if !i.visible then continue
 
@@ -880,7 +881,7 @@ class TableView
 				if i.getAlign() == "right" then editable += " text-right"
 				if i.getAlign() == "center" then editable += " text-center"
 				editable += " col_" + i.getSource()
-				colTag = @elTheTable.addDiv "#{i.getFormatterName()} #{editable}"
+				colTag = rowTag.addDiv "#{i.getFormatterName()} #{editable}"
 				colTag.text "r=#{rowNum},#{i.getSource()}"
 				row.push colTag
 
@@ -949,7 +950,6 @@ class TableView
 			@currentFilters[tableName] = {}
 
 		@currentFilters[tableName][columnName] = $(e.target).val()
-		console.log "VAL=", @currentFilters[tableName]
 		@applyFilters()
 
 		return true

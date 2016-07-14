@@ -39,6 +39,7 @@ class CodeEditor
 		ace.require("ace/ext/language_tools")
 		@_editor = ace.edit @elementHolder.attr('id')
 		@_editor.session.setUseWrapMode(true)
+		@_editor.session.setWrapLimitRange(120, 120)
 		@setMode @languageMode
 		@gid = GlobalValueManager.NextGlobalID()
 		@_histories = []

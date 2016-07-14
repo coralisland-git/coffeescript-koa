@@ -273,7 +273,7 @@ class DataFormatMemo extends DataFormatterType
 		##|
 		##|  Show a popup menu
 		popup = new PopupWindow("Text Editor");
-		popup.resize 600, 400
+		popup.resize 800, 400
 		popup.centerToPoint cx, cy-(popup.popupHeight/2)
 
 		navButtonSave = new NavButton "Save", "toolbar-btn navbar-btn btn-primary"
@@ -406,6 +406,9 @@ class DataFormatInt extends DataFormatterType
 	## @return [Object] data formatted data
 	##
 	format: (data, options, path) =>
+		if data == null or (typeof data == "string" and data.length == 0)
+			return ""
+
 		if options? and options != null
 			return numeral(DataFormatter.getNumber data).format(options)
 		return numeral(DataFormatter.getNumber data).format("#,###")
@@ -418,7 +421,9 @@ class DataFormatInt extends DataFormatterType
 	## @return [Object] data unformatted data
 	##
 	unformat: (data, path) =>
-		return Math.round(DataFormatter.getNumber data)
+		num = DataFormatter.getNumber data
+		if isNaN(num) then return ""
+		return Math.round(num)
 
 
 ## -------------------------------------------------------------------------------------------------------------
@@ -443,7 +448,15 @@ class DataFormatNumber extends DataFormatterType
 	## @return [Object] data formatted data
 	##
 	format: (data, options, path) =>
-		return numeral(DataFormatter.getNumber data).format("#,###.[##]")
+		num = DataFormatter.getNumber data
+
+		if data == null or (typeof data == "string" and data.length == 0)
+			return ""
+
+		if isNaN(num)
+			return "[#{num}]"
+
+		return numeral().format("#,###.[##]")
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to unformat the currently formatted data
