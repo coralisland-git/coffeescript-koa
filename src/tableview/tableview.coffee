@@ -166,12 +166,20 @@ class TableView
 		# @property [Boolean|Function] add menu to context menu
 		@contextMenuCallSetup        = 0
 
+		# @property [int] the max number of rows that can be selected
+		@checkboxLimit = 1
+
 		# @property [Boolean] showCheckboxes if checkbox to be shown or not default false
 		if !@showCheckboxes?
 			@showCheckboxes = false
 
 		if (!@elTableHolder[0])
 			console.log "Error: Table id #{@elTableHolder} doesn't exist"
+
+		# @property [Object] A reference to custom render functions
+		# where a given column name can be rendred without using the data formatters.
+		#
+		@renderFunction = {}
 
 		# @property [Object] current table configurations
 		@tableConfig = {}
@@ -181,6 +189,9 @@ class TableView
 
 		#@property [int] the offset from the top to start showing
 		@offsetShowingTop = 0
+
+		#@property
+		@selectedRows = []
 
 		##|
 		##|  The height of each cell to draw
@@ -245,6 +256,17 @@ class TableView
 		true
 
 	## -------------------------------------------------------------------------------------------------------------
+	## Add a column to the end of the table
+	##|
+	addActionColumn: (tableName, name, callback)=>
+
+		button = new TableViewColButton(tableName, name)
+		@colList.push button
+		@on "click_#{tableName}_#{name}", callback
+
+		true
+
+	## -------------------------------------------------------------------------------------------------------------
 	## Table cache name is set, this allows saving/loading table configuration
 	##
 	## @param [String] tableCacheName the cache name to attach with table
@@ -298,21 +320,38 @@ class TableView
 	## @param [Array] bookmarkArray the array of key to consider as bookmark
 	## @return [Boolean]
 	##
-	resetChecked : (bookmarkArray) =>
+	resetChecked : () =>
+
+		console.log "A @checkboxLimit=#{@checkboxLimit} vs ", @selectedRows.length
+		if @checkboxLimit?
+			@selectedRows.shift() while @selectedRows.length > @checkboxLimit
+
+		console.log "B @checkboxLimit=#{@checkboxLimit} vs ", @selectedRows.length
 
 		for i, o of @rowData
 			o.checked = false
-			for x, y of bookmarkArray
-				if y.id == o.checkbox_key
-					o.checked = true
-
-			key = o.id
-			if o.checked
-				$("#check_#{@gid}_#{key}").html @imgChecked
+			if o.id.toString() in @selectedRows
+				console.log "Found selected Row:", o.id
+				@rowData[i].row_selected = @imgChecked
+				@rowDataRaw[i].row_selected = true
 			else
-				$("#check_#{@gid}_#{key}").html @imgNotChecked
+				@rowData[i].row_selected = @imgNotChecked
+				@rowDataRaw[i].row_selected = false
 
 		false
+
+	##|
+	##| Toggle a row as selected/not selected
+	toggleRowSelected: (row) =>
+
+		if row.id.toString() in @selectedRows
+			@selectedRows = @selectedRows.filter (id) -> id isnt row.id
+		else
+			@selectedRows.push row.id.toString()
+
+		@resetChecked()
+		@updateVisibleText()
+		true
 
 	scrollUp: (amount)=>
 
@@ -386,15 +425,20 @@ class TableView
 				##|  TODO: Add sorting here
 				return false
 
-			##|
-			##|  Use the new event manager
-			@emitEvent "click_#{col}", [ data, e ]
+			if col == "row_selected"
+				##|
+				##|  Toggle row selection
+				@toggleRowSelected data
+			else
+				##|
+				##|  Use the new event manager
+				@emitEvent "click_#{col}", [ data, e ]
 
-			for c in @colList
-				if c.getSource() == col
-					if c.getEditable()
-						console.log "EDIT:", data, e
-						DataMap.getDataMap().editValue e.path, e.target
+				for c in @colList
+					if c.getSource() == col
+						if c.getEditable()
+							console.log "EDIT:", data, e
+							DataMap.getDataMap().editValue e.path, e.target
 
 			false
 
@@ -487,12 +531,15 @@ class TableView
 					continue
 
 				if col.joinKey?
-					val = DataMap.getDataField col.joinTable, obj.id, col.joinKey
-					obj[col.getSource()] = DataMap.getDataFieldFormatted col.tableName, val, col.getSource()
+					val                     = DataMap.getDataField col.joinTable, obj.id, col.joinKey
+					obj[col.getSource()]    = DataMap.getDataFieldFormatted col.tableName, val, col.getSource()
 					objRaw[col.getSource()] = DataMap.getDataField col.tableName, val, col.getSource()
 				else
-					obj[col.getSource()] = DataMap.getDataFieldFormatted col.tableName, obj.id, col.getSource()
-					objRaw[col.getSource()] = DataMap.getDataField col.tableName, obj.id, col.getSource()
+					if col.getSource() != "id"
+						obj[col.getSource()]    = DataMap.getDataFieldFormatted col.tableName, obj.id, col.getSource()
+						objRaw[col.getSource()] = DataMap.getDataField          col.tableName, obj.id, col.getSource()
+					else
+						objRaw.id = obj.id
 
 				colNum++
 
@@ -588,6 +635,8 @@ class TableView
 
 			row = @shadowRows[shadowRowNum]
 
+			# console.log "ShadowRow=#{shadowRowNum}, rowNum=#{rowNum} of #{@rowData.length}:", @rowDataRaw[rowNum]
+
 			if rowNum >= @rowData.length
 				##|
 				##|  Special case, no values left to show
@@ -611,7 +660,17 @@ class TableView
 				if !col.visible
 					continue
 
-				row[colNum].html @rowData[rowNum][col.getSource()]
+				if col.getSource() == "row_selected"
+					if @rowDataRaw[rowNum][col.getSource()]
+						row[colNum].parent.addClass "row_checked"
+					else
+						row[colNum].parent.removeClass "row_checked"
+
+				if col.render?
+					row[colNum].html col.render(@rowData[rowNum], row[colNum])
+				else
+					row[colNum].html @rowData[rowNum][col.getSource()]
+
 				row[colNum].removeClass "dataChanged"
 				row[colNum].setDataPath "/#{col.tableName}/#{@rowData[rowNum].id}/#{col.getSource()}"
 				colNum++
@@ -882,7 +941,7 @@ class TableView
 				if i.getAlign() == "center" then editable += " text-center"
 				editable += " col_" + i.getSource()
 				colTag = rowTag.addDiv "#{i.getFormatterName()} #{editable}"
-				colTag.text "r=#{rowNum},#{i.getSource()}"
+				# colTag.text "r=#{rowNum},#{i.getSource()}"
 				row.push colTag
 
 			@shadowRows.push row

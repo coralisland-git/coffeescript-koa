@@ -509,7 +509,11 @@ class DataFormatFloat extends DataFormatterType
 	## @return [Object] data formatted data
 	##
 	format: (data, options, path) =>
-		return numeral(DataFormatter.getNumber data).format("#,###.##")
+		if !data? then return "&mdash;"
+		if options? and /#/.test options
+			return numeral(DataFormatter.getNumber data).format(options)
+		else
+			return numeral(DataFormatter.getNumber data).format("#,###.##")
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to unformat the currently formatted data
@@ -842,6 +846,9 @@ class DataFormatEnum extends DataFormatterType
 		##|
 		##|  Show a popup menu
 		p = new PopupMenu "Options", left, top
+		if typeof @options == "string"
+			@options = @options.split ","
+
 		if typeof @options == "object" and typeof @options.length == "number"
 			for i, o of @options
 				# console.log "Adding[", i, "][", o, "]"

@@ -27,6 +27,9 @@ $ ->
             table = new TableView $("#renderTest1"), true
             table.addTable "zipcode"
             table.setFixedHeaderAndScrollable()
+            table.addActionColumn "zipcode", "Run", (row)=>
+                console.log "Selected row:", row
+
             table.render()
             true
         go()

@@ -19,6 +19,8 @@ class WidgetTag
         if classes?
             @el.attr "class", classes
             @classes = classes.split ' '
+        else
+            @classes = []
 
         if attributes?
             for attName, attValue of attributes
@@ -68,6 +70,12 @@ class WidgetTag
         @el.removeClass className
 
         return this
+
+    height: ()=>
+        return @el.height()
+
+    width: ()=>
+        return @el.width()
 
     text: (str) =>
         if @currentValue != str

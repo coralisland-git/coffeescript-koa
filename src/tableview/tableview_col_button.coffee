@@ -3,7 +3,7 @@
 ## global functions required to use tables. the cell id is a counter
 ## used to create elements with a new unique ID
 ##
-class TableViewColCheckbox
+class TableViewColButton
 
     ## -------------------------------------------------------------------------------------------------------------
     ## constructor create new column object
@@ -11,21 +11,24 @@ class TableViewColCheckbox
     ## @param [String] name The name of the column
     ## @param [String] title The title to show in the header
     ##
-    constructor : (@tableName) ->
+    constructor : (@tableName, @id) ->
 
         @visible = true
-        @width   = 32
+        @width   = 60
         @sort    = 0
+
+    render: (val)=>
+        return @id
 
     ##|
     ##|  Returns the name of the source field in the datamap
     getSource : ()=>
-        return "row_selected"
+        return @tableName + "_" + @id
 
     ##|
     ##|  Returns the name of the foramtter for this field
     getFormatterName: ()=>
-        return "rowCheckbox"
+        return "table_button"
 
     getAlign: ()=>
         return "center"
@@ -50,9 +53,9 @@ class TableViewColCheckbox
 
         if @visible == false then return
 
-        tag = parent.addDiv "checkable tableHeaderField"
+        tag = parent.addDiv "tableHeaderField"
 
-        tag.setDataPath "/#{@tableName}/Header/Checkbox"
+        tag.setDataPath "/#{@tableName}/Header/Action"
         tag.html "&nbsp;"
 
         return tag

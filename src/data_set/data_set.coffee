@@ -58,17 +58,28 @@ root.DataSet = class DataSet
                     if @useDataMap
                         dm = DataMap.getDataMap()
 
-                    for i, o of rawData
+                    if Array.isArray(rawData)
 
-                        if @keyElement?
-                            key = o[@keyElement]
-                        else
-                            key = i
+                        for i in rawData
 
-                        if @useDataMap
-                            DataMap.addData @baseName, key, o
-                        else
-                            @data[key] = o
+                            if i.data?
+                                DataMap.addData @baseName, i.data.id, i.data
+                            else
+                                DataMap.addData @baseName, i[@keyElement], i
+
+                    else
+
+                        for i, o of rawData
+
+                            if @keyElement?
+                                key = o[@keyElement]
+                            else
+                                key = i
+
+                            if @useDataMap
+                                DataMap.addData @baseName, key, o
+                            else
+                                @data[key] = o
 
                     resolve(this)
 

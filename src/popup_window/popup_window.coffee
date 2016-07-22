@@ -272,8 +272,11 @@ class PopupWindow
 	##
 	initializeFromKeyValue: () =>
 		@popupWindowHolder = $ "[data-key=#{@configurations.keyValue}]"
-		@windowTitle = @popupWindowHolder.find ".title"
-		@windowClose = @windowTitle.find "#windowclose"
+		# @windowTitle = @popupWindowHolder.find ".title"
+		# @windowClose = @windowTitle.find "#windowclose"
+
+		console.log "initializeFromKeyValue, title=", @windowTitle
+
 		@windowBodyWrapperTop = @popupWindowHolder.find ".windowbody"
 		@windowWrapper = @windowBodyWrapperTop.find ".scrollable"
 		@windowScroll = @windowWrapper.find ".scrollcontent"
@@ -337,21 +340,20 @@ class PopupWindow
 
 		##|
 		##| Title div
-		@windowTitle = $ "<div />",
-			class: "title"
-			id: "popuptitle#{id}"
-			dragable: "true"
-		.html @title
-		@popupWindowHolder.append @windowTitle
 
-		@windowClose = $ "<div />",
-			class: "closebutton"
-			id: "windowclose"
-		.html "<i class='glyphicon glyphicon-remove'></i>"
-		@windowTitle.append @windowClose
-		@windowClose.on "click", () =>
+		@windowTitle = new WidgetTag "div", "title", "popuptitle#{id}",
+			dragable: true
+
+		@windowTitleText = @windowTitle.add "span", "title_text"
+		@windowTitleText.html @title
+
+		@windowClose = @windowTitle.add "div", "closebutton", "windowclose#{id}"
+		@windowClose.html "<i class='glyphicon glyphicon-remove'></i>"
+		@windowClose.el.on "click", () =>
 			if @shield? then @shield.remove()
 			if @configurations and @configurations.keyValue then @close() else @destroy()
+
+		@popupWindowHolder.append @windowTitle.el
 
 		##|
 		##| Body div with IScroll wrapper
@@ -498,6 +500,14 @@ class PopupWindow
 	html: (strHtml) =>
 		@windowScroll.html strHtml
 		setTimeout @update, 10
+		true
+
+	## -------------------------------------------------------------------------------------------------------------
+	## Change the title of the window
+	##
+	## @param [String] new html contents
+	setTitle: (strHtml) =>
+		@windowTitleText.html strHtml
 		true
 
 	## -------------------------------------------------------------------------------------------------------------
