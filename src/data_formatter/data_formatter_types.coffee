@@ -179,6 +179,7 @@ class DataFormatterType
 
 		@elEditor.show()
 		@elEditor.focus()
+		@elEditor.select()
 
 
 ## -------------------------------------------------------------------------------------------------------------
