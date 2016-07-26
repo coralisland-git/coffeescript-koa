@@ -1068,6 +1068,57 @@ class DataFormatTimeAgo extends DataFormatterType
 
 
 ## -------------------------------------------------------------------------------------------------------------
+## class for timeago data type
+##
+## @extends [DataFormatterType]
+##
+class DataFormatDuration extends DataFormatterType
+
+	# @property [String] name name of the data type
+	name: "duration"
+
+	# @property [Integer] width
+	width: 70
+
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to format the currently passed data
+	##
+	## @param [Object] data data to be formatted
+	## @param [Object] options additonal options defined for the datatype
+	## @param [String] path path where the value is being edited
+	## @return [Object] data formatted data
+	##
+	format: (data, options, path) =>
+		if typeof data == "string"
+			data = parseFloat options
+
+		sec = data / 1000
+		if sec < 60
+			txt = numeral(sec).format("#.###") + " sec"
+		else if sec < (60 * 60 * 2)
+			min = Math.floor(sec / 60)
+			sec = sec - (min * 60)
+			txt = min + " min, " + Math.floor(sec) + " sec."
+		else
+			hrs = Math.floor(sec / (60*60))
+			min = Math.floor(sec - (hrs * 60 * 60))
+			txt = hrs + " hrs, " + min + " min"
+
+		return txt
+
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to format the currently passed data
+	##
+	## @param [Object] data data to be formatted
+	## @param [Object] options additonal options defined for the datatype
+	## @param [String] path path where the value is being edited
+	## @return [Object] data formatted data
+	##
+	unformat: (data, path) =>
+		return data
+
+
+## -------------------------------------------------------------------------------------------------------------
 ## class for simpleobject data type
 ##
 ## @extends [DataFormatterType]
@@ -1124,6 +1175,7 @@ try
 	globalDataFormatter.register(new DataFormatSourceCode())
 	globalDataFormatter.register(new DataFormatTags())
 	globalDataFormatter.register(new DataFormatMemo())
+	globalDataFormatter.register(new DataFormatDuration())
 
 catch e
 	console.log "Exception while registering global Data Formatter:", e

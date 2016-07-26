@@ -1,5 +1,5 @@
 reDate2           = /[0-9\-]+T[0-9\:\.]+Z$/
-checkForNumber    = /^[\d\-\.]+$/
+checkForNumber    = /^[\d\-\.]{1,12}$/
 
 ##| -------------------------------------------------------------------------------------------------------------
 ##|
@@ -183,8 +183,8 @@ class DataMapEngine
         if !collectionName?
             throw new Error "Missing collection name"
 
-        if typeof keyValue == "string" and /^[0-9]+$/.test keyValue
-            keyValue = parseInt keyValue
+        if typeof keyValue == "string" and checkForNumber.test keyValue
+            keyValue = parseFloat keyValue
 
         c = @internalGetCollection collectionName
         return c.findFast keyValue, subPath
@@ -199,8 +199,8 @@ class DataMapEngine
         if !collectionName?
             throw new Error "Missing collection name"
 
-        if typeof keyValue == "string" and /^[0-9]+$/.test keyValue
-            keyValue = parseInt keyValue
+        if typeof keyValue == "string" and checkForNumber.test keyValue
+            keyValue = parseFloat keyValue
 
         c = @internalGetCollection collectionName
         return c.findFastRow keyValue, subPath

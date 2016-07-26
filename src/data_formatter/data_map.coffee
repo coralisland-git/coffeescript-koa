@@ -168,7 +168,7 @@ class DataMap
 
 		dm = DataMap.getDataMap()
 
-		if typeof keyValue == "string" and /^[0-9]+$/.test keyValue
+		if typeof keyValue == "string" and /^[0-9]{1,12}$/.test keyValue
 			keyValue = parseInt(keyValue)
 
 		path = "/" + tableName + "/" + keyValue + "/" + fieldName
@@ -215,7 +215,7 @@ class DataMap
 
 		dm = DataMap.getDataMap()
 
-		if typeof keyValue == "string" and /^[0-9]+$/.test keyValue
+		if typeof keyValue == "string" and /^[0-9]{1,12}$/.test keyValue
 			keyValue = parseInt(keyValue)
 
 		path = "/" + tableName + "/" + keyValue + "/" + fieldName
