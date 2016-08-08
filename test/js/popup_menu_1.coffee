@@ -47,7 +47,6 @@ $ ->
 
             menu = new PopupMenuCalendar "Calendar", e
             menu.onCheck = (e, data) ->
-                console.log "E=", e
                 console.log "DATA=", data
 
     addTest "Popup menu with badge and icon", ()->
@@ -60,7 +59,7 @@ $ ->
             e.stopPropagation()
 
             menu = new PopupMenu "Test Title", 30, 30
-            
+
             (menu.addItem "Item 1", (data) ->
                 console.log "Clicked item 1: ", data
             , 100).setBadge(5).setClass('primary').setIcon("fa fa-edit")

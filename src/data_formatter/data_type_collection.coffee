@@ -55,6 +55,19 @@ class DataTypeCollection
         @colList = []
         if cols? then @configureColumns cols
 
+    contains: (source)=>
+        if @col[source]? then return true
+        return false
+
+    toSave :()=>
+        output = {}
+        for source, col of @col
+            output[source] = $.extend true, {}, col
+            delete output[source].formatter
+            delete output[source].extraClassName
+
+        return output
+
     ## -------------------------------------------------------------------------------------------------------------
     ## Given an array of column configuration structures, create new
     ## columns automatically based on the configuration.

@@ -23,6 +23,7 @@ class GlobalClassTools
         classObj.once = (eventName, callback)->
             this.eventManager.once eventName, callback
         classObj.emitEvent = (eventName, args)->
+            if not Array.isArray(args) then args = [ args ]
             this.eventManager.emitEvent eventName, args
 
         true

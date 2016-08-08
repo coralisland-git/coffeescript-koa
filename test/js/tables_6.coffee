@@ -100,10 +100,6 @@ $ ->
         width    : 60
         editable : true
         visible  : true
-        render: (val)=>
-            console.log "Off Market Val:", val, typeof val
-            if val then return "Yes"
-            return "No"
 
     TableRetsServer.push
         name     : "Use POST"

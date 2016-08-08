@@ -15,6 +15,22 @@ $ ->
                 console.log "Error loading zipcode data: ", e
                 resolve(false)
 
+    timerTest = ()->
+        return
+
+        counter = 0
+        setInterval ()->
+            counter++
+
+            displayValue = DataMap.getDataFieldFormatted "zipcode", 1001, "city"
+            value = DataMap.getDataField "zipcode", 1001, "city"
+            console.log "display=", displayValue, " actual=", value
+
+            DataMap.getDataMap().updatePathValueEvent "/zipcode/1001/city", "Test#{counter}"
+            console.log "Setting /zipcode/01001/city", counter
+
+        , 1000
+
     loadZipcodes()
     .then ()->
 
@@ -28,7 +44,9 @@ $ ->
             table.addTable "zipcode"
             table.setFixedHeaderAndScrollable()
             table.addActionColumn "zipcode", "Run", (row)=>
-                console.log "Selected row:", row
+                console.log "Zipcode action column selected row:", row
+
+            timerTest()
 
             table.render()
             true

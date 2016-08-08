@@ -76,7 +76,7 @@ class DynamicTabs
 			"data-toggle": "tabs"
 
 		@tabContent = $ "<div />",
-			"class": "block-content tab-content"
+			"class": "ninja-tab-content tab-content"
 
 		@elHolder.append @tabList
 		@elHolder.append @tabContent

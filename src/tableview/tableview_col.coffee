@@ -89,6 +89,8 @@ class TableViewCol
 
 		if @sort == -1
 			@tagSort.addClass "fa-sort-down"
+		else if @sort == 0
+			@tagSort.addClass "fa-sort"
 		else if @sort == 1
 			@tagSort.addClass "fa-sort-up"
 

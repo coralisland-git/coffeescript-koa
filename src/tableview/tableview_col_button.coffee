@@ -16,6 +16,7 @@ class TableViewColButton
         @visible = true
         @width   = 60
         @sort    = 0
+        @name    = @id
 
     render: (val)=>
         return @id
@@ -56,7 +57,7 @@ class TableViewColButton
         tag = parent.addDiv "tableHeaderField"
 
         tag.setDataPath "/#{@tableName}/Header/Action"
-        tag.html "&nbsp;"
+        tag.html @tableName
 
         return tag
 

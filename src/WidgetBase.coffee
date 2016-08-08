@@ -36,6 +36,8 @@ class WidgetTag
         return @add "div", classes, id
 
     setDataPath: (keyVal) =>
+        if @dataPath == keyVal then return this
+        @dataPath = keyVal
         @el.attr "data-path", keyVal
         return this
 
@@ -147,7 +149,6 @@ class WidgetTag
 
         return this
 
-
 class WidgetBase extends WidgetTag
 
     constructor: ()->
@@ -156,4 +157,3 @@ class WidgetBase extends WidgetTag
             console.log "INVALID CALL: Document not ready"
 
         @el = $(document.createDocumentFragment())
-

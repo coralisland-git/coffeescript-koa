@@ -52,11 +52,16 @@ class DataMap
 		# @property [Object] objStore object store
 		@objStore = {}
 
+		##|  Cached values for display
+		@cachedFormat = {}
+
 		@engine = new DataMapEngine()
 		@engine.on "change", (diff, a, b)=>
 
 			if diff.kind == "E"
 				@updateScreenPathValue diff.path, diff.lhs, true
+
+		GlobalClassTools.addEventManager(this)
 
 	## -------------------------------------------------------------------------------------------------------------
 	## function to get singleton global instance of data map
@@ -112,6 +117,8 @@ class DataMap
 		keyValue  = parts[2]
 		fieldName = parts[3]
 
+		delete @cachedFormat[path]
+
 		result = $("[data-path='#{path}']")
 		if result.length > 0
 
@@ -144,19 +151,13 @@ class DataMap
 		keyValue  = parts[2]
 		fieldName = parts[3]
 
-		if !@data[tableName]?
-			@data[tableName] = {}
-
-		if !@data[tableName][keyValue]?
-			@data[tableName][keyValue] = {}
-
+		delete @cachedFormat[path]
 		existingValue = @engine.getFast tableName, keyValue, fieldName
 		##| check if the existing type is boolean
 		if typeof existingValue == 'boolean' and existingValue == Boolean(newValue) then return true
-
 		if existingValue == newValue then return true
 
-		@data[tableName][keyValue][fieldName] = newValue
+		DataMap.getDataMap().engine.setFast tableName, keyValue, fieldName, newValue
 		@updateScreenPathValue path, newValue, true
 
 		if @onSave[tableName]?
@@ -172,6 +173,8 @@ class DataMap
 			keyValue = parseInt(keyValue)
 
 		path = "/" + tableName + "/" + keyValue + "/" + fieldName
+		delete @cachedFormat[path]
+
 		widgetCell.setDataPath path
 		currentValue = DataMap.getDataField tableName, keyValue, fieldName
 
@@ -326,6 +329,30 @@ class DataMap
 		dm.types[tableName].configureColumns columns
 		true
 
+	##|
+	##|  Add a column data type
+	@addColumn: (tableName, options) =>
+
+		config =
+			name     : "New Column"
+			source   : "newcol"
+			visible  : true
+			hideable : false
+			editable : false
+			sortable : true
+			required : false
+			align    : "left"
+			type     : "text"
+			width    : null
+			tooltip  : ""
+			render   : null
+
+		$.extend config, options
+
+		DataMap.setDataTypes tableName, [ config ]
+		dm = DataMap.getDataMap()
+		return dm.types[tableName].col[config.source]
+
 	## -------------------------------------------------------------------------------------------------------------
 	## Reset the columns for a table based on some object
 	##
@@ -428,6 +455,9 @@ class DataMap
 
 	## ===[ Exporting / Retreiving Data ]===
 
+	@setDataCallback: (tableName, methodName, callback)=>
+		return DataMap.getDataMap().engine.setDataCallback tableName, methodName, callback
+
 	## -------------------------------------------------------------------------------------------------------------
 	## get the values of the columns which will be retured true by reduceFunction
 	##
@@ -435,9 +465,7 @@ class DataMap
 	## @param [Function] reduceFunction function that will called on each column and if returns true then it will considered
 	## @return [Array] results the array of the data included using reduceFunction
 	##
-	## >>> RETURNS A PROMISE
 	@getValuesFromTable: (tableName, reduceFunction) =>
-
 		return DataMap.getDataMap().engine.find tableName, reduceFunction
 
 	## -------------------------------------------------------------------------------------------------------------
@@ -448,11 +476,80 @@ class DataMap
 	## @param [Object] values values of the row in form of object
 	## @return [Boolean]
 	##
-	## >>> RETURNS A PROMISE
 	@addData: (tableName, keyValue, newData) =>
 
 		path = "/#{tableName}/#{keyValue}"
 		doc = DataMap.getDataMap().engine.set path, newData
+		return doc
+
+	@changeColumn: (tableName, newColumn)=>
+
+		dm = DataMap.getDataMap()
+		if !dm.types[tableName]?
+			dm.types[tableName] = new DataTypeCollection(tableName)
+
+		console.log "HERE:", newColumn
+
+		found = false
+		if !dm.types[tableName].col[newColumn.col.source]?
+			dm.types[tableName].colList.push newColumn.col.source
+
+		dm.types[tableName].col[newColumn.col.source] = newColumn
+
+	@addDataUpdateTable: (tableName, keyValue, newData) =>
+
+		path = "/#{tableName}/#{keyValue}"
+		doc = DataMap.getDataMap().engine.set path, newData
+
+		dm = DataMap.getDataMap()
+		if !dm.types[tableName]?
+			dm.types[tableName] = new DataTypeCollection(tableName)
+
+		updated = false
+		for keyName, value of newData
+			if keyName == "_id" then continue
+
+			found = dm.types[tableName].contains(keyName)
+			if found == null or found == false
+				dataType = "text"
+				width    = ""
+				align    = "left"
+				options  = ""
+
+				if keyName == "distance"
+					dataType = "distance"
+					width    = 60
+					align    = "right"
+				else if /Year/.test keyName
+					dataType = "number"
+					width    = 60
+					align    = "right"
+					options  = '####'
+				else if typeof value == "number"
+					dataType = "number"
+					width    = 60
+					align = "right"
+				else if value? and typeof value == "object" and value.getTime?
+					dateType = "datetime"
+					width    = 110
+
+				updated = true
+				DataMap.addColumn tableName,
+					name     : keyName
+					source   : keyName
+					editable : false
+					visible  : true
+					type     : dataType
+					required : false
+					hideable : true
+					width    : width
+					align    : align
+					options  : options
+
+		if updated
+			saveText = dm.types[tableName].toSave()
+			dm.emitEvent "table_change", [tableName, saveText]
+
 		return doc
 
 	## -------------------------------------------------------------------------------------------------------------
@@ -475,7 +572,6 @@ class DataMap
 	## @return [String]
 	##
 	@getDataForKey: (tableName, keyValue) =>
-
 		dm = DataMap.getDataMap()
 		return dm.engine.getFastRow tableName, keyValue
 
@@ -496,11 +592,16 @@ class DataMap
 	@getDataFieldFormatted: (tableName, keyValue, fieldName) =>
 
 		path = "/" + tableName + "/" + keyValue + "/" + fieldName
+		dm = DataMap.getDataMap()
+
+		if dm.cachedFormat[path]?
+			return dm.cachedFormat[path]
+
 		currentValue = DataMap.getDataField tableName, keyValue, fieldName
 
 		##|
 		##|  See if there is a formatter attached
-		dm = DataMap.getDataMap()
+
 		if dm.types[tableName]? and dm.types[tableName].col[fieldName]?
 
 			formatter = dm.types[tableName].col[fieldName].formatter
@@ -514,6 +615,7 @@ class DataMap
 		if !currentValue? or currentValue == null
 			currentValue = ""
 
+		dm.cachedFormat[path] = currentValue
 		return currentValue
 
 	## -------------------------------------------------------------------------------------------------------------

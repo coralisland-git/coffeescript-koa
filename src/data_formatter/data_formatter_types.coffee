@@ -66,8 +66,8 @@ class DataFormatterType
 
 		@editorPath = path
 
-		console.log "parentElement=", parentElement
-		console.log "currentValue=", currentValue
+		# console.log "parentElement=", parentElement
+		# console.log "currentValue=",  currentValue
 
 		if parentElement?
 
@@ -98,7 +98,6 @@ class DataFormatterType
 	saveValue: (newValue) =>
 
 		newValue = @unformat(newValue, @editorPath)
-		console.log "Saving value", newValue
 		if @onSaveCallback?
 			@onSaveCallback @editorPath, newValue
 		true
@@ -122,6 +121,23 @@ class DataFormatterType
 		##|
 		##|  Close the popup with the escape key
 		@elEditor.on "keydown", (e) =>
+
+			if e.keyCode == 9
+				##|
+				##|  Tab key handles save
+				@saveValue(@elEditor.val())
+				@editorShowing = false
+				e.preventDefault()
+				e.stopPropagation()
+				@elEditor.hide()
+
+				##|
+				##|  Send out a tab key
+				# if globalKeyboardEvents?
+				# 	globalKeyboardEvents.emitEvent "tab", [ e ]
+
+				return false
+
 			if e.keyCode == 13
 				@saveValue(@elEditor.val())
 				@editorShowing = false
@@ -271,10 +287,29 @@ class DataFormatMemo extends DataFormatterType
 		cx = left + (width / 2)
 		cy = top  - 10
 
+		w = $(window).width()
+		h = $(window).height()
+
+		if w > 1000
+			w = 1000
+		else if w > 800
+			w = 800
+		else
+			w = 600
+
+		if h > 1000
+			h = 1000
+		else if h > 800
+			h = 800
+		else if h > 600
+			h = 600
+		else
+			h = 400
+
 		##|
 		##|  Show a popup menu
 		popup = new PopupWindow("Text Editor");
-		popup.resize 800, 400
+		popup.resize w, h
 		popup.centerToPoint cx, cy-(popup.popupHeight/2)
 
 		navButtonSave = new NavButton "Save", "toolbar-btn navbar-btn btn-primary"
@@ -343,8 +378,17 @@ class DataFormatSourceCode extends DataFormatText
 	openEditor: (elParent, left, top, width, height, currentValue, path) =>
 		##|
 		##|  Show a popup menu
+
+		w = $(window).width()
+		h = $(window).height()
+
+		if width > w then width = w
+		if height > h then height = h
+		if left + width > w then left = 0
+		if top + height > h then top = 0
+
 		popup = new PopupWindow("Source Code");
-		popup.resize 600, 400
+		popup.resize w, h
 
 		navButtonSave = new NavButton "Save", "toolbar-btn navbar-btn btn-primary"
 		navButtonSave.onClick = (e)=>
@@ -363,7 +407,7 @@ class DataFormatSourceCode extends DataFormatText
 
 		popup.windowScroll.append tag
 
-		codeMode = "javacript"
+		codeMode = "javascript"
 		if typeof @options == "string" then codeMode = @options
 
 		codeEditor = new CodeEditor tag
@@ -457,7 +501,10 @@ class DataFormatNumber extends DataFormatterType
 		if isNaN(num)
 			return "[#{num}]"
 
-		return numeral().format("#,###.[##]")
+		if !options?
+			options = "#,###.[##]"
+
+		return numeral(num).format(options)
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to unformat the currently formatted data
@@ -467,6 +514,7 @@ class DataFormatNumber extends DataFormatterType
 	## @return [Object] data unformatted data
 	##
 	unformat: (data, path) =>
+		console.log "unformat number:", data
 		return DataFormatter.getNumber data
 
 
@@ -693,7 +741,13 @@ class DataFormatTags extends DataFormatterType
 		if typeof currentValue == "string"
 			currentValue = currentValue.split ','
 
-		return currentValue.join(", ")
+		if Array.isArray(currentValue)
+			return currentValue.join(", ")
+
+		values = []
+		for idx, obj of currentValue
+			values.push obj
+		return values.join(", ")
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to unformat the currently unformatted data
@@ -966,17 +1020,14 @@ class DataFormatBoolean extends DataFormatterType
 	##
 	openEditor: (elParent, left, top, width, height, currentValue, path) =>
 
-		##|
-		##|  Show a popup menu
-		p = new PopupMenu "Options", left, top
-		p.addItem "Yes", (coords, data) =>
-			@saveValue data
-		, 1
-		p.addItem "No", (coords, data) =>
-			console.log data
-			@saveValue data
-		, 0
-		true
+		if currentValue
+			currentValue = false
+		else
+			currentValue = true
+
+		@saveValue currentValue
+		return true
+
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to format the currently passed data
@@ -1001,6 +1052,11 @@ class DataFormatBoolean extends DataFormatterType
 	##
 	unformat: (data, path) =>
 		if !data? then return false
+
+		if typeof data == "boolean"
+			if data then return true
+			return false
+
 		if data == null or data == 0 then return false
 		if data == "No" or data == "no" or data == "false" or data == "off" then return false
 		return true

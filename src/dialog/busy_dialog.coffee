@@ -82,6 +82,25 @@ class BusyDialog
 
         , 0
 
+    ##|
+    ##|  Show busy waiting for data on a promise
+    waitFor: (strText, promiseValue, timeout) =>
+
+        @showBusy strText
+        new Promise (resolve, reject)=>
+
+            if !timeout? then timeout = 30
+            timerValue = setTimeout ()=>
+                console.log "Timeout waiting on promise:", strText
+                resolve(null)
+            , timeout * 1000
+
+            promiseValue.then (result)=>
+                clearTimeout timerValue
+                @finished()
+                resolve(result)
+
+
     ## -------------------------------------------------------------------------------------------------------------
     ## function to show the busy dialog
     ##

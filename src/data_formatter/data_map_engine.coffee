@@ -55,6 +55,8 @@ class DataMapMemoryCollection
 
         else
 
+            console.log "find: (", condition, ")"
+
             ##|
             ##| Complex search
             allResult = []
@@ -63,10 +65,15 @@ class DataMapMemoryCollection
                 for i, o of condition
                     if obj[i] != o then found = false
                 if found
-                    # allResult.push $.extend(true, {}, o)
                     allResult.push o
 
             return allResult
+
+    setFast: (idValue, subKey, newValue)=>
+
+        if idValue? and @data[idValue]?
+            @data[idValue][subKey] = newValue
+        return
 
     ##|
     ##|  Find a single record for read-online
@@ -167,7 +174,6 @@ class DataMapEngine
     ##|
     ##|  Find all the records in a given collection
     find: (collectionName, filterFunction) =>
-
         c = @internalGetCollection collectionName
         return c.findAll filterFunction
 
@@ -188,6 +194,24 @@ class DataMapEngine
 
         c = @internalGetCollection collectionName
         return c.findFast keyValue, subPath
+
+    ##|
+    ##|  Return the end value from a stored value
+    ##|  without creating a duplicate, this can screw with the data
+    ##|  so it should be used for display or read only
+    setFast: (collectionName, keyValue, subPath, newValue) =>
+
+        ##|
+        ##|  Path should already be parsed into an object.
+
+        if !collectionName?
+            throw new Error "Missing collection name"
+
+        if typeof keyValue == "string" and checkForNumber.test keyValue
+            keyValue = parseFloat keyValue
+
+        c = @internalGetCollection collectionName
+        return c.setFast keyValue, subPath, newValue
 
     ##|
     ##|  Return all the values for a given table row
@@ -219,7 +243,6 @@ class DataMapEngine
 
         if insertIfNeeded? and !doc?
             doc = $.extend true, {}, path.condition
-
             insertedDoc = c.upsert doc
 
         if path.subPath? and path.subPath.length > 0 and doc?
@@ -314,10 +337,17 @@ class DataMapEngine
         ##|
         return insertedDoc
 
+    ##|
+    ##| Overwrite one of the functions for an in memory table
+    setDataCallback: (tableName, methodName, callback)=>
+
+        collection = @internalGetCollection(tableName)
+        collection[methodName] = callback
+
 
     ##| -------------------------------------------------------------------------------------------------------------
     ##|
-    ##|  Internally Loki stores data in collections that are like tables within the database.
+    ##|  Return a reference to a table engine for the given table name
     internalGetCollection: (tableName, indexList) =>
 
         if !@memData[tableName]?

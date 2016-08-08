@@ -97,7 +97,6 @@ class CodeEditor
 		@setOptions
 			tooltipFollowsMouse: false
 		@_editor.addEventListener "guttermousemove",(e) =>
-			console.log e.clientX - @elementHolder.offset().left
 			setTimeout () =>
 				@elementHolder.find(".ace_tooltip").offset({left: 0, top:0})
 			,0

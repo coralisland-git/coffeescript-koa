@@ -17,6 +17,32 @@
 
 ###
 
+globalKeyboardEvents = new EvEmitter()
+
+$(document).on "keyup", (e)=>
+
+	if e.target == document.body
+		if e.keyCode == 38
+			console.log "DOC KEY [up]"
+			globalKeyboardEvents.emitEvent "up", []
+		else if e.keyCode == 40
+			console.log "DOC KEY [down]"
+			globalKeyboardEvents.emitEvent "down", []
+		else if e.keyCode == 37
+			console.log "DOC KEY [left]"
+			globalKeyboardEvents.emitEvent "left", []
+		else if e.keyCode == 39
+			console.log "DOC KEY [right]"
+			globalKeyboardEvents.emitEvent "right", []
+		else if e.keyCode == 9
+			console.log "DOC KEY [tab]"
+			globalKeyboardEvents.emitEvent "tab", []
+		else if e.keyCode == 13
+			console.log "DOC KEY [enter]"
+			globalKeyboardEvents.emitEvent "enter", []
+
+	return true
+
 class TableView
 
 	# @property [String] imgChecked html to be used when checkbox is checked
@@ -117,7 +143,7 @@ class TableView
 	## @return [Integer] the total number of rows
 	##
 	size : () =>
-		return @rowData.length
+		return @totalAvailableRows
 
 	## -------------------------------------------------------------------------------------------------------------
 	## returns the numbe of rows checked
@@ -126,8 +152,8 @@ class TableView
 	##
 	numberChecked: () =>
 		total = 0
-		for i, o of @rowData
-			if o.checked then total++
+		for i, o of @rowDataRaw
+			if o.row_selected then total++
 		total
 
 	## -------------------------------------------------------------------------------------------------------------
@@ -143,7 +169,7 @@ class TableView
 		@colList        = []
 
 		# @property [Array] list of rows as array
-		@rowData        = []
+		@rowDataRaw     = []
 
 		# @property [Boolean|Function] sorting function to apply on render
 		@sort           = 0
@@ -154,11 +180,10 @@ class TableView
 		# @property [Boolean] to show textbox to filter data
 		@showFilters	= true
 
+		@allowSelectCell = true
+
 		# @property [Object] currentFilters current applied filters to the table
 		@currentFilters  = {}
-
-		# @property [Object] rowDataElements data rows in the table
-		@rowDataElements = {}
 
 		# @property [Boolean|Function] callback to call on context menu click
 		@contextMenuCallbackFunction = 0
@@ -292,9 +317,28 @@ class TableView
 	##
 	## @param [Boolean] fixedHeader if header is fixed or not
 	##
+	setSimpleAndFixed: () =>
+
+		@showFilters     = false
+		@showHeaders     = false
+		# @allowSelectCell = false
+		@fixedHeader     = true
+
+		# $(window).on 'resize', () =>
+			# @elTableHolder.find('.table-header .tableview').width(@elTableHolder.find('.table-body .tableview').width())
+
+	## -------------------------------------------------------------------------------------------------------------
+	## make the table with fixed header and scrollable
+	##
+	## @param [Boolean] fixedHeader if header is fixed or not
+	##
 	setFixedHeaderAndScrollable: (@fixedHeader = true) =>
 		$(window).on 'resize', () =>
 			@elTableHolder.find('.table-header .tableview').width(@elTableHolder.find('.table-body .tableview').width())
+		$('a[data-toggle="tab"]').on 'shown.bs.tab', (e)=>
+
+			if @elTableHolder.width() > 0
+				@setHolderToBottom()
 
 	## -------------------------------------------------------------------------------------------------------------
 	## function to make column filter as popup instead of plain text
@@ -328,14 +372,10 @@ class TableView
 
 		console.log "B @checkboxLimit=#{@checkboxLimit} vs ", @selectedRows.length
 
-		for i, o of @rowData
-			o.checked = false
+		for i, o of @rowDataRaw
 			if o.id.toString() in @selectedRows
-				console.log "Found selected Row:", o.id
-				@rowData[i].row_selected = @imgChecked
 				@rowDataRaw[i].row_selected = true
 			else
-				@rowData[i].row_selected = @imgNotChecked
 				@rowDataRaw[i].row_selected = false
 
 		false
@@ -357,8 +397,8 @@ class TableView
 
 		@offsetShowingTop += amount
 
-		if @offsetShowingTop + @shadowRows.length > @rowData.length
-			@offsetShowingTop = @rowData.length - @shadowRows.length
+		if @offsetShowingTop + @shadowRows.length > @totalAvailableRows
+			@offsetShowingTop = @totalAvailableRows - @shadowRows.length
 
 		if @offsetShowingTop < 0
 			@offsetShowingTop = 0
@@ -380,6 +420,22 @@ class TableView
 
 		@elTheTable.el.css "left", -1 * amount
 		@virtualScrollH.setPos amount
+		true
+
+	pressEnter: (e)=>
+
+		if !@focusPath?
+			return false
+
+		row = @findRowFromPath(@focusPath)
+		col = @findColFromPath(@focusPath)
+
+		##|
+		##|  Use the new event manager
+		console.log "PRESS ENTER: [#{col}]", row
+
+		@emitEvent "click_#{col}", [ row, e ]
+		@emitEvent "click_row", [ row, e ]
 		true
 
 	## -------------------------------------------------------------------------------------------------------------
@@ -412,6 +468,15 @@ class TableView
 			data = @findRowFromPath e.path
 			col  = @findColFromPath e.path
 
+			if data? and data.id?
+				@selectedRow = data.id
+				@selectedCol = col
+				@setFocusCell e.path
+			else
+				@selectedRow = null
+				@selectedCol = null
+				@setFocusCell null
+
 			if !data?
 				return false
 
@@ -433,11 +498,11 @@ class TableView
 				##|
 				##|  Use the new event manager
 				@emitEvent "click_#{col}", [ data, e ]
+				@emitEvent "click_row", [ data, e ]
 
 				for c in @colList
 					if c.getSource() == col
 						if c.getEditable()
-							console.log "EDIT:", data, e
 							DataMap.getDataMap().editValue e.path, e.target
 
 			false
@@ -487,24 +552,22 @@ class TableView
 	##
 	internalApplySorting: () =>
 
-		console.log "Apply sorting"
-
-		@rowData.sort (a, b)=>
+		@rowDataRaw.sort (a, b)=>
 
 			for c in @colList
 
+				aValue = DataMap.getDataField c.tableName, a.id, c.getSource()
+				bValue = DataMap.getDataField c.tableName, b.id, c.getSource()
+
 				if c.sort? and c.sort == 1
-					if a[c.getSource()] < b[c.getSource()] then return 1
-					if a[c.getSource()] > b[c.getSource()] then return -1
+					if aValue < bValue then return 1
+					if aValue > bValue then return -1
 
 				else if c.sort? and c.sort == -1
-					if a[c.getSource()] < b[c.getSource()] then return -1
-					if a[c.getSource()] > b[c.getSource()] then return 1
-
-			return 0
+					if aValue < bValue then return -1
+					if aValue > bValue then return 1
 
 		@updateVisibleText()
-
 		true
 
 	## -------------------------------------------------------------------------------------------------------------
@@ -512,46 +575,17 @@ class TableView
 	##
 	updateRowData: () =>
 
-		@rowData = []
 		@rowDataRaw = []
-
-		# for col in @colList
-			# console.log "COL=", col
-
 		allData = DataMap.getValuesFromTable @primaryTableName, @reduceFunction
 		for keyName, obj of allData
 
-			obj.visible = true
+			record =
+				id           : obj.id
+				row_selected : false
 
-			objRaw = {}
-			colNum = 0
-			for col in @colList
+			@rowDataRaw.push record
 
-				if !col.visible
-					continue
-
-				if col.joinKey?
-					val                     = DataMap.getDataField col.joinTable, obj.id, col.joinKey
-					obj[col.getSource()]    = DataMap.getDataFieldFormatted col.tableName, val, col.getSource()
-					objRaw[col.getSource()] = DataMap.getDataField col.tableName, val, col.getSource()
-				else
-					if col.getSource() != "id"
-						obj[col.getSource()]    = DataMap.getDataFieldFormatted col.tableName, obj.id, col.getSource()
-						objRaw[col.getSource()] = DataMap.getDataField          col.tableName, obj.id, col.getSource()
-					else
-						objRaw.id = obj.id
-
-				colNum++
-
-			##|
-			##|  Values for the bookmark / selected checkbox
-			obj.row_selected = @imgNotChecked
-			objRaw.row_selected = false
-
-			# console.log "ADDING ROW", obj
-			@rowData.push obj
-			@rowDataRaw.push objRaw
-
+		@totalAvailableRows = @rowDataRaw.length
 		return true
 
 
@@ -591,28 +625,6 @@ class TableView
 		@lastNewWidth  = newWidth
 		true
 
-	## -------------------------------------------------------------------------------------------------------------
-	## internal function to calculate the number of occurences for each value in options
-	##
-	## @param [Object] col the whole column object
-	## @param [Boolean] initialize if table has been rendered or not
-	##
-	internalCountNumberOfOccurenceOfPopup: (col,initialize = false) =>
-
-		##| calculate occurances of unique values
-		occurences = @rowData.map (r) => {key: r.id, value : DataMap.getDataField col.tableName, r.id, col.getSource()}
-		counts = {}
-		occurences.forEach (v) =>
-			if $("#tbody#{@gid}").find("[data-id=#{v.id}]").is(":visible") or initialize
-				if counts[v.value] then counts[v.value]++ else counts[v.value] = 1
-		occurences = undefined
-		col.filterPopupData = counts
-
-		if @filterAsPopupCols and typeof @filterAsPopupCols == 'object'
-			@filterAsPopupCols[col.getSource()] = col
-		else
-			@filterAsPopupCols =
-				"#{col.getSource()}" : col
 
 	## -------------------------------------------------------------------------------------------------------------
 	## function to make column customizable in the popup
@@ -631,13 +643,14 @@ class TableView
 		rowNum       = @offsetShowingTop
 		shadowRowNum = 0
 
+		if @focus? and @focusPath?
+			@focus.removeClass "cellfocus"
+
 		while shadowRowNum < @shadowRows.length
 
 			row = @shadowRows[shadowRowNum]
 
-			# console.log "ShadowRow=#{shadowRowNum}, rowNum=#{rowNum} of #{@rowData.length}:", @rowDataRaw[rowNum]
-
-			if rowNum >= @rowData.length
+			if shadowRowNum >= @totalAvailableRows
 				##|
 				##|  Special case, no values left to show
 				colNum = 0
@@ -646,12 +659,13 @@ class TableView
 					row[colNum].text ""
 					row[colNum].removeClass "dataChanged"
 					row[colNum].setDataPath ""
+					row[colNum].hide()
 					colNum++
 
 				shadowRowNum++
 				continue
 
-			if @rowData[rowNum].visible? and not @rowData[rowNum].visible
+			if @rowDataRaw[rowNum].visible? and not @rowDataRaw[rowNum].visible
 				rowNum++
 				continue
 
@@ -660,25 +674,36 @@ class TableView
 				if !col.visible
 					continue
 
+				row[colNum].show()
+
 				if col.getSource() == "row_selected"
 					if @rowDataRaw[rowNum][col.getSource()]
 						row[colNum].parent.addClass "row_checked"
 					else
 						row[colNum].parent.removeClass "row_checked"
 
-				if col.render?
-					row[colNum].html col.render(@rowData[rowNum], row[colNum])
+					if @rowDataRaw[rowNum].row_selected
+						row[colNum].html @imgChecked
+					else
+						row[colNum].html @imgNotChecked
+
+				else if col.render?
+					row[colNum].html col.render(@rowDataRaw[rowNum], row[colNum])
 				else
-					row[colNum].html @rowData[rowNum][col.getSource()]
+					displayValue = DataMap.getDataFieldFormatted col.tableName, @rowDataRaw[rowNum].id, col.getSource()
+					row[colNum].html displayValue
 
 				row[colNum].removeClass "dataChanged"
-				row[colNum].setDataPath "/#{col.tableName}/#{@rowData[rowNum].id}/#{col.getSource()}"
+				row[colNum].setDataPath "/#{col.tableName}/#{@rowDataRaw[rowNum].id}/#{col.getSource()}"
 				colNum++
 
 			rowNum++
 			shadowRowNum++
 
-		strStatus = "Showing " + (@offsetShowingTop+1) + " - " + (rowNum) + " of " + @rowData.length
+		if @focus? and @focusPath?
+			@setFocusCell(@focusPath)
+
+		strStatus = "Showing " + (@offsetShowingTop+1) + " - " + (rowNum) + " of " + @totalAvailableRows
 		true
 
 	getMaxVisibleRows: ()=>
@@ -688,13 +713,13 @@ class TableView
 		##|  all rows are visible
 
 		if not @fixedHeader
-			return @rowData.length
+			return @totalAvailableRows
 
 		maxHeight  = @elTableHolder.height()
 
 		##|
 		##|  Remove space for bottom scrollbar
-		maxHeight -= @virtualScrollH.height
+		# maxHeight -= @virtualScrollH.height
 
 		if @showFilters
 			maxHeight -= @filterCellHeight
@@ -705,7 +730,6 @@ class TableView
 		##|
 		##|  Should we account for headers / filters and scroll area?
 		maxRows = maxHeight / @dataCellHeight
-		# console.log "Height=", maxHeight, " MaxRows=", maxRows
 		return Math.ceil(maxRows)
 
 	layoutShadow: ()=>
@@ -815,7 +839,7 @@ class TableView
 					@virtualScrollH.setRange 0, totalWidth, widthLimit
 					@virtualScrollH.setPos 0
 
-				@virtualScrollV.setRange 0, @rowData.length, @shadowRows.length
+				@virtualScrollV.setRange 0, @totalAvailableRows, @shadowRows.length
 				@virtualScrollV.setPos 0
 
 			, 10
@@ -868,11 +892,16 @@ class TableView
 	##
 	render: () =>
 
+		globalKeyboardEvents.on "up", @moveCellUp
+		globalKeyboardEvents.on "down", @moveCellDown
+		globalKeyboardEvents.on "left", @moveCellLeft
+		globalKeyboardEvents.on "right", @moveCellRight
+		globalKeyboardEvents.on "tab", @moveCellRight
+		globalKeyboardEvents.on "enter", @pressEnter
+
 		##|
 		##|  Get the data from that table
-
 		@updateRowData()
-		@rowDataElements = {}
 
 		##|
 		##|  Create a unique ID for the table, that doesn't change
@@ -914,7 +943,7 @@ class TableView
 				@shadowFilter.push tag
 
 		##| if no row found then default message
-		if @rowData.length is 0
+		if @totalAvailableRows is 0
 			console.log "TODO: Add empty results"
 			@addMessageRow "No results"
 
@@ -922,9 +951,9 @@ class TableView
 		##| TODO CHECK FOR FILTER
 
 		maxRows = @getMaxVisibleRows()
-		if maxRows > @rowData.length
+		if maxRows > @totalAvailableRows
 			@virtualScrollV.hide()
-			maxRows = @rowData.length
+			maxRows = @totalAvailableRows
 
 		for rowNum in [0...maxRows]
 
@@ -984,6 +1013,8 @@ class TableView
 			if col.getSource() == name
 				if col.sort == -1
 					col.UpdateSortIcon(1)
+				else if col.sort == 1
+					col.UpdateSortIcon(0)
 				else
 					col.UpdateSortIcon(-1)
 
@@ -1009,6 +1040,8 @@ class TableView
 			@currentFilters[tableName] = {}
 
 		@currentFilters[tableName][columnName] = $(e.target).val()
+		console.log "Current filter:", @currentFilters
+
 		@applyFilters()
 
 		return true
@@ -1051,23 +1084,26 @@ class TableView
 		for tableName, fieldList of @currentFilters
 			for fieldName, filterValue of fieldList
 				filters.push
-					keyName: fieldName
-					filter : new RegExp filterValue, "i"
+					tableName : tableName
+					keyName   : fieldName
+					filter    : new RegExp filterValue, "i"
 
 		rowNum  = 0
 		needRefresh = false
-		for row in @rowData
+		@totalAvailableRows = 0
+		for row in @rowDataRaw
 
 			if !row.visible?
 				row.visible = true
 
 			##|
 			##| Each row has the element (el) and the children TD nodes in children
-
 			keepRow = true
 			for f in filters
 				if not keepRow then continue
-				if not f.filter.test row[f.keyName]
+
+				rowValue = DataMap.getDataField(f.tableName, row.id, f.keyName)
+				if not f.filter.test rowValue
 					keepRow = false
 
 			if keepRow and not row.visible
@@ -1077,8 +1113,17 @@ class TableView
 				row.visible = false
 				needRefresh = true
 
+			if row.visible
+				@totalAvailableRows++
+
 		if needRefresh
 			@updateVisibleText()
+
+			if @totalAvailableRows < @shadowRows.length
+				@virtualScrollV.hide()
+			else
+				@virtualScrollV.setRange 0, @totalAvailableRows, @shadowRows.length
+				@virtualScrollV.setPos @virtualScrollV.current
 
 		return
 
@@ -1125,7 +1170,7 @@ class TableView
 	## @param [String] message the message that should be displayed in column
 	##
 	addMessageRow : (message) =>
-		@rowData.push message
+		@rowDataRaw.push message
 		return 0;
 
 	## -------------------------------------------------------------------------------------------------------------
@@ -1139,7 +1184,6 @@ class TableView
 	##
 	reset: () =>
 		@elTableHolder.html ""
-		@rowData = []
 		@colList = []
 		true
 
@@ -1157,6 +1201,132 @@ class TableView
 			$(".col_#{m[1]}").addClass "clickable"
 
 		true
+
+	moveCellRight: ()=>
+		if !@focus? then return
+		parts     = @focus.dataPath.split("/")
+		tableName = parts[1]
+		id        = parts[2]
+		source    = parts[3]
+
+		found = false
+		for col in @colList
+			if !col.visible then continue
+			if col.getSource() == source
+				found = true
+				continue
+			if found
+				@setFocusCell("/#{tableName}/#{id}/#{col.getSource()}")
+				return
+
+		true
+
+	moveCellLeft: ()=>
+		if !@focus? then return
+		parts     = @focus.dataPath.split("/")
+		tableName = parts[1]
+		id        = parts[2]
+		source    = parts[3]
+
+		previous = null
+		for col in @colList
+			if !col.visible then continue
+			if col.getSource() == source
+				if previous != null
+					@setFocusCell("/#{tableName}/#{id}/#{previous}")
+				return
+
+			previous = col.getSource()
+
+		true
+
+	moveCellUp: ()=>
+		if !@focus? then return
+		parts     = @focus.dataPath.split("/")
+		tableName = parts[1]
+		id        = parts[2]
+		source    = parts[3]
+
+		previous = null
+		for row in @rowDataRaw
+			if row.id.toString() == id
+				if previous != null
+					result = @setFocusCell("/#{tableName}/#{previous.id}/#{source}")
+					if !result
+						@scrollUp(-1)
+						result = @setFocusCell("/#{tableName}/#{previous.id}/#{source}")
+
+				return
+
+			previous = row
+
+		true
+
+	moveCellDown: ()=>
+		if !@focus? then return
+		parts     = @focus.dataPath.split("/")
+		tableName = parts[1]
+		id        = parts[2]
+		source    = parts[3]
+
+		found    = null
+		previous = null
+		for row in @rowDataRaw
+
+			if row.id.toString() == id
+				found = true
+				continue
+
+			if found
+				result = @setFocusCell("/#{tableName}/#{row.id}/#{source}")
+				if !result
+					@scrollUp(1)
+					result = @setFocusCell("/#{tableName}/#{row.id}/#{source}")
+
+				return
+
+		true
+
+	##|
+	##|  Auto select the first visible cell
+	setFocusFirstCell: ()=>
+
+		for shadow in @shadowRows
+			for item in shadow
+				@setFocusCell item.dataPath
+				return true
+
+		true
+
+	##|
+	##|  Focus on a path cell
+	setFocusCell: (path) =>
+
+		if !@allowSelectCell
+			return false
+
+		##|
+		##|  Remove old focus
+		if @focus?
+			@focus.removeClass "cellfocus"
+
+		if path == null
+			@focus = null
+			@emitEvent 'focus_cell', [ null, null ]
+			return false
+
+		count = 0
+		for shadow in @shadowRows
+			for item in shadow
+				if item.dataPath == path
+					@focus = item
+					@focus.addClass "cellfocus"
+					@focusPath = path
+					@emitEvent 'focus_cell', [ path, item ]
+
+					return true
+
+		return false
 
 	## -------------------------------------------------------------------------------------------------------------
 	## internal function to find the col name from the event object

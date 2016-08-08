@@ -58,12 +58,14 @@ class VirtualScrollArea
             @width  = @elScrollTrack.el.width()
             @height = @elScrollTrack.el.height()
 
-        if @isVert
+        if (@max - @min < 1)
+            @spacing = 0
+        else if @isVert
             @spacing  = @height / (@max - @min)
         else
             @spacing  = @width / (@max - @min)
 
-        # console.log "min=#{@min}, max=#{@max}, displaySize=#{@displaySize} spacing=#{@spacing}"
+        # console.log "min=#{@min}, max=#{@max}, displaySize=#{@displaySize} spacing=#{@spacing} current=#{@current}"
         true
 
     setPos: (@current)=>
