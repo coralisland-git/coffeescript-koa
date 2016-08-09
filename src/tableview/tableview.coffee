@@ -740,9 +740,13 @@ class TableView
 		##|
 		##|  If the horizontal scrollbar is showing then don't
 		##|  let the vertical go all the way to the bottom
+		##| we wait for 100 ms so that the constructor has been executed for virtualscrolls
 		##|
-		if @virtualScrollH.visible
-			@virtualScrollV.bottomPadding = @virtualScrollH.height-1
+		setTimeout () =>
+			if @virtualScrollH.visible
+				@virtualScrollV.bottomPadding = @virtualScrollH.height-1
+				@virtualScrollV.resize()
+		, 100
 
 		if !@fixedHeader
 			@virtualScrollV.hide()

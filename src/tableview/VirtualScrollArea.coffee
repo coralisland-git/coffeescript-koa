@@ -48,6 +48,13 @@ class VirtualScrollArea
         @elScrollTrack = new WidgetTag("div", "vscroll #{className}")
         @thumb = @elScrollTrack.add "div", "marker"
 
+        ##|
+        ##| Make the holder element unselectable so drag on it doesn't select text
+        @elHolder.css
+            '-moz-user-select' : 'none',
+            '-webkit-user-select': 'none',
+            'user-select': 'none'
+
         @elHolder.append @elScrollTrack.el
         @resize()
         @setupEvents()
@@ -176,6 +183,7 @@ class VirtualScrollArea
             true
 
         @elScrollTrack.el.on "mousemove", (e)=>
+            e.stopPropagation()
             if @dragMarker and e.target.className == "marker"
                 x = e.offsetX - @dragOffsetX
                 y = e.offsetY - @dragOffsetY
@@ -195,12 +203,31 @@ class VirtualScrollArea
 
             true
 
+        ##|
+        ##| mouse out of the marker should not stop scrolling to support scrolling outside of div
         @elScrollTrack.el.on "mouseout", (e)=>
+            # if e.target.className != "marker" and e.relatedTarget? and e.relatedTarget.className != "marker"
+            #     if @dragMarker
+            #         @onMarkerDragStop()
+            true
 
-            if e.target.className != "marker" and e.relatedTarget? and e.relatedTarget.className != "marker"
-                if @dragMarker
-                    @onMarkerDragStop()
+        ##|
+        ##| stop scrolling if mouse key is left
+        @elHolder.on 'mouseup', (e) =>
+            if @dragMarker
+                @onMarkerDragStop()
 
+        ##|
+        ##| allow scroll outside of scroll div also
+        @elHolder.on 'mousemove', (e) =>
+            if @dragMarker
+                e.stopPropagation()
+                x = e.pageX - @elScrollTrack.el.offset().left - @dragOffsetX
+                y = e.pageY - @elScrollTrack.el.offset().top - @dragOffsetY
+                if @isVert
+                    @OnMarkerSet y, @height
+                else
+                    @OnMarkerSet x, @width
             true
 
         @elHolder.on "DOMMouseScroll", (e)=>
