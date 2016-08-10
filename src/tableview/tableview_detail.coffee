@@ -18,17 +18,38 @@ class TableViewDetailed extends TableView
 	## @return [Boolean]
 	##
 	addTable: (tableName, @rowReduceFunction, @reduceFunction) =>
-
+		@showHeaders = false
+		@showFilters = false
 		@primaryTableName = tableName
 
-		##|
-		##|  Find the columns for the specific table name
-		columns = DataMap.getColumnsFromTable(tableName, @rowReduceFunction)
-		for col in columns
-			c = new TableViewCol tableName, col
-			c.inlineSorting = @inlineSorting
-			@colList.push(c)
-		true
+		##| create 2 columns for table Field Name, Field Value
+		fieldName = {
+			editable: false
+			extraClassName: ''
+			hideable: false
+			name: 'Field Name'
+			required: false
+			sortable: false
+			source: 'field'
+			type: 'text'
+			visible: true
+			align: 'left',
+			calculateWidth: () =>
+				return 100
+		}
+		fieldValue = {
+			editable: false
+			extraClassName: ''
+			hideable: false
+			name: 'Field Value'
+			required: false
+			sortable: false
+			source: 'value'
+			type: 'text'
+			visible: true
+			align: 'right'
+		}
+		@colList = [new TableViewCol "detailed_#{@primaryTableName}", fieldName, new TableViewCol "detailed_#{@primaryTableName}", fieldValue]
 
 	## -------------------------------------------------------------------------------------------------------------
 	## render the table overriden from TableView
@@ -47,42 +68,81 @@ class TableViewDetailed extends TableView
 		if typeof @gid == "undefined"
 			@gid = GlobalValueManager.NextGlobalID()
 
+		@elTableHolder.html("")
+		@widgetBase = new WidgetBase()
+
+		tableWrapper   = @widgetBase.addDiv "table-wrapper", "tableWrapper#{@gid}"
+		outerContainer = tableWrapper.addDiv "outer-container"
+		@elTheTable    = outerContainer.addDiv "inner-container detailview"
+
+		@virtualScrollV = new VirtualScrollArea outerContainer, true
+		@virtualScrollH = new VirtualScrollArea outerContainer, false
 		##|
 		##|  draw the table header
-		html = "<table class='detailview' id='table#{@gid}'>"
+		# html = "<table class='detailview' id='table#{@gid}'>"
 
 		##|
 		##|  Start adding the body
-		html += "<tbody id='tbody#{@gid}'>";
+		# html += "<tbody id='tbody#{@gid}'>";
 
-		@rowData[@dataKey] = {}
 
-		for column in @colList
+		row = []
+		@shadowRows = []
+		# maxRows = @getMaxVisibleRows()
+		# if maxRows > @totalAvailableRows
+		# 	@virtualScrollV.hide()
+		# 	maxRows = @totalAvailableRows
+		columns = {}
+		for c in DataMap.getColumnsFromTable(@primaryTableName, @rowReduceFunction)
+			columns[c.source] = c
 
+		for source, column of columns
+			dataValue = DataMap.getDataField @primaryTableName,@dataKey, source
+			@rowDataRaw.push({field: column.name, value: dataValue})
+
+		rowNum = 0
+		for source, column of columns
 			column.styleFormat = ""
 			column.width       = ""
 			if !column.visible then continue
-
+			row = []
+			rowTag = @elTheTable.add "row"
+			row.push rowTag.addDiv "#{column.formatter.name} #{editable}"
+			editable = ""
+			if column.editable then editable = " editable"
+			if rowNum++ % 2 == 0 then editable += " even"
+			if column.align == "right" then editable += " text-right"
+			if column.align == "center" then editable += " text-center"
+			editable += " col_" + column.source
+			colTags = rowTag.addDiv "#{column.formatter.name} #{editable}"
+			# colTag.text "r=#{rowNum},#{i.getSource()}"
+			row.push colTags
+			@shadowRows.push row
+			console.log @shadowRows
+		@layoutShadow()
+		@updateVisibleText()
+		@internalSetupMouseEvents()
+		@elTableHolder.append tableWrapper.el
 			##|
 			##|  Create the "TR" tag
-			html += "<tr class='trow' data-id='#{@dataKey}' "
-			html += ">"
-			@rowData[@dataKey][column.col.source] = DataMap.getDataField @primaryTableName,@dataKey,column.col.source
-			if @showCheckboxes and @primaryTableName
-				html += @renderCheckable(i)
-			if column.col.visible != false
-				html += "<th style='text-align: right;width: #{@leftWidth}px; '> "
-				html += column.col.name
-				html += "</th>"
-				html += DataMap.renderField "td", column.tableName, column.col.source, @dataKey, column.col.extraClassName
+			# html += "<tr class='trow' data-id='#{@dataKey}' "
+			# html += ">"
+			# @rowDataRaw[@dataKey][column.col.source] = DataMap.getDataField @primaryTableName,@dataKey,column.col.source
+			#if @showCheckboxes and @primaryTableName
+			#	html += @renderCheckable(i)
+			#if column.col.visible != false
+			#	html += "<th style='text-align: right;width: #{@leftWidth}px; '> "
+			#	html += column.col.name
+			#	html += "</th>"
+			#	html += DataMap.renderField "td", column.tableName, column.col.source, @dataKey, column.col.extraClassName
 
-			html += "</tr>";
+			#html += "</tr>";
 
-		html += "</tbody></table>";
+		#html += "</tbody></table>";
 
-		@elTheTable = @elTableHolder.html(html);
-		@contextMenuCallSetup = 0
-		@setupContextMenuHeader()
-		@internalSetupMouseEvents()
+		# @elTableHolder.append tableWrapper.el
+		# @contextMenuCallSetup = 0
+		# @setupContextMenu()
+		# @internalSetupMouseEvents()
 
 		true
