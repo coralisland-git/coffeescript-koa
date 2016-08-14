@@ -127,9 +127,14 @@ class DataMap
 			if @types[tableName]? and @types[tableName].col[fieldName]?
 				formatter    = @types[tableName].col[fieldName].formatter
 				currentValue = formatter.format currentValue, @types[tableName].col[fieldName].options, path
+				result.html currentValue
 
-			result.html currentValue
 			if didDataChange then result.addClass "dataChanged"
+
+		##|
+		##|  Broadcast the data change event
+		if globalKeyboardEvents? and didDataChange
+			globalKeyboardEvents.emitEvent "change", [path, newValue]
 
 		true
 
@@ -153,10 +158,12 @@ class DataMap
 
 		delete @cachedFormat[path]
 		existingValue = @engine.getFast tableName, keyValue, fieldName
+
 		##| check if the existing type is boolean
 		if typeof existingValue == 'boolean' and existingValue == Boolean(newValue) then return true
 		if existingValue == newValue then return true
 
+		# console.log "setFast t=#{tableName} k=#{keyValue} field=#{fieldName} new=#{newValue}"
 		DataMap.getDataMap().engine.setFast tableName, keyValue, fieldName, newValue
 		@updateScreenPathValue path, newValue, true
 
@@ -200,8 +207,6 @@ class DataMap
 
 		widgetCell.text currentValue
 		return
-
-				# otherhtml += " onClick='globalOpenEditor(this);' "
 
 	## -------------------------------------------------------------------------------------------------------------
 	## return the html for the column to render including events and all
@@ -328,6 +333,22 @@ class DataMap
 
 		dm.types[tableName].configureColumns columns
 		true
+
+	##|
+	##|  Remove all the data from a table
+	@removeTableData: (tableName) =>
+		dm = DataMap.getDataMap()
+		dm.engine.eraseCollection(tableName)
+		return true
+
+	##|
+	##|  Entirely remove a table
+	@removeTable: (tableName) =>
+
+		dm = DataMap.getDataMap()
+		delete dm.types[tableName]
+		dm.engine.eraseCollection(tableName)
+		return true
 
 	##|
 	##|  Add a column data type
@@ -617,14 +638,3 @@ class DataMap
 
 		dm.cachedFormat[path] = currentValue
 		return currentValue
-
-	## -------------------------------------------------------------------------------------------------------------
-	## Erase all the data in a table
-	##
-	## >>> RETURNS A PROMISE
-	@eraseCollection: (tableName) =>
-
-		dm  = DataMap.getDataMap()
-		return dm.engine.eraseCollection tableName
-
-

@@ -24,14 +24,47 @@ span#ruler
     .header
         border: 1px solid blue
 
+    .groupRow
+        background-color: #101040
+        color: white
+
+    .groupRowChart1
+        background-color: #4573A7
+        color: white
+
+    .groupRowChart2
+        background-color: #AA4644
+        color: white
+
+    .groupRowChart3
+        background-color: #71588F
+        color: white
+
+    .groupRowChart4
+        background-color: #89A54E
+        color: white
+
+    .groupRowChart5
+        background-color: #4298AF
+        color: white
+
+    .groupRowChart6
+        background-color: #D09392
+        color: white
+
+    .groupRowChart7
+        background-color: #D60006
+        color: white
+
+
     div.cellfocus
-        border:2px dotted #208020 !important
+        border:1px dotted #208020 !important
         background: #f9f9ff
 
-    div.int,
-    div.decimal
+    div.type_int,
+    div.type_decimal
         text-align: right
-        padding-right: 4px
+        padding-right: 6px
 
     div.last
         border-right : 1px dotted rgba(0,0,0, 0.1)
@@ -86,19 +119,24 @@ span#ruler
         background-color: rgba(237, 192, 80, 1.0)
 
     div.editable:hover
-        background-color: #eebbbb
-        cursor: text
+        background-color : #B0E296
+        cursor           : text
 
     div.editable
-        padding-left: 4px
-        padding-right: 4px
-        padding-top: 2px
-        padding-top: 2px
-        color: #106010
+        padding-left  : 4px
+        padding-right : 4px
+        padding-top   : 2px
+        padding-top   : 2px
+        color         : #007F4A
 
     div.dataFilterWrapper
-        margin: 0px
-        padding: 0px
+        margin           : 0px
+        padding          : 0px
+        border           : 0px
+        border-top       : 1px solid #D6D6D6
+        border-bottom    : 1px solid #D6D6D6
+        border-left      : 1px dotted rgba(0,0,0, 0.1)
+        background-color : white
 
     .dynamic_edit
         border: 0px
@@ -111,9 +149,11 @@ span#ruler
         margin: 0px
         background-color: rgba(204, 228, 240, 1.0)
 
-    div:hover
-        background-color: rgba(237, 192, 80, 1.0)
-        // cursor: pointer
+    // div:hover
+    //     // background-color: rgba(237, 192, 80, 1.0)
+    //     // border: 1px solid red
+    //     // cursor: pointer
+    //     color: red
 
     div.table_button
         color: #0000AA
@@ -123,23 +163,27 @@ span#ruler
         border: 1px solid #000070
         background-color: #eeeeff
 
-    row:hover div
+    .tableRow:
+        border-top: 1px solid rgba(0,0,0,0)
+        border-bottom: 1px solid rgba(0,0,0,0)
+
+    .tableRow:hover div
         border-top: 1px solid rgba(80,0,0,0.7)
         border-bottom: 1px solid rgba(80,0,0,0.7)
         color: #200000
 
-    row.row_checked div
+    .tableRow .row_checked
+        font-weight: 600
         background-color: rgba(210, 190, 210, 0.4)
 
 input.dataFilter
     width         : 100%
-    border        : 0px
-    border-top    : 1px solid #D6D6D6
-    border-bottom : 1px solid #D6D6D6
-    height        : 20px
+    height        : 24px
     padding       : 0px
     margin        : 0px
+    border        : 0px
     color         : #205020
+    background-color: white
 
 input.editing
     padding-left: 0px

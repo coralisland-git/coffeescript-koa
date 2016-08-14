@@ -43,7 +43,8 @@ $ ->
             table = new TableView $("#renderTest1"), true
             table.addTable "zipcode"
             table.setFixedHeaderAndScrollable()
-            table.addActionColumn "zipcode", "Run", (row)=>
+            table.groupBy("county")
+            table.addActionColumn "Run", (row)=>
                 console.log "Zipcode action column selected row:", row
 
             timerTest()

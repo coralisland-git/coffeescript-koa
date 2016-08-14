@@ -6,143 +6,113 @@
 ##
 class TableViewDetailed extends TableView
 
-	# @property [Integer] leftWidth
-	leftWidth : 180
+    # @property [Integer] leftWidth
+    leftWidth : 100
 
-	## -------------------------------------------------------------------------------------------------------------
-	## addTable function overriden from TableView
-	##
-	## @param [String] tableName name of the table to consider from datamap
-	## @param [Function] rowReduceFunction will be applied to each row and if returns true then only row will be included
-	## @param [Function] reduceFunction will be applied to each column and if returns true then only column will be included
-	## @return [Boolean]
-	##
-	addTable: (tableName, @rowReduceFunction, @reduceFunction) =>
-		@showHeaders = false
-		@showFilters = false
-		@primaryTableName = tableName
+    # @property [Integer] dataWidth - the smallest width for a column
+    dataWidth : 120
 
-		##| create 2 columns for table Field Name, Field Value
-		fieldName = {
-			editable: false
-			extraClassName: ''
-			hideable: false
-			name: 'Field Name'
-			required: false
-			sortable: false
-			source: 'field'
-			type: 'text'
-			visible: true
-			align: 'left',
-			calculateWidth: () =>
-				return 100
-		}
-		fieldValue = {
-			editable: false
-			extraClassName: ''
-			hideable: false
-			name: 'Field Value'
-			required: false
-			sortable: false
-			source: 'value'
-			type: 'text'
-			visible: true
-			align: 'right'
-		}
-		@colList = [new TableViewCol "detailed_#{@primaryTableName}", fieldName, new TableViewCol "detailed_#{@primaryTableName}", fieldValue]
+    constructor: (@elTableHolder, @showCheckboxes) ->
+        super(@elTableHolder, @showCheckboxes)
+        @showFilters = false
+        @fixedHeader = true
 
-	## -------------------------------------------------------------------------------------------------------------
-	## render the table overriden from TableView
-	##
-	## @param [String] dataKey key to be considered from the datamap, the row with given key will be rendered
-	## @return [Boolean]
-	##
-	render : (@dataKey) =>
+    getTableTotalRows: ()=>
+        count = Object.keys(@colByNum).length
 
-		if !@dataKey?
-			throw new Error "data with key #{@dataKey} not found"
+    getTableTotalCols: ()=>
+        return @totalAvailableRows
 
-		##|
-		##|  Create a unique ID for the table, that doesn't change
-		##|  even if the table is re-drawn
-		if typeof @gid == "undefined"
-			@gid = GlobalValueManager.NextGlobalID()
+    getColWidth: (location)=>
+        if @showHeaders and location.visibleCol == 0 then return @leftWidth
+        return @dataWidth
 
-		@elTableHolder.html("")
-		@widgetBase = new WidgetBase()
+    getCellStriped: (location)=>
+        if @showHeaders and location.visibleCol == 0 then return false
+        return location.visibleRow % 2 == 1
 
-		tableWrapper   = @widgetBase.addDiv "table-wrapper", "tableWrapper#{@gid}"
-		outerContainer = tableWrapper.addDiv "outer-container"
-		@elTheTable    = outerContainer.addDiv "inner-container detailview"
+    ##|
+    ##|  Return true if a cell is editable
+    ##|
+    getCellEditable: (location)=>
+        if !@colByNum[location.rowNum]? then return null
+        return @colByNum[location.rowNum].getEditable()
+    ##|
+    ##|  Return right/left/center - left is assumed by default
+    getCellAlign: (location)=>
+        if !@colByNum[location.rowNum]? then return null
+        return @colByNum[location.rowNum].getAlign()
 
-		@virtualScrollV = new VirtualScrollArea outerContainer, true
-		@virtualScrollH = new VirtualScrollArea outerContainer, false
-		##|
-		##|  draw the table header
-		# html = "<table class='detailview' id='table#{@gid}'>"
+    getCellTablename: (location)=>
+        if !@colByNum[location.rowNum]? then return null
+        return @colByNum[location.rowNum].tableName
 
-		##|
-		##|  Start adding the body
-		# html += "<tbody id='tbody#{@gid}'>";
+    getCellSource: (location)=>
+        if !@colByNum[location.rowNum]? then return null
+        return @colByNum[location.rowNum].getSource()
 
+    getCellRecordID: (location)=>
+        if !@rowDataRaw[location.colNum]? then return 0
+        return @rowDataRaw[location.colNum].id
 
-		row = []
-		@shadowRows = []
-		# maxRows = @getMaxVisibleRows()
-		# if maxRows > @totalAvailableRows
-		# 	@virtualScrollV.hide()
-		# 	maxRows = @totalAvailableRows
-		columns = {}
-		for c in DataMap.getColumnsFromTable(@primaryTableName, @rowReduceFunction)
-			columns[c.source] = c
+    getCellFormatterName: (location)=>
+        if !@colByNum[location.rowNum]? then return null
+        return @colByNum[location.rowNum].getFormatterName()
 
-		for source, column of columns
-			dataValue = DataMap.getDataField @primaryTableName,@dataKey, source
-			@rowDataRaw.push({field: column.name, value: dataValue})
+    shouldSkipRow: (rowNum)=>
+        if !@colByNum[location.rowNum]? then return true
+        return false
 
-		rowNum = 0
-		for source, column of columns
-			column.styleFormat = ""
-			column.width       = ""
-			if !column.visible then continue
-			row = []
-			rowTag = @elTheTable.add "row"
-			row.push rowTag.addDiv "#{column.formatter.name} #{editable}"
-			editable = ""
-			if column.editable then editable = " editable"
-			if rowNum++ % 2 == 0 then editable += " even"
-			if column.align == "right" then editable += " text-right"
-			if column.align == "center" then editable += " text-center"
-			editable += " col_" + column.source
-			colTags = rowTag.addDiv "#{column.formatter.name} #{editable}"
-			# colTag.text "r=#{rowNum},#{i.getSource()}"
-			row.push colTags
-			@shadowRows.push row
-			console.log @shadowRows
-		@layoutShadow()
-		@updateVisibleText()
-		@internalSetupMouseEvents()
-		@elTableHolder.append tableWrapper.el
-			##|
-			##|  Create the "TR" tag
-			# html += "<tr class='trow' data-id='#{@dataKey}' "
-			# html += ">"
-			# @rowDataRaw[@dataKey][column.col.source] = DataMap.getDataField @primaryTableName,@dataKey,column.col.source
-			#if @showCheckboxes and @primaryTableName
-			#	html += @renderCheckable(i)
-			#if column.col.visible != false
-			#	html += "<th style='text-align: right;width: #{@leftWidth}px; '> "
-			#	html += column.col.name
-			#	html += "</th>"
-			#	html += DataMap.renderField "td", column.tableName, column.col.source, @dataKey, column.col.extraClassName
+    shouldSkipCol: (colNum)=>
+        if !@rowDataRaw[location.colNum]? then return false
+        if @rowDataRaw[location.colNum].visible? and @rowDataRaw[location.colNum].visible == false then return true
+        return false
 
-			#html += "</tr>";
+    isHeaderCell: (location)=>
+        if !@colByNum[location.rowNum]? then return false
+        if @showHeaders and location.visibleCol == 0 then return true
+        return false
 
-		#html += "</tbody></table>";
+    shouldAdvanceCol: (location)=>
+        if @showHeaders and location.visibleCol == 0 then return false
+        return true
 
-		# @elTableHolder.append tableWrapper.el
-		# @contextMenuCallSetup = 0
-		# @setupContextMenu()
-		# @internalSetupMouseEvents()
+    ##|
+    ##|  Returns a state record for the current row
+    ##|  data - Cells of data
+    ##|  locked - Cells of header or locked content
+    ##|  group - Starting a new group
+    ##|  skip - Skip this row
+    ##|  invalid - Invalid row
+    ##|
+    getRowType: (location)=>
+        if !@colByNum[location.rowNum]? then return "invalid"
+        return "data"
 
-		true
+    setHeaderField: (location)=>
+        location.cell.html ""
+        if !@colByNum[location.rowNum]? then return false
+        @colByNum[location.rowNum].RenderHeaderHorizontal "", location.cell
+
+    getCellSelected: (location)=>
+        if @rowDataRaw[location.colNum]? and @rowDataRaw[location.colNum].row_selected
+            return true
+
+        return false
+
+    setDataField: (location)=>
+
+        col = @colByNum[location.rowNum]
+        if col.getSource() == "row_selected"
+            if @getRowSelected(@rowDataRaw[location.colNum].id)
+                location.cell.html @imgChecked
+            else
+                location.cell.html @imgNotChecked
+
+        else if col.render?
+            location.cell.html col.render(@rowDataRaw[location.colNum][col.getSource()], @rowDataRaw[location.colNum])
+        else
+            displayValue = DataMap.getDataFieldFormatted col.tableName, @rowDataRaw[location.colNum].id, col.getSource()
+            location.cell.html displayValue
+
+        true

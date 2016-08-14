@@ -46,6 +46,17 @@ getCoffeeFiles = ()->
 
 	return list
 
+getCoffeeTestFiles = ()->
+	list = {}
+
+	for i in fs.readdirSync "test/js/"
+		if !/coffee/.test i then continue
+		if /test_common/.test i then continue
+		js = i.replace ".coffee", ".js"
+		list["ninja/test/js/#{js}"] = ["test/js/#{i}"]
+
+	return list
+
 module.exports = (grunt) ->
 	grunt.initConfig
 
@@ -131,10 +142,13 @@ module.exports = (grunt) ->
 		coffee:
 			options:
 				bare: true
-				sourceMap: false
+				sourceMap: true
 
 			compile:
 				files: getCoffeeFiles()
+
+			test:
+				files: getCoffeeTestFiles()
 
 		watch:
 			grunt:
@@ -145,14 +159,28 @@ module.exports = (grunt) ->
 				tasks: ['stylus:compile']
 
 			coffeeFile:
-				files: ['src/**/*coffee', "test/js/*coffee", "test/js/test_data/*coffee", "module/**/*coffee", "module/**/*.js"]
+				files: ['src/**/*coffee', "module/**/*coffee", "module/**/*.js"]
 				tasks: ['coffee']
+
+			coffeeTestFiles:
+				files: ['test/js/*.coffee']
+				tasks: ['coffee:test']
+
+			testcompileDone:
+				files: ['ninja/test/js*']
+				tasks: []
+				options:
+					livereload: true
 
 			jadefiles:
 				files: ['test/views/*.jade']
 				tasks: ['jade:compile']
 				options:
 					livereload: true
+
+			stylusfiles:
+				files: ['src/**/*.styl']
+				tasks: ['stylus:compile']
 
 			cssfiles:
 				files: ['ninja/ninja.css']

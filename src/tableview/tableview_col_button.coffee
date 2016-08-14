@@ -54,12 +54,9 @@ class TableViewColButton
 
         if @visible == false then return
 
-        tag = parent.addDiv "tableHeaderField"
-
-        tag.setDataPath "/#{@tableName}/Header/Action"
-        tag.html @tableName
-
-        return tag
+        parent.html @tableName
+        parent.addClass "text-center"
+        return parent
 
     UpdateSortIcon: (newSort) =>
         true

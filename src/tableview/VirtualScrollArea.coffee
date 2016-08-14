@@ -10,10 +10,6 @@ class VirtualScrollArea
         @max     = 0
         @current = 0
         @step    = 1
-
-        @width   = 0
-        @height  = 0
-
         @visible = true
 
         @bottomPadding = 0
@@ -59,20 +55,35 @@ class VirtualScrollArea
         @resize()
         @setupEvents()
 
-    setRange: (@min, @max, @displaySize) =>
+    setRange: (@min, @max, @displaySize, @current) =>
 
-        if !@height or !@width
-            @width  = @elScrollTrack.el.width()
-            @height = @elScrollTrack.el.height()
-
-        if (@max - @min < 1)
-            @spacing = 0
-        else if @isVert
-            @spacing  = @height / (@max - @min)
+        if @displaySize >= (@max-@min)
+            console.log "VirtualScrollArea setRange(min=#{@min}, max=#{@max}, #{@displaySize}, #{@current})", @isVert
+            # console.log "VirtualScrollArea setRange hiding, #{@displaySize} >= ", @max-@min
+            @hide()
+            return
         else
-            @spacing  = @width / (@max - @min)
+            @show();
 
-        # console.log "min=#{@min}, max=#{@max}, displaySize=#{@displaySize} spacing=#{@spacing} current=#{@current}"
+        ##|
+        ##|  Figure out the spacing
+
+        if (@height() == 0 or @width() == 0)
+            setTimeout ()=>
+                @setRange @min, @max, @displaySize, @current
+            , 10
+        else
+
+            if (@max - @min < 1)
+                @spacing = 0
+            else if @isVert
+                @spacing  = @height() / (@max - @min)
+            else
+                @spacing  = @width() / (@max - @min)
+
+            # console.log "VirtualScrollArea setRange(#{@min}, #{@max}, #{@displaySize}) spacing=#{@spacing}"
+            @setPos(@current)
+
         true
 
     setPos: (@current)=>
@@ -80,7 +91,7 @@ class VirtualScrollArea
         newOffset = @spacing * @current
         newWidth  = @spacing * @displaySize
 
-        # console.log "POS=#{@current} of #{@max} / #{newOffset} of #{@width}x#{@height} | #{newWidth}"
+        # console.log "VirtualScrollArea setPos(#{@current}), spacing=#{@spacing}, displaySize=#{@displaySize} (newOffset=#{newOffset}, newWidth=#{newWidth})"
 
         if @isVert
             @thumb.el.css "height", newWidth
@@ -98,10 +109,6 @@ class VirtualScrollArea
         @dragOffsetX = offsetX
         @dragOffsetY = offsetY
         @dragCurrent = Math.floor(@current)
-
-        if !@height or !@width
-            @width  = @elScrollTrack.el.width()
-            @height = @elScrollTrack.el.height()
 
         @dragMarker = true
         @thumb.el.css "backgroundColor", @thumbBackColorSelected
@@ -124,8 +131,11 @@ class VirtualScrollArea
         true
 
     OnMarkerSet: (pos, maxLoc)=>
+        console.log "OnMarkerSet pos=#{pos} maxloc=#{maxLoc}"
         percent = pos / (maxLoc - @thumbHeight)
+        console.log "Percent=", percent, "max=#{@max} min=#{@min}"
         num = @min + (percent * (@max - @min))
+        console.log "NUM=", num
         @emitEvent "scroll_to", [ Math.floor(num) ]
         true
 
@@ -155,24 +165,20 @@ class VirtualScrollArea
 
         @elScrollTrack.el.on "mousedown", (e)=>
 
-            if !@height or !@width
-                @width  = @elScrollTrack.el.width()
-                @height = @elScrollTrack.el.height()
-
             if e.target.className == "marker"
                 @onMarkerDragStart(e.offsetX, e.offsetY)
 
             else
-                # console.log "LOC=", e.offsetX, e.offsetY
+                console.log "LOC=", e.offsetX, e.offsetY
 
                 if @isVert
                     if e.offsetY < 10 then e.offsetY = 0
-                    @OnMarkerSet e.offsetY, @height
+                    @OnMarkerSet e.offsetY, @height()
                 else
                     if e.offsetX < 10 then e.offsetX = 0
-                    @OnMarkerSet e.offsetX, @width
+                    @OnMarkerSet e.offsetX, @width()
 
-            # console.log "MOUSE DOWN", e.target.className, e.target.class, e.target
+            console.log "MOUSE DOWN", e.target.className, e.target.class, e.target
             true
 
         @elScrollTrack.el.on "mouseup", (e)=>
@@ -225,9 +231,9 @@ class VirtualScrollArea
                 x = e.pageX - @elScrollTrack.el.offset().left - @dragOffsetX
                 y = e.pageY - @elScrollTrack.el.offset().top - @dragOffsetY
                 if @isVert
-                    @OnMarkerSet y, @height
+                    @OnMarkerSet y, @height()
                 else
-                    @OnMarkerSet x, @width
+                    @OnMarkerSet x, @width()
             true
 
         @elHolder.on "DOMMouseScroll", (e)=>
@@ -270,12 +276,25 @@ class VirtualScrollArea
 
         @visible = false
         @elScrollTrack.el.hide()
+        @elScrollTrack.hide()
         true
 
-    resize: ()=>
+    show: ()=>
 
-        parentWidth  = @elHolder.width()
+        @visible = true
+        @elScrollTrack.el.show()
+        @elScrollTrack.show()
+        true
+
+    height: ()=>
         parentHeight = @elHolder.height()
+        return parentHeight
+
+    width: ()=>
+        parentWidth  = @elHolder.width()
+        return parentWidth
+
+    resize: ()=>
 
         @elScrollTrack.el.css
             position        : "absolute"
@@ -296,15 +315,6 @@ class VirtualScrollArea
                 bottom : @bottomPadding
                 left   : 0
                 height : @mySize
-
-        if !@visible
-            @elScrollTrack.hide()
-            @width  = 0
-            @height = 0
-        else
-            @elScrollTrack.show()
-            @width = @elScrollTrack.el.width()
-            @height = @elScrollTrack.el.height()
 
         true
 

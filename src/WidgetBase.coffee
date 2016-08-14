@@ -22,6 +22,8 @@ class WidgetTag
         else
             @classes = []
 
+        @children = []
+
         if attributes?
             for attName, attValue of attributes
                 @el.attr attName, attValue
@@ -30,29 +32,82 @@ class WidgetTag
         tag = new WidgetTag tagName, classes, id, attributes
         tag.parent = this
         @el.append tag.el
+        @children.push tag
         return tag
 
     addDiv: (classes, id, attributes) =>
         return @add "div", classes, id
 
     setDataPath: (keyVal) =>
-        if @dataPath == keyVal then return this
-        @dataPath = keyVal
-        @el.attr "data-path", keyVal
+        @setDataValue "path", keyVal
+
+    setDataValue: (name, value)=>
+        if !@dataValues? then @dataValues = {}
+        if @dataValues[name] != value
+            @dataValues[name] = value
+            @el[0].dataset[name] = value
+            # @el.attr "data-#{name}", value
+
         return this
+
+    getDataValue: (name) =>
+        if !@dataValues? then @dataValues = {}
+        return @dataValues[name]
+
+    setAbsolute: ()=>
+        @el.css "position", "absolute"
+        true
 
     setAttribute: (keyName, keyVal) =>
         @el.attr keyName, keyVal
         return this
 
+    ##|
+    ##|  Toggle a CSS class either on off as needed
+    ##|
+    setClass: (className, enabled)=>
+
+        if enabled == true
+            return @addClass(className)
+        else
+            return @removeClass(className)
+
+    ##|
+    ##|  Make sure only one of a given type of class is enabled
+    setClassOne: (validClass, patternForGroup)=>
+
+        if typeof patternForGroup == "string"
+            patternForGroup = new RegExp patternForGroup
+
+        newList      = []
+        foundValid   = false
+        foundInvalid = false
+
+        for name in @classes
+            if validClass == name
+                foundValid = true
+                newList.push validClass
+            else if patternForGroup.test name
+                foundInvalid = true
+            else
+                newList.push name
+
+        @classes = newList
+        if !foundValid then @classes.push validClass
+
+        if foundInvalid or !foundValid
+            @el[0].className = @classes.join ' '
+
+        true
+
     addClass: (className) =>
         for cn in @classes
-            if cn == className then return this
+            if cn == className then return true
 
         ##|
         ##| TODO: check the @classes list and cache
         @classes.push className
-        @el.addClass className
+        @el[0].className = @classes.join ' '
         return this
 
     removeClass: (className) =>
@@ -65,11 +120,9 @@ class WidgetTag
             else
                 newList.push cn
 
-        @classes = newList
-
-        ##|
-        ##| TODO: check the @classes list and cache
-        @el.removeClass className
+        if found
+            @classes = newList
+            @el[0].className = @classes.join ' '
 
         return this
 
@@ -110,21 +163,22 @@ class WidgetTag
         this
 
     move: (x, y, w, h)=>
-        if x != @x or y != @y or w != @w or h != @h
-            @x = x
-            @y = y
-            @w = w
-            @h = h
-            @el[0].style.left   = @x + "px"
-            @el[0].style.top    = @y + "px"
-            @el[0].style.width  = @w + "px"
-            @el[0].style.height = @h + "px"
 
-            # @el.css
-            #     left   : @x
-            #     top    : @y
-            #     width  : @w
-            #     height : @h
+        if x != @x
+            @x = x
+            @el[0].style.left   = @x + "px"
+
+        if y != @y
+            @y = y
+            @el[0].style.top    = @y + "px"
+
+        if w != @w
+            @w = w
+            @el[0].style.width  = @w + "px"
+
+        if h != @h
+            @h = h
+            @el[0].style.height = @h + "px"
 
         return this
 
@@ -134,11 +188,17 @@ class WidgetTag
         ##|  so the event handled can easily find this ID
         @el.bind eventName, (e)=>
 
-            path = $(e.target).data("path")
-            if !path? or !path
-                path = $(e.target).parent().data("path")
+            allData = $(e.target).parent().parent().data()
+            for keyName, keyVal of allData
+                e[keyName] = keyVal
 
-            e.path = path
+            allData = $(e.target).parent().data()
+            for keyName, keyVal of allData
+                e[keyName] = keyVal
+
+            allData = $(e.target).data()
+            for keyName, keyVal of allData
+                e[keyName] = keyVal
 
             if callback(e)
                 e.preventDefault()
@@ -156,4 +216,5 @@ class WidgetBase extends WidgetTag
         if !document?
             console.log "INVALID CALL: Document not ready"
 
+        @children = []
         @el = $(document.createDocumentFragment())

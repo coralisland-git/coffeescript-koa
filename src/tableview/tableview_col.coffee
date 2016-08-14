@@ -36,6 +36,9 @@ class TableViewCol
 	getAlign: ()=>
 		return @col.align
 
+	getName: ()=>
+		return @col.name
+
 	calculateWidth: ()=>
 
 		##| if width is 0 then consider as auto width = left padding + max length text width + right padding
@@ -64,19 +67,43 @@ class TableViewCol
 			if @col.extraClassName.length then @col.extraClassName += " "
 			@col.extraClassName += extraClassName
 
-		tag = parent.addDiv "#{@col.formatter.name} tableHeaderField " + @col.extraClassName
+		parent.html @getName()
+		parent.addClass "tableHeaderField"
 
 		if @col.tooltip? and @col.tooltip.length > 0
-			tag.setAttribute "tooltip", "simple"
-			tag.setAttribute "data-title", @col.tooltip
+			parent.setAttribute "tooltip", "simple"
+			parent.setAttribute "data-title", @col.tooltip
 
-		tag.setDataPath "/#{@tableName}/Header/#{@col.source}"
-		tag.html @col.name
-
-		@tagSort = tag.add "i", "fa fa-sort table-sorter pull-right"
+		@tagSort = parent.add "i", "fa fa-sort table-sorter pull-right"
 		@sort    = 0
 
-		return tag
+		return parent
+
+	RenderHeaderHorizontal: (extraClassName, parent) =>
+
+		if @visible == false then return
+
+		parent.html @getName()
+		parent.addClass "tableHeaderField"
+
+		if @col.tooltip? and @col.tooltip.length > 0
+			parent.setAttribute "tooltip", "simple"
+			parent.setAttribute "data-title", @col.tooltip
+
+		@tagSort = parent.add "i", "fa fa-sort table-sorter"
+		@tagSort.el.css
+			"float" : "left"
+			"padding-right" : "20"
+
+		parent.el.css
+			"text-align"       : "right"
+			"padding-right"    : 8
+			"border-right"     : "1px solid #CCCCCC"
+			"background-color" : "linear-gradient(to right, #fff, #f2f2f2);"
+
+		@sort    = 0
+
+		return parent
 
 	UpdateSortIcon: (newSort) =>
 

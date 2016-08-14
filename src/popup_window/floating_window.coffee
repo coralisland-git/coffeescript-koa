@@ -42,7 +42,7 @@ class FloatingSelect extends FloatingWindow
             @el.remove()
             delete @table
 
-    setTable: (@tableName, @columns)=>
+    setTable: (@tableName, @columns, config)=>
 
         GlobalClassTools.addEventManager(this)
 
@@ -63,20 +63,16 @@ class FloatingSelect extends FloatingWindow
                 true
 
             @table.on "focus_cell", (path, item)=>
-                @emitEvent "preselect", [ item.currentValue ]
+                console.log "on focus cell:", path, item
+                @emitEvent "preselect", [ item.id, item ]
                 true
 
             @table.setSimpleAndFixed()
+            if config? and config.showHeaders
+                @table.showHeaders = true
+                # @table.showFilters = true
+
             @table.render()
-
-            ##|
-            ##| Find first row
-            if @table.rowDataRaw.length > 0 and @columns? and @columns.length > 0
-                id  = @table.rowDataRaw[0].id
-                col = @columns[0]
-                @table.setFocusCell "/#{@tableName}/#{id}/#{col}"
-                console.log "Focus to /#{@tableName}/#{id}/#{col}"
-
 
         return @table
 
@@ -87,19 +83,15 @@ class TypeaheadInput
         if e.keyCode == 13
             @emitEvent "change", val
             @win.hide()
-            return true
+            return false
 
         if e.keyCode == 38
-            @win.table.moveCellUp()
-            return false
+            @moveCellUp()
+            return
 
         if e.keyCode == 40
-            if @win.table.focus?
-                @win.table.moveCellDown()
-            else
-                @win.table.setFocusFirstCell()
-
-            return false
+            @moveCellDown()
+            return
 
         console.log "Keypress during input", e, e.keyCode, val
         @win.setFilter val
@@ -107,6 +99,7 @@ class TypeaheadInput
 
     onFocus: (e)=>
         @emitEvent "focus", [e]
+        @elInputField.select()
         @win.show()
         return true
 
@@ -115,7 +108,27 @@ class TypeaheadInput
         # @win.hide()
         return true
 
-    constructor: (@elInputField, @tableName, @columns) ->
+    moveCellUp: (e)=>
+        if !@win.table.currentFocusCell?
+            @win.table.setFocusFirstCell()
+        else
+            @win.table.moveCellUp()
+        true
+
+    moveCellDown: (e)=>
+        if !@win.table.currentFocusCell?
+            @win.table.setFocusFirstCell()
+        else
+            @win.table.moveCellDown()
+        true
+
+    constructor: (InputField, @tableName, @columns, options) ->
+
+        config =
+            rowHeight : 24
+            numRows   : 10
+
+        @elInputField = $(InputField)
 
         ##|
         ##|
@@ -123,6 +136,10 @@ class TypeaheadInput
         @elInputField.on "keyup", @onKeypress
         @elInputField.on "focus", @onFocus
         @elInputField.on "blur",  @onBlur
+        @elInputField.on "click", @onFocus
+
+        # globalKeyboardEvents.on "up", @moveCellUp
+        # globalKeyboardEvents.on "down", @moveCellDown
 
         scrollTop  = document.body.scrollTop
         scrollLeft = document.body.scrollLeft
@@ -133,13 +150,83 @@ class TypeaheadInput
         width      = @elInputField.outerWidth(true)
         height     = @elInputField.outerHeight(true)
 
-        @win = new FloatingSelect(posLeft + scrollLeft, posTop+scrollTop+height, width, 300)
+        $.extend config, options
+
+        @win = new FloatingSelect(posLeft + scrollLeft, posTop+scrollTop+height, width, config.rowHeight*config.numRows)
         @win.setTable @tableName, @columns
+
         @win.on "select", (row)=>
             col = @columns[0]
             @elInputField.val(row[col])
             @emitEvent "change", row[col]
             @win.hide()
 
-        @win.on "preselect", (value)=>
+        @win.on "preselect", (value, itemRow)=>
             @elInputField.val(value)
+            @elInputField.select()
+
+
+class TableDropdownMenu
+
+    setValue: (row)=>
+        col = @columns[0]
+        if @config.render? and typeof @config.render == "function"
+            @elInputField.html @config.render(row[col], row)
+        else
+            @elInputField.html row[col]
+
+        @emitEvent "change", row[col]
+
+    constructor: (HolderField, @tableName, @columns, options)->
+
+        @config =
+            rowHeight   : 24
+            numRows     : 10
+            showHeaders : false
+            width       : null
+            height      : null
+            render      : null
+            placeholder : "Select an option"
+
+        $.extend @config, options
+
+        @elInputField = $ "<div class='floatingDropdownValue'/>"
+        @elCarot = $ "<i class='fa fa-arrow-down floatingDropdownIcon'></i>"
+
+        @elHolder = $(HolderField)
+        @elHolder.addClass "floatingDropdown"
+        @elHolder.append @elInputField
+        @elHolder.append @elCarot
+        @elInputField.html @config.placeholder
+
+        GlobalClassTools.addEventManager(this)
+
+        scrollTop  = document.body.scrollTop
+        scrollLeft = document.body.scrollLeft
+
+        posTop     = @elInputField.position().top
+        posLeft    = @elInputField.position().left
+
+        width      = @elInputField.outerWidth(true)
+        height     = @elInputField.outerHeight(true)
+        if !@config.width?  then @config.width = width
+        if !@config.height? then @config.height = @config.rowHeight*@config.numRows
+
+        @elInputField.on "click", (e)=>
+            @win.show()
+            ##|
+            ##|  Setup an event so we can close this popup
+            globalKeyboardEvents.once "global_mouse_down", (ee)=>
+                console.log "Onetime mouse down, closing after other events"
+                setTimeout ()=>
+                    @win.hide()
+                , 1050
+                return false
+
+        @win = new FloatingSelect(posLeft + scrollLeft, posTop+scrollTop+height, @config.width, @config.height)
+        @win.setTable @tableName, @columns, @config
+
+        @win.on "select", (row)=>
+            @setValue row
+            @win.hide()
+

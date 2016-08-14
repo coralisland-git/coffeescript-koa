@@ -25,7 +25,7 @@ class TableViewColCheckbox
     ##|
     ##|  Returns the name of the foramtter for this field
     getFormatterName: ()=>
-        return "rowCheckbox"
+        return "boolean"
 
     getAlign: ()=>
         return "center"
@@ -50,12 +50,31 @@ class TableViewColCheckbox
 
         if @visible == false then return
 
-        tag = parent.addDiv "checkable tableHeaderField"
+        parent.addClass "checkable"
+        parent.addClass "tableHeaderField"
+        parent.html "&nbsp;"
+        parent
 
-        tag.setDataPath "/#{@tableName}/Header/Checkbox"
-        tag.html "&nbsp;"
+    RenderHeaderHorizontal: (extraClassName, parent) =>
 
-        return tag
+        if @visible == false then return
+
+        parent.addClass "checkable"
+        parent.addClass "tableHeaderField"
+        parent.html "Select Row"
+
+        @tagSort = parent.add "i", "fa fa-sort table-sorter"
+        @tagSort.el.css
+            "float" : "left"
+            "padding-right" : "20"
+
+        parent.el.css
+            "text-align"       : "right"
+            "padding-right"    : 8
+            "border-right"     : "1px solid #CCCCCC"
+            "background-color" : "linear-gradient(to right, #fff, #f2f2f2);"
+
+        return parent
 
     UpdateSortIcon: (newSort) =>
         true
