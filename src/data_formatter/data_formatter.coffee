@@ -24,6 +24,8 @@ root.DataFormatter = class DataFormatter
 
 		result = data.toString().replace /[^0-9\.\-]/g, ""
 		result = parseFloat result
+		if isNaN(result) then return 0
+		return result
 
 	## -------------------------------------------------------------------------------------------------------------
 	## Given a date in a human readable form, parse it and return the Moment

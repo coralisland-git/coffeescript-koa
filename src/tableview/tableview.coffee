@@ -386,14 +386,11 @@ class TableView
 		maxCol = @getTableTotalCols()
 
 		@offsetShowingLeft += amount
-		console.log "Check ",@offsetShowingLeft, "+", visCol, " > ", maxCol
 		if @offsetShowingLeft + visCol > maxCol
 			@offsetShowingLeft = maxCol - visCol - 1
-			console.log "New offset=", @offsetShowingLeft
 
 		if @offsetShowingLeft < 1
 			@offsetShowingLeft = 0
-			console.log "New offset2=", @offsetShowingLeft
 
 		@updateVisibleText()
 		true
@@ -599,6 +596,14 @@ class TableView
 
 		return filteredRowData
 
+	updateFullHeight: ()=>
+		if @fixedHeader then return
+		h = 0
+		if @showHeaders then h = h + @headerCellHeight
+		if @showFilters then h = h + @filterCellHeight
+		h = h + (@totalAvailableRows * @dataCellHeight)
+		@elTableHolder.height(h)
+		return h
 
 	## -------------------------------------------------------------------------------------------------------------
 	## function to update row data on the screen if new data has been added in datamapper they can be considered
@@ -616,6 +621,7 @@ class TableView
 				@rowDataRaw.push { id: obj.id, group: null }
 
 			@totalAvailableRows = @rowDataRaw.length
+			@updateFullHeight()
 			return
 
 		##|
@@ -660,6 +666,7 @@ class TableView
 		console.log "RowData=", @rowDataRaw
 
 		@totalAvailableRows = @rowDataRaw.length
+		@updateFullHeight()
 		return true
 
 	## -------------------------------------------------------------------------------------------------------------
@@ -1223,6 +1230,9 @@ class TableView
 
 		if !@shadowCells?
 			@shadowCells = {}
+
+		if !@fixedHeader
+			@elTableHolder.width("100%")
 
 		##|
 		##|  Get the data from that table
