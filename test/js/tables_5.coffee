@@ -1,19 +1,18 @@
 $ ->
 
     loadZipcodes = ()->
+#
 
         ##|
         ##|  Load the zipcode data before the test begins
         new Promise (resolve, reject) ->
-            ds  = new DataSet "zipcode"
-            ds.setAjaxSource "/js/test_data/zipcodes.json", "data", "code"
-            ds.doLoadData()
-            .then (dsObject)->
-                console.log "Loaded", dsObject
+
+            $.get "/js/test_data/zipcodes.json", (allData)->
+                for rec in allData.data
+                    rec.Weather = "https://www.wunderground.com/cgi-bin/findweather/getForecast?query=pz:#{rec.code}&zip=1"
+                    DataMap.addDataUpdateTable "zipcode", rec.code, rec
+
                 resolve(true)
-            .catch (e) ->
-                console.log "Error loading zipcode data: ", e
-                resolve(false)
 
     timerTest = ()->
         return
@@ -31,11 +30,17 @@ $ ->
 
         , 1000
 
+    popupTest = ()->
+        popup = new PopupTable "zipcode", "Zipcode table popup", 50, 50, 500, 300
+
     loadZipcodes()
     .then ()->
 
         ##|
         ##|  Tests
+
+        popupTest()
+
 
         addTest "Sorting, Fixed Header, Group By", ()->
             addHolder("renderTest1")
@@ -44,8 +49,20 @@ $ ->
             table.addTable "zipcode"
             table.setFixedHeaderAndScrollable()
             table.groupBy("county")
-            table.addActionColumn "Run", (row)=>
-                console.log "Zipcode action column selected row:", row
+            # table.groupBy("city")
+            table.addActionColumn
+                name: "Run"
+                source: "id"
+                callback: (row)=>
+                    console.log "Zipcode action column selected row:", row
+                # render: (currentValue, tableName, colName, id)=>
+                #     console.log "c=", currentValue, "t=", tableName, "c=", colName
+                #     return "[" + id + "]"
+                width: 80
+
+            # DataMap.changeColumnAttribute "zipcode", "city", "render", (val, row)=>
+            #     console.log "Render city val=", val, "row=", row
+            #     return "City"
 
             timerTest()
 

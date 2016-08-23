@@ -37,22 +37,28 @@ root.DataFormatter = class DataFormatter
 	##
 	@getMoment: (data) =>
 
-		if !data? then return null
+		try
 
-		if data? and data._isAMomentObject? and data._isAMomentObject
-			return data
+			if !data? then return null
 
-		if typeof data == "object" and data.getTime?
-			return moment(data)
+			if data? and data._isAMomentObject? and data._isAMomentObject
+				return data
 
-		if data.match /\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d/
-			return moment(data, "YYYY-MM-DD HH:mm:ss")
+			if typeof data == "object" and data.getTime?
+				return moment(data)
 
-		if data.match /\d\d\d\d.\d\d.\d\d/
-			return moment(data, "YYYY-MM-DD")
+			if data.match /\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d/
+				return moment(data, "YYYY-MM-DD HH:mm:ss")
 
-		if data.match /\d\d-\d\d-\d\d\d\d/
-			return moment(data, "MM-DD-YYYY")
+			if data.match /\d\d\d\d.\d\d.\d\d/
+				return moment(data, "YYYY-MM-DD")
+
+			if data.match /\d\d-\d\d-\d\d\d\d/
+				return moment(data, "MM-DD-YYYY")
+
+		catch e
+
+			console.log "Unable to get date from [", data, "]"
 
 		return null;
 

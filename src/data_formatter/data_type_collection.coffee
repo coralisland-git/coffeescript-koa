@@ -59,12 +59,77 @@ class DataTypeCollection
         if @col[source]? then return true
         return false
 
-    toSave :()=>
+    ##|
+    ##|  Convert some javascript into a function for render() call
+    ##|  It's suggested that the function be clean (renderFunctionToString) first.
+    ##|
+    @renderStringToFunction: (renderText)->
+        try
+            template = '''
+                try {  // toStringWrapper
+                XXCODEXX
+                } catch (e) { console.log("Render error:",e); console.log("val=",val,"tableName=",tableName,"fieldName=",fieldName,"id=",id); return "Error"; }
+            '''
+
+            renderFunction = new Function("val", "tableName", "fieldName", "id", template.replace("XXCODEXX", renderText))
+            # console.log "F=", renderFunction
+            return renderFunction
+        catch
+            console.log "Error converting code to function:", renderText
+            return null
+
+    ##|
+    ##|  Render is either a function or the string version of a function, cleanup the text
+    ##|  and return something without the function prototype around it.
+    ##|
+    @renderFunctionToString: (render)->
+        try
+            # console.log "renderFunctionToString, initial:", render
+
+            fun = render.toString().replace /^\s+/, ""
+            if /^function/.test fun
+                ##|
+                ##|  This has a function wrapper around it already.   Remove it.
+                fun = fun.replace /function[^\)]+\)/, ""
+                fun = fun.replace /^[\s\r\n]/g, ""
+                if fun.charAt(0) == '{'
+                    fun = fun.replace /^\{/, ""
+                    fun = fun.replace /[\}\s]+$/, ""
+
+            if /toStringWrapper/.test fun
+                fun = fun.replace /.*toStringWrapper/g, ""
+                fun = fun.replace /.*\} catch .*Render error.*/, ""
+
+            fun = fun.replace /^\s+/, ""
+            fun = fun.replace /[\s\r\n]+$/g, ""
+            # console.log "renderFunctionToString: return:", fun
+            return fun
+
+        catch e
+
+            console.log "renderFunctionToString: Error creating function:", e
+            return ""
+
+    ##|
+    ##|  Convert the data type collection back to values that can be saved to a database
+    ##|
+    toSave: ()=>
+
         output = {}
+
         for source, col of @col
             output[source] = $.extend true, {}, col
             delete output[source].formatter
             delete output[source].extraClassName
+            delete output[source].dataFormatter
+
+            if output[source].render? and typeof output[source].render == "function"
+                ##|
+                ##|  Convert function to string
+                functionText = DataTypeCollection.renderFunctionToString(output[source].render)
+                output[source]["render"] = functionText
+
+
 
         return output
 
@@ -92,15 +157,37 @@ class DataTypeCollection
         ##|
         ##|  Allocate the data formatter
         c.formatter = globalDataFormatter.getFormatter col.type
-        c.extraClassName = "col_" + @configName + "_" + col.source
-
-        ##|
-        ##| Optional render function on the column
-        if typeof col.render == "function"
-            c.displayFormat = col.render
 
         @col[c.source] = c
         @colList.push(c.source)
+
+    ##|
+    ##|  Verify that the sort order id for each column is unique
+    verifyOrderIsUnique: ()=>
+
+        seen = {}
+        max  = 0
+
+        ##|
+        ##|  For any columns with a known order
+        for source in @colList
+            c = @col[source]
+            if c.order? and typeof c.order == "number"
+                if seen[c.order]?
+                    c.order = null
+                    console.log "Duplicate order for #{name}"
+                else
+                    seen[c.order] = true
+
+        ##|
+        ##|  Assign all unassigned
+        for source in @colList
+            c = @col[source]
+            if !c.order?
+                max = max + 1 while seen[max]?
+                c.order = max++
+
+        true
 
 
     ## -------------------------------------------------------------------------------------------------------------
@@ -114,26 +201,5 @@ class DataTypeCollection
         for col in columns
             @configureColumn(col)
 
-        ##|
-        ##|  See if there is any CSS to inject
-
-        css = ""
-        for i, col of @col
-
-            str = ""
-            if col.width? and col.width
-                str += "width : #{col.width}px; "
-            if col.align? and col.align
-                str += "text-align : " + col.align
-
-            if str and str.length > 0
-                css += "." + col.extraClassName + " {"
-                css += str
-                css += "}\n"
-
-        if css
-            $("head").append "<style type='text/css'>\n" + css + "\n</style>"
-
-        # $('head').append('<style type="text/css">body{font:normal 14pt Ar
-
+        @verifyOrderIsUnique();
         true

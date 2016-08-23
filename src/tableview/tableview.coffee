@@ -18,28 +18,30 @@
 ###
 
 globalKeyboardEvents = new EvEmitter()
+globalTableEvents    = new EvEmitter()
+globalTableAdmin     = true
 
 $(document).on "keyup", (e)=>
 
 	if e.target == document.body
 		if e.keyCode == 38
-			console.log "DOC KEY [up]"
-			globalKeyboardEvents.emitEvent "up", []
+			# console.log "DOC KEY [up]"
+			globalKeyboardEvents.emitEvent "up", [e]
 		else if e.keyCode == 40
-			console.log "DOC KEY [down]"
-			globalKeyboardEvents.emitEvent "down", []
+			# console.log "DOC KEY [down]"
+			globalKeyboardEvents.emitEvent "down", [e]
 		else if e.keyCode == 37
-			console.log "DOC KEY [left]"
-			globalKeyboardEvents.emitEvent "left", []
+			# console.log "DOC KEY [left]"
+			globalKeyboardEvents.emitEvent "left", [e]
 		else if e.keyCode == 39
-			console.log "DOC KEY [right]"
-			globalKeyboardEvents.emitEvent "right", []
+			# console.log "DOC KEY [right]"
+			globalKeyboardEvents.emitEvent "right", [e]
 		else if e.keyCode == 9
-			console.log "DOC KEY [tab]"
-			globalKeyboardEvents.emitEvent "tab", []
+			# console.log "DOC KEY [tab]"
+			globalKeyboardEvents.emitEvent "tab", [e]
 		else if e.keyCode == 13
-			console.log "DOC KEY [enter]"
-			globalKeyboardEvents.emitEvent "enter", []
+			# console.log "DOC KEY [enter]"
+			globalKeyboardEvents.emitEvent "enter", [e]
 
 	return true
 
@@ -84,50 +86,6 @@ class TableView
 		console.log "onSetCheckbox(", checkbox_key, ",", value, ")"
 
 	## -------------------------------------------------------------------------------------------------------------
-	## function called when the right click context menu event on a header column.
-	##
-	## @event onContextMenuHeader
-	## @param [Object] coords coordinates {x:300,y:500}
-	## @param [Object] column the current column which is clicked
-	##
-	onContextMenuHeader: (coords, column) =>
-
-		console.log "COORDS=", coords
-		selectedColumn = @colList.filter (columnObj) =>
-			return columnObj.col.name is column
-		.pop()
-
-		##| if column is sortable in dataTypes
-		if selectedColumn.col.sortable
-			popupMenu = new PopupMenu "Column: #{column}", coords.x-150, coords.y
-
-			##| add sorting menu item
-			popupMenu.addItem "Sort Ascending", () =>
-				popupMenu.closeTimer()
-				@internalApplySorting()
-			popupMenu.addItem "Sort Descending", () =>
-				popupMenu.closeTimer()
-				@internalApplySorting()
-
-		if @customizableColumns
-			if !popupMenu
-				popupMenu = new PopupMenu "Column: #{column}", coords.x-150, coords.y
-			popupMenu.addItem "Customize", (coords, data) =>
-				popupMenu.closeTimer()
-				@onConfigureColumns
-					x: coords.x
-					y: coords.y
-
-
-		if typeof @tableCacheName != "undefined" && @tableCacheName != null
-			if !popupMenu
-				popupMenu = new PopupMenu "Column: #{column}", coords.x-150, coords.y
-			popupMenu.addItem "Configure Columns", (coords, data) =>
-				@onConfigureColumns
-					x: coords.x
-					y: coords.y
-
-	## -------------------------------------------------------------------------------------------------------------
 	## Display a popup to adjust the column of the table
 	##
 	## @param [Object] coords coordinates including x and y
@@ -155,7 +113,8 @@ class TableView
 	constructor: (@elTableHolder, @showCheckboxes) ->
 
 		# @property [Array] list of columns as array
-		@colList        = []
+		@colList       = []
+		@actionColList = []
 
 		# @property [Array] list of rows as array
 		@rowDataRaw      = []
@@ -165,13 +124,16 @@ class TableView
 		@showHeaders    = true
 
 		# @property [Boolean] to show textbox to filter data
-		@showFilters	= true
-
+		@showFilters     = true
 		@allowSelectCell = true
+		@showResize      = true
 
 		# @property [Object] currentFilters current applied filters to the table
-		@currentFilters = {}
-		@currentGroups  = []
+		@currentFilters    = {}
+		@currentGroups     = []
+		@sortRules         = []
+		@showGroupPadding  = false
+		@groupPaddingWidth = 10
 
 		# @property [Boolean|Function] callback to call on context menu click
 		@contextMenuCallbackFunction = 0
@@ -186,7 +148,8 @@ class TableView
 		if !@showCheckboxes? then @showCheckboxes = false
 
 		if (!@elTableHolder[0])
-			console.log "Error: Table id #{@elTableHolder} doesn't exist"
+			console.log "Error: Table id #{@elTableHolder} doesn't exist for #{@primaryTableName}"
+			return
 
 		#@property [int] the offset from the top to start showing
 		@offsetShowingTop  = 0
@@ -212,6 +175,8 @@ class TableView
 		globalKeyboardEvents.on "enter", @pressEnter
 		globalKeyboardEvents.on "global_mouse_down", @onGlobalMouseDown
 		globalKeyboardEvents.on "change", @onGlobalDataChange
+		globalTableEvents.on "table_change", @onGlobalTableChange
+		DataMap.getDataMap().on "new_data", @onGlobalNewData
 
 		##|
 		##|  Create a unique ID for the table, that doesn't change
@@ -265,19 +230,67 @@ class TableView
 		##|  Find the columns for the specific table name
 		columns = DataMap.getColumnsFromTable(tableName, @columnReduceFunction)
 		for col in columns
+
 			c = new TableViewCol tableName, col
 			@colList.push(c)
 
+			if c.col.type == "simpleobject"
+				@on "click_#{c.getSource()}", @onClickSimpleObject
+
 		true
 
-	## -------------------------------------------------------------------------------------------------------------
-	## Add a column to the end of the table
 	##|
-	addActionColumn: (name, callback)=>
+	##| Return a column from source name
+	findColumn: (source)=>
 
-		button = new TableViewColButton(name, name)
-		@colList.push button
-		@on "click_#{name}", callback
+		for c in @colList
+			if c.getSource() == source
+				return c
+
+	##|-------------------------------------------------------------------------------------------------------------
+	##| Convert one of the columns into an action column
+	##|
+	moveActionColumn: (sourceName)=>
+
+		found   = false
+		newList = []
+
+		col = @findColumn(sourceName)
+		if col?
+			@actionColList.push col
+
+		@updateRowData()
+		@resetCachedFromSize()
+		@updateVisibleText()
+
+		return found
+
+	##|-------------------------------------------------------------------------------------------------------------
+	##| Add a column to the end of the table
+	##|
+	addActionColumn: (options)=>
+
+		config    =
+			name      : ""
+			render    : null
+			width     : 100
+			callback  : null
+			source    : null
+			tableName : @primaryTableName
+
+		$.extend config, options
+
+		button = new TableViewColButton(@primaryTableName, config.name)
+		button.width       = config.width
+		button.actualWidth = config.width
+		if config.render?
+			# console.log "Setting render", button
+			button.render = config.render
+
+		button.source = config.source
+		@actionColList.push button
+		if config.callback?
+			@on "click_#{config.name}", config.callback
 
 		true
 
@@ -303,36 +316,45 @@ class TableView
 		# $(window).on 'resize', () =>
 			# @elTableHolder.find('.table-header .tableview').width(@elTableHolder.find('.table-body .tableview').width())
 
+	setFixedSize: (w, h)=>
+
+		@fixedWidth  = w
+		@fixedHeight = h
+		@showFilters = false
+		@fixedHeight = true
+		@showHeaders = true
+		@elTableHolder.width(w)
+		@elTableHolder.height(h)
+		@elTableHolder.find('.table-header .tableview').width(@elTableHolder.find('.table-body .tableview').width())
+		@resetCachedFromSize()
+
 	## -------------------------------------------------------------------------------------------------------------
 	## make the table with fixed header and scrollable
 	##
 	## @param [Boolean] fixedHeader if header is fixed or not
 	##
 	setFixedHeaderAndScrollable: (@fixedHeader = true) =>
+
 		$(window).on 'resize', () =>
 			@elTableHolder.find('.table-header .tableview').width(@elTableHolder.find('.table-body .tableview').width())
-		$('a[data-toggle="tab"]').on 'shown.bs.tab', (e)=>
-
-			if @elTableHolder.width() > 0
-				@setHolderToBottom()
+			@cachedVisibleWidth  = null
+			@cachedVisibleHeight = null
 
 	## -------------------------------------------------------------------------------------------------------------
-	## function to make column filter as popup instead of plain text
-	##
-	## @example
-	##		tableview.setColumnFilterAsPopup("sample") where sample is column name or source
-	## @param [String] colName column name or source to be used in the filter
-	##
-	setColumnFilterAsPopup: (colName) ->
-		col = @colList.filter (column) =>
-				return column.col.name is colName
-		if ! col.length
-			col = @colList.filter (column) =>
-					return column.getSource() is colName
-		if ! col.length
-			throw new Error "column with name or source #{colName} is not found"
-		col = col.pop()
-		@internalCountNumberOfOccurenceOfPopup(col,true)
+	onClickSimpleObject: (row, e)=>
+		coords    = GlobalValueManager.GetCoordsFromEvent(e)
+		data =  $(e.target).data()
+		if data.path?
+			@openSimpleObject(data.path)
+		true
+
+	##|
+	##|  Open a popup view of a simple object
+	openSimpleObject: (path, coords)=>
+
+		coords    = GlobalValueManager.GetCoordsFromEvent(e)
+
+# "/geosetfull/22/bbox"
 
 	## -------------------------------------------------------------------------------------------------------------
 	## remove the checkbox for all items except those included in the bookmark array that comes from the server
@@ -378,21 +400,61 @@ class TableView
 
 	scrollUp: (amount)=>
 		@offsetShowingTop += amount
-		@updateVisibleText()
+		@resetCachedFromScroll()
 		true
 
 	scrollRight: (amount)=>
-		visCol = @getTableVisibleCols()
-		maxCol = @getTableTotalCols()
-
 		@offsetShowingLeft += amount
-		if @offsetShowingLeft + visCol > maxCol
-			@offsetShowingLeft = maxCol - visCol - 1
+		@resetCachedFromSize()
+		true
 
-		if @offsetShowingLeft < 1
-			@offsetShowingLeft = 0
+	##|
+	##|  New data from the server
+	onGlobalNewData: (tableName, id)=>
 
-		@updateVisibleText()
+		if tableName == @primaryTableName
+			@resetCachedFromSize()
+			@updateRowData()
+
+			# if @resetTimer? then clearTimeout(@resetTimer)
+			# @resetTimer = setTimeout ()=>
+			# 	delete @resetTimer
+			# , 50
+
+	onGlobalTableChange: (tableName, sourceName, field, newValue)=>
+
+		console.log "tableView, onGlobalTableChange t=#{tableName} s=#{sourceName}"
+
+		if @resetTimer? then clearTimeout(@resetTimer)
+		@resetTimer = setTimeout ()=>
+			delete @resetTimer
+			@resetCachedFromSize()
+		, 50
+
+		for col in @colList
+			if col.tableName == tableName and col.getSource() == sourceName
+				console.log "tableView, onGlobalTableChange, I have table and source for field=#{field}, new=#{newValue}"
+				if field == "type"
+					col.type = newValue
+					col.formatter = globalDataFormatter.getFormatter newValue
+				else if field == "render"
+					##|
+					##|  do nothing, global is already updated with new render function, just redraw
+				else if field == "width"
+					col.width = newValue
+					col.actualWidth = newValue
+				else if field == "visible"
+					console.log "Setting visible #{sourceName}:", newValue
+					col.visible = newValue
+				else if field == "order"
+					console.log "Change order at", col.col.name, "was=", col.col.order, "now=", newValue
+					if col.col? then col.col.order = newValue
+				else
+					col[field] = newValue
+
+
+				return true
+
 		true
 
 	onGlobalDataChange: (path, newData)=>
@@ -414,22 +476,49 @@ class TableView
 
 	pressEnter: (e)=>
 
-		if !@currentFocusCell?
+		# console.log "pressEnter cell=", @currentFocusCell, "path=", @currentFocusPath
+
+		if @currentFocusCell? and !@currentFocusPath?
+			##|
+			##|  Likely due to an open editor so now reset focus
+			@setFocusCell(@currentFocusRow, @currentFocusCol, e)
 			return false
 
-		parts = @currentFocusPath.split "/"
+		if !@currentFocusCell? or !@currentFocusPath?
+			return false
+
+		if e.path? then @currentFocusPath = e.path
+		parts     = @currentFocusPath.split "/"
 		tableName = parts[1]
-		fieldName = parts[2]
-		record_id = parts[3]
+		record_id = parts[2]
+		fieldName = parts[3]
+		path      = @currentFocusPath
 
 		for row in @rowDataRaw
-			if row.id.toString() == record_id.toString()
+			if not row.id? then continue
+			if row.id.toString() == record_id
+
+				for c in @colList
+					row[c.getSource()] = DataMap.getDataField c.tableName, row.id, c.getSource()
+					if c.getSource() == fieldName
+						if c.getEditable()
+							@currentFocusPath = null
+							DataMap.getDataMap().editValue path, @currentFocusCell.el
 
 				##|  Use the new event manager
-				console.log "PRESS ENTER: [#{col}]", row
+				console.log "FIRE click_#{fieldName}"
 				@emitEvent "click_#{fieldName}", [ row, e ]
 				@emitEvent "click_row", [ row, e ]
 
+		true
+
+	onColumnResizeDrag: (diffX, diffY, e)=>
+		@setCustomWidth(@resizingRow, @resizingColumn, @resizingBefore + diffX)
+		true
+
+	onColumnResizeFinished: (diffX, diffY, e)=>
+		console.log "Resize complete."
+		delete @resizingColumn
 		true
 
 	## -------------------------------------------------------------------------------------------------------------
@@ -437,24 +526,41 @@ class TableView
 	##
 	internalSetupMouseEvents: () =>
 
-		@virtualScrollV.on "scroll_y", (amount)=>
-			@scrollUp(amount)
-			true
-
 		@virtualScrollV.on "scroll_to", (amount)=>
 			@offsetShowingTop = amount
-			@scrollUp(0)
-			true
-
-		@virtualScrollH.on "scroll_x", (amount)=>
-			# console.log "SCROLL X = ", amount
+			@resetCachedFromScroll()
 			true
 
 		@virtualScrollH.on "scroll_to", (amount)=>
-			@scrollRight(amount)
+			@offsetShowingLeft = amount
+			@resetCachedFromScroll()
 			true
 
-		@elTheTable.bind "click touchbegin", (e) =>
+		@elTheTable.on "mousedown", (e)=>
+
+			##|
+			##|  Let other tables know because this gives up focus on cells
+			globalKeyboardEvents.emitEvent "global_mouse_down", [ e ]
+
+			##|
+			##|  Check for a resize start
+			if e.path? and e.path == "grab"
+				##|
+				##|  Start resizing, save the location that was selected at the start
+				@resizingColumn = e.cn
+				@resizingRow    = e.rn
+				@resizingBefore = @colByNum[e.cn].currentWidth
+				return GlobalMouseDrag.startDrag(e, @onColumnResizeDrag, @onColumnResizeFinished)
+
+			return false
+
+		@elTheTable.on "click touchbegin", (e) =>
+
+			console.log "click=", e, e.target.className
+			if e.target.className == "dataFilter"
+				console.log "passing"
+				$(e.target).focus()
+				return false
 
 			e.preventDefault()
 			e.stopPropagation()
@@ -463,7 +569,7 @@ class TableView
 			col  = @findColFromPath e.path
 
 			if data? and data.id?
-				@setFocusCell(e.vr, e.vc)
+				@setFocusCell(e.vr, e.vc, e)
 			else
 				@setFocusCell(null)
 
@@ -487,24 +593,164 @@ class TableView
 			else
 				##|
 				##|  Use the new event manager
-				@emitEvent "click_#{col}", [ data, e ]
-				@emitEvent "click_row", [ data, e ]
+				@pressEnter(e)
 
-				for c in @colList
-					if c.getSource() == col
-						if c.getEditable()
-							DataMap.getDataMap().editValue e.path, e.target
+				##|
+				##|  See if the cell has a focus function, which we
+				##|  only call on mouse focus not keyboard
+				realCol = @findColumn(col)
+				if realCol? and realCol.onFocus? then realCol.onFocus(e, col, data)
+
 
 			false
 
+	##|
+	##|  Called when context menu on a group row
+	onContextMenuGroup: (rowNum, coords)=>
+		popupMenu = new PopupMenu "Data Grouping", coords.x-150, coords.y
+
+		##| add sorting menu item
+		for source in @currentGroups
+			popupMenu.addItem "Removing #{source}", (e, source) =>
+				console.log "Remove grouping", source
+
+				col = @findColumn(source)
+				if col? then col.isGrouped = false
+
+				newList = []
+				for name in @currentGroups
+					if name == source then continue
+					newList.push name
+
+				@currentGroups = newList
+				@updateRowData()
+				@updateVisibleText()
+
+			, source
+
+
+		true
+
+	onResize: ()=>
+
+		@cachedVisibleWidth     = null
+		@cachedVisibleHeight    = null
+		@cachedTotalVisibleCols = null
+		@cachedTotalVisibleRows = null
+
+		if @fixedWidth? and @fixedHeight?
+			@elTableHolder.width(@fixedWidth)
+			@elTableHolder.height(@fixedHeight);
+			console.log "FIXED #{@fixedWidth}, #{@fixedHeight}"
+		else if @elTableHolder.width() > 0
+			@setHolderToBottom()
+			@updateRowData()
+
+		true
+
+	##|
+	##|  Dialog to rename a column
+	onRenameField: (source) =>
+
+		for col in @colList
+			if col.getSource() == source
+
+		        m = new ModalDialog
+		            showOnCreate: false
+		            content:      "Enter a new name for this column"
+		            position:     "center"
+		            title:        "Name:"
+		            ok:           "Save"
+
+		        m.getForm().addTextInput "input1", "Name", col.getName()
+		        m.getForm().onSubmit = (form) =>
+		            @setCustomName(source, form.input1)
+		            @updateVisibleText()
+		            m.hide()
+
+		        m.show()
+
+	contextMenuChangeType: (source, coords)=>
+
+		popupMenu = new PopupMenu "New Type: #{source}", coords.x-150, coords.y-200
+		for name in Object.keys(globalDataFormatter.formats)
+			popupMenu.addItem name, (e, opt)=>
+				console.log "Change type of #{source} to #{opt}"
+
+				for col in @colList
+					if col.getSource() == source
+						DataMap.changeColumnAttribute col.tableName, source, "type", opt
+						col.col.type  = opt
+						col.formatter = globalDataFormatter.getFormatter opt
+
+						@updateVisibleText()
+						return
+
+			, name
+		true
+
+	onContextMenuHeader: (source, coords)=>
+
+		console.log "Context on header:", source
+		popupMenu = null
+
+		for col in @colList
+			if col.getSource() == source
+
+				popupMenu = new PopupMenu "Column: #{col.getName()}", coords.x-150, coords.y
+				popupMenu.addItem "Hide column", (e, source)=>
+					@setCustomVisible(source, false)
+					@updateRowData()
+				, source
+
+				popupMenu.addItem "Group similar values", (e, source)=>
+					@groupBy(source)
+				, source
+
+				popupMenu.addItem "Rename", (e, source)=>
+					@onRenameField source
+					@updateVisibleText()
+				, source
+
+				popupMenu.addItem "Change Type", (e, source)=>
+					@contextMenuChangeType source, coords
+					@updateRowData()
+				, source
+
+				if globalTableAdmin
+					popupMenu.addItem "Open table editor", (e, source)=>
+						for col in @colList
+							if col.getSource() == source
+								console.log "Emitting open_editor"
+								globalTableEvents.emitEvent "open_editor", [ col.tableName ]
+					, source
+
+		if popupMenu == null
+			popupMenu = new PopupMenu "Unknown #{source}", coords.x-150, coords.y
+
+		##|
+		##|  Make a list of hidden columns that we can offer to unhide
+		for col in @colList
+			if col.visible? and col.visible == false
+				popupMenu.addItem "Show #{col.getName()}", (e, list)=>
+					showName = list.pop()
+					source   = list.pop()
+					num      = @findColumn(source).getOrder()
+					DataMap.changeColumnAttribute col.tableName, showName, "visible", true
+					DataMap.changeColumnAttribute col.tableName, showName, "order", num
+					setTimeout ()=>
+						@resetCachedFromSize()
+						@updateVisibleText()
+					, 200
+				, [source, col.getSource()]
+
+
+		false
+
+
 	## -------------------------------------------------------------------------------------------------------------
-	## to add context menu with header column click
-	##
-	## @example
-	##		tableview.setupContextMenu (coordinates,data) ->
-	## @param [Function] contextMenuCallbackFunction function to execute on the click of context menu item
-	## @return [Boolean]
-	##
+	## Internal function that enables context menus
+	##|
 	setupContextMenu: (@contextMenuCallbackFunction) =>
 
 		if @contextMenuCallSetup == 1 then return true
@@ -513,25 +759,66 @@ class TableView
 		@elTableHolder.bind "contextmenu", (e) =>
 
 			coords    = GlobalValueManager.GetCoordsFromEvent(e)
-			data      = @findRowFromElement e.target
 
-			if data == null
-				$target = $ e.target
+			allData = e.target.parentElement.parentElement.dataset
+			for keyName, keyVal of allData
+				e[keyName] = keyVal
 
-				##|
-				##|  Check to see if it's a header column
-				if $target.is "th"
-					@onContextMenuHeader coords, $target.text()
-					console.log "Click on header:", coords, $target.text()
-					return true
+			allData = e.target.parentElement.dataset
+			for keyName, keyVal of allData
+				e[keyName] = keyVal
 
-			if typeof @contextMenuCallbackFunction == "function"
-				@contextMenuCallbackFunction coords, data
+			allData = e.target.dataset
+			for keyName, keyVal of allData
+				e[keyName] = keyVal
 
-			true
+			if !e.path? then return false
+
+			if m = e.path.match(/^.group.([0-9]+)/)
+				@onContextMenuGroup(parseInt(m[1]), coords)
+				return false
+
+			if m = e.path.match(/^.*Header[^a-zA-Z](.*)/)
+				@onContextMenuHeader(m[1], coords)
+				return false
+
+			console.log "Context menu for #{e.path}"
+			return false
 
 		true
 
+
+	##|
+	##|  Add a new sort rule in a given order
+	##|  sortMode = null/undefined => toggle
+	##|  sortMode = 0 / false => descending
+	##|  sortMode = 1 / true  => ascending
+	##|
+	addSortRule: (tableName, sourceName, sortMode)=>
+
+		found = null
+		for rule in @sortRules
+			if rule.source == sourceName and rule.tableName == tableName
+				found = rule
+				break
+
+		if found == null
+			found = { source: sourceName, tableName: tableName, state: -1 }
+			@sortRules = [ found ]
+
+		if sortMode? and sortMode == 0
+			found.state = 0
+		else if sortMode? and sortMode == 1
+			found.state = 1
+		else if found.state == -1
+			found.state = 0
+		else if found.state == 0
+			found.state = 1
+		else
+			found.state = -1
+
+		@updateRowData()
+		return
 
 
 	## -------------------------------------------------------------------------------------------------------------
@@ -540,25 +827,34 @@ class TableView
 	## @param [Object] column column on which sorting should be applied
 	## @param [String] type it can be ASC|DESC
 	##
-	internalApplySorting: () =>
+	applySorting: (rowData) =>
 
-		@rowDataRaw.sort (a, b)=>
+		if !@sortRules? or @sortRules.length == 0
+			return rowData
 
-			for c in @colList
+		sorted = rowData.sort (a, b)=>
 
-				aValue = DataMap.getDataField c.tableName, a.id, c.getSource()
-				bValue = DataMap.getDataField c.tableName, b.id, c.getSource()
+			for rule in @sortRules
+				if rule.state == -1 then continue
 
-				if c.sort? and c.sort == 1
-					if aValue < bValue then return 1
-					if aValue > bValue then return -1
+				aValue = DataMap.getDataField rule.tableName, a.id, rule.source
+				bValue = DataMap.getDataField rule.tableName, b.id, rule.source
 
-				else if c.sort? and c.sort == -1
-					if aValue < bValue then return -1
-					if aValue > bValue then return 1
+				if rule.state == 0 and aValue < bValue then return 1
+				if rule.state == 0 and aValue > bValue then return -1
 
-		@updateVisibleText()
-		true
+				if rule.state == 1 and aValue < bValue then return -1
+				if rule.state == 1 and aValue > bValue then return 1
+
+			return 0
+
+		for x in sorted
+			d = DataMap.getDataField @primaryTableName, x.id, "distance"
+			n = DataMap.getDataField @primaryTableName, x.id, "name"
+			# console.log "sorted x=#{x.id}", d, n
+
+		return sorted
+
 
 	## -------------------------------------------------------------------------------------------------------------
 	## Apply filters stored in "currentFilters" to each column and show/hide the rows
@@ -602,7 +898,8 @@ class TableView
 		if @showHeaders then h = h + @headerCellHeight
 		if @showFilters then h = h + @filterCellHeight
 		h = h + (@totalAvailableRows * @dataCellHeight)
-		@elTableHolder.height(h)
+		if not @fixedHeight
+			@elTableHolder.height(h)
 		return h
 
 	## -------------------------------------------------------------------------------------------------------------
@@ -611,62 +908,105 @@ class TableView
 	updateRowData: () =>
 
 		@rowDataRaw = []
-		allData = DataMap.getValuesFromTable @primaryTableName, @reduceFunction
+		@colByNum   = {}
+		allData     = DataMap.getValuesFromTable @primaryTableName, @reduceFunction
+		console.log "ALL DATA = ", allData
 
+		##|
+		##|  reset available columns
+		total = 0
+		sortedColList = @colList.sort (a, b)->
+			return a.getOrder() - b.getOrder()
+
+		for col in @colList
+
+			found = false
+			for source in @currentGroups
+				if source == col.getSource()
+					found = true
+					break
+
+			if found == false
+				for acol in @actionColList
+					if acol.getSource() == col.getSource()
+						found = true
+						# console.log "Skipping action col", col.getSource()
+						break
+
+			if found then continue
+			if not col.getVisible() then continue
+
+			# console.log "colByNum[#{total}] = ", col.getName()
+			@colByNum[total] = col
+			total++
+
+		##|
+		##|  Path 1 - There are no groups defined so just quickly sort and filter
+		##|
 		if @currentGroups.length == 0
+			@showGroupPadding = false
 			##|
 			##|  Simple data, no grouping
 			filteredData = @applyFilters(allData)
-			for keyName, obj of filteredData
+			filteredData = @applySorting(filteredData)
+			for obj in filteredData
 				@rowDataRaw.push { id: obj.id, group: null }
 
 			@totalAvailableRows = @rowDataRaw.length
 			@updateFullHeight()
+			@resetCachedFromSize()
+			console.log "All Data=", @rowDataRaw
+			console.log "total=", @totalAvailableRows
 			return
 
 		##|
 		##|  Apply grouping filters
 		groupedData        = {}
 		@rowDataRaw        = []
+		@showGroupPadding  = true
 		currentGroupNumber = 0
 
-		for name in @currentGroups
+		for item in allData
 
-			displayName = name
-			for col in @colList
-				if col.getSource() == name then displayName = col.getName()
+			key = ""
+			for name in @currentGroups
 
-			for item in allData
+				if key != "" then key += ", "
+
+				displayName = name
+				for col in @colList
+					if col.getSource() == name then displayName = col.getName()
+
 				value = DataMap.getDataField @primaryTableName, item.id, name
-				if !groupedData[value]?
-					groupedData[value] = []
+				key += displayName + ": " + value
 
-				groupedData[value].push item.id
+			if !groupedData[key]?
+				groupedData[key] = []
 
-			for value in Object.keys(groupedData).sort()
+			groupedData[key].push item.id
 
-				currentGroupNumber++
-				if currentGroupNumber > 7 then currentGroupNumber = 1
 
-				filteredData = @applyFilters(groupedData[value])
-				if filteredData.length > 0
-					##|
-					##|  There are rows of data in this group so add the group to the row list.
-					@rowDataRaw.push
-						id    : null
-						type  : "group"
-						name  : "#{displayName}: #{value}"
-						group : currentGroupNumber
-						count : filteredData.length
+		for value in Object.keys(groupedData).sort()
+			currentGroupNumber++
+			if currentGroupNumber > 7 then currentGroupNumber = 1
 
-					for id in filteredData
-						@rowDataRaw.push { id: id, visible: true, group: currentGroupNumber }
+			filteredData = @applyFilters(groupedData[value])
+			if filteredData.length > 0
+				##|
+				##|  There are rows of data in this group so add the group to the row list.
+				@rowDataRaw.push
+					id     : null
+					type   : "group"
+					name   : value
+					group  : currentGroupNumber
+					count  : filteredData.length
 
-		console.log "GroupDate=", groupedData
-		console.log "RowData=", @rowDataRaw
+				for id in @applySorting(filteredData)
+					@rowDataRaw.push { id: id, visible: true, group: currentGroupNumber }
 
 		@totalAvailableRows = @rowDataRaw.length
 		@updateFullHeight()
+		@resetCachedFromSize()
 		return true
 
 	## -------------------------------------------------------------------------------------------------------------
@@ -688,7 +1028,7 @@ class TableView
 
 			if newWidth != @lastNewWidth or newHeight != @lastNewHeight
 				# console.log "setHolderToBottom, WindowHeight=#{height}, Table Position=", pos, " newHeight=#{newHeight}, newWidth=#{newWidth}"
-				@render()
+				@resetCachedFromSize()
 
 			return true
 
@@ -698,6 +1038,7 @@ class TableView
 			$(window).on "resize", ()=>
 				##|
 				##|  Automatically adjust the position if the screen size changes
+				# console.log "TableView Resize from setHolderToBottom"
 				@setHolderToBottom()
 				true
 
@@ -715,28 +1056,67 @@ class TableView
 	##
 	allowCustomize: (@customizableColumns = true) ->
 
+	setCustomName: (source, newName)=>
+		col    = @findColumn(source)
+		DataMap.changeColumnAttribute col.tableName, col.getSource(), "name", newName
+		true
+
+	setCustomVisible: (source, shouldShow)=>
+		if !shouldShow? then shouldShow = false
+		col    = @findColumn(source)
+		DataMap.changeColumnAttribute col.tableName, col.getSource(), "visible", shouldShow
+		true
+
+	##|
+	##|  Assign a custom width to a column
+	setCustomWidth: (rowNum, colNum, newWidth)=>
+		source = @colByNum[colNum].getSource()
+		col    = @findColumn(source)
+		if newWidth < 10 then newWidth = 10
+		if newWidth > 800 then newWidth = 800
+		DataMap.changeColumnAttribute col.tableName, col.getSource(), "width", newWidth
+		true
+
+	getTotalActionWidth: ()=>
+		##|
+		##|  Width of all fixed right action columns
+		total = 0
+		for col in @actionColList
+			total += col.width
+		return total
+
 	##|
 	##|  Total available rows to display excluding headers
 	getTableTotalRows: ()=>
 		return @totalAvailableRows
 
 	getTableTotalCols: ()=>
-		count = Object.keys(@colByNum).length
-		return count
+		return Object.keys(@colByNum).length
+
+		total = 0
+		for col in @colList
+			if col.isGrouped? and col.isGrouped == true then continue
+			total++
+
+		# console.log "total cols=", total, "[", @colList, "]"
+		return total
 
 	getTableVisibleWidth: ()=>
+		if @cachedVisibleWidth? then return @cachedVisibleWidth
 		maxWidth = @elTableHolder.width()
-		if @virtualScrollV.visible then maxWidth -= 20
-		return maxWidth
+		if @virtualScrollV? and @virtualScrollV.visible then maxWidth -= 20
+		@cachedVisibleWidth = maxWidth - @getTotalActionWidth()
 
 	getTableVisibleHeight: ()=>
+		if @cachedVisibleHeight? then return @cachedVisibleHeight
 		maxHeight  = @elTableHolder.height()
-		if @virtualScrollH.visible then maxHeight -= 20
-		return maxHeight
+		if @virtualScrollH? and @virtualScrollH.visible then maxHeight -= 20
+		@cachedVisibleHeight = maxHeight
 
 	##|
 	##|  Number of visible rows
 	getTableVisibleRows: ()=>
+		if @cachedTotalVisibleRows? then return @cachedTotalVisibleRows
 
 		y           = 0
 		visRowCount = 0
@@ -753,11 +1133,14 @@ class TableView
 			visRowCount++
 			rowNum++
 
+		if visRowCount > 0 then @cachedTotalVisibleRows = visRowCount
 		return visRowCount
 
 	##|
 	##|  Number of visible columns
 	getTableVisibleCols: ()=>
+
+		if @cachedTotalVisibleCols? then return @cachedTotalVisibleCols
 
 		visColCount = 0
 		x           = 0
@@ -767,16 +1150,27 @@ class TableView
 
 		while x < maxWidth and colNum < totalCols
 
-			while (colNum < totalCols) and @shouldSkipCol(location)
+			col = @colByNum[colNum]
+			location =
+				colNum     : colNum
+				tableName  : col.tableName
+				sourceName : col.getSource()
+				visibleCol : colNum
+
+			if (colNum < totalCols) and @shouldSkipCol(location)
+				console.log "shouldSkip ", location.colNum
 				colNum++
+				continue
 
 			if colNum >= totalCols
 				break
 
-			x = x + @getColWidth { visibleCol: visColCount, colNum: colNum }
+			col.currentWidth = @getColWidth(location)
+			x = x + col.currentWidth
 			visColCount++
 			colNum++
 
+		if visColCount > 0 then @cachedTotalVisibleCols = visColCount
 		return visColCount
 
 	##|
@@ -785,12 +1179,16 @@ class TableView
 
 		if location.cellType == "group"
 			maxWidth = @getTableVisibleWidth()
-			if location.visibleCol == 1 then return maxWidth-200
-			if location.visibleCol == 2 then return 100
-			if location.visibleCol == 3 then return 90
+			if location.visibleCol == 1 then return 200
+			if location.visibleCol == 2 then return 90
+			if location.visibleCol == 3 then return maxWidth-290
 			return 0
 
-		if !@colByNum[location.colNum]? then return 0
+		if !@colByNum[location.colNum]? or !@colByNum[location.colNum].actualWidth?
+			console.log "getColWidth Invalid col:", location.colNum, @colByNum
+			return 10
+
+		# console.log "Return #{location.colNum} [#{location.sourceName}] width:", @colByNum[location.colNum].actualWidth
 		return @colByNum[location.colNum].actualWidth
 
 	##|
@@ -806,8 +1204,9 @@ class TableView
 		return @colByNum[location.colNum].getEditable()
 
 	getCellClickable: (location)=>
-		if @colByNum[location.colNum]? and @colByNum[location.colNum].getFormatterName() == "table_button"
-			return true
+		if @colByNum[location.colNum]?
+			# console.log "Checking clickable:", location.colNum, " =",@colByNum[location.colNum].getClickable()
+			return @colByNum[location.colNum].getClickable()
 		return false
 
 	##|
@@ -836,9 +1235,13 @@ class TableView
 		return @colByNum[location.colNum].getAlign()
 
 	getCellTablename: (location)=>
+		if location.cellType != "data" then return @primaryTableName
 		return @colByNum[location.colNum].tableName
 
 	getCellSource: (location)=>
+		if location.cellType == "invalid" then return null
+		if !@colByNum[location.colNum]? then return null
+		# console.log "getCell #{location.colNum}", @colByNum[location.colNum].getSource()
 		return @colByNum[location.colNum].getSource()
 
 	getCellRecordID: (location)=>
@@ -851,20 +1254,57 @@ class TableView
 	shouldAdvanceCol: (location)=>
 		return true
 
+	getCellDataPath: (location)=>
+		if location.cellType == "data"
+			return "/#{location.tableName}/#{location.recordId}/#{location.sourceName}"
+
+		if location.cellType == "group"
+			return "/group/#{location.rowNum}"
+
+		return "/unknown/" + location.celltype
+
+	setHeaderFilterField: (location)=>
+
+		if location.cell.children.length == 0
+			location.cell.addClass "dataFilterWrapper"
+			location.cell.add "input", "dataFilter"
+			location.cell.children[0].bind "keyup", @onFilterKeypress
+
+		location.cell.children[0].setDataPath "/#{location.tableName}/Filter/#{location.sourceName}"
+		true
+
 	setHeaderField: (location)=>
 
-		if location.cell.children.length == 0 and location.cell.currentCol == location.colNum
-			return
+		# console.log "Header children=", location.cell.children.length, "current=", location.cell.currentCol, " vs", location.colNum
+		# if location.cell.currentCol == location.colNum
+			# return
 
+		# console.log "Force Redraw Header:", location
+
+		location.cell.currentCol = location.colNum
 		location.cell.html ""
+		location.cell.removeClass "spacer"
+
 		if location.visibleRow == 0
-			@colByNum[location.colNum].RenderHeader "", location.cell
+
+			@colByNum[location.colNum].RenderHeader location.cell, location
+			location.cell.setDataPath "/#{location.tableName}/Header/#{location.sourceName}"
+
 		else
-			if location.cell.children.length == 0
-				location.cell.addClass "dataFilterWrapper"
-				filter = location.cell.add "input", "dataFilter"
-				filter.setDataPath "/#{@colByNum[location.colNum].tableName}/Filter/#{@colByNum[location.colNum].getSource()}"
-				filter.bind "keyup", @onFilterKeypress
+
+			@setHeaderFilterField(location)
+
+
+		true
+
+	setHeaderGroupField: (location)=>
+		##|
+		##|  Setup the div that is in a header row along left where the group indicator color
+		##|  normally goes.  Headers don't have groups
+		if location.visibleRow == 0
+			location.cell.addClass "tableHeaderField"
+		else if location.visibleRow == 1
+			location.cell.addClass "dataFilterWrapper"
 
 		true
 
@@ -877,10 +1317,13 @@ class TableView
 		if location.cellType == "group"
 			if location.visibleCol == 1
 				location.cell.html @rowDataRaw[location.rowNum].name
-			else if location.visibleCol == 2
-				location.cell.html ""
 			else if location.visibleCol == 3
-				location.cell.html "#{@rowDataRaw[location.rowNum].count}"
+				location.cell.html ""
+			else if location.visibleCol == 2
+				if @rowDataRaw[location.rowNum].count == 1
+					location.cell.html "#{@rowDataRaw[location.rowNum].count} Record"
+				else
+					location.cell.html "#{@rowDataRaw[location.rowNum].count} Records"
 			return
 
 		col = @colByNum[location.colNum]
@@ -891,17 +1334,14 @@ class TableView
 			else
 				location.cell.html @imgNotChecked
 
-		else if col.render?
-			location.cell.html col.render(@rowDataRaw[location.rowNum][col.getSource()], @rowDataRaw[location.rowNum])
 		else
-			displayValue = DataMap.getDataFieldFormatted col.tableName, @rowDataRaw[location.rowNum].id, col.getSource()
+			displayValue = DataMap.getDataFieldFormatted col.tableName, location.recordId, location.sourceName
 			location.cell.html displayValue
 
 		true
 
 	shouldSkipCol: (location)=>
-		if @colByNum[location.colNum]? and @colByNum[location.colNum].isGrouped? and @colByNum[location.colNum].isGrouped == true
-			return true
+		if !@colByNum[location.colNum]? then return true
 		return false
 
 	##|
@@ -930,109 +1370,261 @@ class TableView
 		if location.visibleRow == 0 and (@showHeaders or @showFilters) then return true
 		return false
 
+	isResizable: (location)=>
+		if not @showResize then return false
+		if location.visibleRow > 0 then return false
+		if not location.isHeader then return false
+		if @showGroupPadding and location.visibleCol == 0 then return false
+		if location.sourceName == "row_selected" then return false
+		if location.colNum >= location.totalColCount then return false
+		return true
+
+	##|
+	##|  Setup the spacer cell for a location
+	initializeSpacerCell: (location, spacer)=>
+
+		if location.groupNum?
+			spacer.setClassOne "groupRowChart#{location.groupNum}", /^groupRowChart/
+		else
+			spacer.setClassOne null, /^groupRowChart/
+
+		spacer.setDataPath "grab"
+		spacer.setDataValue "rn", location.rowNum
+		spacer.setDataValue "cn", location.colNum
+		spacer.setDataValue "vr", 0
+		spacer.setDataValue "vc", 0
+		true
+
+	updateCellClasses: (location, div)=>
+
+		div.show()
+
+		##|
+		##|  Set the column / row data on the element
+		div.setDataValue "rn", location.rowNum
+		div.setDataValue "cn", location.colNum
+		div.setDataValue "vr", location.visibleRow
+		div.setDataValue "vc", location.visibleCol
+		# div.removeClass "tableHeaderField"
+
+		if location.groupNum?
+			div.setClassOne "groupRowChart#{location.groupNum}", /^groupRowChart/
+		else
+			div.setClassOne null, /^groupRowChart/
+
+		##|
+		##|  Align right/center as left is the default
+		location.cell.setClass "even", @getCellStriped(location)
+
+		##|
+		##|  Apply alignment to the cell
+		location.align = @getCellAlign(location)
+		location.cell.setClass "text-right", (location.align == "right")
+		location.cell.setClass "text-center", (location.align == "center")
+
+		true
+
+	incrementColumn: (location, showSpacer)=>
+
+		if location.x + location.colWidth > location.maxWidth
+			location.colWidth = location.maxWidth - location.x
+
+		if (location.cellType == "data" or location.cellType == "locked") and location.colNum + 1 == location.totalColCount
+			# console.log "Fixing last:", location.colNum, location.totalColCount, location
+			location.colWidth = location.maxWidth - location.x
+
+		if location.spacer?
+
+			location.cell.move location.x, 0, location.colWidth-3, location.rowHeight
+			location.spacer.move location.colWidth+location.x-3, 0, 3, location.rowHeight
+			location.spacer.show()
+			location.spacer.addClass "spacer"
+			location.shadowVisibleCol++
+
+		else
+
+			location.cell.move location.x, 0, location.colWidth, location.rowHeight
+
+		location.x += location.colWidth
+		location.shadowVisibleCol++
+		location.visibleCol++
+
+		true
+
+	updateVisibleActionRowText: (location, acol, cell)=>
+
+		location.tableName = acol.tableName
+		location.sourceName = acol.getSource()
+
+		cell.setClass "clickable", acol.getClickable()
+		if acol.render?
+			try
+				# console.log "[#{location.tableName}][#{location.recordId}][#{location.sourceName}]"
+				currentValue = DataMap.getDataField location.tableName, location.recordId, location.sourceName
+				displayValue = acol.render(currentValue, location.tableName, location.sourceName, location.recordId)
+			catch e
+				console.log "updateVisibleActionRow locaiton=", location
+				console.log "Custom render error:", e
+				displayValue = ""
+
+			cell.html displayValue
+		else
+			displayValue = DataMap.getDataFieldFormatted acol.tableName, location.recordId, acol.getSource()
+			cell.html displayValue
+
+		true
+
+	updateVisibleActionRow: (location)=>
+
+		count = 0
+		for acol in @actionColList
+
+			if @shadowCells[location.visibleRow].children.length <= location.shadowVisibleCol
+				@shadowCells[location.visibleRow].addDiv "cell"
+				@shadowCells[location.visibleRow].children[location.shadowVisibleCol].setAbsolute()
+
+			cell = @shadowCells[location.visibleRow].children[location.shadowVisibleCol]
+			cell.show()
+
+			cell.move location.x, 0, acol.width, location.rowHeight
+
+			cell.setClass "text-right", acol.getAlign() == "right"
+			cell.setClass "text-center", acol.getAlign() == "center"
+
+			cell.removeClass "spacer"
+			cell.setClass "even", @getCellStriped(location)
+
+			cell.setDataValue "rn", location.rowNum
+			cell.setDataValue "cn", location.colNum
+			cell.setDataValue "vr", location.visibleRow
+			cell.setDataValue "vc", location.visibleCol
+			cell.setDataValue "action", acol.getSource()
+			cell.setDataPath "/#{@primaryTableName}/#{location.recordId}/#{acol.getSource()}"
+
+			if location.groupNum?
+				cell.setClassOne "groupRowChart#{location.groupNum}", /^groupRowChart/
+			else
+				cell.setClassOne null, /^groupRowChart/
+
+			if location.isHeader
+
+				if location.visibleRow == 0
+					acol.RenderHeader cell, location
+					cell.show()
+				else
+					location.cell = cell
+					location.sourceName = acol.getSource()
+					@setHeaderFilterField location
+			else
+
+				if location.state == "group"
+					cell.removeClass "clickable"
+					cell.html "&nbsp;"
+				else
+					@updateVisibleActionRowText(location, acol, cell)
+
+			location.x += acol.width
+			location.shadowVisibleCol++
+
 	##|
 	##|  Draw a single row, returns the next rowNum.
 	##|
-	updateVisibleTextRow: (location, rowHeight, maxWidth, totalColCount)=>
+	updateVisibleTextRow: (location)=>
 
-		x                   = 0    ## Pixel location of current column
-		location.visibleCol = 0
-		location.colNum     = 0
+		location.x                = 0    ## Pixel location of current column
+		location.visibleCol       = 0
+		location.colNum           = @offsetShowingLeft
+		location.shadowVisibleCol = 0
 
-		while x < maxWidth
+		while location.x < location.maxWidth
 
-			if @shadowCells[location.visibleRow].children.length <= location.visibleCol
+			if location.colNum >= location.totalColCount then break
+
+			if @shadowCells[location.visibleRow].children.length <= location.shadowVisibleCol
 				@shadowCells[location.visibleRow].addDiv "cell"
-				@shadowCells[location.visibleRow].children[location.visibleCol].setAbsolute()
+				@shadowCells[location.visibleRow].children[location.shadowVisibleCol].setAbsolute()
 
-			isHeaderRow       = @isHeaderCell(location)
-			location.groupNum = @getCellGroupNumber(location)
-			location.cell     = @shadowCells[location.visibleRow].children[location.visibleCol]
-			location.cellType = @getCellType(location)
+			location.cell       = @shadowCells[location.visibleRow].children[location.shadowVisibleCol]
+			location.spacer     = null
+			location.isHeader   = @isHeaderCell(location)
+			location.groupNum   = @getCellGroupNumber(location)
+			location.cellType   = @getCellType(location)
+			location.tableName  = @getCellTablename location
+			location.sourceName = @getCellSource location
+			location.colWidth   = @getColWidth(location)
 
-			if isHeaderRow and Object.keys(@currentGroups).length > 0 and location.visibleCol == 0
-				@shadowCells[location.visibleRow].children[location.visibleCol].move x, 0, 10, rowHeight
-				x += 10
-				location.visibleCol++
-				continue
+			if location.cellType == "invalid"
+				console.log "Invalid cell at colNum=#{location.colNum}"
+				break
 
-			if !isHeaderRow and location.groupNum? and location.visibleCol == 0
-				@shadowCells[location.visibleRow].children[location.visibleCol].move x, 0, 10, rowHeight
-				@shadowCells[location.visibleRow].children[location.visibleCol].setClassOne "groupRowChart#{location.groupNum}", /^groupRowChart/
-				location.visibleCol++
-				x += 10
-				continue
-
-			while (location.colNum < totalColCount) and @shouldSkipCol(location)
+			if @shouldSkipCol(location)
 				location.colNum++
 				continue
 
-			colWidth = @getColWidth(location)
-			if location.colNum + 1 == totalColCount
-				# console.log "last column #{location.colNum} == #{totalColCount}, width was=#{colWidth} want=#{maxWidth-x}"
-				colWidth = maxWidth - x
+			if @isResizable(location)
+				##|
+				##|  Headers get an extra spacer column
+				if @shadowCells[location.visibleRow].children.length <= location.shadowVisibleCol+1
+					@shadowCells[location.visibleRow].addDiv "spacer"
+					@shadowCells[location.visibleRow].children[location.shadowVisibleCol+1].setAbsolute()
 
-			if location.colNum >= totalColCount
-				break
+				@initializeSpacerCell(location, @shadowCells[location.visibleRow].children[location.shadowVisibleCol+1])
+				location.spacer = @shadowCells[location.visibleRow].children[location.shadowVisibleCol+1]
 
-			location.cell.show()
-			location.cell.removeClass "groupRow"
+			if @showGroupPadding and location.visibleCol == 0
+				##|
+				##|  This is a group indicator column
+				location.colWidth = @groupPaddingWidth
 
-			##|
-			##|  Get the table and column for this cell
-			tableName  = @getCellTablename location
-			sourceName = @getCellSource location
+				if !location.isHeader
+					location.cell.setClassOne "groupRowChart#{location.groupNum}", /^groupRowChart/
+					location.cell.removeClass "even"
+					location.cell.html "&nbsp;"
+				else
+					@setHeaderGroupField location
 
-			##|
-			##|  Align right/center as left is the default
-			location.cell.setClass "even", @getCellStriped(location)
-			align = @getCellAlign(location)
-			location.cell.setClass "text-right", (align == "right")
-			location.cell.setClass "text-center", (align == "center")
+				@incrementColumn(location)
+				continue
 
-			##|
-			##|  Apply one and only one formatting type
-			formatter  = @getCellFormatterName(location)
-			location.cell.setClassOne "type_#{formatter}", /^type_/
-			location.cell.setClassOne "groupRowChart#{location.groupNum}", /^groupRowChart/
+			@updateCellClasses(location, location.cell)
 
-			##|
-			##|  Set the column / row data on the element
-			location.cell.setDataValue "vr", location.visibleRow
-			location.cell.setDataValue "vc", location.visibleCol
-			location.cell.setDataValue "rn", location.rowNum
-			location.cell.setDataValue "cn", location.colNum
+			if location.isHeader
 
-			location.cell.setClass "tableHeaderField", isHeaderRow
-			location.cell.move x, 0, colWidth, rowHeight
-
-			if isHeaderRow
-
-				location.cell.setDataPath "/#{tableName}/Header/#{sourceName}"
 				@setHeaderField(location)
 
 			else
 
-				recordId = @getCellRecordID(location)
-				location.cell.setDataPath "/#{tableName}/#{recordId}/#{sourceName}"
+				location.recordId = @getCellRecordID(location)
+
 				location.cell.setClass "clickable", @getCellClickable(location)
 				location.cell.setClass "editable", @getCellEditable(location)
-				location.cell.setClass "row_checked", @getRowSelected(recordId)
+				location.cell.setClass "row_checked", @getRowSelected(location.recordId)
+
+				location.cell.setDataPath @getCellDataPath(location)
 				@setDataField(location)
 
-			if @shouldAdvanceCol(location) then location.colNum++
-			location.visibleCol++
-			x += colWidth
+			@incrementColumn(location)
+			if @shouldAdvanceCol(location)
+				location.colNum++
+
+		##|
+		##|  Add in the action rows
+		@updateVisibleActionRow(location)
 
 		##|
 		##|  Hide any remaining cached cells on the right
-		while @shadowCells[location.visibleRow].children[location.visibleCol]?
-			@shadowCells[location.visibleRow].children[location.visibleCol].hide()
-			location.visibleCol++
+		while @shadowCells[location.visibleRow].children[location.shadowVisibleCol]?
+			@shadowCells[location.visibleRow].children[location.shadowVisibleCol].hide()
+			@shadowCells[location.visibleRow].children[location.shadowVisibleCol].setDataPath(null);
+			location.shadowVisibleCol++
 
 		true
 
 	updateVisibleText: ()=>
+
+		# console.log "updateVisibleText showingLeft=", @offsetShowingLeft
+
+		if !@elTheTable? then return
 
 		if !@offsetShowingTop? or @offsetShowingTop < 0
 			@offsetShowingTop = 0
@@ -1040,25 +1632,31 @@ class TableView
 		if !@offsetShowingLeft? or @offsetShowingLeft < 0
 			@offsetShowingLeft = 0
 
-		@updateScrollbarSettings()
-
 		y               = 0
 		groupState      = null
 		maxHeight       = @getTableVisibleHeight()
-		maxWidth        = @getTableVisibleWidth()
-		totalColCount   = @getTableTotalCols()
 		totalRowCount   = @getTableTotalRows()
 		refreshRequired = false
 
+		##|
+		##|  For rabbit mouse scrolling, this resets the offset back to a reasonable amount
+		##|  so that the refreshNeeded doesn't have to loop through a bunch of times
+		##|
+		if @offsetShowingTop >= totalRowCount
+			@offsetShowingTop = totalRowCount - 1
+
 		location =
-			visibleRow : 0
-			rowNum     : @offsetShowingTop
+			visibleRow    : 0
+			rowNum        : @offsetShowingTop
+			totalColCount : @getTableTotalCols()
+			maxWidth      : @getTableVisibleWidth()
+			actionWidth   : @getTotalActionWidth()
 
 		# console.log "updateVisibleText offsetShowingTop=", @offsetShowingTop, " offsetShowingLeft=", @offsetShowingLeft, " maxRow=", totalRowCount, "maxCol=", totalColCount
 		while y < maxHeight
 
-			rowHeight = @getRowHeight(location)
-			state = @getRowType(location)
+			location.rowHeight = @getRowHeight(location)
+			location.state     = @getRowType(location)
 
 			if !@shadowCells[location.visibleRow]?
 				@shadowCells[location.visibleRow] = @elTheTable.addDiv "tableRow"
@@ -1067,9 +1665,9 @@ class TableView
 
 			##|
 			##|  Row div goes the entire width
-			@shadowCells[location.visibleRow].move 0, y, maxWidth, rowHeight
+			@shadowCells[location.visibleRow].move 0, y, location.maxWidth+location.actionWidth, location.rowHeight
 
-			if state == "invalid"
+			if location.state == "invalid"
 				##|
 				##|  Scroll down too far
 				if @offsetShowingTop > 0
@@ -1078,41 +1676,64 @@ class TableView
 
 				break
 
-			else if state == "skip"
+			else if location.state == "skip"
 				location.rowNum++
 				continue
 
-			else if state == "group"
+			else if location.state == "group"
 				@shadowCells[location.visibleRow].show()
 				@shadowCells[location.visibleRow].removeClass "tableRow"
-				@updateVisibleTextRow location, rowHeight, maxWidth, totalColCount
+				@updateVisibleTextRow location
 				location.rowNum++
 
-			else if state == "locked"
+			else if location.state == "locked"
 				@shadowCells[location.visibleRow].show()
 				@shadowCells[location.visibleRow].removeClass "tableRow"
-				@updateVisibleTextRow location, rowHeight, maxWidth, totalColCount
+				@updateVisibleTextRow location
 
-			else if state == "data"
+			else if location.state == "data"
 				@shadowCells[location.visibleRow].show()
 				@shadowCells[location.visibleRow].addClass "tableRow"
-				@updateVisibleTextRow location, rowHeight, maxWidth, totalColCount
+				@updateVisibleTextRow location
 				location.rowNum++
 
 			else
-				console.log "Unknown state at v=#{visibleRow}, r=#{rowNum}:", state
+				console.log "Unknown state at v=#{visibleRow}, r=#{rowNum}:", location.state
 				location.rowNum++
 
-			y += rowHeight
+			y += location.rowHeight
 			location.visibleRow++
+
+		if refreshRequired
+			@resetCachedFromSize()
+			return true
 
 		while @shadowCells[location.visibleRow]?
 			@shadowCells[location.visibleRow].hide()
 			location.visibleRow++
 
-		if refreshRequired
-			@updateVisibleText()
+		@updateScrollbarSettings()
 
+		true
+
+	resetCachedFromScroll: ()=>
+		@cachedTotalVisibleCols  = null
+		@cachedTotalVisibleRows  = null
+		@updateVisibleText()
+		true
+
+	resetCachedFromSize: ()=>
+		@cachedTotalVisibleCols  = null
+		@cachedTotalVisibleRows  = null
+		@cachedVisibleWidth      = null
+		@cachedVisibleHeight     = null
+		@cachedLayoutShadowWidth = null
+
+		for col in @colList
+			col.currentCol = null
+
+		@layoutShadow()
+		@updateVisibleText()
 		true
 
 	##|
@@ -1125,6 +1746,8 @@ class TableView
 		maxAvailableRows = @getTableTotalRows()
 		maxAvailableCols = @getTableTotalCols()
 
+		# console.log "updateScrollbarSettings H:(#{currentVisibleCols} vs #{maxAvailableCols}) V:(#{currentVisibleRows} vs #{maxAvailableRows})"
+
 		##|
 		##|  Don't show more rows than fit on the screen
 		if @offsetShowingTop >= maxAvailableRows - currentVisibleRows
@@ -1132,15 +1755,37 @@ class TableView
 			@offsetShowingTop = maxAvailableRows - currentVisibleRows
 
 		if @offsetShowingLeft >= maxAvailableCols - currentVisibleCols
-			@offsetShowingLeft = maxAvailableCols - currentVisibleCols
 			# console.log "updateScrollbarSettings offsetShowingLeft #{@offsetShowingLeft} >= #{maxAvailableCols} - #{currentVisibleCols}"
+			@offsetShowingLeft = maxAvailableCols - currentVisibleCols
+			# console.log "updateScrollbarSettings, reset offsetShowingLeft to ", @offsetShowingLeft
 
 		##|
 		##|  Scrollbar settings show/hide
-		console.log "updateScrollbarSettings H:(#{currentVisibleCols} vs #{maxAvailableCols}) V:(#{currentVisibleRows} vs #{maxAvailableRows})"
 
-		@virtualScrollV.setRange 0, maxAvailableRows, currentVisibleRows, @offsetShowingTop
-		@virtualScrollH.setRange 0, maxAvailableCols, currentVisibleCols, @offsetShowingLeft
+
+		r1 = @virtualScrollV.setRange 0, maxAvailableRows, currentVisibleRows, @offsetShowingTop
+		r2 = @virtualScrollH.setRange 0, maxAvailableCols, currentVisibleCols, @offsetShowingLeft
+		if r1 or r2
+			@resetCachedFromSize()
+
+	##|
+	##|  Find the best fit for the data in a given column
+	##|
+	findBestFit: (col)=>
+
+		max    = 10
+		source = col.getSource()
+		for obj in @rowDataRaw
+			if !obj.id? then continue
+			value = DataMap.getDataField col.tableName, obj.id, source
+			if !value? then continue
+			len   = value.toString().length
+			if len > max then max = len
+
+		if max < 10 then max = 10
+		if max > 40 then max = 40
+		return (max * 8)
+
 
 	##|
 	##|  For a standard table, adjust the width of the columns to fit the space available
@@ -1149,6 +1794,7 @@ class TableView
 	layoutShadow: ()=>
 
 		maxWidth   = @getTableVisibleWidth()
+		if @cachedLayoutShadowWidth? and @cachedLayoutShadowWidth == maxWidth then return
 
 		##|
 		##|  Look at all the columns, determine the likely width
@@ -1156,8 +1802,13 @@ class TableView
 		missingCount = 0
 		colNum       = 0
 
+		##|
+		##|  Look at all columns, if they have a desired with already
+		##|  use that value.  If not, mark the column's iActualWidth so
+		##|  the next stage can try to auto assign it.
+		##|
 		for i in @colList
-			if !i.visible then continue
+			if not i.getVisible() then continue
 
 			calcWidth = i.calculateWidth()
 			if !calcWidth? or calcWidth < 0
@@ -1171,15 +1822,18 @@ class TableView
 
 		##|
 		##|  Split the remaining space
+		##|
 		if missingCount > 0
 			unallocatedSpace = Math.ceil(maxWidth / missingCount)
 			if unallocatedSpace < 60 then unallocatedSpace = 60
 
-		totalWidth = 0
-		totalColCount = 0
-		for i in @colList
+		# console.log "layoutShadow, unallocatedSpace=#{unallocatedSpace} of max #{widthLimit}"
 
-			if not i.visible then continue
+		totalWidth            = 0
+		totalColCount         = 0
+		autoAdjustableColumns = []
+		for i in @colList
+			if not i.getVisible() then continue
 
 			if totalColCount == colNum-1 and !i.actualWidth?
 				i.actualWidth = widthLimit - totalWidth
@@ -1187,37 +1841,45 @@ class TableView
 					i.actualWidth = 60
 
 			if !i.actualWidth?
-				i.actualWidth = unallocatedSpace
+				# console.log "Find best width for ", i.getSource()
+				i.actualWidth = @findBestFit(i)
+				autoAdjustableColumns.push i
 
 			totalWidth += i.actualWidth
 			totalColCount++
 
 		##|
+		##|  If nothing wants to be auto adjusted then force all the text fields
+		if autoAdjustableColumns.length == 0
+			for col in @colList
+				if not col.getVisible() then continue
+				if col.getFormatterName() != "text" then continue
+				autoAdjustableColumns.push col
+
+		# console.log "Sized:", totalWidth, " vs max", widthLimit, Math.abs(totalWidth - widthLimit)
+
+		##|
 		##|  Remove or add a pixel until we have the exact amount
 		##|  but only if we are smaller than available size or very close to it
-		if totalWidth - 50 < widthLimit
+		if (widthLimit - totalWidth) > -50 and autoAdjustableColumns.length > 0
 
 			attemptCounter = 0
 			while Math.ceil(totalWidth) != Math.ceil(widthLimit) and attemptCounter++ < 1500
 
-				# console.log "Trying to fix, totalWidth=#{totalWidth}, widthLimit=#{widthLimit}"
+				adjustAmount = Math.floor((widthLimit-totalWidth)/autoAdjustableColumns.length)
+				if adjustAmount == 0 then adjustAmount = 1
 
-				found = false
-				for i in @colList
-					if not i.visible then continue
-					if i.getSource() == "row_selected" then continue
-					if i.getFormatterName() != "text" then continue
-					found = true
+				for i in autoAdjustableColumns
+					if Math.ceil(totalWidth) == Math.ceil(widthLimit) then break
+
 					if totalWidth > widthLimit
-						i.actualWidth--
-						totalWidth--
+						i.actualWidth -= adjustAmount
+						totalWidth -= adjustAmount
 					else if totalWidth < widthLimit
-						i.actualWidth++
-						totalWidth++
+						i.actualWidth += adjustAmount
+						totalWidth += adjustAmount
 
-				if not found then break
-
-				# console.log "Actual=", widthLimit, "Total Width = ", totalWidth
+		@cachedLayoutShadowWidth = maxWidth
 		true
 
 	## -------------------------------------------------------------------------------------------------------------
@@ -1234,14 +1896,9 @@ class TableView
 		if !@fixedHeader
 			@elTableHolder.width("100%")
 
-		##|
-		##|  Get the data from that table
-		if !@rowDataRaw? or @rowDataRaw.length == 0
-			@updateRowData()
-
 		@elTableHolder.html("")
-		@widgetBase = new WidgetBase()
 
+		@widgetBase    = new WidgetBase()
 		tableWrapper   = @widgetBase.addDiv "table-wrapper", "tableWrapper#{@gid}"
 		outerContainer = tableWrapper.addDiv "outer-container"
 		@elTheTable    = outerContainer.addDiv "inner-container tableview"
@@ -1250,24 +1907,14 @@ class TableView
 		@virtualScrollH = new VirtualScrollArea outerContainer, false
 
 		##|
-		##|  Make a reference to the columns by number
-		colNum = 0
-		@colByNum = {}
-		for i in @colList
-			if !i.visible then continue
-			i.colNum = colNum++
-			@colByNum[i.colNum] = i
+		##|  Get the data from that table
+		if !@rowDataRaw? or @rowDataRaw.length == 0
+			@updateRowData()
 
 		@layoutShadow()
 		@updateVisibleText()
 		@elTableHolder.append tableWrapper.el
 		@internalSetupMouseEvents()
-
-		setTimeout () =>
-			# globalResizeScrollable();
-			if setupSimpleTooltips?
-				setupSimpleTooltips();
-		, 1
 
 		##|
 		##|  This is a new render which means we need to re-establish any context menu
@@ -1275,10 +1922,7 @@ class TableView
 
 		##|
 		##|  Setup context menu on the header
-		# @setupContextMenu @contextMenuCallbackFunction
-
-		##| add default context menu for sorting as per #89 comment
-		# @setupContextMenu @contextMenuCallbackFunction
+		@setupContextMenu @contextMenuCallbackFunction
 		true
 
 
@@ -1289,17 +1933,7 @@ class TableView
 	## @param [String] type it can be ASC|DESC
 	##
 	sortByColumn: (name) =>
-
-		for col in @colList
-			if col.getSource() == name
-				if col.sort == -1
-					col.UpdateSortIcon(1)
-				else if col.sort == 1
-					col.UpdateSortIcon(0)
-				else
-					col.UpdateSortIcon(-1)
-
-		@internalApplySorting()
+		@addSortRule @primaryTableName, name
 		true
 
 	##|
@@ -1310,18 +1944,12 @@ class TableView
 			if name == columnSource then return
 
 		@currentGroups.push columnSource
-
-		for col in @colList
-			if col.getSource() in @currentGroups
-				col.isGrouped = true
-			else
-				col.isGrouped = false
-
 		@updateRowData()
+		@updateVisibleText()
 		return
 
 
-	## -------------------------------------------------------------------------------------------------------------
+	## -----------------------------------------------------------------------------------------------ƒmove--------------
 	## intenal event key press in a filter field, that executes during the filter text box keypress event
 	##
 	## @event onFilterKeypress
@@ -1378,8 +2006,14 @@ class TableView
 			##|
 			##|  Added a click event to a column named m[1]
 			##|
-			$(".col_#{m[1]}").css "cursor", "pointer"
-			$(".col_#{m[1]}").addClass "clickable"
+			col = @findColumn(m[1])
+			# console.log "Searching clickable: [#{m[1]}]", col
+			if col?
+				col.clickable = true
+				@updateVisibleText()
+			else
+				console.log "Warning: Didn't find column for #{eventName}:", m[1]
+				# @resetCachedFromScroll()
 
 		true
 
@@ -1395,8 +2029,7 @@ class TableView
 			@setFocusCell(@currentFocusRow, @currentFocusCol)
 			return
 
-		if @currentFocusCol + 1 >= @getTableVisibleCols()
-			console.log "col=@currentFocusCol, scrolling"
+		if @offsetShowingLeft + @getTableVisibleCols() + 1 < @getTableTotalCols()
 			@scrollRight(1)
 			@setFocusCell(@currentFocusRow, @currentFocusCol)
 			return
@@ -1421,6 +2054,8 @@ class TableView
 
 	moveCellUp: ()=>
 
+		lastFocusRow = @currentFocusRow
+		lastFocusCol = @currentFocusCol
 		if !@currentFocusRow? then return
 
 		if @offsetShowingTop > 0
@@ -1429,15 +2064,17 @@ class TableView
 			return
 
 		if @currentFocusRow == 0
-			@scrollUp(-1)
-			@setFocusCell(@currentFocusRow, @currentFocusCol)
 			return
 
-		@setFocusCell(@currentFocusRow-1, @currentFocusCol)
+		if not @setFocusCell(@currentFocusRow-1, @currentFocusCol)
+			@setFocusCell(lastFocusRow, lastFocusCol)
+
 		true
 
 	moveCellDown: ()=>
 
+		lastFocusRow = @currentFocusRow
+		lastFocusCol = @currentFocusCol
 		if !@currentFocusRow? then return
 
 		visRow = @getTableVisibleRows()
@@ -1447,12 +2084,14 @@ class TableView
 			@setFocusCell(@currentFocusRow, @currentFocusCol)
 			return
 
-		if @currentFocusRow+1 >= @getTableVisibleRows()
+		if @offsetShowingTop+1+@getTableVisibleRows >= @getTableVisibleRows()
 			@scrollUp(1)
 			@setFocusCell(@currentFocusRow, @currentFocusCol)
 			return
 
-		@setFocusCell(@currentFocusRow+1, @currentFocusCol)
+		if not @setFocusCell(@currentFocusRow+1, @currentFocusCol)
+			@setFocusCell(lastFocusRow, lastFocusCol)
+
 		true
 
 	##|
@@ -1464,33 +2103,62 @@ class TableView
 
 	##|
 	##|  Focus on a path cell
-	setFocusCell: (visibleRow, visColNum) =>
+	setFocusCell: (visibleRow, visColNum, e) =>
 
 		if !@allowSelectCell
 			return false
+		##|
+		##|  Remove old focus
+		if @currentFocusCell? and @currentFocusCell.removeClass?
+			@currentFocusCell.removeClass "cellfocus"
 
-		cellType = @getCellType { visibleRow: visibleRow, visibleCol: visColNum, rowNum: null, colNum: null }
+		@currentFocusCell = null
+		@currentFocusCol  = null
+		@currentFocusRow  = null
+		@currentFocusPath = null
+
+		if visibleRow == null or visColNum == null
+			return false
+
+		element = @elTableHolder.find("[data-vr=#{visibleRow}][data-vc=#{visColNum}]")
+		rowNum  = element.data("rn")
+		colNum  = element.data("cn")
+
+		if e? and e.path?
+			path = e.path
+		else
+			path = element[0].dataset["path"]
+
+		if path?
+			@currentFocusCell = path
+			parts = path.split("/")
+			if parts?
+				tableName = parts[1]
+				record_id = parts[2]
+				source    = parts[3]
+
+		cellType = @getCellType { visibleRow: visibleRow, visibleCol: visColNum, rowNum: rowNum, colNum: colNum }
+
+		if !source?
+			source = @getCellSource { visibleRow: visibleRow, visibleCol: visColNum, rowNum: rowNum, colNum: colNum }
+
+		console.log "setFocusCell #{visibleRow}, #{visColNum} = #{cellType} | #{source}"
 		if !visibleRow? or !visColNum? or cellType != "data"
 			return false
 
-		##|
-		##|  Remove old focus
-		if @currentFocusCell?
-			@currentFocusCell.removeClass "cellfocus"
-			@currentFocusCell = null
-
-		@currentFocusRow = visibleRow
-		@currentFocusCol = visColNum
+		@currentFocusRow = parseInt visibleRow
+		@currentFocusCol = parseInt visColNum
 
 		if visibleRow == null or visColNum == null
 			@currentFocusRow = null
 			@currentFocusCol = null
-			return
+			return false
 
 		@currentFocusCell = @shadowCells[visibleRow].children[visColNum]
+
 		if @currentFocusCell?
 			path = @currentFocusCell.getDataValue("path")
-
+			@currentFocusPath = path
 			@currentFocusCell.addClass "cellfocus"
 			item = @findRowFromPath(path)
 			@emitEvent 'focus_cell', [ path, item ]

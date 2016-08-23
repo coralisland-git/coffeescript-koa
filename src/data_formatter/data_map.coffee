@@ -4,6 +4,10 @@
 ## @param [Element] e the element in which the editor to create
 ## @return [Boolean]
 ##
+
+reDate1 = /^[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]T00.00.00.000Z/
+reDate2 = /^[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]T[0-9][0-9].[0-9][0-9].[0-9][0-9].[0-9][0-9][0-9]Z/
+
 globalOpenEditor = (e) ->
 	##|
 	##|  Clicked on an editable field
@@ -297,21 +301,14 @@ class DataMap
 		dm.types[tableName] = new DataTypeCollection(tableName)
 
 		for sourceName, obj of savedConfig
+			if sourceName == "_lastModified" then continue
+			if typeof obj != "object" then continue
 
 			if obj.render and typeof obj.render == "string" and obj.render.length > 1
 				##|
 				##| Convert to a function
-				try
-					fun = obj.render.replace /function[^\)]+\)/, ""
-					fun = fun.replace /^ /g, ""
-					if fun.charAt(0) == '{'
-						fun = fun.replace /^\{/, ""
-						fun = fun.replace /\{$/, ""
-
-					obj.render = Function("val","obj", fun)
-				catch e
-					console.log "Error creating function:", e
-
+				functionText = DataTypeCollection.renderFunctionToString(obj.render)
+				obj.render   = DataTypeCollection.renderStringToFunction(functionText)
 
 			dm.types[tableName].configureColumns [ obj ]
 
@@ -336,9 +333,16 @@ class DataMap
 
 	##|
 	##|  Remove all the data from a table
+	@eraseCollection: (tableName) =>
+		dm = DataMap.getDataMap()
+		dm.engine.eraseCollection(tableName)
+		dm.cachedFormat = {}
+		return true
+
 	@removeTableData: (tableName) =>
 		dm = DataMap.getDataMap()
 		dm.engine.eraseCollection(tableName)
+		dm.cachedFormat = {}
 		return true
 
 	##|
@@ -346,13 +350,16 @@ class DataMap
 	@removeTable: (tableName) =>
 
 		dm = DataMap.getDataMap()
-		delete dm.types[tableName]
 		dm.engine.eraseCollection(tableName)
+		delete dm.types[tableName]
+		dm.cachedFormat = {}
 		return true
 
 	##|
 	##|  Add a column data type
 	@addColumn: (tableName, options) =>
+
+		# console.log "Adding column #{tableName}:", options
 
 		config =
 			name     : "New Column"
@@ -372,6 +379,13 @@ class DataMap
 
 		DataMap.setDataTypes tableName, [ config ]
 		dm = DataMap.getDataMap()
+		dm.types[tableName].col[config.source].formatter = globalDataFormatter.getFormatter config.type
+
+		if config.render?
+			functionText = DataTypeCollection.renderFunctionToString(config.render)
+			dm.types[tableName].col[config.source].render = DataTypeCollection.renderStringToFunction(functionText)
+
+		# console.log "addColumn Setting formatter for #{config.type}=", dm.types[tableName].col[config.source].formatter
 		return dm.types[tableName].col[config.source]
 
 	## -------------------------------------------------------------------------------------------------------------
@@ -388,45 +402,93 @@ class DataMap
 		obj = null
 		minWidth = {}
 
+		updated = false
 		for i, o of objects
-			if !obj?
-				obj = o
-				for dataName, dataValue of obj
-					minWidth[dataName] = dataName.length
+			if dm.setDataTypesFromSingleObject(tableName, o)
+				updated = true
 
-			for dataName, dataValue of o
-				len = dataValue.toString().length
-				if len > minWidth[dataName]
-					minWidth[dataName] = len
+		true
 
-		columns = []
-		reDate1 = /^[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]T00.00.00.000Z/
-		reDate2 = /^[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]T[0-9][0-9].[0-9][0-9].[0-9][0-9].[0-9][0-9][0-9]Z/
+	setDataTypesFromSingleObject: (tableName, newData)=>
 
-		for i, o of obj
-			# console.log "Check [#{i}] = ", o, " Type=", typeof o
+		if !@types[tableName]?
+			@types[tableName] = new DataTypeCollection(tableName)
 
-			dataType = "text"
-			if typeof o == "number"
-				dataType = "number"
+		##|
+		##|  Returns updated = true if the data type(s) found in this table
+		##|  are new or different than before.
+		##|  TODO:  Check to see if something we assumed before, such as a blank value
+		##|  or a number may contain a less restricitve type now and convert the
+		##|  column to something like text.
+		##|
 
-			else if reDate2.test o
-				dataType = "datetime"
+		updated = false
+		for keyName, value of newData
+			if keyName == "_id" then continue
+			if keyName == "loc" then continue
 
-			else if reDate1.test o
-				dataType = "date"
+			found = @types[tableName].contains(keyName)
+			if found == null or found == false
 
-			col =
-				name     : i
-				source   : i
-				visible  : true
-				editable : false
-				type     : dataType
+				colName = keyName.charAt(0).toUpperCase() + keyName[1..]
+				colName = colName.replace(/([a-z])([A-Z])/g, "$1 $2")
 
-			col.width = 20 + (10 * minWidth[i])
-			columns.push col
+				config =
+					name     : colName
+					source   : keyName
+					editable : false
+					visible  : true
+					type     : "text"
+					required : false
+					hideable : true
+					width    : ""
+					align    : ""
+					options  : ""
 
-		dm.types[tableName].configureColumns columns
+				if keyName == "distance"
+					config.type     = "distance"
+					config.width    = 60
+					config.align    = "right"
+				else if /^http/.test value
+					config.type  = "link"
+					config.align = "center"
+					config.width = 90
+				else if /Year/.test keyName
+					config.type     = "number"
+					config.width    = 60
+					config.align    = "right"
+					config.options  = '####'
+				else if reDate2.test value or reDate1.test value
+					config.type     = "datetime"
+					config.width    = 120
+					config.align    = "left"
+				else if typeof value == "number" or /^[\-0-9]{0,1}[0-9]{1,11}$/.test value
+					config.type     = "number"
+					config.width    = 66
+					config.align    = "right"
+				else if value? and typeof value == "object" and value.getTime?
+					config.type = "datetime"
+					config.width    = 110
+				else if typeof value == "object"
+					config.type     = "simpleobject"
+					config.width    = 60
+
+				if keyName == "id"
+					config.type     = "text"
+					config.name     = "ID"
+					# config.visible  = false
+					config.hideable = true
+
+				if /MLS/.test(keyName) and config.type == "number"
+					config.type  = "text"
+					config.width = 90
+
+				updated = true
+				# console.log "Adding ", config.name, config
+				DataMap.addColumn tableName, config
+
+		return updated
+
 
 	## -------------------------------------------------------------------------------------------------------------
 	## Return the columns associated with a given table
@@ -467,10 +529,12 @@ class DataMap
 	##
 	@importDataFromObjects: (tableName, objects) =>
 
-		dm = DataMap.getDataMap()
+		# console.log "importDataFromObjects table=#{tableName} Obj=", objects
+		# console.log JSON.stringify(objects)
 
+		dm = DataMap.getDataMap()
 		for i, o of objects
-			@addData tableName, i, o
+			@addDataUpdateTable tableName, i, o
 
 		true
 
@@ -501,7 +565,101 @@ class DataMap
 
 		path = "/#{tableName}/#{keyValue}"
 		doc = DataMap.getDataMap().engine.set path, newData
+
+		dm = DataMap.getDataMap()
+		dm.emitEvent "new_data", [ tableName, keyValue ]
+
 		return doc
+
+	## -------------------------------------------------------------------------------------------------------------
+	## Change the data type of a column
+	##
+	@changeColumnType: (tableName, sourceName, newType, ignoreEvents)=>
+
+		dm = DataMap.getDataMap()
+		if !dm.types[tableName]? then return false
+		if dm.types[tableName].col[sourceName]?
+			dm.types[tableName].col[sourceName].type = newType
+			dm.types[tableName].col[sourceName].formatter = globalDataFormatter.getFormatter newType
+
+			if newType == "number"
+				dm.types[tableName].col[sourceName].align = "right"
+
+			saveText = dm.types[tableName].toSave()
+			if ignoreEvents? and ignoreEvents == true or !globalTableEvents?
+				return true
+
+			dm.emitEvent "table_change", [tableName, saveText]
+			globalTableEvents.emitEvent "table_change", [ tableName, sourceName, "type", newType ]
+
+			return true
+
+		return false
+
+	@changeColumnOrder: (tableName, sourceName, newValue, ignoreEvents)=>
+
+		if !ignoreEvents?
+			globalTableEvents.emitEvent "table_change", [ tableName, sourceName, "order", newValue ]
+
+		dm = DataMap.getDataMap()
+		dm.cachedFormat = {}
+		oldOrder = dm.types[tableName].col[sourceName].order
+		console.log "oldOrder=#{oldOrder} new=#{newValue}"
+		for source, c of dm.types[tableName].col
+			if c.order < newValue then continue
+			if c.order > oldOrder then continue
+			c.order = c.order + 1
+			if !ignoreEvents?
+				globalTableEvents.emitEvent "table_change", [ tableName, source, "order", c.order ]
+
+		 dm.types[tableName].col[sourceName].order = newValue
+		 if !ignoreEvents?
+		 	saveText = dm.types[tableName].toSave()
+		 	dm.emitEvent "table_change", [tableName, saveText]
+
+		true
+
+	## -------------------------------------------------------------------------------------------------------------
+	## Change an attribute from an active table
+	##
+	@changeColumnAttribute: (tableName, sourceName, field, newValue, ignoreEvents)=>
+
+		if field == "type" then return @changeColumnType(tableName, sourceName, newValue, ignoreEvents)
+
+		dm = DataMap.getDataMap()
+		dm.cachedFormat = {}
+		if !dm.types[tableName]?
+			return false
+
+		if dm.types[tableName].col[sourceName]?
+
+			##|
+			##|  Special case for column order
+			if field == "order"
+				@changeColumnOrder(tableName, sourceName, newValue, ignoreEvents)
+				return true
+
+			if field == "render"
+				renderText = DataTypeCollection.renderFunctionToString(newValue)
+				render     = DataTypeCollection.renderStringToFunction(renderText)
+				dm.types[tableName].col[sourceName][field] = render
+				newValue = renderText
+			else
+				dm.types[tableName].col[sourceName][field] = newValue
+
+			if ignoreEvents? and ignoreEvents == true or !globalTableEvents?
+				return true
+
+			##|
+			##| Send chagne event
+			globalTableEvents.emitEvent "table_change", [ tableName, sourceName, field, newValue ]
+
+			saveText = dm.types[tableName].toSave()
+			dm.emitEvent "table_change", [tableName, saveText]
+
+			return true
+
+		return false
 
 	@changeColumn: (tableName, newColumn)=>
 
@@ -509,7 +667,7 @@ class DataMap
 		if !dm.types[tableName]?
 			dm.types[tableName] = new DataTypeCollection(tableName)
 
-		console.log "HERE:", newColumn
+		# console.log "HERE:", newColumn
 
 		found = false
 		if !dm.types[tableName].col[newColumn.col.source]?
@@ -526,51 +684,14 @@ class DataMap
 		if !dm.types[tableName]?
 			dm.types[tableName] = new DataTypeCollection(tableName)
 
-		updated = false
-		for keyName, value of newData
-			if keyName == "_id" then continue
-
-			found = dm.types[tableName].contains(keyName)
-			if found == null or found == false
-				dataType = "text"
-				width    = ""
-				align    = "left"
-				options  = ""
-
-				if keyName == "distance"
-					dataType = "distance"
-					width    = 60
-					align    = "right"
-				else if /Year/.test keyName
-					dataType = "number"
-					width    = 60
-					align    = "right"
-					options  = '####'
-				else if typeof value == "number"
-					dataType = "number"
-					width    = 60
-					align = "right"
-				else if value? and typeof value == "object" and value.getTime?
-					dateType = "datetime"
-					width    = 110
-
-				updated = true
-				DataMap.addColumn tableName,
-					name     : keyName
-					source   : keyName
-					editable : false
-					visible  : true
-					type     : dataType
-					required : false
-					hideable : true
-					width    : width
-					align    : align
-					options  : options
+		updated = dm.setDataTypesFromSingleObject(tableName, newData)
 
 		if updated
 			saveText = dm.types[tableName].toSave()
 			dm.emitEvent "table_change", [tableName, saveText]
 
+		# console.log "Sending new data alert"
+		dm.emitEvent "new_data", [ tableName, keyValue ]
 		return doc
 
 	## -------------------------------------------------------------------------------------------------------------
@@ -627,11 +748,11 @@ class DataMap
 
 			formatter = dm.types[tableName].col[fieldName].formatter
 
-			if formatter? and formatter
-				currentValue = formatter.format currentValue, dm.types[tableName].col[fieldName].options, path
+			if dm.types[tableName].col[fieldName].render?
+				currentValue = dm.types[tableName].col[fieldName].render(currentValue, tableName, fieldName, keyValue)
 
-			if dm.types[tableName].col[fieldName].render? and typeof dm.types[tableName].col[fieldName].render == "function"
-				currentValue = dm.types[tableName].col[fieldName].render(currentValue, path)
+			else if formatter? and formatter
+				currentValue = formatter.format currentValue, dm.types[tableName].col[fieldName].options, path
 
 		if !currentValue? or currentValue == null
 			currentValue = ""

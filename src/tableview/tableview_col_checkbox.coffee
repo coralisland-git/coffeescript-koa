@@ -3,7 +3,7 @@
 ## global functions required to use tables. the cell id is a counter
 ## used to create elements with a new unique ID
 ##
-class TableViewColCheckbox
+class TableViewColCheckbox extends TableViewColBase
 
     ## -------------------------------------------------------------------------------------------------------------
     ## constructor create new column object
@@ -17,6 +17,9 @@ class TableViewColCheckbox
         @width   = 32
         @sort    = 0
 
+    getName: ()=>
+        return "row_selected"
+
     ##|
     ##|  Returns the name of the source field in the datamap
     getSource : ()=>
@@ -29,6 +32,9 @@ class TableViewColCheckbox
 
     getAlign: ()=>
         return "center"
+
+    getOrder: ()=>
+        return -99
 
     ##|
     ##|  returns true if the field is editable
@@ -46,33 +52,26 @@ class TableViewColCheckbox
     ## @param [String] extraClassName extra class name that will be included in the th
     ## @return [String] html the html for the th
     ##
-    RenderHeader: (extraClassName, parent) =>
+    RenderHeader: (parent, location) =>
 
         if @visible == false then return
-
         parent.addClass "checkable"
         parent.addClass "tableHeaderField"
         parent.html "&nbsp;"
         parent
 
-    RenderHeaderHorizontal: (extraClassName, parent) =>
+    RenderHeaderHorizontal: (parent, location) =>
 
         if @visible == false then return
 
         parent.addClass "checkable"
-        parent.addClass "tableHeaderField"
+        parent.addClass "tableHeaderFieldHoriz"
         parent.html "Select Row"
-
-        @tagSort = parent.add "i", "fa fa-sort table-sorter"
-        @tagSort.el.css
-            "float" : "left"
-            "padding-right" : "20"
-
         parent.el.css
-            "text-align"       : "right"
-            "padding-right"    : 8
-            "border-right"     : "1px solid #CCCCCC"
-            "background-color" : "linear-gradient(to right, #fff, #f2f2f2);"
+            "text-align"    : "right"
+            "padding-right" : 8
+            "border-right"  : "1px solid #CCCCCC"
+            "background"    : "linear-gradient(to right, #fff, #f2f2f2);"
 
         return parent
 

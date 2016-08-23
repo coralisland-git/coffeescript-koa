@@ -15,8 +15,8 @@ class DataFormatterType
 	# @property [String] editorPath suggests current path of the value being edited
 	editorPath    : ""
 
-	# @property [String] styleFormat to apply additional style
-	styleFormat: ""
+	# @property [String] align
+	align: null
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to get the formatted data fromt the datatype
@@ -127,8 +127,6 @@ class DataFormatterType
 				##|  Tab key handles save
 				@saveValue(@elEditor.val())
 				@editorShowing = false
-				e.preventDefault()
-				e.stopPropagation()
 				@elEditor.hide()
 
 				##|
@@ -141,15 +139,11 @@ class DataFormatterType
 			if e.keyCode == 13
 				@saveValue(@elEditor.val())
 				@editorShowing = false
-				e.preventDefault()
-				e.stopPropagation()
 				@elEditor.hide()
 				return false
 
 			if e.keyCode == 27
 				@editorShowing = false
-				e.preventDefault()
-				e.stopPropagation()
 				@elEditor.hide()
 				return false
 
@@ -160,6 +154,19 @@ class DataFormatterType
 
 		$("document").on "click", (e) =>
 			console.log "Click"
+
+	##|
+	##|  Trigger when the mouse goes down on any place in the window, this
+	##|  will remove the input field if you click outside the cell.
+	onGlobalMouseDown: (e)=>
+		if e.target.className == "dynamic_edit"
+			globalKeyboardEvents.once "global_mouse_down", @onGlobalMouseDown
+			return true
+
+		@editorShowing = false
+		@elEditor.hide()
+		true
+
 
 
 	## -------------------------------------------------------------------------------------------------------------
@@ -196,6 +203,14 @@ class DataFormatterType
 		@elEditor.show()
 		@elEditor.focus()
 		@elEditor.select()
+
+		globalKeyboardEvents.once "global_mouse_down", @onGlobalMouseDown
+
+	## onFocus: (elParent, left, top, width, height, currentValue, path) =>
+	## define as null if there is no on click action by default.
+	## click can only happen if the caller determines that editing is not possible
+	##
+	onFocus: null
 
 
 ## -------------------------------------------------------------------------------------------------------------
@@ -419,7 +434,7 @@ class DataFormatSourceCode extends DataFormatText
 		if !currentValue
 			code = ''
 		else if typeof currentValue isnt 'string'
-			code = currentValue.toString()
+			code = DataTypeCollection.renderFunctionToString(currentValue)
 		else
 			code = currentValue
 
@@ -439,8 +454,10 @@ class DataFormatInt extends DataFormatterType
 	# @property [String] name name of the data type
 	name: "int"
 
-	# @property [String] styleFormat
-	styleFormat: "text-align: right;"
+	# @property [String] align
+	align: "right"
+
+	width: 90
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to format the currently passed data
@@ -481,8 +498,8 @@ class DataFormatNumber extends DataFormatterType
 	# @property [String] name name of the data type
 	name: "number"
 
-	# @property [String] styleFormat
-	styleFormat: "text-align: right;"
+	# @property [String] align
+	align: "right"
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to format the currently passed data
@@ -501,10 +518,15 @@ class DataFormatNumber extends DataFormatterType
 		if isNaN(num)
 			return "[#{num}]"
 
-		if !options?
+		if !options? or options == ""
 			options = "#,###.[##]"
 
-		return numeral(num).format(options)
+		try
+			return numeral(num).format(options)
+		catch e
+			console.log "Exception formatting number [#{num}] using [#{optinos}]"
+			retunr "[#{num}]"
+
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to unformat the currently formatted data
@@ -528,8 +550,10 @@ class DataFormatFloat extends DataFormatterType
 	# @property [String] name name of the data type
 	name: "decimal"
 
-	# @property [String] styleFormat
-	styleFormat: "text-align: right;"
+	# @property [String] align
+	align: "right"
+
+	width: 100
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to allow specific key code
@@ -585,8 +609,8 @@ class DataFormatCurrency extends DataFormatterType
 	# @property [String] name name of the data type
 	name: "money"
 
-	# @property [String] styleFormat
-	styleFormat: "text-align: right;"
+	# @property [String] align
+	align: "right"
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to format the currently passed data
@@ -623,8 +647,8 @@ class DataFormatPercent extends DataFormatterType
 	# @property [Strin] name name of the data type
 	name: "percent"
 
-	# @property [String] styleFormat
-	styleFormat: "text-align: right;"
+	# @property [String] align
+	align: "right"
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to format the currently passed data
@@ -832,8 +856,8 @@ class DataFormatDateAge extends DataFormatterType
 	# @property [Integer] width
 	width: 135
 
-	# @property [String] styleFormat
-	styleFormat: "text-align: right;"
+	# @property [String] align
+	align: "right"
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to format the currently passed data
@@ -963,10 +987,10 @@ class DataFormatDistance extends DataFormatterType
 	name: "distance"
 
 	# @property [Integer] width
-	width: 80
+	width: 100
 
 	## -------------------------------------------------------------------------------------------------------------
-	## Takes meters in, returns a formatted string
+	## Takes miles in, returns a formatted string
 	##
 	## @param [Object] data data to be formatted
 	## @param [Object] options additonal options defined for the datatype
@@ -974,11 +998,10 @@ class DataFormatDistance extends DataFormatterType
 	## @return [Object] data formatted data
 	##
 	format: (data, options, path) =>
-		val = DataFormatter.getNumber data
-		ft = 3280.8 * val
-		if (ft < 1000) then return numeral(ft).format("#,###") + " ft."
-		mi = 0.621371 * val
-		return numeral(mi).format("#,###.##") + " mi.";
+		feet = 5280 * data
+		if feet < 50 then return "< 50 ft"
+		if feet < 100 then return Math.ceil(feet) + " ft"
+		return numeral(data).format('#,###.##') + " mi"
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to unformat the currently formatted data
@@ -989,8 +1012,9 @@ class DataFormatDistance extends DataFormatterType
 	## @return [Object] data unformatted data
 	##
 	unformat: (data, path) =>
+		console.log "Unformat distance doesn't work:", data
 		val = DataFormatter.getNumber(data)
-		return val * 3280.8
+		return val
 
 
 ## -------------------------------------------------------------------------------------------------------------
@@ -1005,6 +1029,9 @@ class DataFormatBoolean extends DataFormatterType
 
 	# @property [Integer] width
 	width: 40
+
+	textYes: "<i class='fa fa-circle'></i> Yes"
+	textNo: "<i class='fa fa-circle-thin'></i> No"
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to open editor including ace code editor
@@ -1038,9 +1065,9 @@ class DataFormatBoolean extends DataFormatterType
 	## @return [Object] data formatted data
 	##
 	format: (data, options, path) =>
-		if !data? then return "No"
-		if data == null or data == 0 or data == false then return "No"
-		return "Yes"
+		if !data? then return @textNo
+		if data == null or data == 0 or data == false then return @textNo
+		return @textYes
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to unformat the currently formatted data
@@ -1097,7 +1124,7 @@ class DataFormatTimeAgo extends DataFormatterType
 			days = Math.floor(age / 86400)
 			hrs  = Math.floor((age - (days * 86400)) / (60 * 60))
 			if days != 1 then daysTxt = "days" else daysTxt = "day"
-			if hrs > 0
+			if hrs > 0 and days < 30
 				txt = "#{days} #{daysTxt}, #{hrs} hr"
 				if hrs != 1 then txt += "s"
 			else
@@ -1194,9 +1221,7 @@ class DataFormatSimpleObject extends DataFormatterType
 	## @return [Object] data formatted data
 	##
 	format: (data,options,path) =>
-		if !options.compile
-			throw new Error "compilation template not defined inside options.compile"
-		return Handlebars.compile(options.compile)(data)
+		return "View"
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to unformat the currently formatted data
@@ -1206,7 +1231,67 @@ class DataFormatSimpleObject extends DataFormatterType
 	## @return [Object] data unformatted data
 	##
 	unformat: (data,path) =>
+		console.log "unformat simple:", data
 		return data
+
+## -------------------------------------------------------------------------------------------------------------
+## class for simpleobject data type
+##
+## @extends [DataFormatterType]
+##
+class DataFormatLink extends DataFormatterType
+
+	# @property [String] name name of the data type
+	name: "link"
+
+	width: 70
+
+	clickable: true
+
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to format the currently passed data
+	##
+	## @param [Object] data data to be formatted
+	## @param [Object] options additonal options defined for the datatype
+	## @param [String] path path where the value is being edited
+	## @return [Object] data formatted data
+	##
+	format: (data,options,path) =>
+		if !data? then return ""
+		if /wwww/.test data then return "Open Link"
+		if /^http/.test data then return "Open Link"
+		if /^ftp/.test data then return "Open FTP"
+		if data.length > 0
+			return data
+		return ""
+
+
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to unformat the currently formatted data
+	##
+	## @param [Object] data data to be unformatted
+	## @param [String] path path where the value is being edited
+	## @return [Object] data unformatted data
+	##
+	unformat: (data,path) =>
+		console.log "TODO: DataFormatLink.unformat not implemented:", data
+		return data
+
+
+	openEditor: (elParent, left, top, width, height, currentValue, path) =>
+		##|
+		##| TODO:  Open a dialog to edit the link and validate it
+		console.log "TODO: openEditor not implemented for link"
+		return null
+
+	onFocus: (e, col, data) =>
+		console.log "click, col=", col, "data=", data
+		url = data[col]
+		if url? and url.length > 0
+			win = window.open(url, "_blank")
+			win.focus()
+
+		true
 
 
 ## -------------------------------------------------------------------------------------------------------------
@@ -1233,6 +1318,8 @@ try
 	globalDataFormatter.register(new DataFormatTags())
 	globalDataFormatter.register(new DataFormatMemo())
 	globalDataFormatter.register(new DataFormatDuration())
+	globalDataFormatter.register(new DataFormatLink())
+
 
 catch e
 	console.log "Exception while registering global Data Formatter:", e

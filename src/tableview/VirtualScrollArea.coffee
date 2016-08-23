@@ -1,3 +1,5 @@
+globalScrollbarTooltip = null
+
 class VirtualScrollArea
 
     constructor: (holderElement, @isVert, @otherScrollBar)->
@@ -6,20 +8,16 @@ class VirtualScrollArea
         ##|  Event manager for Event Emitter style events
         GlobalClassTools.addEventManager(this)
 
-        @min     = 0
-        @max     = 0
-        @current = 0
-        @step    = 1
-        @visible = true
-
+        @min           = 0
+        @max           = 0
+        @current       = 0
+        @visible       = true
         @bottomPadding = 0
         @rightPadding  = 0
         @mySize        = 20
 
         @backColor              = "#F0F0F0"
         @borderColor            = "1px solid #E7E7E7"
-        @thumbBackColor         = "#8F9F8E"
-        @thumbBackColorSelected = "#EC9720"
 
         ##|
         ##|  This is either Horizontal or Vertical
@@ -47,22 +45,70 @@ class VirtualScrollArea
         ##|
         ##| Make the holder element unselectable so drag on it doesn't select text
         @elHolder.css
-            '-moz-user-select' : 'none',
-            '-webkit-user-select': 'none',
-            'user-select': 'none'
+            '-moz-user-select'    : 'none'
+            '-webkit-user-select' : 'none'
+            'user-select'         : 'none'
 
         @elHolder.append @elScrollTrack.el
+
+        if globalScrollbarTooltip == null
+
+            globalScrollbarTooltip = $ "<div />"
+            globalScrollbarTooltip.css
+                "position"      : "absolute"
+                top             : 0
+                left            : 0
+                width           : 90
+                height          : 24
+                textAlign       : "center"
+                borderRadius    : "4px"
+                padding         : 4
+                margin          : 0
+                fontSize        : "12px"
+                backgroundColor : "#E6DB74"
+                color           : "#000000"
+                zIndex          : 153002
+                display         : "none"
+                "box-shadow"    : "2px 2px #000000"
+            $("body").append(globalScrollbarTooltip)
+
+
         @resize()
         @setupEvents()
 
-    setRange: (@min, @max, @displaySize, @current) =>
+    setRange: (newMin, newMax, newDisplaySize, newCurrent)=>
 
+        updated = false
+
+        if !newMin? or !newMax? or !newDisplaySize? or !newCurrent? then return false
+
+        if newMin != @min
+            @min = newMin
+            updated = true
+
+        if newMax != @max
+            @max = newMax
+            updated = true
+
+        if newDisplaySize != @displaySize
+            @displaySize = newDisplaySize
+            updated = true
+
+        if newCurrent != @current
+            @current = newCurrent
+            updated = true
+
+        # console.log "VirtualScrollArea setRange(min=#{@min}, max=#{@max}, #{@displaySize}, #{@current}) [#{updated}]", @isVert
+
+        if updated == false
+            return false
+
+        result = false;
         if @displaySize >= (@max-@min)
-            console.log "VirtualScrollArea setRange(min=#{@min}, max=#{@max}, #{@displaySize}, #{@current})", @isVert
             # console.log "VirtualScrollArea setRange hiding, #{@displaySize} >= ", @max-@min
-            @hide()
-            return
+            return @hide()
         else
+            if @visible == false then result = true
             @show();
 
         ##|
@@ -70,7 +116,8 @@ class VirtualScrollArea
 
         if (@height() == 0 or @width() == 0)
             setTimeout ()=>
-                @setRange @min, @max, @displaySize, @current
+                @current = -1
+                @setRange newMin, newMax, newDisplaySize, newCurrent
             , 10
         else
 
@@ -84,14 +131,15 @@ class VirtualScrollArea
             # console.log "VirtualScrollArea setRange(#{@min}, #{@max}, #{@displaySize}) spacing=#{@spacing}"
             @setPos(@current)
 
-        true
+        result
 
     setPos: (@current)=>
 
         newOffset = @spacing * @current
         newWidth  = @spacing * @displaySize
 
-        # console.log "VirtualScrollArea setPos(#{@current}), spacing=#{@spacing}, displaySize=#{@displaySize} (newOffset=#{newOffset}, newWidth=#{newWidth})"
+        newWidth = Math.floor(newWidth)
+        # console.log "VirtualScrollArea setPos(#{@current}), spacing=#{@spacing}, displaySize=#{@displaySize} (newOffset=#{newOffset}, newWidth=#{newWidth}) vis=#{@visible}"
 
         if @isVert
             @thumb.el.css "height", newWidth
@@ -103,198 +151,136 @@ class VirtualScrollArea
 
         true
 
-    onMarkerDragStart: (offsetX, offsetY)=>
+    OnMarkerSet: (pos, maxLoc)=>
+        percent = pos / (maxLoc - @thumbHeight)
+        num = @min + (percent * (@max - @min))
+        @emitEvent "scroll_to", [ Math.floor(num) ]
+        true
 
-        # console.log "OFF=", offsetX, offsetY
-        @dragOffsetX = offsetX
-        @dragOffsetY = offsetY
-        @dragCurrent = Math.floor(@current)
-
-        @dragMarker = true
-        @thumb.el.css "backgroundColor", @thumbBackColorSelected
+    onMarkerDrag: (diffX, diffY)=>
 
         if @isVert
-            @thumb.el.css "cursor", "ns-resize"
-            @elScrollTrack.el.css "cursor", "ns-resize"
+            amount = diffY/@spacing
         else
-            @thumb.el.css "cursor", "ew-resize"
-            @elScrollTrack.el.css "cursor", "ew-resize"
+            amount = diffX/@spacing
 
+        # console.log "From #{@dragCurrent} moving #{amount}"
+        amount = @dragCurrent + amount
+
+        if amount < 1 then amount = 0
+        if amount + @displaySize >= @max then amount = @max - @displaySize
+        amount = Math.floor(amount)
+
+        globalScrollbarTooltip.show()
+        globalScrollbarTooltip.html "#{amount+1} to #{@displaySize + @current} of #{@max}"
+
+        @emitEvent "scroll_to", [ Math.floor(amount) ]
         true
 
-    onMarkerDragStop: ()=>
-
-        @dragMarker = false
-        @thumb.el.css "backgroundColor", @thumbBackColor
-        @thumb.el.css "cursor", "grab"
-        @elScrollTrack.el.css "cursor", "pointer"
+    ##|
+    ##|  Called when the thumb slider drag is complete.
+    onMarkerDragFinished: (diffX, diffY, e)=>
+        globalScrollbarTooltip.hide()
         true
 
-    OnMarkerSet: (pos, maxLoc)=>
-        console.log "OnMarkerSet pos=#{pos} maxloc=#{maxLoc}"
-        percent = pos / (maxLoc - @thumbHeight)
-        console.log "Percent=", percent, "max=#{@max} min=#{@min}"
-        num = @min + (percent * (@max - @min))
-        console.log "NUM=", num
-        @emitEvent "scroll_to", [ Math.floor(num) ]
+    onScrollTrackMouseDown: (e) =>
+
+        pos = @elHolder.offset()
+        globalScrollbarTooltip.css
+            left: pos.left + 20
+            top: pos.top + 20
+
+        if e.target.className == "marker"
+            @dragCurrent = Math.floor(@current)
+            GlobalMouseDrag.startDrag(e, @onMarkerDrag, @onMarkerDragFinished)
+
+        else
+
+            if @isVert
+                if e.offsetY < 10 then e.offsetY = 0
+                @OnMarkerSet e.offsetY, @height()
+            else
+                if e.offsetX < 10 then e.offsetX = 0
+                @OnMarkerSet e.offsetX, @width()
+
         true
 
     setupEvents: ()=>
 
         @thumbHeight = 18
-        @dragMarker  = false
+        @document    = $(document)
 
         if @isVert
             @thumb.el.css
-                position        : "absolute"
-                left            : 1
-                right           : 1
-                top             : 1
-                height          : @thumbHeight
-                backgroundColor : @thumbBackColor
-                cursor          : "grab"
+                height : @thumbHeight
+                width  : @thumbHeight-2
         else
             @thumb.el.css
-                position        : "absolute"
-                left            : 1
-                top             : 1
-                bottom          : 1
-                width           : @thumbHeight
-                backgroundColor : @thumbBackColor
-                cursor          : "grab"
+                width  : @thumbHeight
+                height : @thumbHeight-2
 
-        @elScrollTrack.el.on "mousedown", (e)=>
-
-            if e.target.className == "marker"
-                @onMarkerDragStart(e.offsetX, e.offsetY)
-
-            else
-                console.log "LOC=", e.offsetX, e.offsetY
-
-                if @isVert
-                    if e.offsetY < 10 then e.offsetY = 0
-                    @OnMarkerSet e.offsetY, @height()
-                else
-                    if e.offsetX < 10 then e.offsetX = 0
-                    @OnMarkerSet e.offsetX, @width()
-
-            console.log "MOUSE DOWN", e.target.className, e.target.class, e.target
-            true
-
-        @elScrollTrack.el.on "mouseup", (e)=>
-
-            if @dragMarker
-                @onMarkerDragStop()
-
-            true
-
-        @elScrollTrack.el.on "mousemove", (e)=>
-            e.stopPropagation()
-            if @dragMarker and e.target.className == "marker"
-                x = e.offsetX - @dragOffsetX
-                y = e.offsetY - @dragOffsetY
-                # console.log "x=#{x} y=#{y} current=#{@current}"
-
-                if @isVert
-                    @dragCurrent += (y/@spacing)
-                else
-                    @dragCurrent += (x/@spacing)
-
-                @setPos(@dragCurrent)
-
-                # console.log "Checking ",Math.floor(@current),@dragCurrent
-                if Math.floor(@current) != @dragCurrent
-                    # console.log "Fixing loc:", @current, " vs ", @dragCurrent
-                    @emitEvent "scroll_to", [ Math.floor(@dragCurrent) ]
-
-            true
-
-        ##|
-        ##| mouse out of the marker should not stop scrolling to support scrolling outside of div
-        @elScrollTrack.el.on "mouseout", (e)=>
-            # if e.target.className != "marker" and e.relatedTarget? and e.relatedTarget.className != "marker"
-            #     if @dragMarker
-            #         @onMarkerDragStop()
-            true
-
-        ##|
-        ##| stop scrolling if mouse key is left
-        @elHolder.on 'mouseup', (e) =>
-            if @dragMarker
-                @onMarkerDragStop()
-
-        ##|
-        ##| allow scroll outside of scroll div also
-        @elHolder.on 'mousemove', (e) =>
-            if @dragMarker
-                e.stopPropagation()
-                x = e.pageX - @elScrollTrack.el.offset().left - @dragOffsetX
-                y = e.pageY - @elScrollTrack.el.offset().top - @dragOffsetY
-                if @isVert
-                    @OnMarkerSet y, @height()
-                else
-                    @OnMarkerSet x, @width()
-            true
-
-        @elHolder.on "DOMMouseScroll", (e)=>
-            console.log "THIS:", @isVert, " DOMMouseScroll=", e
-            true
+        @elScrollTrack.el.on "mousedown", @onScrollTrackMouseDown
 
         @elHolder.on "wheel", (e)=>
 
             if !@visible then return true
 
-            # console.log "Wheel:", e.target.className
-
             ##|
             ##|  Mouse event in some browsers
             ##|
             if e.originalEvent.deltaMode == e.originalEvent.DOM_DELTA_LINE
-                deltaX = e.originalEvent.deltaX * -50
-                deltaY = e.originalEvent.deltaY * -50
+                deltaX = e.originalEvent.deltaX * -5
+                deltaY = e.originalEvent.deltaY * -5
             else
                 deltaX = e.originalEvent.deltaX * -1
                 deltaY = e.originalEvent.deltaY * -1
 
-            scrollX = Math.ceil(deltaX / 50)
-            scrollY = Math.ceil(deltaY / 50)
+            scrollX = Math.ceil(deltaX/60)
+            scrollY = Math.ceil(deltaY/60)
+            if scrollY > 3 then scrollX = 0
 
             e.preventDefault()
             e.stopPropagation()
             if @isVert and scrollY != 0
-                @emitEvent "scroll_y", [ scrollY ]
+                @emitEvent "scroll_to", [ @current+scrollY ]
             if not @isVert and scrollX != 0
-                @emitEvent "scroll_x", [ scrollX ]
+                @emitEvent "scroll_to", [ @current+scrollX ]
 
             true
 
-        @elHolder.on "mousewheel", (e)=>
-            console.log "THIS:", @isVert, " mousewheel=", e
-            true
 
     hide: ()=>
-
-        @visible = false
+        # console.log "Calling Hide on #{@isVert}"
+        if @visible == false then return false
+        @visible      = false
+        @parentHeight = null
+        @parentWidth  = null
         @elScrollTrack.el.hide()
-        @elScrollTrack.hide()
         true
 
     show: ()=>
-
-        @visible = true
+        # console.log "Calling Show on #{@isVert}"
+        # if @visible == true then return false
+        @visible      = true
+        @parentHeight = null
+        @parentWidth  = null
         @elScrollTrack.el.show()
-        @elScrollTrack.show()
         true
 
     height: ()=>
-        parentHeight = @elHolder.height()
-        return parentHeight
+        if @parentHeight? and @parentHeight > 0 then return @parentHeight
+        @parentHeight = @elHolder.height()
+        return @parentHeight
 
     width: ()=>
-        parentWidth  = @elHolder.width()
-        return parentWidth
+        if @oarentWidth? and @parentWidth > 0 then return @parentWidth
+        @parentWidth  = @elHolder.width()
+        return @parentWidth
 
     resize: ()=>
+
+        @parentHeight = null
+        @parentWidth = null
 
         @elScrollTrack.el.css
             position        : "absolute"

@@ -3,7 +3,43 @@
 ## global functions required to use tables. the cell id is a counter
 ## used to create elements with a new unique ID
 ##
-class TableViewCol
+class TableViewColBase
+
+	getName: ()->
+		return "No name"
+
+	getSource: ()->
+		return ""
+
+	getOrder: ()->
+		return 999
+
+	getClickable: ()->
+		return false
+
+	getEditable: ()->
+		return false
+
+	getAlign: ()->
+		return null
+
+	calculateWidth: ()=>
+		return @width || 0
+
+	RenderHeader: (parent, location) =>
+		parent.html "No RenderHeader"
+
+	RenderHeaderHorizontal: (parent, location) =>
+		parent.html "No RenderHeaderHorizontal"
+
+	UpdateSortIcon: (newSort)->
+		return null
+
+	getVisible: ()->
+		return true
+
+
+class TableViewCol extends TableViewColBase
 
 	## -------------------------------------------------------------------------------------------------------------
 	## constructor create new column object
@@ -18,10 +54,44 @@ class TableViewCol
 		if !@visible? then @visible = true
 		if !@width? then @width = ""
 
+
+	##|
+	##|  Return the name of the column
+	getName: ()=>
+		return @col.name
+
 	##|
 	##|  Returns the name of the source field in the datamap
 	getSource : ()=>
 		return @col.source
+
+	getOrder: ()=>
+		return @col.order
+
+	getVisible: ()=>
+		if @isGrouped? and @isGrouped == true then return false
+		if @col.visible? and @col.visible == true then return true
+		if @col.visible? and @col.visible == false then return false
+		return true
+
+	getClickable: ()=>
+
+		if @clickable? and @clickable == true
+			return true
+
+		if @clickable? and @clickable == false
+			return false
+
+		if @col.clickable? and @col.clickable == true
+			return true
+
+		if @col.clickable? and @col.clickable == false
+			return false
+
+		if @col.formatter.clickable? and @col.formatter.clickable == true
+			return true
+
+		return false
 
 	##|
 	##|  returns true if the field is editable
@@ -34,15 +104,26 @@ class TableViewCol
 		return @col.formatter.name
 
 	getAlign: ()=>
-		return @col.align
+		if @col.align? and @col.align.length > 0
+			return @col.align
 
-	getName: ()=>
-		return @col.name
+		if @col.formatter.align?
+			return @col.formatter.align
+
+		return null
+
+	onFocus: (e, col, data) =>
+		if @col? and @col.formatter? and @col.formatter.onFocus?
+			@col.formatter.onFocus e, col, data
+		true
 
 	calculateWidth: ()=>
 
 		##| if width is 0 then consider as auto width = left padding + max length text width + right padding
 		if (@width is 0 || @width is '0px' || @width is "" )
+			if @col.formatter? and @col.formatter.width?
+				return @col.formatter.width
+
 			return null
 
 		if typeof @width == "string"
@@ -56,44 +137,33 @@ class TableViewCol
 	## @param [String] extraClassName extra class name that will be included in the th
 	## @return [String] html the html for the th
 	##
-	RenderHeader: (extraClassName, parent) =>
+	RenderHeader: (parent, location) =>
 
 		if @visible == false then return
-
-		if !@col.extraClassName?
-			@col.extraClassName = ""
-
-		if extraClassName
-			if @col.extraClassName.length then @col.extraClassName += " "
-			@col.extraClassName += extraClassName
 
 		parent.html @getName()
 		parent.addClass "tableHeaderField"
 
-		if @col.tooltip? and @col.tooltip.length > 0
-			parent.setAttribute "tooltip", "simple"
-			parent.setAttribute "data-title", @col.tooltip
-
-		@tagSort = parent.add "i", "fa fa-sort table-sorter pull-right"
-		@sort    = 0
+		if @sort? and @sort != 0
+			@tagSort = parent.add "i", "fa fa-sort table-sorter pull-right"
 
 		return parent
 
-	RenderHeaderHorizontal: (extraClassName, parent) =>
+	RenderHeaderHorizontal: (parent, location) =>
 
 		if @visible == false then return
 
 		parent.html @getName()
-		parent.addClass "tableHeaderField"
+		parent.addClass "tableHeaderFieldHoriz"
 
 		if @col.tooltip? and @col.tooltip.length > 0
 			parent.setAttribute "tooltip", "simple"
 			parent.setAttribute "data-title", @col.tooltip
 
-		@tagSort = parent.add "i", "fa fa-sort table-sorter"
-		@tagSort.el.css
-			"float" : "left"
-			"padding-right" : "20"
+		# @tagSort = parent.add "i", "fa fa-sort table-sorter"
+		# @tagSort.el.css
+			# "float" : "left"
+			# "padding-right" : "20"
 
 		parent.el.css
 			"text-align"       : "right"

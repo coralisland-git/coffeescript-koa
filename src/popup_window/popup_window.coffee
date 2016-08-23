@@ -35,6 +35,7 @@ class PopupWindow
 		keyValue   : null
 		windowName : null
 		resizable  : true
+		scrollable : true
 
 	## -------------------------------------------------------------------------------------------------------------
 	## returns the available height for the body element
@@ -52,7 +53,8 @@ class PopupWindow
 	## update the display, must be called if the height of the body content changes
 	##
 	update: () =>
-		@myScroll.refresh();
+		if @configurations.scrollable
+			@myScroll.refresh();
 
 	## -------------------------------------------------------------------------------------------------------------
 	## makes popup visible and render on the current screen
@@ -60,9 +62,12 @@ class PopupWindow
 	## @return [Boolean]
 	##
 	open: () =>
-		setTimeout () =>
-			@update()
-		, 20
+
+		if @configurations.scrollable
+			setTimeout () =>
+				@update()
+			, 20
+
 		@popupWindowHolder.show()
 		@isVisible = true
 		true
@@ -227,9 +232,10 @@ class PopupWindow
 			width  : @popupWidth
 			height : @popupHeight - 26 - 5
 
-		setTimeout () =>
-			@myScroll.refresh()
-		, 100
+		if @configurations.scrollable
+			setTimeout () =>
+				@myScroll.refresh()
+			, 100
 
 		@popupWindowHolder.show()
 		@isVisible = true
@@ -241,6 +247,8 @@ class PopupWindow
 	## internal function to check to see if there is a saved location and move to it
 	##
 	internalCheckSavedLocation: () =>
+
+		return false
 
 		# location = user.get "PopupLocation_#{@title}", 0
 		if @configurations.tableName and @configurations.tableName.length
@@ -265,28 +273,6 @@ class PopupWindow
 					y: @y
 					h: @popupHeight
 					w: @popupWidth
-
-
-	## -------------------------------------------------------------------------------------------------------------
-	## function to initialize all members of class from keyValue
-	##
-	initializeFromKeyValue: () =>
-		@popupWindowHolder = $ "[data-key=#{@configurations.keyValue}]"
-		# @windowTitle = @popupWindowHolder.find ".title"
-		# @windowClose = @windowTitle.find "#windowclose"
-
-		console.log "initializeFromKeyValue, title=", @windowTitle
-
-		@windowBodyWrapperTop = @popupWindowHolder.find ".windowbody"
-		@windowWrapper = @windowBodyWrapperTop.find ".scrollable"
-		@windowScroll = @windowWrapper.find ".scrollcontent"
-		@myScroll = new IScroll "##{@windowWrapper.attr('id')}",
-			mouseWheel: true
-			scrollbars: true
-			bounce: false
-			resizeScrollbars: false
-			freeScroll: @allowHorizontalScroll
-			scrollX: @allowHorizontalScroll
 
 	##|
 	##|
@@ -332,9 +318,6 @@ class PopupWindow
 			class: "PopupWindow"
 			id:    "popup#{id}"
 
-		if @configurations.keyValue
-			html.attr 'data-key',@configurations.keyValue
-
 		@popupWindowHolder = $(html)
 		$("body").append @popupWindowHolder
 
@@ -363,7 +346,8 @@ class PopupWindow
 		@windowWrapper = $ "<div />",
 			id: "windowwrapper#{id}"
 			class: "scrollable"
-		.append @windowScroll
+
+		@windowWrapper.append @windowScroll
 
 		if @configurations.resizable
 			@resizable = $ "<div />",
@@ -385,13 +369,14 @@ class PopupWindow
 
 		##|
 		##|  Setup a scroll area within the body
-		@myScroll = new IScroll "#windowwrapper#{id}",
-			mouseWheel: true
-			scrollbars: true
-			bounce: false
-			resizeScrollbars: false
-			freeScroll: @allowHorizontalScroll
-			scrollX: @allowHorizontalScroll
+		if @configurations.scrollable
+			@myScroll = new IScroll "#windowwrapper#{id}",
+				mouseWheel: true
+				scrollbars: true
+				bounce: false
+				resizeScrollbars: false
+				freeScroll: @allowHorizontalScroll
+				scrollX: @allowHorizontalScroll
 
 		@dragabilly = new Draggabilly "#popup#{id}",
 			handle: "#popuptitle#{id}"
@@ -424,9 +409,9 @@ class PopupWindow
 			@popupWindowHolder.css "opacity", "1.0"
 			return false
 
-		startX = 0
-		startY = 0
-		startWidth = 0
+		startX      = 0
+		startY      = 0
+		startWidth  = 0
 		startHeight = 0
 		doMove = (e) =>
 			@popupWidth = startWidth + e.clientX - startX
@@ -437,7 +422,7 @@ class PopupWindow
 			@windowWrapper.height @popupHeight - @windowTitle.height() - 1 - @toolbarHeight
 			@windowScroll.trigger('resize')
 
-			console.log "emit [resize]", @popupWidth, @popupHeight, this
+			# console.log "emit [resize]", @popupWidth, @popupHeight, this
 			@emitEvent "resize", [ @popupWidth, @popupHeight ]
 			true
 
@@ -471,27 +456,23 @@ class PopupWindow
 		GlobalClassTools.addEventManager(this)
 
     	##| check the new passed configurations object and extract values from it
-		if !configurations && typeof configuration != 'object'
-			configuration = {}
+		if !configurations? or typeof configurations != 'object'
+			configurations = {}
+
+		if !configurations.scrollable?
+			configurations.scrollable = true
+
 		@configurations = $.extend(@configurations,configurations);
 		if @configurations.w and @configurations.w > 0 then @popupWidth  = @configurations.w
 		if @configurations.h and @configurations.h > 0 then @popupHeight = @configurations.h
 
 		@internalCheckSavedLocation();
-
-		##| if keyValue popup is available then get only reference else create new popupHolder
-		if @configurations.keyValue and $("[data-key=#{@configurations.keyValue}]").length
-			##| check if the x,y,w,h is good for current window
-			@initializeFromKeyValue()
-		else
-			@createPopupHolder()
+		@createPopupHolder()
 
 		##|
 		##|  Setup with default sizeing
 		@resize @popupWidth, @popupHeight
-		@colCount  = 1
-		@menuItems = {}
-		@menuData  = {}
+		true
 
 	## -------------------------------------------------------------------------------------------------------------
 	## Set the contents of the window

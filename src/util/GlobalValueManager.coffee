@@ -1,3 +1,4 @@
+l = console.log
 
 ## global date format for utc date
 reDateUtc = /\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ/
@@ -126,29 +127,35 @@ class GlobalValueManager
 	##
     @GetMoment = (date) ->
 
-        if date == null
-            return null;
+        try
 
-        if date? and typeof date == "object" and date.getTime?
-            return moment(date)
+            if date == null
+                return null;
 
-        if typeof date != "string"
-            return null;
+            if date? and typeof date == "object" and date.getTime?
+                return moment(date)
+
+            if typeof date != "string"
+                return null;
 
 
-        if reDateUtc.test date
-            return moment(date)
+            if reDateUtc.test date
+                return moment(date)
 
-        date = date.replace "T", " "
+            date = date.replace "T", " "
 
-        if date.match /\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d/
-            return moment(date, "YYYY-MM-DD HH:mm:ss")
+            if date.match /\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d/
+                return moment(date, "YYYY-MM-DD HH:mm:ss")
 
-        if date.match /\d\d\d\d.\d\d.\d\d/
-            return moment(date, "YYYY-MM-DD")
+            if date.match /\d\d\d\d.\d\d.\d\d/
+                return moment(date, "YYYY-MM-DD")
 
-        if date.match /\d\d-\d\d-\d\d\d\d/
-            return moment(date, "MM-DD-YYYY")
+            if date.match /\d\d-\d\d-\d\d\d\d/
+                return moment(date, "MM-DD-YYYY")
+
+        catch e
+
+            console.log "Unable to get date from:", e
 
         return null;
 

@@ -3,7 +3,7 @@
 ## global functions required to use tables. the cell id is a counter
 ## used to create elements with a new unique ID
 ##
-class TableViewColButton
+class TableViewColButton extends TableViewColBase
 
     ## -------------------------------------------------------------------------------------------------------------
     ## constructor create new column object
@@ -21,10 +21,17 @@ class TableViewColButton
     render: (val)=>
         return @id
 
+    getName: ()=>
+        return "BUTTON:#{@id}"
+
+    getOrder: ()=>
+        return 99
+
     ##|
     ##|  Returns the name of the source field in the datamap
     getSource : ()=>
-        return @tableName + "_" + @id
+        if @source? then return @source
+        return @id
 
     ##|
     ##|  Returns the name of the foramtter for this field
@@ -33,6 +40,9 @@ class TableViewColButton
 
     getAlign: ()=>
         return "center"
+
+    getClickable: ()=>
+        return true
 
     ##|
     ##|  returns true if the field is editable
@@ -50,12 +60,16 @@ class TableViewColButton
     ## @param [String] extraClassName extra class name that will be included in the th
     ## @return [String] html the html for the th
     ##
-    RenderHeader: (extraClassName, parent) =>
-
-        if @visible == false then return
-
+    RenderHeader: (parent, location) =>
         parent.html @tableName
         parent.addClass "text-center"
+        parent.addClass "tableHeaderField"
+        return parent
+
+    RenderHeaderHorizontal: (parent, location) =>
+        parent.html @tableName
+        parent.addClass "text-center"
+        parent.addClass "tableHeaderFieldHoriz"
         return parent
 
     UpdateSortIcon: (newSort) =>

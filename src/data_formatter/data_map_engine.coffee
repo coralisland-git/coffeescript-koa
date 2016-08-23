@@ -55,7 +55,7 @@ class DataMapMemoryCollection
 
         else
 
-            console.log "find: (", condition, ")"
+            console.log "find: (", condition, "):"
 
             ##|
             ##| Complex search
@@ -161,9 +161,7 @@ class DataMapEngine
     ##|
     ##|  Erase all the data in a given table
     eraseCollection: (collectionName) =>
-
-        c = @internalGetCollection collectionName
-        return c.eraseCollection()
+        @memData[collectionName] = new DataMapMemoryCollection(collectionName)
 
     delete: (pathText) =>
 

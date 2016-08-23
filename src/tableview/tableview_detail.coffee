@@ -14,14 +14,47 @@ class TableViewDetailed extends TableView
 
     constructor: (@elTableHolder, @showCheckboxes) ->
         super(@elTableHolder, @showCheckboxes)
-        @showFilters = false
-        @fixedHeader = true
+        @showFilters      = false
+        @fixedHeader      = true
+        @showGroupPadding = false
+        @showResize       = false
 
     getTableTotalRows: ()=>
         count = Object.keys(@colByNum).length
 
     getTableTotalCols: ()=>
         return @totalAvailableRows
+
+    ##|
+    ##|  Number of visible columns
+    getTableVisibleCols: ()=>
+
+        if @cachedTotalVisibleCols? then return @cachedTotalVisibleCols
+
+        visColCount = 0
+        x           = 0
+        colNum      = @offsetShowingLeft
+        maxWidth    = @getTableVisibleWidth()
+        totalCols   = @getTableTotalCols()
+
+        while x < maxWidth and colNum < totalCols
+
+            while (colNum < totalCols) and @shouldSkipCol(location)
+                colNum++
+
+            if colNum >= totalCols
+                break
+
+            location =
+                colNum: colNum
+                visibleCol: visColCount
+
+            x = x + @getColWidth location
+            visColCount++
+            colNum++
+
+        @cachedTotalVisibleCols = visColCount
+        return visColCount
 
     getColWidth: (location)=>
         if @showHeaders and location.visibleCol == 0 then return @leftWidth
@@ -74,7 +107,7 @@ class TableViewDetailed extends TableView
         return false
 
     shouldAdvanceCol: (location)=>
-        if @showHeaders and location.visibleCol == 0 then return false
+        if @showHeaders and location.visibleCol == 1 then return false
         return true
 
     ##|
@@ -86,19 +119,33 @@ class TableViewDetailed extends TableView
     ##|  invalid - Invalid row
     ##|
     getRowType: (location)=>
+        if !@colByNum[location.rowNum]?
+            console.log "returning invalid getRowType: #{location.rowNum}"
+
         if !@colByNum[location.rowNum]? then return "invalid"
         return "data"
 
     setHeaderField: (location)=>
         location.cell.html ""
         if !@colByNum[location.rowNum]? then return false
-        @colByNum[location.rowNum].RenderHeaderHorizontal "", location.cell
+        @colByNum[location.rowNum].RenderHeaderHorizontal location.cell, location
 
     getCellSelected: (location)=>
         if @rowDataRaw[location.colNum]? and @rowDataRaw[location.colNum].row_selected
             return true
 
         return false
+
+    getCellType: (location)=>
+        if @isHeaderCell(location) then return "locked"
+        if not location.colNum? or !@rowDataRaw[location.colNum]?
+            console.log "detail return invalid 1", location.colNum
+            return "invalid"
+        if !@rowDataRaw[location.colNum]?
+            console.log "detail return invalid 2"
+            return "invalid"
+        if @rowDataRaw[location.colNum].type? then return @rowDataRaw[location.colNum].type
+        return "data"
 
     setDataField: (location)=>
 

@@ -10,20 +10,33 @@ class WidgetTag
 
     constructor: (tagName, classes, id, attributes)->
 
-        @el = $(document.createElement tagName)
+        ##|
+        ##|  Store a reference to the jQuery version and the raw html5 element
+        @el      = $(document.createElement tagName)
+        @element = @el[0]
 
         if id?
             @el.attr "id", id
             @id = id
 
+        ##|
+        ##|  Classes stores a list of active classes on the element
         if classes?
             @el.attr "class", classes
             @classes = classes.split ' '
         else
             @classes = []
 
+        ##|
+        ##|  A reference to the children added to this element
         @children = []
 
+        ##|
+        ##|  Already showing by default
+        @visible = true
+
+        ##|
+        ##|  Any other attributes that need setting
         if attributes?
             for attName, attValue of attributes
                 @el.attr attName, attValue
@@ -41,23 +54,31 @@ class WidgetTag
     setDataPath: (keyVal) =>
         @setDataValue "path", keyVal
 
+    ##|
+    ##|  Set the "data-" values within the element, cache
+    ##|  then and only update the DOM if there is a change
     setDataValue: (name, value)=>
         if !@dataValues? then @dataValues = {}
         if @dataValues[name] != value
             @dataValues[name] = value
-            @el[0].dataset[name] = value
-            # @el.attr "data-#{name}", value
+            @element.dataset[name] = value
 
         return this
 
+    ##|
+    ##|  Use the cache to get any elements
     getDataValue: (name) =>
         if !@dataValues? then @dataValues = {}
         return @dataValues[name]
 
+    ##|
+    ##|  Add the "absolute" style to an element
     setAbsolute: ()=>
-        @el.css "position", "absolute"
+        @element.style.position = "absolute"
         true
 
+    ##|
+    ##|  Set an attribute
     setAttribute: (keyName, keyVal) =>
         @el.attr keyName, keyVal
         return this
@@ -79,9 +100,10 @@ class WidgetTag
         if typeof patternForGroup == "string"
             patternForGroup = new RegExp patternForGroup
 
-        newList      = []
-        foundValid   = false
-        foundInvalid = false
+        newList        = []
+        foundValid     = false
+        foundInvalid   = false
+        updateRequired = false
 
         for name in @classes
             if validClass == name
@@ -92,11 +114,16 @@ class WidgetTag
             else
                 newList.push name
 
-        @classes = newList
-        if !foundValid then @classes.push validClass
+        if foundInvalid
+            @classes = newList
+            updateRequired = true
 
-        if foundInvalid or !foundValid
-            @el[0].className = @classes.join ' '
+        if !foundValid and validClass != null
+            @classes.push validClass
+            updateRequired = true
+
+        if updateRequired
+            @element.className = @classes.join ' '
 
         true
 
@@ -107,7 +134,7 @@ class WidgetTag
         ##|
         ##| TODO: check the @classes list and cache
         @classes.push className
-        @el[0].className = @classes.join ' '
+        @element.className = @classes.join ' '
         return this
 
     removeClass: (className) =>
@@ -122,7 +149,7 @@ class WidgetTag
 
         if found
             @classes = newList
-            @el[0].className = @classes.join ' '
+            @element.className = @classes.join ' '
 
         return this
 
@@ -135,7 +162,7 @@ class WidgetTag
     text: (str) =>
         if @currentValue != str
             @currentValue = str
-            @el.text(str)
+            @element.innerText = str
 
         return this
 
@@ -150,37 +177,42 @@ class WidgetTag
 
         if @currentValue != str
             @currentValue = str
-            @el.html(str)
+            @element.innerHTML = str
 
         return this
 
     show: ()=>
-        @el.show()
+        if @visible != true then @el.show()
+        @visible = true
         this
 
     hide: ()=>
-        @el.hide()
+        if @visible == true then @el.hide()
+        @visible = false
         this
 
     move: (x, y, w, h)=>
 
         if x != @x
             @x = x
-            @el[0].style.left   = @x + "px"
+            @element.style.left   = @x + "px"
 
         if y != @y
             @y = y
-            @el[0].style.top    = @y + "px"
+            @element.style.top    = @y + "px"
 
         if w != @w
             @w = w
-            @el[0].style.width  = @w + "px"
+            @element.style.width  = @w + "px"
 
         if h != @h
             @h = h
-            @el[0].style.height = @h + "px"
+            @element.style.height = @h + "px"
 
         return this
+
+    on: (eventName, callback)=>
+        @bind(eventName, callback)
 
     bind: (eventName, callback)=>
         ##|
@@ -188,15 +220,15 @@ class WidgetTag
         ##|  so the event handled can easily find this ID
         @el.bind eventName, (e)=>
 
-            allData = $(e.target).parent().parent().data()
+            allData = e.target.parentElement.parentElement.dataset
             for keyName, keyVal of allData
                 e[keyName] = keyVal
 
-            allData = $(e.target).parent().data()
+            allData = e.target.parentElement.dataset
             for keyName, keyVal of allData
                 e[keyName] = keyVal
 
-            allData = $(e.target).data()
+            allData = e.target.dataset
             for keyName, keyVal of allData
                 e[keyName] = keyVal
 
