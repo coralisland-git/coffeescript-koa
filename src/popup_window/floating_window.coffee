@@ -36,7 +36,7 @@ class FloatingSelect extends FloatingWindow
 			delete @table
 
 	hide: ()=>
-		# @el.hide();
+		@el.hide();
 		return true
 
 	show: ()=>
@@ -107,14 +107,17 @@ class TypeaheadInput
 
 	onFocus: (e)=>
 		@emitEvent "focus", [e]
+		@clearIcon.show()
 		@elInputField.select()
 		console.log "Showing window", @win
 		@win.onResize()
 		return true
 
 	onBlur: (e)=>
-		@emitEvent "blur", [e]
-		# @win.hide()
+		if ! @excludeBlurEvent
+			@emitEvent "blur", [e]
+			@clearIcon.hide()
+			@win.hide()
 		return true
 
 	moveCellUp: (e)=>
@@ -143,6 +146,20 @@ class TypeaheadInput
 
 		@elInputField = $(InputField)
 
+		##| add clear text input icon
+		@elInputField.after $('<i />',
+			'class': 'fa fa-times floatingDropdownIcon'
+			style: 'margin-left: -20px; float:none; display:none')
+		@clearIcon = @elInputField.next()
+		##| bind clear icon click event
+		@clearIcon.on 'click', (e) =>
+			@elInputField.val('')
+			@emitEvent 'change', ''
+			@elInputField.focus()
+		.on 'mouseover', () =>
+			@excludeBlurEvent = true
+		.on 'mouseleave', () =>
+			@excludeBlurEvent = false
 		##|
 		##|
 		GlobalClassTools.addEventManager(this)
@@ -157,8 +174,8 @@ class TypeaheadInput
 		scrollTop  = document.body.scrollTop
 		scrollLeft = document.body.scrollLeft
 
-		posTop     = @elInputField.position().top + @elInputField.offset().top
-		posLeft    = @elInputField.position().left + @elInputField.offset().left
+		posTop     = @elInputField.offset().top
+		posLeft    = @elInputField.offset().left
 
 		scrollTop = 0
 		scrollLeft = 0
@@ -169,7 +186,7 @@ class TypeaheadInput
 		$.extend config, options
 
 		# @win = new FloatingSelect(posLeft + scrollLeft, posTop+scrollTop+height, width, config.rowHeight*config.numRows, @elInputField.parent())
-		@win = new FloatingSelect(0, 30, width, config.rowHeight*config.numRows, @elInputField.parent())
+		@win = new FloatingSelect(posLeft, posTop + height, width, config.rowHeight*config.numRows, @elInputField.parent())
 		@win.setTable @tableName, @columns
 
 		@win.on "select", (row)=>
@@ -221,8 +238,8 @@ class TableDropdownMenu
 		scrollTop  = document.body.scrollTop
 		scrollLeft = document.body.scrollLeft
 
-		posTop     = @elInputField.position().top + @elInputField.offset().top
-		posLeft    = @elInputField.position().left + @elInputField.offset().left
+		posTop     = @elInputField.offset().top
+		posLeft    = @elInputField.offset().left
 
 		width      = @elInputField.outerWidth(true)
 		height     = @elInputField.outerHeight(true)
@@ -246,4 +263,3 @@ class TableDropdownMenu
 		@win.on "select", (row)=>
 			@setValue row
 			@win.hide()
-
