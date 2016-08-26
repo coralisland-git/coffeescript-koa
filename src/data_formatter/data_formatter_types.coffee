@@ -687,6 +687,54 @@ class DataFormatDate extends DataFormatterType
 	width: 65
 
 	## -------------------------------------------------------------------------------------------------------------
+	## funtion to open editor as flatpickr
+	##
+	## @param [JqueryObject] elParent parent element
+	## @param [Integer] left left position offset
+	## @param [Integer] top top position offset
+	## @param [Integer] width width of the editor
+	## @param [Integer] height height of the editor
+	## @param [Object] currentValue current value of the cell
+	## @param [String] path path where the value is being edited
+	## @return null
+	##
+	openEditor: (elParent, left, top, width, height, currentValue, path) =>
+		if !@elEditor
+			@elEditor = $ "<input />",
+				type: "text"
+				class: "dynamic_edit"
+
+			@appendEditor()
+			@elEditor.on 'keydown', (e) =>
+				##| if editor is closed then close datepicker
+				if !@editorShowing
+					@datePicker.close()
+
+		@datePicker = new flatpickr @elEditor[0],
+			allowInput: true
+			parseDate: (dateString) ->
+				DataFormatter.getMoment dateString
+			onChange: (dateObject, dateString) =>
+				@saveValue dateObject
+				@editorShowing = false
+				@elEditor.hide()
+			onOpen: (dateObj, dateStr, instance) =>
+				instance.setDate(new Date(currentValue))
+
+		@elEditor.css
+			position  : "absolute"
+			"z-index" : 5001
+			top       : top
+			left      : left
+			width     : width
+			height    : height
+
+		@elEditor.val currentValue
+
+		@elEditor.show()
+		@elEditor.focus()
+
+	## -------------------------------------------------------------------------------------------------------------
 	## funtion to format the currently passed data
 	##
 	## @param [Object] data data to be formatted
@@ -809,13 +857,43 @@ class DataFormatDateTime extends DataFormatterType
 	## @return null
 	##
 	openEditor: (elParent, left, top, width, height, currentValue, path) =>
+		if !@elEditor
+			@elEditor = $ "<input />",
+				type: "text"
+				class: "dynamic_edit"
 
-		##|
-		##|  Show a popup menu
-        @picker = new PopupMenuCalendar currentValue, top, left
-        @picker.onChange = (newValue) =>
-        	@saveValue newValue
-		true
+			@appendEditor()
+			@elEditor.on 'keydown', (e) =>
+				##| if editor is closed then close datepicker
+				if !@editorShowing
+					@datePicker.close()
+
+		@datePicker = new flatpickr @elEditor[0],
+			allowInput: true
+			parseDate: (dateString) ->
+				DataFormatter.getMoment dateString
+			onChange: (dateObject, dateString) =>
+				@saveValue dateObject
+				@editorShowing = false
+				@elEditor.hide()
+			onOpen: (dateObj, dateStr, instance) =>
+				instance.setDate (new Date(currentValue))
+				instance.setTime DataFormatter.getMoment(new Date(currentValue)).format('HH:mm:ss')
+			enableTime: true
+			time_24hr: true
+
+		@elEditor.css
+			position  : "absolute"
+			"z-index" : 5001
+			top       : top
+			left      : left
+			width     : width
+			height    : height
+
+		@elEditor.val currentValue
+
+		@elEditor.show()
+		@elEditor.focus()
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to format the currently passed data
@@ -858,6 +936,57 @@ class DataFormatDateAge extends DataFormatterType
 
 	# @property [String] align
 	align: "right"
+
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to open editor with flatpickr
+	##
+	## @param [JqueryObject] elParent parent element
+	## @param [Integer] left left position offset
+	## @param [Integer] top top position offset
+	## @param [Integer] width width of the editor
+	## @param [Integer] height height of the editor
+	## @param [Object] currentValue current value of the cell
+	## @param [String] path path where the value is being edited
+	## @return null
+	##
+	openEditor: (elParent, left, top, width, height, currentValue, path) =>
+		if !@elEditor
+			@elEditor = $ "<input />",
+				type: "text"
+				class: "dynamic_edit"
+
+			@appendEditor()
+			@elEditor.on 'keydown', (e) =>
+				##| if editor is closed then close datepicker
+				if !@editorShowing
+					@datePicker.close()
+
+		@datePicker = new flatpickr @elEditor[0],
+			allowInput: true
+			parseDate: (dateString) ->
+				DataFormatter.getMoment dateString
+			onChange: (dateObject, dateString) =>
+				@saveValue dateObject
+				@editorShowing = false
+				@elEditor.hide()
+			onOpen: (dateObj, dateStr, instance) =>
+				instance.setDate (new Date(currentValue))
+				instance.setTime DataFormatter.getMoment(new Date(currentValue)).format('HH:mm:ss')
+			enableTime: true
+			time_24hr: true
+
+		@elEditor.css
+			position  : "absolute"
+			"z-index" : 5001
+			top       : top
+			left      : left
+			width     : width
+			height    : height
+
+		@elEditor.val currentValue
+
+		@elEditor.show()
+		@elEditor.focus()
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to format the currently passed data
@@ -1101,6 +1230,57 @@ class DataFormatTimeAgo extends DataFormatterType
 
 	# @property [Integer] width
 	width: 135
+
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to open editor with flatpickr
+	##
+	## @param [JqueryObject] elParent parent element
+	## @param [Integer] left left position offset
+	## @param [Integer] top top position offset
+	## @param [Integer] width width of the editor
+	## @param [Integer] height height of the editor
+	## @param [Object] currentValue current value of the cell
+	## @param [String] path path where the value is being edited
+	## @return null
+	##
+	openEditor: (elParent, left, top, width, height, currentValue, path) =>
+		if !@elEditor
+			@elEditor = $ "<input />",
+				type: "text"
+				class: "dynamic_edit"
+
+			@appendEditor()
+			@elEditor.on 'keydown', (e) =>
+				##| if editor is closed then close datepicker
+				if !@editorShowing
+					@datePicker.close()
+
+		@datePicker = new flatpickr @elEditor[0],
+			allowInput: true
+			parseDate: (dateString) ->
+				DataFormatter.getMoment dateString
+			onChange: (dateObject, dateString) =>
+				@saveValue dateObject
+				@editorShowing = false
+				@elEditor.hide()
+			onOpen: (dateObj, dateStr, instance) =>
+				instance.setDate (new Date(currentValue))
+				instance.setTime DataFormatter.getMoment(new Date(currentValue)).format('HH:mm:ss')
+			enableTime: true
+			time_24hr: true
+
+		@elEditor.css
+			position  : "absolute"
+			"z-index" : 5001
+			top       : top
+			left      : left
+			width     : width
+			height    : height
+
+		@elEditor.val currentValue
+
+		@elEditor.show()
+		@elEditor.focus()
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to format the currently passed data

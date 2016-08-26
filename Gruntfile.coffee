@@ -204,4 +204,3 @@ module.exports = (grunt) ->
 		grunt.registerTask 'synclive', ['buildnumber', 'coffee', 'copy', 'stylus:compile', 'jade:compile', 'shell:synclive']
 		grunt.registerTask 'default', ['coffee', 'copy', 'stylus:compile', 'jade:compile', 'express', 'watch']
 		grunt.registerTask 'build', ['coffee', 'copy', 'stylus:compile', 'jade:compile' ]
-
