@@ -18,25 +18,25 @@ $ ->
 
     .then ()->
 
-        # addHolder("renderTest1");
-        # $("#renderTest1").css
-        #     width        : 1000
-        #     height       : 500
-        #     padding      : 0
-        #     margin       : 0
-        #     "background" : "blue"
-        #     "border"     : "1px solid green"
+        addHolder("renderTest1");
+        $("#renderTest1").css
+            width        : 1000
+            height       : 500
+            padding      : 0
+            margin       : 0
+            "background" : "blue"
+            "border"     : "1px solid green"
 
-        # table = new TableView $("#renderTest1"), true
-        # table.addTable "zipcode"
-        # table.setFixedHeaderAndScrollable()
-        # table.showFilters = false
-        # table.render (id)->
-        #     if id is '00544' then return true
-        #     return false
-        # table.on "click_city", (row, e)=>
-        #     console.log "Table 1 - Click city:", row, " e=", e
-        #     return true
+        table = new TableView $("#renderTest1"), true
+        table.addTable "zipcode"
+        table.setFixedHeaderAndScrollable()
+        table.showFilters = false
+        table.render (id)->
+            if id is '00544' then return true
+            return false
+        table.on "click_city", (row, e)=>
+            console.log "Table 1 - Click city:", row, " e=", e
+            return true
 
         addHolder("renderTestSpace");
         $("#renderTestSpace").css
