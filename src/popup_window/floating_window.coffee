@@ -117,7 +117,7 @@ class TypeaheadInput
 		if ! @excludeBlurEvent
 			@emitEvent "blur", [e]
 			@clearIcon.hide()
-			@win.hide()
+			# @win.hide()
 		return true
 
 	moveCellUp: (e)=>
