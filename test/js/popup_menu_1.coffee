@@ -46,14 +46,26 @@ $ ->
         .bind 'click', (e) ->
 
             menu = new PopupMenuCalendar "Calendar", e
-            menu.onCheck = (e, data) ->
-                console.log "DATA=", data
+            menu.onChange = (dateObject, dateString) ->
+                console.log "DATE STRING=", dateString, "DATE OBJECT=", dateObject
+                menu.destroy() # to destroy calendar
+
+    addTest "Popup Calendar with default value", ()->
+
+        button = $ "<div />",
+            class: "btn btn-primary"
+            html: "Calendar Test 2"
+        .bind 'click', (e) ->
+            menu = new PopupMenuCalendar "2014-05-20", e
+            menu.onChange = (dateObject, dateString) ->
+                console.log "DATE STRING=", dateString, "DATE OBJECT=", dateObject
+                menu.destroy() # to destroy calendar
 
     addTest "Popup menu with badge and icon", ()->
 
         button = $ "<div />",
             class: "btn btn-primary"
-            html: "Calendar Test 1"
+            html: "Popup menu"
         .bind 'click', (e) ->
             e.preventDefault()
             e.stopPropagation()
