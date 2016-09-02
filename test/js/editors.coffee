@@ -98,6 +98,8 @@ $ ->
     addExample "sourcecode"   , "var name='Brian';"
     addExample "tags"         , "Apple,Grape,Orange", "Tags as text"
     addExample "tags"         , ["Apple","Grape","Orange"], "Tags as array"
+    addExample "multiselect"  , "Apple,Grape,Orange", "multiselect as text", ['Apple', 'Grape', 'Orange', 'Banana']
+    addExample "multiselect"  , ["Apple","Grape"], "multiselect as array", ['Apple', 'Grape', 'Orange', 'Banana']
     addExample "memo"         , 'This is a test\nHaving two lines"', "Popup Editor"
 
     html += "</table>"

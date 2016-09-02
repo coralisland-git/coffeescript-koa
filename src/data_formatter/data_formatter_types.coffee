@@ -834,6 +834,79 @@ class DataFormatTags extends DataFormatterType
 		return currentValue
 
 
+class DataFormatMultiselect extends DataFormatterType
+
+	# @property [String] name name of the data type
+	name: "multiselect"
+
+	# @property [Array|Object] options provided options for selection
+	options: []
+
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to open multiselect editor
+	##
+	## @param [JqueryObject] elParent parent element
+	## @param [Integer] left left position offset
+	## @param [Integer] top top position offset
+	## @param [Integer] width width of the editor
+	## @param [Integer] height height of the editor
+	## @param [Object] currentValue current value of the cell
+	## @param [String] path path where the value is being edited
+	## @return null
+	##
+	openEditor: (elParent, left, top, width, height, currentValue, path) =>
+
+		m = new ModalDialog
+			showOnCreate : false
+			content      : "Select the list of items"
+			title        : "Select options"
+			ok           : "Save"
+
+		if typeof currentValue == "string"
+			currentValue = currentValue.split ','
+
+		m.getForm().addMultiselect "select1", "Selection", currentValue.join(','),
+			options: @options
+
+		m.getForm().onSubmit = (form) =>
+			@saveValue form.select1
+			m.hide()
+
+		m.show()
+
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to format the currently passed data
+	##
+	## @param [Object] data data to be formatted
+	## @param [Object] options additonal options defined for the datatype
+	## @param [String] path path where the value is being edited
+	## @return [Object] data formatted data
+	##
+	format: (currentValue, options, path) =>
+		@options = options
+		if typeof currentValue == "string"
+			currentValue = currentValue.split ','
+
+		if Array.isArray(currentValue)
+			return currentValue.join(", ")
+
+		values = []
+		for idx, obj of currentValue
+			values.push obj
+		return values.join(", ")
+
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to unformat the currently unformatted data
+	##
+	## @param [Object] data data to be unformatted
+	## @param [String] path path where the value is being edited
+	## @return [Object] data unformatted data
+	##
+	unformat: (currentValue, path) =>
+		if typeof currentValue == "string"
+			currentValue = currentValue.split ','
+		return currentValue
+
 ## -------------------------------------------------------------------------------------------------------------
 ## class for datetime data type
 ##
@@ -1496,6 +1569,7 @@ try
 	globalDataFormatter.register(new DataFormatSimpleObject())
 	globalDataFormatter.register(new DataFormatSourceCode())
 	globalDataFormatter.register(new DataFormatTags())
+	globalDataFormatter.register(new DataFormatMultiselect())
 	globalDataFormatter.register(new DataFormatMemo())
 	globalDataFormatter.register(new DataFormatDuration())
 	globalDataFormatter.register(new DataFormatLink())

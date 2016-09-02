@@ -109,11 +109,29 @@ class FormWrapper
 			<div class="form-group">
 				<label for="{{fieldName}}" class='control-label col-sm-2'> {{label}} </label>
 				<div class='col-sm-10'>
-					<input class="form-control" type="{{type}}" id="{{fieldName}}" value="{{value}}" name="{{fieldName}}"
-					{{#each attrs}}
-					{{@key}}="{{this}}"
-					{{/each}}
-					/>
+						<input class="form-control" type="{{type}}" id="{{fieldName}}" value="{{value}}" name="{{fieldName}}"
+							{{#each attrs}}
+							{{@key}}="{{this}}"
+							{{/each}}
+						/>
+					<div id="{{fieldName}}error" class="text-danger"></div>
+				</div>
+			</div>
+		'''
+
+		@templateSelectFieldText = Handlebars.compile '''
+			<div class="form-group">
+				<label for="{{fieldName}}" class='control-label col-sm-2'> {{label}} </label>
+				<div class='col-sm-10'>
+						<select class="form-control" id="{{fieldName}}" name="{{fieldName}}"
+							{{#each attrs}}
+							{{@key}}="{{this}}"
+							{{/each}}
+						>
+							{{#each options}}
+								<option value="{{this}}">{{this}}</option>
+							{{/each}}
+						</select>
 					<div id="{{fieldName}}error" class="text-danger"></div>
 				</div>
 			</div>
@@ -160,6 +178,30 @@ class FormWrapper
 		field
 
 	## -------------------------------------------------------------------------------------------------------------
+	## Add a multiselect selectbox
+	##
+	## @param [String] fieldName name of the input field
+	## @param [String] label label to be displayed infornt of text input
+	## @param [String] value default value to be filled
+	## @param [Object] attrs object as attributes that will be included in the html
+	## @param [Function] fnValidate a validation function can be passed if it returns true value will be valid else invalid
+	##
+	addMultiselect: (fieldName, label, value, attrs, fnValidate) =>
+		attrs = $.extend attrs,
+			multiple: 'multiple'
+
+		field = @addInput(fieldName, label, value, "select", attrs, fnValidate)
+
+		field.superAfterShow = field.onAfterShow
+		field.onAfterShow = ()->
+			if ! Array.isArray(value)
+				value = value.split ','
+			@el.multiSelect()
+			@el.multiSelect('select', value);
+			@superAfterShow()
+		field
+
+	## -------------------------------------------------------------------------------------------------------------
 	## Add a general input field
 	##
 	## @param [String] fieldName name of the input field
@@ -188,7 +230,13 @@ class FormWrapper
 		content = "<form id='#{@gid}' class='form-horizontal' role='form'>"
 
 		for field in @fields
-			content += @templateFormFieldText(field)
+			if field.type is 'select'
+				##| parse given options and remove from attributes
+				field.options = field.attrs.options
+				delete field.attrs.options
+				content += @templateSelectFieldText(field)
+			else
+				content += @templateFormFieldText(field)
 
 		content += "</form>";
 
