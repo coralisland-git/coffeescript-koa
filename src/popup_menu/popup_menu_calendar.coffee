@@ -68,7 +68,8 @@ class PopupMenuCalendar
 		## while the popup menu is open, close it.
 		##
 		$(document).one 'click', (e) =>
-			@flatPickr.close()
+			if ! $(e.target).parents('.flatpickr-wrapper').length
+				@flatPickr.close()
 
 		## -------------------------------------------------------------------------------------------------------------
 		## close the popup with escape key
