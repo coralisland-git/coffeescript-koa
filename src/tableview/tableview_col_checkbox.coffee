@@ -41,9 +41,7 @@ class TableViewColCheckbox extends TableViewColBase
     getEditable: ()=>
         return false
 
-    calculateWidth: ()=>
-
-        if !@visible? then return 0
+    getWidth: ()=>
         return @width
 
     ## -------------------------------------------------------------------------------------------------------------
@@ -57,7 +55,7 @@ class TableViewColCheckbox extends TableViewColBase
         if @visible == false then return
         parent.addClass "checkable"
         parent.addClass "tableHeaderField"
-        parent.html "&nbsp;"
+        parent.html ""
         parent
 
     RenderHeaderHorizontal: (parent, location) =>

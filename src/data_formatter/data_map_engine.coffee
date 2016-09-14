@@ -32,7 +32,7 @@ class DataMapMemoryCollection
                 result = true
 
             if result
-                allResults.push $.extend(true, {}, obj)
+                allResults.push obj
 
         return allResults
 
@@ -98,9 +98,9 @@ class DataMapMemoryCollection
     ##|
 
     upsert: (doc) =>
-
         strKey = @getDocumentKey(doc)
-        @data[strKey] = $.extend(true, {}, doc);
+        # @data[strKey] = doc.extend(true, {}, doc);
+        @data[strKey] = doc
         @count = Object.keys(@data).length
         return @data[strKey]
 
@@ -307,6 +307,15 @@ class DataMapEngine
 
         ##|
         ##|  Unmodified version for change tracking
+        if Object.keys(doc).length < 2
+            ##|
+            ##|  Fastest path because there are no differences on a new document
+            ##|
+            c = @internalGetCollection path.collection
+            newData.id  = doc.id
+            insertedDoc = c.upsert(newData)
+            return insertedDoc
+
         origDoc = $.extend true, {}, doc
 
         basePointer = doc

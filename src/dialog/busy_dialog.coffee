@@ -28,7 +28,7 @@ class BusyDialog
             </div>
             <div class="modal-body">
                 <div class="progress">
-                  <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
+                  <div id='busyProgressBar' class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
                     <span class="sr-only">Working</span>
                   </div>
                 </div>
@@ -116,6 +116,8 @@ class BusyDialog
         if typeof options == "object"
             for name, val of options
                 this[name] = val
+
+        $("#busyProgressBar").attr("aria-valuenow", 0).css("width", 0)
 
         ##|
         ##|  Update the text if already showing

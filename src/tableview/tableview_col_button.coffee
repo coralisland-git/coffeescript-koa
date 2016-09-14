@@ -12,7 +12,6 @@ class TableViewColButton extends TableViewColBase
     ## @param [String] title The title to show in the header
     ##
     constructor : (@tableName, @id) ->
-
         @visible = true
         @width   = 60
         @sort    = 0
@@ -22,7 +21,7 @@ class TableViewColButton extends TableViewColBase
         return @id
 
     getName: ()=>
-        return "BUTTON:#{@id}"
+        return @name
 
     getOrder: ()=>
         return 99
@@ -49,9 +48,7 @@ class TableViewColButton extends TableViewColBase
     getEditable: ()=>
         return false
 
-    calculateWidth: ()=>
-
-        if !@visible? then return 0
+    getWidth: ()=>
         return @width
 
     ## -------------------------------------------------------------------------------------------------------------
@@ -61,7 +58,7 @@ class TableViewColButton extends TableViewColBase
     ## @return [String] html the html for the th
     ##
     RenderHeader: (parent, location) =>
-        parent.html @tableName
+        parent.html @getName()
         parent.addClass "text-center"
         parent.addClass "tableHeaderField"
         return parent

@@ -1,44 +1,4 @@
 ## -------------------------------------------------------------------------------------------------------------
-## A list of data types that go together such as columns in a table
-## or database columns.   The configName part of the constructor is used
-## to save or load the configuration if needed
-##
-class DataType
-
-    # @property [String] source data source to copy from
-    source        : ''
-
-    # @property [Boolean] visible used for tables
-    visible       : false
-
-    # @property [Boolean] editable inline edit for display
-    editable      : false
-
-    # @property [Boolean] hideable can be hidden
-    hideable      : true
-
-    # @property [Boolean] required used to create a new record
-    required      : false
-
-    # @property [String] type data type text
-    type          : ''
-
-    # @property [String] tooltip tooltip text
-    tooltip       : ''
-
-    # @property [Function|null] formatter additional formatter to use for getting formatted value
-    formatter     : null
-
-    # @property [null|Function] displayFormat formatter to display the data on screen
-    displayFormat : null
-
-    ## -------------------------------------------------------------------------------------------------------------
-    ## constructor
-    ##
-    constructor: () ->
-
-
-## -------------------------------------------------------------------------------------------------------------
 ## class for DataTypeCollection
 ##
 class DataTypeCollection
@@ -46,18 +6,16 @@ class DataTypeCollection
     ## -------------------------------------------------------------------------------------------------------------
     ## constructor
     ##
-    ## @param [String] configName to identify the DataTypeCollection inside dataMap
+    ## @param [String] tableName to identify the DataTypeCollection inside dataMap
     ## @param [Object] cols the columns to include in the tables
     ##
-    constructor: (@configName, cols) ->
-
+    constructor: (@tableName) ->
         @col = {}
-        @colList = []
-        if cols? then @configureColumns cols
 
-    contains: (source)=>
-        if @col[source]? then return true
-        return false
+    ##|
+    ##|  Returns the column if defined by
+    getColumn: (source)=>
+        return @col[source]
 
     ##|
     ##|  Convert some javascript into a function for render() call
@@ -118,18 +76,13 @@ class DataTypeCollection
         output = {}
 
         for source, col of @col
-            output[source] = $.extend true, {}, col
-            delete output[source].formatter
-            delete output[source].extraClassName
-            delete output[source].dataFormatter
+            output[source] = col.serialize()
 
             if output[source].render? and typeof output[source].render == "function"
                 ##|
                 ##|  Convert function to string
                 functionText = DataTypeCollection.renderFunctionToString(output[source].render)
                 output[source]["render"] = functionText
-
-
 
         return output
 
@@ -149,17 +102,12 @@ class DataTypeCollection
     ##
     configureColumn: (col) =>
 
-        c = new DataType()
+        if !@col[col.source]?
+            @col[col.source] = new TableViewCol(@tableName)
 
-        for name, value of col
-            c[name] = value
-
-        ##|
-        ##|  Allocate the data formatter
-        c.formatter = globalDataFormatter.getFormatter col.type
-
-        @col[c.source] = c
-        @colList.push(c.source)
+        @col[col.source].deserialize(col)
+        @col[col.source].deduceInitialColumnType()
+        return @col[col.source]
 
     ##|
     ##|  Verify that the sort order id for each column is unique
@@ -170,22 +118,22 @@ class DataTypeCollection
 
         ##|
         ##|  For any columns with a known order
-        for source in @colList
-            c = @col[source]
-            if c.order? and typeof c.order == "number"
-                if seen[c.order]?
-                    c.order = null
+        for source, col of @col
+            order = col.getOrder()
+            if order?
+                if seen[order]?
+                    col.changeColumn "order", null
                     console.log "Duplicate order for #{name}"
                 else
-                    seen[c.order] = true
+                    seen[order] = true
 
         ##|
         ##|  Assign all unassigned
-        for source in @colList
-            c = @col[source]
-            if !c.order?
+        for source, col of @col
+            if col.getOrder() == null
                 max = max + 1 while seen[max]?
-                c.order = max++
+                col.changeColumn "order", max
+                seen[max] = true
 
         true
 

@@ -184,29 +184,6 @@ class TableView
 		if !@gid?
 			@gid = GlobalValueManager.NextGlobalID()
 
-
-	## -------------------------------------------------------------------------------------------------------------
-	## to add the join table with current rendered table
-	##
-	## @example table.addJoinTable "county", null, "county"
-	## @param [String] tableName name of the table to add as join table from datamap
-	## @param [Function|null] columnReduceFunction will be applied to each row and each column and if returns true then only column will be included
-	## @param [String] sourceField the name of the source property
-	## @return [Boolean]
-	##
-	addJoinTable: (tableName, columnReduceFunction, sourceField) =>
-
-		columns = DataMap.getColumnsFromTable tableName, columnReduceFunction
-		for col in columns
-			if col.source != sourceField
-				c = new TableViewCol tableName, col
-				console.log "Setting joinKey ", sourceField
-				c.joinKey = sourceField
-				c.joinTable = @primaryTableName
-				@colList.push(c)
-
-		true
-
 	## -------------------------------------------------------------------------------------------------------------
 	## to add the table in the view from datamap
 	##
@@ -216,27 +193,8 @@ class TableView
 	## @param [Function] reduceFunction will be applied to each row and if returns true then only row will be included
 	## @return [Boolean]
 	##
-	addTable: (tableName, @columnReduceFunction, @reduceFunction) =>
-
+	addTable: (tableName, @columnReduceFunction, @overallReduceFunction) =>
 		@primaryTableName = tableName
-
-		##|
-		##|  Add a checkbox column if needed
-		if @showCheckboxes
-			c = new TableViewColCheckbox(tableName)
-			@colList.push c
-
-		##|
-		##|  Find the columns for the specific table name
-		columns = DataMap.getColumnsFromTable(tableName, @columnReduceFunction)
-		for col in columns
-
-			c = new TableViewCol tableName, col
-			@colList.push(c)
-
-			if c.col.type == "simpleobject"
-				@on "click_#{c.getSource()}", @onClickSimpleObject
-
 		true
 
 	##|
@@ -279,6 +237,8 @@ class TableView
 			tableName : @primaryTableName
 
 		$.extend config, options
+
+		console.log "AddActionColumn:", config
 
 		button = new TableViewColButton(@primaryTableName, config.name)
 		button.width       = config.width
@@ -354,8 +314,6 @@ class TableView
 
 		coords    = GlobalValueManager.GetCoordsFromEvent(e)
 
-# "/geosetfull/22/bbox"
-
 	## -------------------------------------------------------------------------------------------------------------
 	## remove the checkbox for all items except those included in the bookmark array that comes from the server
 	##
@@ -421,38 +379,16 @@ class TableView
 			# 	delete @resetTimer
 			# , 50
 
+	##|
+	##|  Event triggered when any tableview has a column change
+	##|  so that we can see if we need to update the view
 	onGlobalTableChange: (tableName, sourceName, field, newValue)=>
 
-		console.log "tableView, onGlobalTableChange t=#{tableName} s=#{sourceName}"
-
-		if @resetTimer? then clearTimeout(@resetTimer)
-		@resetTimer = setTimeout ()=>
-			delete @resetTimer
-			@resetCachedFromSize()
-		, 50
-
-		for col in @colList
-			if col.tableName == tableName and col.getSource() == sourceName
-				console.log "tableView, onGlobalTableChange, I have table and source for field=#{field}, new=#{newValue}"
-				if field == "type"
-					col.type = newValue
-					col.formatter = globalDataFormatter.getFormatter newValue
-				else if field == "render"
-					##|
-					##|  do nothing, global is already updated with new render function, just redraw
-				else if field == "width"
-					col.width = newValue
-					col.actualWidth = newValue
-				else if field == "visible"
-					console.log "Setting visible #{sourceName}:", newValue
-					col.visible = newValue
-				else if field == "order"
-					console.log "Change order at", col.col.name, "was=", col.col.order, "now=", newValue
-					if col.col? then col.col.order = newValue
-				else
-					col[field] = newValue
-
-
+		if tableName == @primaryTableName
+			col = @findColumn(sourceName)
+			if col?
+				console.log "Table found that has #{sourceName} for change to #{field} (#{newValue})"
+				@updateRowData()
 				return true
 
 		true
@@ -473,6 +409,10 @@ class TableView
 		##|  remove focus on a mouse down someplace, it will
 		##|  get reset if the mouse was on this table
 		@setFocusCell null, null
+
+	##|
+	##|  Set a column's filter to show a popup instead of clear typing
+	setColumnFilterAsPopup: (sourceName)=>
 
 	pressEnter: (e)=>
 
@@ -544,44 +484,49 @@ class TableView
 
 			##|
 			##|  Check for a resize start
-			if e.path? and e.path == "grab"
+			data = WidgetTag.getDataFromEvent e
+			console.log "elTheTable.on mousedown data=", data
+			if data.path? and data.path == "grab"
 				##|
 				##|  Start resizing, save the location that was selected at the start
-				@resizingColumn = e.cn
-				@resizingRow    = e.rn
-				@resizingBefore = @colByNum[e.cn].currentWidth
+				@resizingColumn = data.cn
+				@resizingRow    = data.rn
+				@resizingBefore = @colByNum[data.cn].currentWidth
 				return GlobalMouseDrag.startDrag(e, @onColumnResizeDrag, @onColumnResizeFinished)
 
 			return false
 
 		@elTheTable.on "click touchbegin", (e) =>
 
-			console.log "click=", e, e.target.className
 			if e.target.className == "dataFilter"
 				console.log "passing"
 				$(e.target).focus()
 				return false
 
-			e.preventDefault()
-			e.stopPropagation()
+			data = WidgetTag.getDataFromEvent e
+			console.log "elTheTable.on click data=", data
 
-			data = @findRowFromPath e.path
-			col  = @findColFromPath e.path
+			if !data? or !data.path?
+				console.log "No path for click", e.path
+				return false
 
-			if data? and data.id?
-				@setFocusCell(e.vr, e.vc, e)
+			row  = @findRowFromPath data.path
+			col  = @findColFromPath data.path
+
+			if row? and row.id?
+				@setFocusCell(data.vr, data.vc, e)
 			else
 				@setFocusCell(null)
 
-			if !data?
+			if !row?
 				return false
 
-			if data == "Filter"
+			if row == "Filter"
 				##|
 				##|  Don't do anything here for filter columns
 				return false
 
-			if data == "Header"
+			if row == "Header"
 				##|
 				##|  TODO: Add sorting here
 				return false
@@ -589,7 +534,7 @@ class TableView
 			if col == "row_selected"
 				##|
 				##|  Toggle row selection
-				@toggleRowSelected data
+				@toggleRowSelected row
 			else
 				##|
 				##|  Use the new event manager
@@ -599,8 +544,7 @@ class TableView
 				##|  See if the cell has a focus function, which we
 				##|  only call on mouse focus not keyboard
 				realCol = @findColumn(col)
-				if realCol? and realCol.onFocus? then realCol.onFocus(e, col, data)
-
+				if realCol? and realCol.onFocus? then realCol.onFocus(e, col, row)
 
 			false
 
@@ -680,13 +624,11 @@ class TableView
 				for col in @colList
 					if col.getSource() == source
 						DataMap.changeColumnAttribute col.tableName, source, "type", opt
-						col.col.type  = opt
-						col.formatter = globalDataFormatter.getFormatter opt
-
-						@updateVisibleText()
+						# @updateRowData()
 						return
 
 			, name
+
 		true
 
 	onContextMenuHeader: (source, coords)=>
@@ -758,31 +700,20 @@ class TableView
 
 		@elTableHolder.bind "contextmenu", (e) =>
 
-			coords    = GlobalValueManager.GetCoordsFromEvent(e)
+			data   = WidgetTag.getDataFromEvent(e)
+			console.log "Context Menu:", data
 
-			allData = e.target.parentElement.parentElement.dataset
-			for keyName, keyVal of allData
-				e[keyName] = keyVal
+			if !data.path? then return false
 
-			allData = e.target.parentElement.dataset
-			for keyName, keyVal of allData
-				e[keyName] = keyVal
-
-			allData = e.target.dataset
-			for keyName, keyVal of allData
-				e[keyName] = keyVal
-
-			if !e.path? then return false
-
-			if m = e.path.match(/^.group.([0-9]+)/)
-				@onContextMenuGroup(parseInt(m[1]), coords)
+			if m = data.path.match(/^.group.([0-9]+)/)
+				@onContextMenuGroup(parseInt(m[1]), data.coords)
 				return false
 
-			if m = e.path.match(/^.*Header[^a-zA-Z](.*)/)
-				@onContextMenuHeader(m[1], coords)
+			if m = data.path.match(/^.*Header[^a-zA-Z](.*)/)
+				@onContextMenuHeader(m[1], data.coords)
 				return false
 
-			console.log "Context menu for #{e.path}"
+			console.log "Context menu for #{data.path}"
 			return false
 
 		true
@@ -796,6 +727,8 @@ class TableView
 	##|
 	addSortRule: (tableName, sourceName, sortMode)=>
 
+		console.log "adding sort rule table=#{tableName}, source=#{sourceName}, mode=#{sortMode}"
+
 		found = null
 		for rule in @sortRules
 			if rule.source == sourceName and rule.tableName == tableName
@@ -803,7 +736,7 @@ class TableView
 				break
 
 		if found == null
-			found = { source: sourceName, tableName: tableName, state: -1 }
+			found = { source: sourceName, tableName: tableName, state: 0 }
 			@sortRules = [ found ]
 
 		if sortMode? and sortMode == 0
@@ -817,6 +750,7 @@ class TableView
 		else
 			found.state = -1
 
+		console.log "Found=", found
 		@updateRowData()
 		return
 
@@ -829,29 +763,28 @@ class TableView
 	##
 	applySorting: (rowData) =>
 
+		if @sortRules.length == 0 then return rowData
+
+		console.log "applySorting", @sortRules, rowData
+
 		if !@sortRules? or @sortRules.length == 0
 			return rowData
 
 		sorted = rowData.sort (a, b)=>
 
 			for rule in @sortRules
-				if rule.state == -1 then continue
+				if rule.state == 0 then continue
 
-				aValue = DataMap.getDataField rule.tableName, a.id, rule.source
-				bValue = DataMap.getDataField rule.tableName, b.id, rule.source
+				aValue = DataMap.getDataField @primaryTableName, a, rule.source
+				bValue = DataMap.getDataField @primaryTableName, b, rule.source
 
-				if rule.state == 0 and aValue < bValue then return 1
-				if rule.state == 0 and aValue > bValue then return -1
+				if rule.state == -1 and aValue < bValue then return 1
+				if rule.state == -1 and aValue > bValue then return -1
 
 				if rule.state == 1 and aValue < bValue then return -1
 				if rule.state == 1 and aValue > bValue then return 1
 
 			return 0
-
-		for x in sorted
-			d = DataMap.getDataField @primaryTableName, x.id, "distance"
-			n = DataMap.getDataField @primaryTableName, x.id, "name"
-			# console.log "sorted x=#{x.id}", d, n
 
 		return sorted
 
@@ -859,86 +792,114 @@ class TableView
 	## -------------------------------------------------------------------------------------------------------------
 	## Apply filters stored in "currentFilters" to each column and show/hide the rows
 	##
-	applyFilters: (rowData) =>
+	applyFilters: () =>
 
 		##|
-		##| Build the filters
+		##|  Generate a function that takes a row and returns true or false
+		##|  to keep or filter the row.
+		##|
+
+		strJavascript = ""
+
+		if @overallReduceFunction? and typeof overallReduceFunction == "string"
+			console.log "!!! applyFilters Not implemented:", overallReduceFunction
+			return false
 
 		filters = []
 		for tableName, fieldList of @currentFilters
 			for fieldName, filterValue of fieldList
-				filters.push
-					tableName : tableName
-					keyName   : fieldName
-					filter    : new RegExp filterValue, "i"
 
-		filteredRowData = []
-		for row in rowData
+				field = "row['#{fieldName}']"
+				strJavascript += "if (typeof(#{field}) == 'undefined') return false;\n"
+				strJavascript += "if (#{field} == null) return false;\n"
+				strJavascript += "re = new RegExp('#{filterValue}', 'i');\n"
+				strJavascript += "if (!re.test(#{field})) return false;\n";
 
-			##|
-			##| Each row has the element (el) and the children TD nodes in children
-			keepRow = true
-			for f in filters
-				if not keepRow then continue
+		strJavascript += "return true;\n";
+		# console.log "applyFilters Javascript:", strJavascript
+		@reduceFunction = new Function("row", strJavascript)
+		return true
 
-				rowValue = DataMap.getDataField(f.tableName, row, f.keyName)
-				if not f.filter.test rowValue
-					keepRow = false
-
-			if not keepRow
-				continue
-
-			filteredRowData.push(row)
-
-		return filteredRowData
-
+	##|
+	##|  If this table is not a "fixed size" table then we have to adjust the
+	##|  widget height to allow all rows to show.
+	##|
 	updateFullHeight: ()=>
 		if @fixedHeader then return
+
 		h = 0
 		if @showHeaders then h = h + @headerCellHeight
 		if @showFilters then h = h + @filterCellHeight
 		h = h + (@totalAvailableRows * @dataCellHeight)
 		if not @fixedHeight
 			@elTableHolder.height(h)
+
 		return h
 
-	## -------------------------------------------------------------------------------------------------------------
-	## function to update row data on the screen if new data has been added in datamapper they can be considered
-	##
-	updateRowData: () =>
+	##|
+	##|  Refresh the list of available columns
+	updateColumnList: ()=>
 
-		@rowDataRaw = []
-		@colByNum   = {}
-		allData     = DataMap.getValuesFromTable @primaryTableName, @reduceFunction
-		console.log "ALL DATA = ", allData
+		@colList  = []
+		@colByNum = {}
 
 		##|
-		##|  reset available columns
+		##|  Add a checkbox column if needed
+		if @showCheckboxes
+			c = new TableViewColCheckbox(@primaryTableName)
+			@colList.push c
+
+		##|
+		##|  Find the columns for the specific table name
+		columns = DataMap.getColumnsFromTable(@primaryTableName, @columnReduceFunction)
+		# console.log "Columns found:", columns
+
+		for col in columns
+			if not col.getVisible() then continue
+			@colList.push(col)
+
+		##|
+		##|  reset available columns and sort them
 		total = 0
 		sortedColList = @colList.sort (a, b)->
 			return a.getOrder() - b.getOrder()
 
 		for col in @colList
 
-			found = false
+			if not col.getVisible() then continue
+
+			foundInGroup = false
 			for source in @currentGroups
 				if source == col.getSource()
-					found = true
+					foundInGroup = true
 					break
 
-			if found == false
-				for acol in @actionColList
-					if acol.getSource() == col.getSource()
-						found = true
-						# console.log "Skipping action col", col.getSource()
-						break
+			if foundInGroup then continue
 
-			if found then continue
-			if not col.getVisible() then continue
+			foundInActionCol = false
+			for acol in @actionColList
+				if acol.getSource() == col.getSource()
+					foundInActionCol = true
+					break
+
+			if foundInActionCol then continue
 
 			# console.log "colByNum[#{total}] = ", col.getName()
 			@colByNum[total] = col
 			total++
+
+		return true
+
+	## -------------------------------------------------------------------------------------------------------------
+	## function to update row data on the screen if new data has been added in datamapper they can be considered
+	##
+	updateRowData: () =>
+
+		@applyFilters()
+		@rowDataRaw = []
+		allData     = DataMap.getValuesFromTable @primaryTableName, @reduceFunction
+
+		@updateColumnList()
 
 		##|
 		##|  Path 1 - There are no groups defined so just quickly sort and filter
@@ -947,16 +908,13 @@ class TableView
 			@showGroupPadding = false
 			##|
 			##|  Simple data, no grouping
-			filteredData = @applyFilters(allData)
-			filteredData = @applySorting(filteredData)
+			filteredData = @applySorting(allData)
 			for obj in filteredData
 				@rowDataRaw.push { id: obj.id, group: null }
 
 			@totalAvailableRows = @rowDataRaw.length
 			@updateFullHeight()
 			@resetCachedFromSize()
-			console.log "All Data=", @rowDataRaw
-			console.log "total=", @totalAvailableRows
 			return
 
 		##|
@@ -990,7 +948,7 @@ class TableView
 			currentGroupNumber++
 			if currentGroupNumber > 7 then currentGroupNumber = 1
 
-			filteredData = @applyFilters(groupedData[value])
+			filteredData = groupedData[value]
 			if filteredData.length > 0
 				##|
 				##|  There are rows of data in this group so add the group to the row list.
@@ -1008,6 +966,11 @@ class TableView
 		@updateFullHeight()
 		@resetCachedFromSize()
 		return true
+
+	##| -------------------------------------------------------------------------------------------------------------
+	##| Enable a status bar along the bottom.
+	setStatusBarEnabled: (isEnabled = true)=>
+		@showStatusBar = isEnabled
 
 	## -------------------------------------------------------------------------------------------------------------
 	## set the holder element to go to the bottom of the screen
@@ -1188,8 +1151,8 @@ class TableView
 			console.log "getColWidth Invalid col:", location.colNum, @colByNum
 			return 10
 
-		# console.log "Return #{location.colNum} [#{location.sourceName}] width:", @colByNum[location.colNum].actualWidth
-		return @colByNum[location.colNum].actualWidth
+		# console.log "Return #{location.colNum} [#{location.sourceName}] set=", @colByNum[location.colNum].getWidth(), " width:", @colByNum[location.colNum].actualWidth
+		return Math.floor(@colByNum[location.colNum].actualWidth)
 
 	##|
 	##|  Compute the height of a given row
@@ -1286,6 +1249,11 @@ class TableView
 		location.cell.removeClass "spacer"
 
 		if location.visibleRow == 0
+
+			@colByNum[location.colNum].sort = 0
+			for sort in @sortRules
+				if sort.source == @colByNum[location.colNum].getSource()
+					@colByNum[location.colNum].sort = sort.state
 
 			@colByNum[location.colNum].RenderHeader location.cell, location
 			location.cell.setDataPath "/#{location.tableName}/Header/#{location.sourceName}"
@@ -1405,7 +1373,6 @@ class TableView
 		div.setDataValue "cn", location.colNum
 		div.setDataValue "vr", location.visibleRow
 		div.setDataValue "vc", location.visibleCol
-		# div.removeClass "tableHeaderField"
 
 		if location.groupNum?
 			div.setClassOne "groupRowChart#{location.groupNum}", /^groupRowChart/
@@ -1430,7 +1397,6 @@ class TableView
 			location.colWidth = location.maxWidth - location.x
 
 		if (location.cellType == "data" or location.cellType == "locked") and location.colNum + 1 == location.totalColCount
-			# console.log "Fixing last:", location.colNum, location.totalColCount, location
 			location.colWidth = location.maxWidth - location.x
 
 		if location.spacer?
@@ -1439,6 +1405,7 @@ class TableView
 			location.spacer.move location.colWidth+location.x-3, 0, 3, location.rowHeight
 			location.spacer.show()
 			location.spacer.addClass "spacer"
+			location.spacer.html ""
 			location.shadowVisibleCol++
 
 		else
@@ -1519,7 +1486,7 @@ class TableView
 
 				if location.state == "group"
 					cell.removeClass "clickable"
-					cell.html "&nbsp;"
+					cell.html ""
 				else
 					@updateVisibleActionRowText(location, acol, cell)
 
@@ -1579,7 +1546,7 @@ class TableView
 				if !location.isHeader
 					location.cell.setClassOne "groupRowChart#{location.groupNum}", /^groupRowChart/
 					location.cell.removeClass "even"
-					location.cell.html "&nbsp;"
+					location.cell.html ""
 				else
 					@setHeaderGroupField location
 
@@ -1596,8 +1563,8 @@ class TableView
 
 				location.recordId = @getCellRecordID(location)
 
-				location.cell.setClass "clickable", @getCellClickable(location)
-				location.cell.setClass "editable", @getCellEditable(location)
+				location.cell.setClass "clickable",   @getCellClickable(location)
+				location.cell.setClass "editable",    @getCellEditable(location)
 				location.cell.setClass "row_checked", @getRowSelected(location.recordId)
 
 				location.cell.setDataPath @getCellDataPath(location)
@@ -1623,7 +1590,6 @@ class TableView
 	updateVisibleText: ()=>
 
 		# console.log "updateVisibleText showingLeft=", @offsetShowingLeft
-
 		if !@elTheTable? then return
 
 		if !@offsetShowingTop? or @offsetShowingTop < 0
@@ -1713,7 +1679,6 @@ class TableView
 			location.visibleRow++
 
 		@updateScrollbarSettings()
-
 		true
 
 	resetCachedFromScroll: ()=>
@@ -1727,7 +1692,7 @@ class TableView
 		@cachedTotalVisibleRows  = null
 		@cachedVisibleWidth      = null
 		@cachedVisibleHeight     = null
-		@cachedLayoutShadowWidth = null
+		# @cachedLayoutShadowWidth = null
 
 		for col in @colList
 			col.currentCol = null
@@ -1745,6 +1710,10 @@ class TableView
 
 		maxAvailableRows = @getTableTotalRows()
 		maxAvailableCols = @getTableTotalCols()
+
+		if @elStatusScrollTextRows?
+			@elStatusScrollTextRows.html "Rows #{@offsetShowingTop+1} - #{@offsetShowingTop+currentVisibleRows} of #{maxAvailableRows}"
+			@elStatusScrollTextCols.html "Cols #{@offsetShowingLeft+1}-#{@offsetShowingLeft+currentVisibleCols} of #{maxAvailableCols}"
 
 		# console.log "updateScrollbarSettings H:(#{currentVisibleCols} vs #{maxAvailableCols}) V:(#{currentVisibleRows} vs #{maxAvailableRows})"
 
@@ -1773,6 +1742,9 @@ class TableView
 	##|
 	findBestFit: (col)=>
 
+		if !@cachedBestFit? then @cachedBestFit = {}
+		if @cachedBestFit[col.getSource()] then return @cachedBestFit[col.getSource()]
+
 		max    = 10
 		source = col.getSource()
 		for obj in @rowDataRaw
@@ -1784,6 +1756,7 @@ class TableView
 
 		if max < 10 then max = 10
 		if max > 40 then max = 40
+		@cachedBestFit[col.getSource()] = (max * 8)
 		return (max * 8)
 
 
@@ -1808,10 +1781,11 @@ class TableView
 		##|  the next stage can try to auto assign it.
 		##|
 		for i in @colList
-			if not i.getVisible() then continue
 
-			calcWidth = i.calculateWidth()
-			if !calcWidth? or calcWidth < 0
+			if i.isGrouped? and i.isGrouped == true then continue
+
+			calcWidth = i.getWidth()
+			if i.getAutoSize()
 				missingCount++
 				i.actualWidth = null
 			else
@@ -1823,6 +1797,7 @@ class TableView
 		##|
 		##|  Split the remaining space
 		##|
+		# console.log "missingCount=", missingCount, "unallocated=", Math.ceil(maxWidth / missingCount)
 		if missingCount > 0
 			unallocatedSpace = Math.ceil(maxWidth / missingCount)
 			if unallocatedSpace < 60 then unallocatedSpace = 60
@@ -1833,7 +1808,6 @@ class TableView
 		totalColCount         = 0
 		autoAdjustableColumns = []
 		for i in @colList
-			if not i.getVisible() then continue
 
 			if totalColCount == colNum-1 and !i.actualWidth?
 				i.actualWidth = widthLimit - totalWidth
@@ -1882,6 +1856,12 @@ class TableView
 		@cachedLayoutShadowWidth = maxWidth
 		true
 
+	updateStatusText: (message...)=>
+		if !@elStatusText? then return
+		str = message.join ", "
+		@elStatusText.html str
+		return true
+
 	## -------------------------------------------------------------------------------------------------------------
 	## function to render the added table inside the table holder element
 	##
@@ -1905,6 +1885,32 @@ class TableView
 
 		@virtualScrollV = new VirtualScrollArea outerContainer, true
 		@virtualScrollH = new VirtualScrollArea outerContainer, false
+
+		##|
+		##|  Make room for the status bar
+		if @showStatusBar? and @showStatusBar == true
+
+			@virtualScrollH.bottomPadding = 26
+			@virtualScrollH.resize()
+
+			@virtualScrollV.bottomPadding = 26
+			@virtualScrollV.resize()
+
+			console.log "Showing status bar"
+			@elStatusBar = tableWrapper.addDiv "statusbar"
+
+			@elStatusText = @elStatusBar.addDiv "scrollStatusText"
+			@elStatusText.html "Ready."
+
+			@elStatusScrollTextRows = @elStatusBar.addDiv "scrollTextRows"
+			@elStatusScrollTextRows.html ""
+
+			@elStatusScrollTextCols = @elStatusBar.addDiv "scrollTextCols"
+			@elStatusScrollTextCols.html ""
+
+			@elStatusActionCopy = @elStatusBar.addDiv "statusActionsCopy"
+			@elStatusActionCopy.html "<i class='fa fa-copy'></i> Copy"
+			@elStatusActionCopy.on "click", @onActionCopyCell
 
 		##|
 		##|  Get the data from that table
@@ -2102,6 +2108,22 @@ class TableView
 		true
 
 	##|
+	##|  Copy to clipboard the current cell
+	onActionCopyCell: ()=>
+
+		if !@currentFocusCell? then return
+		path = @currentFocusCell.getDataValue("path")
+		if path?
+			parts     = path.split("/")
+			tableName = parts[1]
+			record_id = parts[2]
+			source    = parts[3]
+			item      = @findRowFromPath(path)
+			console.log "COPY:", item[source]
+
+		true
+
+	##|
 	##|  Focus on a path cell
 	setFocusCell: (visibleRow, visColNum, e) =>
 
@@ -2118,17 +2140,24 @@ class TableView
 		@currentFocusPath = null
 
 		if visibleRow == null or visColNum == null
+			@updateStatusText "Nothing selected"
 			return false
 
-		element = @elTableHolder.find("[data-vr=#{visibleRow}][data-vc=#{visColNum}]")
-		rowNum  = element.data("rn")
-		colNum  = element.data("cn")
+		element = null
+		for tag_id, tag_data of globalTagData
+			if tag_data.vr == visibleRow and tag_data.vc == visColNum
+				element = @elTableHolder.find("[data-id='#{tag_id}']")
+				path    = tag_data.path
+				rowNum  = tag_data.rn
+				colNum  = tag_data.cn
+				console.log "find data-id=#{tag_id}:", element[0]
+				break
 
-		if e? and e.path?
-			path = e.path
-		else
-			path = element[0].dataset["path"]
+		if !element?
+			console.log "Unable to find element for #{visibleRow}/#{visibleCol}"
+			return false
 
+		console.log "here path=", path
 		if path?
 			@currentFocusCell = path
 			parts = path.split("/")
@@ -2144,6 +2173,7 @@ class TableView
 
 		console.log "setFocusCell #{visibleRow}, #{visColNum} = #{cellType} | #{source}"
 		if !visibleRow? or !visColNum? or cellType != "data"
+			@updateStatusText "Nothing selected"
 			return false
 
 		@currentFocusRow = parseInt visibleRow
@@ -2152,16 +2182,20 @@ class TableView
 		if visibleRow == null or visColNum == null
 			@currentFocusRow = null
 			@currentFocusCol = null
+			@updateStatusText "Nothing selected"
 			return false
 
 		@currentFocusCell = @shadowCells[visibleRow].children[visColNum]
 
 		if @currentFocusCell?
 			path = @currentFocusCell.getDataValue("path")
-			@currentFocusPath = path
-			@currentFocusCell.addClass "cellfocus"
-			item = @findRowFromPath(path)
-			@emitEvent 'focus_cell', [ path, item ]
+			if path?
+				@currentFocusPath = path
+				@currentFocusCell.addClass "cellfocus"
+				item = @findRowFromPath(path)
+				@emitEvent 'focus_cell', [ path, item ]
+
+				@updateStatusText item[source]
 
 		return true
 
@@ -2205,6 +2239,8 @@ class TableView
 		tableName = parts[1]
 		keyValue  = parts[2]
 		colName   = parts[3]
+
+		console.log "Here findRowFromPath keyValue=", keyValue
 
 		if keyValue == "Filter"
 			return "Filter"

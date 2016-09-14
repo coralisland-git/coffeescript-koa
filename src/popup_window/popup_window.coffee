@@ -9,6 +9,8 @@
 
 globalOpenWindowList = []
 
+
+
 ## -------------------------------------------------------------------------------------------------------------
 ## Popup window widget
 ## this class creates a popup window that has a title and its dragable.

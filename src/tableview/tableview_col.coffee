@@ -3,6 +3,12 @@
 ## global functions required to use tables. the cell id is a counter
 ## used to create elements with a new unique ID
 ##
+
+reDate1  = /^[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]T00.00.00.000Z/
+reDate2  = /^[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]T[0-9][0-9].[0-9][0-9].[0-9][0-9].[0-9][0-9][0-9]Z/
+reNumber = /^[\-1-9][0-9]{1,10}$/
+reDecimal = /^[\-1-9\.][0-9\.]{1,11}\.[0-9]+$/
+
 class TableViewColBase
 
 	getName: ()->
@@ -14,6 +20,9 @@ class TableViewColBase
 	getOrder: ()->
 		return 999
 
+	getOptions: ()->
+		return null
+
 	getClickable: ()->
 		return false
 
@@ -23,8 +32,8 @@ class TableViewColBase
 	getAlign: ()->
 		return null
 
-	calculateWidth: ()=>
-		return @width || 0
+	getWidth: ()=>
+		return 0;
 
 	RenderHeader: (parent, location) =>
 		parent.html "No RenderHeader"
@@ -38,6 +47,92 @@ class TableViewColBase
 	getVisible: ()->
 		return true
 
+	getType: ()=>
+		return "text"
+
+	getFormatter: ()=>
+		if @formatter then return @formatter
+		@formatter = globalDataFormatter.getFormatter @getType()
+
+	getFormatterName: ()=>
+		f = @getFormatter()
+		if f? then return f.name
+		return null
+
+	onFocus: (e, col, data) =>
+		f = @getFormatter()
+		if f? and f.onFocus? then f.onFocus e, col, data
+		true
+
+	getRequired: ()=>
+		return false
+
+	getHideable: ()=>
+		return false
+
+	getSystemColumn: ()=>
+		return false
+
+	getAutoSize: ()=>
+		return false
+
+	##|
+	##|  Return html to display
+	##|  @param value [mixed] Whatever the current value is in database format
+	##|  @param value [mixed] The key value on the row for this record if any
+	##|  @param value [object] The row object if any
+	renderValue: (value, keyValue, row)=>
+		return value
+
+	##|
+	##|  Update configuration of the column
+	##|  The varName / value should be the same as defined
+	##|  in the "serialize" function but we allow one update
+	##|  function we can adjust the related fields in the subclasses.
+	changeColumn: (varName, value)=>
+		return true
+
+	getRenderFunction: ()=>
+		return null
+
+	##|
+	##|  Given some new data, see if we need to automatically change
+	##|  the data type on this column.
+	deduceColumnType: (newData)=>
+		return null
+
+	##|
+	##|  Called once when the column is created to see if the
+	##|  class wants to update the information on the column type
+	deduceInitialColumnType: ()=>
+		return null
+
+	serialize: ()=>
+
+		obj           = {}
+		obj.type      = @getType()
+		obj.width     = @getWidth()
+		obj.options   = @getOptions()
+		obj.editable  = @getEditable()
+		obj.visible   = @getVisible()
+		obj.clickable = @getClickable()
+		obj.align     = @getAlign()
+		obj.source    = @getSource()
+		obj.required  = @getRequired()
+		obj.hideable  = @getHideable()
+		obj.system    = @getSystemColumn()
+		obj.autosize  = @getAutoSize()
+		obj.order     = @getOrder()
+		obj.render    = @getRenderFunction()
+		return obj
+
+	deserialize: (obj)=>
+
+		for varName, value of obj
+			@changeColumn varName, value
+
+		true
+
 
 class TableViewCol extends TableViewColBase
 
@@ -47,32 +142,70 @@ class TableViewCol extends TableViewColBase
 	## @param [String] name The name of the column
 	## @param [String] title The title to show in the header
 	##
-	constructor : (@tableName, @col) ->
-		@visible = @col.visible
-		@width   = @col.width
+	constructor : (@tableName)->
+		@data = {}
 
-		if !@visible? then @visible = true
-		if !@width? then @width = ""
+	changeColumn: (varName, value)=>
+		if @data[varName] == value then return
 
+		if varName == "render"
+			if value? and typeof value != "function"
+				console.log "changeColumn ", @data.name, "render=", value
+				functionText = DataTypeCollection.renderFunctionToString(value)
+				value = DataTypeCollection.renderStringToFunction(functionText)
+
+			@render = value
+			return true
+
+		@data[varName] = value
+		delete @formatter
+		delete @actualWidth
+		return true
+
+	##|
+	##|  By default check for a render function defined
+	##|  and use that,  if no render function is defined
+	##|  then use the formatter if defined.
+	renderValue: (value, keyValue, row)=>
+
+		f = @getRenderFunction()
+		if f? then return f(value, @tableName, @getSource(), keyValue, row)
+
+		f = @getFormatter()
+		if f? then return f.format(value, @getOptions(), @tableName, keyValue)
+
+		return value
+
+	getRenderFunction: ()=>
+		if @render? and typeof @render == "function"
+			return @render
 
 	##|
 	##|  Return the name of the column
 	getName: ()=>
-		return @col.name
+		return @data.name
 
 	##|
 	##|  Returns the name of the source field in the datamap
 	getSource : ()=>
-		return @col.source
+		return @data.source
 
 	getOrder: ()=>
-		return @col.order
+		return @data.order
 
 	getVisible: ()=>
-		if @isGrouped? and @isGrouped == true then return false
-		if @col.visible? and @col.visible == true then return true
-		if @col.visible? and @col.visible == false then return false
+		if @isGrouped?    and @isGrouped == true then return false
+		if @data.visible? and @data.visible == true then return true
+		if @data.visible? and @data.visible == false then return false
 		return true
+
+	getHideable: ()=>
+		if @data.hideable? and @data.hideable == true then return true
+		return false
+
+	getRequired: ()=>
+		if @data.required? and @data.required == true then return true
+		return false
 
 	getClickable: ()=>
 
@@ -82,54 +215,62 @@ class TableViewCol extends TableViewColBase
 		if @clickable? and @clickable == false
 			return false
 
-		if @col.clickable? and @col.clickable == true
+		if @data.clickable? and @data.clickable == true
 			return true
 
-		if @col.clickable? and @col.clickable == false
+		if @data.clickable? and @data.clickable == false
 			return false
 
-		if @col.formatter.clickable? and @col.formatter.clickable == true
+		f = @getFormatter()
+		if f? and f.clickable? and f.clickable == true
 			return true
 
 		return false
 
+	getOptions: ()=>
+		if @data.options? then return @data.options
+		return null
+
 	##|
 	##|  returns true if the field is editable
 	getEditable: ()=>
-		return @col.editable
+		return @data.editable
 
 	##|
-	##|  Returns the name of the foramtter for this field
-	getFormatterName: ()=>
-		return @col.formatter.name
+	##|  Returns the type in text format
+	getType: ()=>
+		if @data.type? then return @data.type
+		return "text"
 
 	getAlign: ()=>
-		if @col.align? and @col.align.length > 0
-			return @col.align
+		if @data.align? and @data.align.length > 0
+			return @data.align
 
-		if @col.formatter.align?
-			return @col.formatter.align
+		f = @getFormatter()
+		if f? and f.align? then return f.align
 
 		return null
 
-	onFocus: (e, col, data) =>
-		if @col? and @col.formatter? and @col.formatter.onFocus?
-			@col.formatter.onFocus e, col, data
-		true
+	getAutoSize: ()=>
+		if @data.autosize? and @data.autosize == true then return true
+		width = @getWidth()
+		if width? and width > 0 then return false
+		return true
 
-	calculateWidth: ()=>
+	getWidth: ()=>
+
+		if typeof @data.width == "string"
+			@data.width = parseInt(@data.width)
 
 		##| if width is 0 then consider as auto width = left padding + max length text width + right padding
-		if (@width is 0 || @width is '0px' || @width is "" )
-			if @col.formatter? and @col.formatter.width?
-				return @col.formatter.width
+		if (@data.width is 0 || @data.width is '0px' || @data.width is "" || !@data.width? )
+			f = @getFormatter()
+			if f? and f.width? and f.width > 0
+				return f.width
 
 			return null
 
-		if typeof @width == "string"
-			return parseInt(@width)
-
-		return @width
+		return @data.width
 
 	## -------------------------------------------------------------------------------------------------------------
 	## RenderHeader function to render the header for the column
@@ -141,11 +282,14 @@ class TableViewCol extends TableViewColBase
 
 		if @visible == false then return
 
-		parent.html @getName()
-		parent.addClass "tableHeaderField"
+		html = @getName()
+		if @sort == -1
+			html += "<i class='pull-right fa fa-sort-down'></i>"
+		else if @sort == 1
+			html += "<i class='pull-right fa fa-sort-up'></i>"
 
-		if @sort? and @sort != 0
-			@tagSort = parent.add "i", "fa fa-sort table-sorter pull-right"
+		parent.html html
+		parent.addClass "tableHeaderField"
 
 		return parent
 
@@ -155,16 +299,6 @@ class TableViewCol extends TableViewColBase
 
 		parent.html @getName()
 		parent.addClass "tableHeaderFieldHoriz"
-
-		if @col.tooltip? and @col.tooltip.length > 0
-			parent.setAttribute "tooltip", "simple"
-			parent.setAttribute "data-title", @col.tooltip
-
-		# @tagSort = parent.add "i", "fa fa-sort table-sorter"
-		# @tagSort.el.css
-			# "float" : "left"
-			# "padding-right" : "20"
-
 		parent.el.css
 			"text-align"       : "right"
 			"padding-right"    : 8
@@ -176,8 +310,6 @@ class TableViewCol extends TableViewColBase
 		return parent
 
 	UpdateSortIcon: (newSort) =>
-
-		console.log "newSort = ", newSort, @sort
 
 		@sort = newSort
 		@tagSort.removeClass "fa-sort"
@@ -192,4 +324,126 @@ class TableViewCol extends TableViewColBase
 			@tagSort.addClass "fa-sort-up"
 
 		true
+
+
+	##|
+	##|  Called once when the column is created to see if the
+	##|  class wants to update the information on the column type
+	deduceInitialColumnType: ()=>
+
+		reYear     = /year/i
+		reDistance = /distance/i
+
+		@data.skipDeduce = false
+		@data.deduceAttempts = 0
+		@data.foundOnlyNumbers = true
+
+		if reYear.test @data.name
+			@changeColumn "type", "int"
+			@changeColumn "options", '####'
+			@changeColumn "width", 50
+			@changeColumn "align", "right"
+			@data.skipDeduce = true
+			return
+
+		if reDistance.test @data.name
+			@changeColumn "type", "distance"
+			@changeColumn "width", 60
+			@changeColumn "align", "right"
+			@data.skipDeduce = true
+			return
+
+		if @data.name == "id"
+			@changeColumn "type", "text"
+			@changeColumn "width", null
+			@changeColumn "visible", false
+			@changeColumn "align", "left"
+			@changeColumn "name", "ID"
+			return
+
+		if @data.source == "lat" or @data.source == "lon"
+			@changeColumn "type", "decimal"
+			@changeColumn "width", 60
+			@changeColumn "visible", true
+			@changeColumn "align", "right"
+			@changeColumn "options", '#.#####'
+			return
+
+		return
+
+	##|
+	##|  Given some new data, see if we need to automatically change
+	##|  the data type on this column.
+	deduceColumnType: (newData)=>
+
+		if @data.skipDeduce? and @data.skipDeduce == true then return null
+		if @data.deduceAttempts++ > 50 then return null
+		if !newData? then return null
+
+		if typeof newData == "string"
+
+			if reDate1.test newData
+				@changeColumn "type", "timeago"
+				@changeColumn "width", 80
+				@data.skipDeduce = true
+				return
+
+			if reDate2.test newData
+				@changeColumn "type", "datetime"
+				@changeColumn "width", 110
+				@data.skipDeduce = true
+				true
+
+			# console.log "name=", @data.name, "newdata=", newData, typeof newData, @data.skipDeduce
+
+			if /^https*/.test newData
+				@changeColumn "type", "link"
+				@changeColumn "align", "center"
+				@changeColumn "width", 80
+				@data.skipDeduce = true
+				return true
+
+			if /^ftp*:/.test newData
+				@changeColumn "type", "link"
+				@changeColumn "align", "center"
+				@changeColumn "width", 80
+				@data.skipDeduce = true
+				return true
+
+			if @data.foundOnlyNumbers and reNumber.test newData
+				@changeColumn "type", "int"
+				@changeColumn "width", 80
+				return
+
+			if @data.foundOnlyNumbers and reDecimal.test newData
+				@changeColumn "type", "decimal"
+				@changeColumn "width", 100
+				return
+
+			if @data.foundOnlyNumbers
+				@changeColumn "type", "text"
+				@data.foundOnlyNumbers = false
+
+		else if typeof newData == "number"
+
+			if @data.foundOnlyNumbers
+				@changeColumn "type", "int"
+				@changeColumn "align", "right"
+				@changeColumn "width", 80
+
+		else if typeof newData == "boolean"
+
+			@changeColumn "type", "boolean"
+			@changeColumn "width", 60
+			@data.skipDeduce = true
+			return true
+
+		else if typeof newData == "object"
+
+			@changeColumn "type", "simpleobject"
+			@changeColumn "width", null
+			@data.skipDeduce = true
+			return true
+
+		return null
 

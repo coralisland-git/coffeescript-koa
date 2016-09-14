@@ -10,6 +10,66 @@ span#ruler
 .tableviewSimpleWrapper
     overflow: auto
 
+.statusbar
+    background-color : #EEECE9
+    border-top       : 1px solid #909090
+    color            : #303030
+    font-size        : 12px
+    padding          : 0
+    margin           : 0
+    position         : absolute
+    left             : 0px
+    right            : 0px
+    bottom           : 0px
+    height           : 26px
+    overflow         : hidden;
+    padding-left     : 4px
+    padding-top: 2px
+
+    .scrollStatusText
+        overflow         : hidden
+        height           : 24px
+        margin-right     : 250px
+        line-height      : 22px
+
+    .scrollTextCols
+        background-color : #EEECE9
+        padding-left     : 6px
+        padding-top      : 2px
+        padding-right    : 6px
+        position         : absolute
+        right            : 0
+        top              : 0
+        width            : 150px
+        line-height      : 22px
+        border-left      : 1px solid #bbbbbb
+
+    .scrollTextRows
+        background-color : #EEECE9
+        padding-left     : 6px
+        padding-top      : 2px
+        padding-right    : 6px
+        position         : absolute
+        right            : 150px
+        top              : 0
+        width            : 150px
+        line-height      : 22px
+        border-left      : 1px solid #bbbbbb
+
+    .statusActionsCopy
+        line-height      : 22px
+        background-color : #EEECE9
+        padding-left     : 6px
+        padding-top      : 2px
+        padding-right    : 6px
+        position         : absolute
+        right            : 300px
+        top              : 0
+        width            : 90px
+        font-size        : 14px
+        font-family      : 'San Francisco Display', "Segoe UI", "Tahoma", "Arial";
+        border-left      : 1px solid #bbbbbb
+
 .tableview
     width: 100%
     border-inside: 1px solid #909090
@@ -61,8 +121,8 @@ span#ruler
 
 
     div.cellfocus
-        border:1px solid #40B080 !important
-        background-color: rgba(250,255,250,0.6)
+        border:1px solid #4040CC !important
+        background-color: rgba(0,0,250,0.2)
 
     // div.type_int,
     // div.type_decimal
@@ -70,15 +130,19 @@ span#ruler
     //     padding-right: 6px
 
     div
-        position    : absolute
-        display     : block
-        font-family : 'San Francisco Text', "Segoe UI", "Tahoma", "Arial";
-        color       : black
-        font-weight : 300
-        font-size   : 12px
-        padding     : 4px
-        overflow    : hidden;
-        background  : #ffffff;
+        position       : absolute
+        display        : block
+        font-family    : 'San Francisco Text', "Segoe UI", "Tahoma", "Arial";
+        color          : black
+        font-weight    : 300
+        font-size      : 12px
+        padding-top    : 0px
+        padding-bottom : 0px
+        padding-left   : 4px
+        padding-right  : 4px
+        line-height    : 22px
+        overflow       : hidden
+        background     : #ffffff;
 
     div.spacer.dragging
         background-color: blue
@@ -163,6 +227,16 @@ span#ruler
     .tableRow .cell
         border-right     : 1px solid #dddddd
         cursor           : cell
+
+        .memo
+            color: rgba(0,0,0,0.9)
+            overflow: hidden
+            margin-right: 18px
+
+        .fieldicon
+            float: right
+            width: 18px
+            color: rgba(0, 0, 0, 0.2)
 
     .tableRow .cell.editable:hover
         background-color : #B0E296
@@ -254,8 +328,3 @@ span.fage
 .table-wrapper
     position: relative
     height: 100%
-
-.vscroll
-    .marker
-        background: #C8C8C8
-        border-radius: 10px

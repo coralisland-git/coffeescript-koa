@@ -236,6 +236,9 @@ class DataFormatText extends DataFormatterType
 		if !data?
 			return ""
 
+		if data.length > 300
+			return data[0..300] + "..."
+
 		return data
 
 	## -------------------------------------------------------------------------------------------------------------
@@ -272,7 +275,10 @@ class DataFormatMemo extends DataFormatterType
 		if !data?
 			return ""
 
-		return data
+		if data.length == 0
+			return ""
+
+		return "<span class='memo'>" + data[0..200] + "</span><span class='fieldicon'><i class='si si-eyeglasses'></i></span>"
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to unformat the currently formatted data
@@ -284,6 +290,23 @@ class DataFormatMemo extends DataFormatterType
 	unformat: (data, path) =>
 
 		return data
+
+	onFocus: (e, col, data) =>
+		console.log "e=", e
+		console.log "col=", col
+		console.log "data=", data
+
+		text = data[col]
+		if text? and typeof text == "string" and text.length > 0
+			content = "<br><textarea style='width:100%; height: 600px; font-size: 16px; line-height: 20px; font-family: Consolas, monospaced, arial;'>#{text}</textarea>"
+			m = new ModalDialog
+				showOnCreate : true
+				content      : content
+				title        : "View Contents"
+				ok           : "Done"
+				close        : ""
+
+		true
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to open editor including ace code editor
@@ -582,7 +605,7 @@ class DataFormatFloat extends DataFormatterType
 	## @return [Object] data formatted data
 	##
 	format: (data, options, path) =>
-		if !data? then return "&mdash;"
+		if !data? then return ""
 		if options? and /#/.test options
 			return numeral(DataFormatter.getNumber data).format(options)
 		else
@@ -622,7 +645,7 @@ class DataFormatCurrency extends DataFormatterType
 	##
 	format: (data, options, path) =>
 		if !data? or data == null or data == 0 or data == ""
-			return "&mdash;"
+			return ""
 
 		return numeral(DataFormatter.getNumber data).format('$ #,###.[##]')
 
@@ -1071,7 +1094,7 @@ class DataFormatDateAge extends DataFormatterType
 	##
 	format: (data, options, path) =>
 		m = DataFormatter.getMoment data
-		if !m? then return "&mdash;"
+		if !m? then return ""
 
 		html = "<span class='fdate'>" + m.format("MM/DD/YYYY") + "</span>"
 		age = moment().diff m
@@ -1157,7 +1180,7 @@ class DataFormatEnum extends DataFormatterType
 			@options = @options.split /\s*,\s*/
 
 		if !data?
-			return "&mdash;"
+			return ""
 
 		for i, o of @options
 			if data == o then return o
@@ -1233,7 +1256,8 @@ class DataFormatBoolean extends DataFormatterType
 	width: 40
 
 	textYes: "<i class='fa fa-circle'></i> Yes"
-	textNo: "<i class='fa fa-circle-thin'></i> No"
+	textNo : "<i class='fa fa-circle-thin'></i> No"
+	textNotSet: "<i class='fa fa-fs'></i> Not Set"
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to open editor including ace code editor
@@ -1267,7 +1291,8 @@ class DataFormatBoolean extends DataFormatterType
 	## @return [Object] data formatted data
 	##
 	format: (data, options, path) =>
-		if !data? then return @textNo
+		if !data? then return @textNotSet
+		if data == "" then return @textNotSet
 		if data == null or data == 0 or data == false then return @textNo
 		return @textYes
 
@@ -1364,11 +1389,21 @@ class DataFormatTimeAgo extends DataFormatterType
 	## @return [Object] data formatted data
 	##
 	format: (data, options, path) =>
-		stamp = DataFormatter.getMoment data
-		if stamp == null
-			return "&mdash;"
 
-		age  = moment().diff(stamp) / 1000
+		if typeof data == "string"
+			stamp = new Date(data)
+		else if typeof data == "number"
+			stamp = new Date(data)
+		else if typeof data == "object" and data.getTime?
+			stamp = data
+		else
+			return ""
+
+		age = new Date().getTime() - stamp.getTime()
+		age /= 1000
+
+		# console.log "timeAgo data=", data, " age=", age
+
 		if age < 60
 			txt = numeral(age).format("#") + " sec"
 		else if age < (60 * 60)
@@ -1416,6 +1451,8 @@ class DataFormatDuration extends DataFormatterType
 
 	# @property [Integer] width
 	width: 70
+
+	align: "right"
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to format the currently passed data

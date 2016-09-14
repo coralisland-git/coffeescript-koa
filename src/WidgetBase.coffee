@@ -1,3 +1,7 @@
+globalTagData = {}
+globalTagPath = {}
+globalTagID   = 0
+
 class WidgetTag
 
     ##|
@@ -8,12 +12,48 @@ class WidgetTag
     ##|  parent -  pointer to another WidgetTag
     ##|
 
+    @getDataFromEvent: (e)->
+
+        if !e? or !e.target? then return {}
+
+        results = {}
+        results.coords = GlobalValueManager.GetCoordsFromEvent(e)
+
+        ##|
+        ##|  Recursive loop through the element and then all the parents
+        ##|  looking for the data-id value and pulling in data from those
+        ##|  elements,  the top level element data is loaded first so
+        ##|  the deeper into the DOM the data over-writes.
+        ##|
+        getFromElement = (results, target, level)->
+
+            if target.parentElement? and level < 6
+                getFromElement(results, target.parentElement, level + 1)
+
+            for varName, value of target.dataset
+                if varName == "id" then continue
+                results[varName] = value
+
+            id = target.dataset.id
+            if id? and typeof id == "string"
+                id = parseInt(id)
+
+            if id? and typeof id == "number"
+                if globalTagData[id]?
+                    for varName, value of globalTagData[id]
+                        results[varName] = value
+
+
+        getFromElement(results, e.target, 0)
+        return results
+
     constructor: (tagName, classes, id, attributes)->
 
         ##|
         ##|  Store a reference to the jQuery version and the raw html5 element
         @el      = $(document.createElement tagName)
         @element = @el[0]
+        @gid     = globalTagID++
 
         if id?
             @el.attr "id", id
@@ -36,11 +76,19 @@ class WidgetTag
         @visible = true
 
         ##|
+        ##|  All tags have an id number referenced into the globalTagData
+        @element.dataset.id = @gid
+
+        ##|
         ##|  Any other attributes that need setting
         if attributes?
             for attName, attValue of attributes
                 @el.attr attName, attValue
 
+    ##|
+    ##|  Adds a new child tag under this one of a given type
+    ##|  with a default class, id, and attributes
+    ##|
     add: (tagName, classes, id, attributes) =>
         tag = new WidgetTag tagName, classes, id, attributes
         tag.parent = this
@@ -48,28 +96,34 @@ class WidgetTag
         @children.push tag
         return tag
 
+    ##|
+    ##|  Shortcut to add a div
     addDiv: (classes, id, attributes) =>
         return @add "div", classes, id
 
+    ##|
+    ##|  Shortcut to setting a data value for the path
     setDataPath: (keyVal) =>
+        globalTagPath[keyVal] = @gid
         @setDataValue "path", keyVal
 
     ##|
     ##|  Set the "data-" values within the element, cache
     ##|  then and only update the DOM if there is a change
     setDataValue: (name, value)=>
-        if !@dataValues? then @dataValues = {}
-        if @dataValues[name] != value
-            @dataValues[name] = value
-            @element.dataset[name] = value
+        if !globalTagData[@gid]
+            globalTagData[@gid] = {}
 
+        globalTagData[@gid][name] = value
         return this
 
     ##|
     ##|  Use the cache to get any elements
     getDataValue: (name) =>
-        if !@dataValues? then @dataValues = {}
-        return @dataValues[name]
+        if !globalTagData[@gid]
+            globalTagData[@gid] = {}
+
+        return globalTagData[@gid][name]
 
     ##|
     ##|  Add the "absolute" style to an element
@@ -85,7 +139,6 @@ class WidgetTag
 
     ##|
     ##|  Toggle a CSS class either on off as needed
-    ##|
     setClass: (className, enabled)=>
 
         if enabled == true
@@ -127,6 +180,8 @@ class WidgetTag
 
         true
 
+    ##|
+    ##|  Add an enable a class name
     addClass: (className) =>
         for cn in @classes
             if cn == className then return true
@@ -135,8 +190,10 @@ class WidgetTag
         ##| TODO: check the @classes list and cache
         @classes.push className
         @element.className = @classes.join ' '
-        return this
+        return true
 
+    ##|
+    ##|  Remove a class
     removeClass: (className) =>
 
         newList = []
@@ -151,33 +208,64 @@ class WidgetTag
             @classes = newList
             @element.className = @classes.join ' '
 
-        return this
+        return true
 
     height: ()=>
-        return @el.height()
+        if @cachedHeight? then return @cachedHeight
+        @cachedHeight = @el.height()
+        return @cachedHeight
 
     width: ()=>
-        return @el.width()
+        if @cachedWidth? then return @cachedWidth
+        @cachedWidth = @el.width()
+        return @cachedWidth
 
+    ##|
+    ##|  Call this function if the outside container changes size
+    onResize: ()=>
+        console.log "WidgetTag onResize called"
+        delete @cachedWidth
+        delete @cachedHeight
+        for c in @children
+            c.onResize()
+
+    ##|
+    ##|   Set the text value or get the text value if nothing passed in
     text: (str) =>
+        if !str? then return !currentValue
+
         if @currentValue != str
             @currentValue = str
             @element.innerText = str
 
         return this
 
-    val: (str) =>
+    ##|
+    ##|  Set or get the current html value
+    html: (str) =>
+
+        if !str? then return @currentValue
+
         if @currentValue != str
             @currentValue = str
-            @el.val(str)
+            if /</.test str
+                @element.innerHTML = str
+            else
+                @element.innerText = str
 
         return this
 
-    html: (str) =>
+    ##|
+    ##|  Get the value (for input style elements)
+    ##|
+    val: (str) =>
+        if !str?
+            @currentValue = @el.val()
+            return @currentValue
 
         if @currentValue != str
             @currentValue = str
-            @element.innerHTML = str
+            @el.val(str)
 
         return this
 
@@ -191,6 +279,8 @@ class WidgetTag
         @visible = false
         this
 
+    ##|
+    ##|  Reposition aboslute elements
     move: (x, y, w, h)=>
 
         if x != @x
@@ -203,10 +293,12 @@ class WidgetTag
 
         if w != @w
             @w = w
+            delete @cachedWidth
             @element.style.width  = @w + "px"
 
         if h != @h
             @h = h
+            delete @cachedHeight
             @element.style.height = @h + "px"
 
         return this
@@ -214,23 +306,20 @@ class WidgetTag
     on: (eventName, callback)=>
         @bind(eventName, callback)
 
+    ##|
+    ##|  Bind helper function, does a jQuery bind but first
+    ##|  sets the path and other data elements before calling
+    ##|  the target callback function.
+    ##|
     bind: (eventName, callback)=>
         ##|
         ##|  For mouse events, add a reference to the callback
         ##|  so the event handled can easily find this ID
         @el.bind eventName, (e)=>
 
-            allData = e.target.parentElement.parentElement.dataset
-            for keyName, keyVal of allData
-                e[keyName] = keyVal
-
-            allData = e.target.parentElement.dataset
-            for keyName, keyVal of allData
-                e[keyName] = keyVal
-
-            allData = e.target.dataset
-            for keyName, keyVal of allData
-                e[keyName] = keyVal
+            data = WidgetTag.getDataFromEvent(e)
+            for varName, value of data
+                e[varName] = value
 
             if callback(e)
                 e.preventDefault()

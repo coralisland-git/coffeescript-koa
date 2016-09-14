@@ -1,4 +1,3 @@
-globalScrollbarTooltip = null
 
 class VirtualScrollArea
 
@@ -15,9 +14,8 @@ class VirtualScrollArea
         @bottomPadding = 0
         @rightPadding  = 0
         @mySize        = 20
-
-        @backColor              = "#F0F0F0"
-        @borderColor            = "1px solid #E7E7E7"
+        @backColor     = "#F0F0F0"
+        @borderColor   = "1px solid #E7E7E7"
 
         ##|
         ##|  This is either Horizontal or Vertical
@@ -51,33 +49,12 @@ class VirtualScrollArea
 
         @elHolder.append @elScrollTrack.el
 
-        if globalScrollbarTooltip == null
-
-            globalScrollbarTooltip = $ "<div />"
-            globalScrollbarTooltip.css
-                "position"      : "absolute"
-                top             : 0
-                left            : 0
-                width           : 90
-                height          : 24
-                textAlign       : "center"
-                borderRadius    : "4px"
-                padding         : 4
-                margin          : 0
-                fontSize        : "12px"
-                backgroundColor : "#E6DB74"
-                color           : "#000000"
-                zIndex          : 153002
-                display         : "none"
-                "box-shadow"    : "2px 2px #000000"
-            $("body").append(globalScrollbarTooltip)
-
-
         @resize()
         @setupEvents()
 
     setRange: (newMin, newMax, newDisplaySize, newCurrent)=>
 
+        # return
         updated = false
 
         if !newMin? or !newMax? or !newDisplaySize? or !newCurrent? then return false
@@ -171,24 +148,17 @@ class VirtualScrollArea
         if amount + @displaySize >= @max then amount = @max - @displaySize
         amount = Math.floor(amount)
 
-        globalScrollbarTooltip.show()
-        globalScrollbarTooltip.html "#{amount+1} to #{@displaySize + @current} of #{@max}"
-
         @emitEvent "scroll_to", [ Math.floor(amount) ]
         true
 
     ##|
     ##|  Called when the thumb slider drag is complete.
     onMarkerDragFinished: (diffX, diffY, e)=>
-        globalScrollbarTooltip.hide()
         true
 
     onScrollTrackMouseDown: (e) =>
 
         pos = @elHolder.offset()
-        globalScrollbarTooltip.css
-            left: pos.left + 20
-            top: pos.top + 20
 
         if e.target.className == "marker"
             @dragCurrent = Math.floor(@current)

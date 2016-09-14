@@ -10,22 +10,11 @@ fs = require 'fs'
 ##|  this includes custom output for each module
 ##|
 
-getModules = ()->
-	try
-		files = fs.readdirSync "module/"
-		return files
-	catch e
-		console.log "getModule error: ", e
-		process.exit(0)
-
 getStylusFiles = ()->
 	list =
 		'ninja/ninja.css': ['src/**/*styl']
 		'ninja/test/ninja.css': ['src/**/*styl']
 		'ninja/test/css/test.css': ['test/css/*styl']
-
-	for i in getModules()
-		list["ninja/module_#{i}.css"] = ["module/#{i}/*styl"]
 
 	list
 
@@ -36,13 +25,11 @@ getCoffeeFiles = ()->
 		"ninja/test/js/test_common.js": ["test/js/test_common.coffee", "test/js/test_data/*coffee"]
 
 	for i in fs.readdirSync "test/js/"
+		if /\.gz/.test i then continue
 		if !/coffee/.test i then continue
 		if /test_common/.test i then continue
 		js = i.replace ".coffee", ".js"
 		list["ninja/test/js/#{js}"] = ["test/js/#{i}"]
-
-	for i in getModules()
-		list["ninja/module_#{i}.js"] = ["module/#{i}/*coffee", "module/#{i}/*.js"]
 
 	return list
 
@@ -51,6 +38,7 @@ getCoffeeTestFiles = ()->
 
 	for i in fs.readdirSync "test/js/"
 		if !/coffee/.test i then continue
+		if /\.gz/.test i then continue
 		if /test_common/.test i then continue
 		js = i.replace ".coffee", ".js"
 		list["ninja/test/js/#{js}"] = ["test/js/#{i}"]
