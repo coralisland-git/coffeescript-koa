@@ -55,7 +55,7 @@ class DataMapMemoryCollection
 
         else
 
-            console.log "find: (", condition, "):"
+            # console.log "find: (", condition, "):"
 
             ##|
             ##| Complex search

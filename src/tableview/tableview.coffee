@@ -127,6 +127,7 @@ class TableView
 		@showFilters     = true
 		@allowSelectCell = true
 		@showResize      = true
+		@showConfigTable = true
 
 		# @property [Object] currentFilters current applied filters to the table
 		@currentFilters    = {}
@@ -176,7 +177,7 @@ class TableView
 		globalKeyboardEvents.on "global_mouse_down", @onGlobalMouseDown
 		globalKeyboardEvents.on "change", @onGlobalDataChange
 		globalTableEvents.on "table_change", @onGlobalTableChange
-		DataMap.getDataMap().on "new_data", @onGlobalNewData
+		window.addEventListener "new_data", @onGlobalNewData, false
 
 		##|
 		##|  Create a unique ID for the table, that doesn't change
@@ -250,7 +251,7 @@ class TableView
 		button.source = config.source
 		@actionColList.push button
 		if config.callback?
-			@on "click_#{config.name}", config.callback
+			@on "click_#{config.source}", config.callback
 
 		true
 
@@ -368,16 +369,18 @@ class TableView
 
 	##|
 	##|  New data from the server
-	onGlobalNewData: (tableName, id)=>
+	onGlobalNewData: (e)=>
 
-		if tableName == @primaryTableName
-			@resetCachedFromSize()
-			@updateRowData()
+		# console.log "table #{@gid} onGlobalNewData e=", e
+		if e.detail.tablename == @primaryTableName
+			# @resetCachedFromSize()
+			if @resetTimer?
+				clearTimeout(@resetTimer)
 
-			# if @resetTimer? then clearTimeout(@resetTimer)
-			# @resetTimer = setTimeout ()=>
-			# 	delete @resetTimer
-			# , 50
+			@resetTimer = setTimeout ()=>
+				delete @resetTimer
+				@updateRowData()
+			, 50
 
 	##|
 	##|  Event triggered when any tableview has a column change
@@ -396,6 +399,7 @@ class TableView
 	onGlobalDataChange: (path, newData)=>
 		##|
 		##|  Something globally change the value of a path, see if we care
+		# console.log "tableView onGlobalDataChange path=#{path}"
 		cell = @findPathVisible(path)
 		if cell != null
 			# console.log "Found cell for #{path}"
@@ -649,23 +653,27 @@ class TableView
 					@groupBy(source)
 				, source
 
-				popupMenu.addItem "Rename", (e, source)=>
-					@onRenameField source
-					@updateVisibleText()
-				, source
+				##|
+				##|  Allow table to reconfigure
+				if @showConfigTable
 
-				popupMenu.addItem "Change Type", (e, source)=>
-					@contextMenuChangeType source, coords
-					@updateRowData()
-				, source
-
-				if globalTableAdmin
-					popupMenu.addItem "Open table editor", (e, source)=>
-						for col in @colList
-							if col.getSource() == source
-								console.log "Emitting open_editor"
-								globalTableEvents.emitEvent "open_editor", [ col.tableName ]
+					popupMenu.addItem "Rename", (e, source)=>
+						@onRenameField source
+						@updateVisibleText()
 					, source
+
+					popupMenu.addItem "Change Type", (e, source)=>
+						@contextMenuChangeType source, coords
+						@updateRowData()
+					, source
+
+					if globalTableAdmin
+						popupMenu.addItem "Open table editor", (e, source)=>
+							for col in @colList
+								if col.getSource() == source
+									console.log "Emitting open_editor"
+									globalTableEvents.emitEvent "open_editor", [ col.tableName ]
+						, source
 
 		if popupMenu == null
 			popupMenu = new PopupMenu "Unknown #{source}", coords.x-150, coords.y
@@ -765,9 +773,10 @@ class TableView
 
 		if @sortRules.length == 0 then return rowData
 
-		console.log "applySorting", @sortRules, rowData
+		# console.log "applySorting", @sortRules, rowData
 
 		if !@sortRules? or @sortRules.length == 0
+			console.log "applySorting return 1"
 			return rowData
 
 		sorted = rowData.sort (a, b)=>
@@ -775,8 +784,11 @@ class TableView
 			for rule in @sortRules
 				if rule.state == 0 then continue
 
-				aValue = DataMap.getDataField @primaryTableName, a, rule.source
-				bValue = DataMap.getDataField @primaryTableName, b, rule.source
+				# console.log "Get ", @primaryTableName, "key=", a.id,  "source=", rule.source
+				aValue = DataMap.getDataField @primaryTableName, a.id, rule.source
+				bValue = DataMap.getDataField @primaryTableName, b.id, rule.source
+
+				# console.log "Sort a=", aValue, "b=", bValue
 
 				if rule.state == -1 and aValue < bValue then return 1
 				if rule.state == -1 and aValue > bValue then return -1
@@ -786,6 +798,7 @@ class TableView
 
 			return 0
 
+		# console.log "applySorting return:", sorted
 		return sorted
 
 
@@ -801,9 +814,8 @@ class TableView
 
 		strJavascript = ""
 
-		if @overallReduceFunction? and typeof overallReduceFunction == "string"
-			console.log "!!! applyFilters Not implemented:", overallReduceFunction
-			return false
+		if @overallReduceFunction? and typeof @overallReduceFunction == "string"
+			strJavascript += "try {\n" + @overallReduceFunction + ";\n} catch (e) { console.log(\"eee=\",e); }\n";
 
 		filters = []
 		for tableName, fieldList of @currentFilters
@@ -1147,12 +1159,19 @@ class TableView
 			if location.visibleCol == 3 then return maxWidth-290
 			return 0
 
-		if !@colByNum[location.colNum]? or !@colByNum[location.colNum].actualWidth?
-			console.log "getColWidth Invalid col:", location.colNum, @colByNum
+		if !@colByNum[location.colNum]?
+			# console.log "getColWidth Invalid col:", location.colNum, @colByNum
 			return 10
 
-		# console.log "Return #{location.colNum} [#{location.sourceName}] set=", @colByNum[location.colNum].getWidth(), " width:", @colByNum[location.colNum].actualWidth
-		return Math.floor(@colByNum[location.colNum].actualWidth)
+		if !@colByNum[location.colNum].actualWidth?
+			return @colByNum[location.colNum].getWidth()
+
+		# console.log "getColWidth colNum=#{location.colNum} source=[#{location.sourceName}] set=", @colByNum[location.colNum].getWidth(), " width:", @colByNum[location.colNum].actualWidth
+		if @colByNum[location.colNum].actualWidth? and !isNaN(@colByNum[location.colNum].actualWidth)
+			return Math.floor(@colByNum[location.colNum].actualWidth)
+
+		# console.log "getColWdith rreturn ", @colByNum[location.colNum].getWidth()
+		return @colByNum[location.colNum].getWidth()
 
 	##|
 	##|  Compute the height of a given row
@@ -1768,6 +1787,7 @@ class TableView
 
 		maxWidth   = @getTableVisibleWidth()
 		if @cachedLayoutShadowWidth? and @cachedLayoutShadowWidth == maxWidth then return
+		@cachedLayoutShadowWidth = maxWidth
 
 		##|
 		##|  Look at all the columns, determine the likely width
@@ -1789,6 +1809,7 @@ class TableView
 				missingCount++
 				i.actualWidth = null
 			else
+				# console.log "Setting actualWidth of ", i.getName(), " max=#{maxWidth}, calc=#{calcWidth}"
 				maxWidth -= calcWidth
 				i.actualWidth = calcWidth
 
@@ -1798,6 +1819,7 @@ class TableView
 		##|  Split the remaining space
 		##|
 		# console.log "missingCount=", missingCount, "unallocated=", Math.ceil(maxWidth / missingCount)
+
 		if missingCount > 0
 			unallocatedSpace = Math.ceil(maxWidth / missingCount)
 			if unallocatedSpace < 60 then unallocatedSpace = 60
@@ -1817,6 +1839,8 @@ class TableView
 			if !i.actualWidth?
 				# console.log "Find best width for ", i.getSource()
 				i.actualWidth = @findBestFit(i)
+				# console.log "Setting actual", i.actualWidth
+
 				autoAdjustableColumns.push i
 
 			totalWidth += i.actualWidth
@@ -1838,22 +1862,27 @@ class TableView
 		if (widthLimit - totalWidth) > -50 and autoAdjustableColumns.length > 0
 
 			attemptCounter = 0
-			while Math.ceil(totalWidth) != Math.ceil(widthLimit) and attemptCounter++ < 1500
+			while Math.ceil(totalWidth) != Math.ceil(widthLimit) and attemptCounter++ < 1500 and autoAdjustableColumns.length > 0
 
-				adjustAmount = Math.floor((widthLimit-totalWidth)/autoAdjustableColumns.length)
+				adjustAmount = Math.abs(Math.floor((widthLimit-totalWidth)/autoAdjustableColumns.length))
+				# console.log "WW=", widthLimit, totalWidth, "==>", adjustAmount
+
+				if isNaN(adjustAmount) then break
 				if adjustAmount == 0 then adjustAmount = 1
 
 				for i in autoAdjustableColumns
 					if Math.ceil(totalWidth) == Math.ceil(widthLimit) then break
 
 					if totalWidth > widthLimit
+						# console.log "Adjust #{i.getName()} W=#{i.actualWidth} by #{adjustAmount}"
 						i.actualWidth -= adjustAmount
 						totalWidth -= adjustAmount
 					else if totalWidth < widthLimit
+						# console.log "Adjust #{i.getName()} W=#{i.actualWidth} by #{adjustAmount}"
 						i.actualWidth += adjustAmount
 						totalWidth += adjustAmount
 
-		@cachedLayoutShadowWidth = maxWidth
+
 		true
 
 	updateStatusText: (message...)=>
@@ -2157,7 +2186,6 @@ class TableView
 			console.log "Unable to find element for #{visibleRow}/#{visibleCol}"
 			return false
 
-		console.log "here path=", path
 		if path?
 			@currentFocusCell = path
 			parts = path.split("/")

@@ -318,6 +318,7 @@ class WidgetTag
         @el.bind eventName, (e)=>
 
             data = WidgetTag.getDataFromEvent(e)
+            console.log "bind DataFromEvent:", data
             for varName, value of data
                 e[varName] = value
 

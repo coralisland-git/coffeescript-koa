@@ -1390,6 +1390,8 @@ class DataFormatTimeAgo extends DataFormatterType
 	##
 	format: (data, options, path) =>
 
+		if !data? then return ""
+
 		if typeof data == "string"
 			stamp = new Date(data)
 		else if typeof data == "number"
@@ -1566,7 +1568,6 @@ class DataFormatLink extends DataFormatterType
 	unformat: (data,path) =>
 		console.log "TODO: DataFormatLink.unformat not implemented:", data
 		return data
-
 
 	openEditor: (elParent, left, top, width, height, currentValue, path) =>
 		##|

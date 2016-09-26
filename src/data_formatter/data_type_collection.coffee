@@ -116,6 +116,10 @@ class DataTypeCollection
         seen = {}
         max  = 0
 
+        # for source, col of @col
+        #     order = col.getOrder()
+        #     console.log "FIRST PASS:", source, "=", order
+
         ##|
         ##|  For any columns with a known order
         for source, col of @col
@@ -130,10 +134,17 @@ class DataTypeCollection
         ##|
         ##|  Assign all unassigned
         for source, col of @col
-            if col.getOrder() == null
+            if !col.getOrder()?
                 max = max + 1 while seen[max]?
                 col.changeColumn "order", max
                 seen[max] = true
+
+        names = Object.keys(@col).sort (a, b)=>
+            return @col[a].getOrder() - @col[b].getOrder()
+
+        max = 0
+        for name in names
+            @col[name].data.order = max++
 
         true
 

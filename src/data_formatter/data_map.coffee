@@ -98,24 +98,24 @@ class DataMap
 	##
 	updateScreenPathValue: (path, newValue, didDataChange) =>
 
-		parts     = path.split '/'
-		tableName = parts[1]
-		keyValue  = parts[2]
-		fieldName = parts[3]
+		# parts     = path.split '/'
+		# tableName = parts[1]
+		# keyValue  = parts[2]
+		# fieldName = parts[3]
 
-		delete @cachedFormat[path]
+		# delete @cachedFormat[path]
 
-		result = $("[data-path='#{path}']")
-		if result.length > 0
+		# result = $("[data-path='#{path}']")
+		# if result.length > 0
 
-			currentValue = newValue
+		# 	currentValue = newValue
 
-			if @types[tableName]? and @types[tableName].col[fieldName]?
-				formatter    = @types[tableName].col[fieldName].formatter
-				currentValue = formatter.format currentValue, @types[tableName].col[fieldName].options, path
-				result.html currentValue
+		# 	if @types[tableName]? and @types[tableName].col[fieldName]?
+		# 		formatter    = @types[tableName].col[fieldName].formatter
+		# 		currentValue = formatter.format currentValue, @types[tableName].col[fieldName].options, path
+		# 		result.html currentValue
 
-			if didDataChange then result.addClass "dataChanged"
+		# 	if didDataChange then result.addClass "dataChanged"
 
 		##|
 		##|  Broadcast the data change event
@@ -189,16 +189,15 @@ class DataMap
 		dm.types[tableName] = new DataTypeCollection(tableName)
 
 		for sourceName, obj of savedConfig
+
+			if tableName == "jobrun"
+				console.log "Config #{tableName} source=#{sourceName} obj=", obj
+
 			if sourceName == "_lastModified" then continue
 			if typeof obj != "object" then continue
-
-			if obj.render and typeof obj.render == "string" and obj.render.length > 1
-				##|
-				##| Convert to a function
-				functionText = DataTypeCollection.renderFunctionToString(obj.render)
-				obj.render   = DataTypeCollection.renderStringToFunction(functionText)
-
 			dm.types[tableName].configureColumns [ obj ]
+
+		console.log  "importDataTypes table=#{tableName}:", dm.types[tableName]
 
 		true
 
@@ -217,6 +216,9 @@ class DataMap
 		   dm.types[tableName] = new DataTypeCollection(tableName)
 
 		dm.types[tableName].configureColumns columns
+
+		# console.log "ADDING:", tableName, columns
+		console.log dm.types[tableName]
 		true
 
 	##|
@@ -424,9 +426,18 @@ class DataMap
 			renderText = DataTypeCollection.renderFunctionToString(newValue)
 			newValue   = DataTypeCollection.renderStringToFunction(renderText)
 
+		if field == "order"
+			for source, col of dm.types[tableName].col
+				if col.getOrder() >= newValue
+					# console.log "Move ", col.getName(), " to ", col.data.order+1
+					col.data.order++
+
 		##|
 		##|  Make the change
+		# console.log "BEFORE CHANGE:", col.data
 		col.changeColumn(field, newValue)
+		# console.log "CHANGE:", col.data
+
 		dm.types[tableName].verifyOrderIsUnique()
 
 		##|
@@ -459,7 +470,10 @@ class DataMap
 			dm.emitEvent "table_change", [tableName, saveText]
 
 		# console.log "Sending new data alert"
-		dm.emitEvent "new_data", [ tableName, keyValue ]
+		# dm.emitEvent "new_data", [ tableName, keyValue ]
+		ev = new CustomEvent("new_data", { detail: { tablename: tableName, id: keyValue }})
+		window.dispatchEvent ev
+
 		return doc
 
 	## -------------------------------------------------------------------------------------------------------------

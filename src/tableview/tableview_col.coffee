@@ -4,9 +4,9 @@
 ## used to create elements with a new unique ID
 ##
 
-reDate1  = /^[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]T00.00.00.000Z/
-reDate2  = /^[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]T[0-9][0-9].[0-9][0-9].[0-9][0-9].[0-9][0-9][0-9]Z/
-reNumber = /^[\-1-9][0-9]{1,10}$/
+reDate1   = /^[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]T00.00.00.000Z/
+reDate2   = /^[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]T[0-9][0-9].[0-9][0-9].[0-9][0-9].[0-9][0-9][0-9]Z/
+reNumber  = /^[\-1-9][0-9]{1,10}$/
 reDecimal = /^[\-1-9\.][0-9\.]{1,11}\.[0-9]+$/
 
 class TableViewColBase
@@ -110,6 +110,7 @@ class TableViewColBase
 	serialize: ()=>
 
 		obj           = {}
+		obj.name      = @getName()
 		obj.type      = @getType()
 		obj.width     = @getWidth()
 		obj.options   = @getOptions()
@@ -379,6 +380,9 @@ class TableViewCol extends TableViewColBase
 		if @data.skipDeduce? and @data.skipDeduce == true then return null
 		if @data.deduceAttempts++ > 50 then return null
 		if !newData? then return null
+		if @data.type == "timeago" then return null
+		if @data.type == "datetime" then return null
+		if @data.type == "link" then return null
 
 		if typeof newData == "string"
 
