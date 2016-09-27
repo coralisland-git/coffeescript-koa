@@ -27,9 +27,6 @@ class FloatingSelect extends FloatingWindow
 	getOptionHeight: ()=>
 		return 24
 
-	setFilter: (text)=>
-		console.log "Filter..."
-
 	close: ()=>
 		if @table?
 			@el.remove()
@@ -37,57 +34,70 @@ class FloatingSelect extends FloatingWindow
 
 	hide: ()=>
 		@el.hide();
+		if @table?
+			console.log "Hiding, removing table?", @el
 		return true
 
 	show: ()=>
 		@el.show()
+		@showTable()
+		@table.onResize()
 		true
 
 	onResize: ()=>
 		@el.show()
-		@table.onResize()
+		if @table? then @table.onResize()
 
 	setTable: (@tableName, @columns, config)=>
-
 		GlobalClassTools.addEventManager(this)
 
-		if !@table?
-			@table = new TableView(@el, false)
-			@table.showGroupPadding = false
-			@table.showResize       = false
+	showTable: ()=>
 
-			@table.addTable @tableName, (colName)=>
-				##|
-				##|  Column filter function only shows specific columns
-				##|
-				if !@columns? then return true
-				for opt in @columns
-					if opt == colName.source then return true
-				return false
+		if @table?
+			console.log "Table already setup"
+			return @table
 
-			@table.on "click_row", (row, e)=>
-				@emitEvent "select", [ row ]
-				true
+		@table = new TableView(@el, false)
+		@table.showGroupPadding = false
+		@table.showResize       = false
 
-			@table.on "focus_cell", (path, item)=>
-				console.log "on focus cell:", path, item
-				@emitEvent "preselect", [ item.id, item ]
-				true
+		@table.addTable @tableName, (colName)=>
+			##|
+			##|  Column filter function only shows specific columns
+			##|
+			if !@columns? then return true
+			for opt in @columns
+				if opt == colName.getSource()
+					return true
 
-			if config? and config.showHeaders
-				@table.showHeaders = true
-				# @table.showFilters = true
+			return false
 
-			@table.setFixedSize(@w, @h)
-			@table.render()
-			@table.onResize()
+		@table.on "click_row", (row, e)=>
+			@emitEvent "select", [ row ]
+			true
 
-		return @table
+		@table.on "focus_cell", (path, item)=>
+			console.log "on focus cell:", path, item
+			@emitEvent "preselect", [ item.id, item ]
+			true
+
+		if config? and config.showHeaders
+			@table.showHeaders = true
+			# @table.showFilters = true
+
+		@table.setFixedSize(@w, @h)
+		@table.render()
+		@table.onResize()
 
 class TypeaheadInput
 
 	onKeypress: (e)=>
 		val = @elInputField.val()
+
+		if e.keyCode == 27
+			@win.hide()
+			return false
+
 		if e.keyCode == 13
 			@emitEvent "change", val
 			@win.hide()
@@ -102,7 +112,7 @@ class TypeaheadInput
 			return
 
 		console.log "Keypress during input", e, e.keyCode, val
-		@win.setFilter val
+		@setFilter val
 		return true
 
 	onFocus: (e)=>
@@ -110,6 +120,7 @@ class TypeaheadInput
 		@clearIcon.show()
 		@elInputField.select()
 		console.log "Showing window", @win
+		@win.show()
 		@win.onResize()
 		return true
 
@@ -134,8 +145,8 @@ class TypeaheadInput
 			@win.table.moveCellDown()
 		true
 
-	setFilter: (callback)=>
-		@win.setFilter = callback
+	setFilter: (newText)=>
+		@emitEvent "filter", [ newText, @win.table ]
 		true
 
 	constructor: (InputField, @tableName, @columns, options) ->
@@ -155,6 +166,7 @@ class TypeaheadInput
 		@clearIcon.on 'click', (e) =>
 			@elInputField.val('')
 			@emitEvent 'change', ''
+			@setFilter ""
 			@elInputField.focus()
 		.on 'mouseover', () =>
 			@excludeBlurEvent = true

@@ -50,17 +50,32 @@ $ ->
 
         Words = [ "Apple", "Ball", "Bat", "Bath", "Car", "Dog", "Double", "Big Dog", "Bath House", "Ball Boy", "Dog Track", "Tracking", "Simple", "Zebra", "Cow","Horse","Pig","Snake"]
         DataMap.setDataCallback "test", "findAll", (condition)->
+            console.log "data callback:", condition
             results = []
             results.push { id: word } for word in Words
+            console.log "Return ", results
             return results
 
         DataMap.setDataCallback "test", "findFast", (id, subkey)->
+            console.log "data callback test findFast id=#{id} subkey=#{subkey}"
             return id
 
         ##|
         ##|  Simple typeahead example
 
         t = new TypeaheadInput("#testCity", "test", [ "options" ])
+        t.on "filter", (val, table)->
+
+            max = Math.random() * 30
+            Words = []
+            for n in [0..max]
+                Words.push val+" "+Math.ceil(Math.random()*2000)
+
+            table.updateRowData()
+            # console.log "TypeaheadInput on filter:", val
+            # console.log "Typeahead table:", table
+            true
+
         t.on "change", (val)->
             console.log "TypeaheadInput #1:", val
 
@@ -83,13 +98,13 @@ $ ->
         ##|
         ##|  Example 3 - Using the Zipcode data with a custom render function
 
-        options.render = (id, row)=>
-            console.log "render[#{id}]", row
-            return row.city + ", " + row.state + " - " + row.code
+        # options.render = (id, row)=>
+        #     console.log "render[#{id}]", row
+        #     return row.city + ", " + row.state + " - " + row.code
 
-        options.placeholder = "Select a location"
+        # options.placeholder = "Select a location"
 
-        t = new TableDropdownMenu("#ptestMenu3", "zipcode", [ "id", "code", "city", "state" ], options)
-        t.on "change", (val)->
-            console.log "TableDropdownMenu #2:", val
+        # t = new TableDropdownMenu("#ptestMenu3", "zipcode", [ "id", "code", "city", "state" ], options)
+        # t.on "change", (val)->
+        #     console.log "TableDropdownMenu #2:", val
 

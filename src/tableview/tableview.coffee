@@ -589,7 +589,6 @@ class TableView
 		if @fixedWidth? and @fixedHeight?
 			@elTableHolder.width(@fixedWidth)
 			@elTableHolder.height(@fixedHeight);
-			console.log "FIXED #{@fixedWidth}, #{@fixedHeight}"
 		else if @elTableHolder.width() > 0
 			@setHolderToBottom()
 			@updateRowData()
@@ -864,7 +863,7 @@ class TableView
 		##|
 		##|  Find the columns for the specific table name
 		columns = DataMap.getColumnsFromTable(@primaryTableName, @columnReduceFunction)
-		# console.log "Columns found:", columns
+		console.log "Columns found from #{@primaryTableName}:", @columnReduceFunction, columns
 
 		for col in columns
 			if not col.getVisible() then continue
@@ -910,6 +909,8 @@ class TableView
 		@applyFilters()
 		@rowDataRaw = []
 		allData     = DataMap.getValuesFromTable @primaryTableName, @reduceFunction
+
+		console.log "allData=", allData
 
 		@updateColumnList()
 
