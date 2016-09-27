@@ -420,7 +420,7 @@ class TableView
 
 	pressEnter: (e)=>
 
-		# console.log "pressEnter cell=", @currentFocusCell, "path=", @currentFocusPath
+		console.log "pressEnter cell=", @currentFocusCell, "path=", @currentFocusPath
 
 		if @currentFocusCell? and !@currentFocusPath?
 			##|
@@ -1600,6 +1600,7 @@ class TableView
 		##|
 		##|  Hide any remaining cached cells on the right
 		while @shadowCells[location.visibleRow].children[location.shadowVisibleCol]?
+			@shadowCells[location.visibleRow].children[location.shadowVisibleCol].resetDataValues()
 			@shadowCells[location.visibleRow].children[location.shadowVisibleCol].hide()
 			@shadowCells[location.visibleRow].children[location.shadowVisibleCol].setDataPath(null);
 			location.shadowVisibleCol++
@@ -1695,6 +1696,7 @@ class TableView
 
 		while @shadowCells[location.visibleRow]?
 			@shadowCells[location.visibleRow].hide()
+			@shadowCells[location.visibleRow].resetDataValues()
 			location.visibleRow++
 
 		@updateScrollbarSettings()

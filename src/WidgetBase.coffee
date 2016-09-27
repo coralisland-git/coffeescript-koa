@@ -101,6 +101,17 @@ class WidgetTag
     addDiv: (classes, id, attributes) =>
         return @add "div", classes, id
 
+    resetDataValues: ()=>
+        if globalTagData[@gid]?
+            path = globalTagData[@gid]
+            if path? then delete globalTagPath[path]
+            globalTagData[@gid] = {}
+
+        for c in @children
+            c.resetDataValues()
+
+        return true
+
     ##|
     ##|  Shortcut to setting a data value for the path
     setDataPath: (keyVal) =>

@@ -9,7 +9,10 @@
 globalOpenEditor = (e) ->
 	##|
 	##|  Clicked on an editable field
-	path = $(e).attr("data-path")
+	console.log "GlobalOpenEditor:", e
+	data = WidgetTag.getDataFromEvent(e)
+	console.log "GlobalOpenEditor Data:", data
+	path = data.path
 	DataMap.getDataMap().editValue path, e
 	false
 
@@ -78,12 +81,14 @@ class DataMap
 		fieldName = parts[3]
 
 		existingValue = @engine.getFast tableName, keyValue, fieldName
-		formatter     = @types[tableName].col[fieldName].formatter
+		formatter     = @types[tableName].col[fieldName].getFormatter()
 
 		##|
 		##|  Fix the options in the global formatter object
-		if @types[tableName].col[fieldName].options?
-			formatter.options = @types[tableName].col[fieldName].options
+		formatter.options = @types[tableName].col[fieldName].getOptions()
+
+		console.log "editValue path=#{path} table=#{tableName}, keyValue=#{keyValue}, field=#{fieldName}"
+		console.log "Formatter:", formatter
 
 		formatter.editData el, existingValue, path, @updatePathValueEvent
 		return true

@@ -380,9 +380,7 @@ class TableViewCol extends TableViewColBase
 		if @data.skipDeduce? and @data.skipDeduce == true then return null
 		if @data.deduceAttempts++ > 50 then return null
 		if !newData? then return null
-		if @data.type == "timeago" then return null
-		if @data.type == "datetime" then return null
-		if @data.type == "link" then return null
+		if @data.type != "text" then return null
 
 		if typeof newData == "string"
 
