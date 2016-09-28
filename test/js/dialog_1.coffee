@@ -57,6 +57,19 @@ $ ->
 			, 3000
 		, 3000
 
+	addTestButton "Busy Dialog - Percents 1", "Open", ()->
+
+		window.globalBusyDialog.showBusy "Doing something that takes time"
+		window.globalBusyDialog.setMinMax(0, 100)
+
+		counter = 0
+		do loopRunning = ()->
+			window.globalBusyDialog.updatePercent(counter++)
+			if counter < 100
+				setTimeout loopRunning, 100
+			else
+				window.globalBusyDialog.finished()
+
 	addTestButton "Simple Form 1", "Open", () ->
 
 		m = new ModalDialog

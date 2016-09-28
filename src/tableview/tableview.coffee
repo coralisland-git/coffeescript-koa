@@ -910,8 +910,6 @@ class TableView
 		@rowDataRaw = []
 		allData     = DataMap.getValuesFromTable @primaryTableName, @reduceFunction
 
-		console.log "allData=", allData
-
 		@updateColumnList()
 
 		##|
