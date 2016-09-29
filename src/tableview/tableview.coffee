@@ -986,7 +986,7 @@ class TableView
 	## -------------------------------------------------------------------------------------------------------------
 	## set the holder element to go to the bottom of the screen
 	##
-	setHolderToBottom: () =>
+	setHolderToBottom: (attemptCounter) =>
 
 		height = $(window).height()
 
@@ -996,10 +996,15 @@ class TableView
 		tableWidth = @elTableHolder.outerWidth()
 		tableHeight = @elTableHolder.outerHeight()
 
-		console.log "setHolderToBottom #{@primaryTableName} winHeight=#{height}, pos=", pos, " offset=", offset, "table=#{tableWidth} x #{tableHeight}"
-
-		if tableWidth == 0 and tableHeight == 0
+		if pos.top == 0 and pos.left == 0 and tableWidth == 0
+			if attemptCounter? and attemptCounter == 3 then return
+			setTimeout ()=>
+				if !attemptCounter? then attemptCounter = 0
+				@setHolderToBottom(attemptCounter+1)
+			, 10
 			return
+
+		# console.log "setHolderToBottom #{@primaryTableName} winHeight=#{height}, pos=", pos, " offset=", offset, "table=#{tableWidth} x #{tableHeight} v=", @elTableHolder[0].style.visibility
 
 		newHeight = height - pos.top
 		@elTableHolder.height(newHeight)
@@ -1921,7 +1926,6 @@ class TableView
 			@virtualScrollV.bottomPadding = 26
 			@virtualScrollV.resize()
 
-			console.log "Showing status bar"
 			@elStatusBar = tableWrapper.addDiv "statusbar"
 
 			@elStatusText = @elStatusBar.addDiv "scrollStatusText"

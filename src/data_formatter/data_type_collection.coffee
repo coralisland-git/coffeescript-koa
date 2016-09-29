@@ -127,7 +127,7 @@ class DataTypeCollection
             if order?
                 if seen[order]?
                     col.changeColumn "order", null
-                    console.log "Duplicate order for #{name}"
+                    console.log "Duplicate order for #{source}"
                 else
                     seen[order] = true
 
