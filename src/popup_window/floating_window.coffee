@@ -111,7 +111,7 @@ class TypeaheadInput
 			@moveCellDown()
 			return
 
-		console.log "Keypress during input", e, e.keyCode, val
+		# console.log "Keypress during input", e, e.keyCode, val
 		@setFilter val
 		return true
 
@@ -160,7 +160,7 @@ class TypeaheadInput
 		##| add clear text input icon
 		@elInputField.after $('<i />',
 			'class': 'fa fa-times floatingDropdownIcon'
-			style: 'margin-left: -20px; float:none; display:none')
+			style: 'margin-left: -20px; float:right; display:none')
 		@clearIcon = @elInputField.next()
 		##| bind clear icon click event
 		@clearIcon.on 'click', (e) =>
@@ -195,6 +195,10 @@ class TypeaheadInput
 		width      = @elInputField.outerWidth(true)
 		height     = @elInputField.outerHeight(true)
 
+		px = @elInputField.position()
+
+		console.log "Scroll=#{scrollLeft},#{scrollTop} pos=#{posLeft},#{posTop} px=", px
+
 		$.extend config, options
 
 		# @win = new FloatingSelect(posLeft + scrollLeft, posTop+scrollTop+height, width, config.rowHeight*config.numRows, @elInputField.parent())
@@ -226,13 +230,14 @@ class TableDropdownMenu
 	constructor: (HolderField, @tableName, @columns, options)->
 
 		@config =
-			rowHeight   : 24
-			numRows     : 10
-			showHeaders : false
-			width       : null
-			height      : null
-			render      : null
-			placeholder : "Select an option"
+			rowHeight:   24
+			numRows:     10
+			showHeaders: false
+			width:       null
+			height:      null
+			render:      null
+			allowEmpty:  true
+			placeholder: "Select an option"
 
 		$.extend @config, options
 
@@ -257,6 +262,12 @@ class TableDropdownMenu
 		height     = @elInputField.outerHeight(true)
 		if !@config.width?  then @config.width = width
 		if !@config.height? then @config.height = @config.rowHeight*@config.numRows
+
+		if @config.allowEmpty? and @config.allowEmpty == false
+			##|
+			##|  Select the first row automatically
+			tableRows = DataMap.getValuesFromTable @tableName
+			if tableRows? then @setValue tableRows.shift()
 
 		@elInputField.on "click", (e)=>
 			@win.show()
