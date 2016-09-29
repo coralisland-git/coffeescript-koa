@@ -195,9 +195,6 @@ class DataMap
 
 		for sourceName, obj of savedConfig
 
-			if tableName == "jobrun"
-				console.log "Config #{tableName} source=#{sourceName} obj=", obj
-
 			if sourceName == "_lastModified" then continue
 			if typeof obj != "object" then continue
 			dm.types[tableName].configureColumns [ obj ]
@@ -223,7 +220,7 @@ class DataMap
 		dm.types[tableName].configureColumns columns
 
 		# console.log "ADDING:", tableName, columns
-		console.log dm.types[tableName]
+		# console.log dm.types[tableName]
 		true
 
 	##|
@@ -308,6 +305,7 @@ class DataMap
 		for keyName, value of newData
 			if keyName == "_id" then continue
 			if keyName == "loc" then continue
+			if keyName == "id" then continue
 
 			found = @types[tableName].getColumn(keyName)
 			if !found?

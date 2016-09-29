@@ -863,7 +863,7 @@ class TableView
 		##|
 		##|  Find the columns for the specific table name
 		columns = DataMap.getColumnsFromTable(@primaryTableName, @columnReduceFunction)
-		console.log "Columns found from #{@primaryTableName}:", @columnReduceFunction, columns
+		# console.log "Columns found from #{@primaryTableName}:", @columnReduceFunction, columns
 
 		for col in columns
 			if not col.getVisible() then continue
@@ -989,32 +989,27 @@ class TableView
 	setHolderToBottom: () =>
 
 		height = $(window).height()
+
 		pos = @elTableHolder.position()
+		offset = @elTableHolder.offset()
+
+		tableWidth = @elTableHolder.outerWidth()
+		tableHeight = @elTableHolder.outerHeight()
+
+		console.log "setHolderToBottom #{@primaryTableName} winHeight=#{height}, pos=", pos, " offset=", offset, "table=#{tableWidth} x #{tableHeight}"
+
+		if tableWidth == 0 and tableHeight == 0
+			return
 
 		newHeight = height - pos.top
 		@elTableHolder.height(newHeight)
 
 		##|
 		##|  If the width of the table scrolls, this fixes it
-		newWidth = @elTableHolder.width()
+		newWidth = @elTableHolder.outerWidth()
 
-		if @resizeHolderEvent?
-
-			if newWidth != @lastNewWidth or newHeight != @lastNewHeight
-				# console.log "setHolderToBottom, WindowHeight=#{height}, Table Position=", pos, " newHeight=#{newHeight}, newWidth=#{newWidth}"
-				@resetCachedFromSize()
-
-			return true
-
-		else
-
-			@resizeHolderEvent = true
-			$(window).on "resize", ()=>
-				##|
-				##|  Automatically adjust the position if the screen size changes
-				# console.log "TableView Resize from setHolderToBottom"
-				@setHolderToBottom()
-				true
+		@resetCachedFromSize()
+		@updateVisibleText()
 
 		@lastNewHeight = newHeight
 		@lastNewWidth  = newWidth
