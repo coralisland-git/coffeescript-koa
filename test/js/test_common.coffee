@@ -118,15 +118,15 @@ go = () ->
 			$(allTests[0].tag).html "<div class='exception'>Exception: " + e + "</div>"
 
 
-globalTableEvents.on "set_custom", (tableName, source, field, newValue)=>
-    console.log "globalTableEvents: table=#{tableName} source=#{source} field=#{field} new=", newValue
-    true
-
-DataMap.getDataMap().on "table_change", (tableName, config)->
-	console.log "DataMap.table_change tableName=#{tableName} config=", config
-	true
-
 $ ->
+
+	globalTableEvents.on "set_custom", (tableName, source, field, newValue)=>
+	    console.log "globalTableEvents: table=#{tableName} source=#{source} field=#{field} new=", newValue
+	    true
+
+	DataMap.getDataMap().on "table_change", (tableName, config)->
+		console.log "DataMap.table_change tableName=#{tableName} config=", config
+		true
 
 	console.log "Test Framework Loaded"
 
