@@ -69,7 +69,7 @@ class DynamicTabs
 	## @param [String] the id of the element in which tab should be rendered
 	##
 	constructor: (holderElement)->
-		@elHolder = $ "<div class='block' />"
+		@elHolder = $ "<div />"
 
 		@tabList = $ "<ul />",
 			"class": "nav nav-tabs"

@@ -60,7 +60,7 @@ module.exports = (grunt) ->
 					hostname: "0.0.0.0"
 					bases: ["ninja/test", "doc", "."]
 
-		##|
+		##|``
 		##|  Copy task, takes all the files in the different build folders
 		##|  produces the final "public" version for consumption
 		##|  merging resources from different frameworks

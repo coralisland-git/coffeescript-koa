@@ -12,6 +12,7 @@ $ ->
     for id, newData of Data
         # if !newData.id? then continue
         # id = newData.id
+        newData.distance = Math.random() * 10
         DataMap.addDataUpdateTable theTable, id, newData
 
     addHolder("renderTest1");

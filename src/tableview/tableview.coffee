@@ -113,8 +113,9 @@ class TableView
 	constructor: (@elTableHolder, @showCheckboxes) ->
 
 		# @property [Array] list of columns as array
-		@colList       = []
-		@actionColList = []
+		@colList           = []
+		@actionColListMove = []
+		@actionColList     = []
 
 		# @property [Array] list of rows as array
 		@rowDataRaw      = []
@@ -214,10 +215,10 @@ class TableView
 		found   = false
 		newList = []
 
-		col = @findColumn(sourceName)
-		if col?
-			@actionColList.push col
+		for name in @actionColListMove
+			if name == sourceName then return
 
+		@actionColListMove.push sourceName
 		@updateRowData()
 		@resetCachedFromSize()
 		@updateVisibleText()
@@ -867,7 +868,23 @@ class TableView
 
 		for col in columns
 			if not col.getVisible() then continue
-			@colList.push(col)
+
+			found = 0
+			for name in @actionColListMove
+				if name == col.getSource()
+					found = 1
+					console.log "col=", col.getSource(), " found=", found
+					for acol in @actionColList
+						if acol.getSource() == name then found = 2
+					console.log "col=", col.getSource(), " found=", found
+					if found == 1
+						console.log "Adding action column:", @actionColList
+						@actionColList.push col
+
+			if found == 0
+				@colList.push(col)
+
+		console.log "ColList=", @colList
 
 		##|
 		##|  reset available columns and sort them
@@ -1007,6 +1024,7 @@ class TableView
 		# console.log "setHolderToBottom #{@primaryTableName} winHeight=#{height}, pos=", pos, " offset=", offset, "table=#{tableWidth} x #{tableHeight} v=", @elTableHolder[0].style.visibility
 
 		newHeight = height - pos.top
+		newHeight = Math.floor(newHeight)
 		@elTableHolder.height(newHeight)
 
 		##|
