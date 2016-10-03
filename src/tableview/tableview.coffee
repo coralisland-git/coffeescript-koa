@@ -21,6 +21,10 @@ globalKeyboardEvents = new EvEmitter()
 globalTableEvents    = new EvEmitter()
 globalTableAdmin     = true
 
+$(window).on "resize", (e)=>
+	console.log "Window Global Resize", e
+	globalTableEvents.emitEvent "resize", []
+
 $(document).on "keyup", (e)=>
 
 	if e.target == document.body
@@ -50,6 +54,10 @@ $(document).on "mousedown", (e)=>
 	return true
 
 class TableView
+
+	SORT_ASC  : 1
+	SORT_DESC : -1
+	SORT_NONE : 0
 
 	# @property [String] imgChecked html to be used when checkbox is checked
 	imgChecked     : "<img src='images/checkbox.png' width='16' height='16' alt='Selected' />"
@@ -114,7 +122,6 @@ class TableView
 
 		# @property [Array] list of columns as array
 		@colList           = []
-		@actionColListMove = []
 		@actionColList     = []
 
 		# @property [Array] list of rows as array
@@ -215,15 +222,12 @@ class TableView
 		found   = false
 		newList = []
 
-		for name in @actionColListMove
-			if name == sourceName then return
+		columns = DataMap.getColumnsFromTable(@primaryTableName, null)
+		for col in columns
+			if col.getSource() == sourceName
+				@actionColList.push col
 
-		@actionColListMove.push sourceName
-		@updateRowData()
-		@resetCachedFromSize()
-		@updateVisibleText()
-
-		return found
+		return true
 
 	##|-------------------------------------------------------------------------------------------------------------
 	##| Add a column to the end of the table
@@ -733,18 +737,19 @@ class TableView
 	##|  sortMode = 0 / false => descending
 	##|  sortMode = 1 / true  => ascending
 	##|
-	addSortRule: (tableName, sourceName, sortMode)=>
 
-		console.log "adding sort rule table=#{tableName}, source=#{sourceName}, mode=#{sortMode}"
+	addSortRule: (sourceName, sortMode)=>
+
+		console.log "adding sort rule table=#{@primaryTableName}, source=#{sourceName}, mode=#{sortMode}"
 
 		found = null
 		for rule in @sortRules
-			if rule.source == sourceName and rule.tableName == tableName
+			if rule.source == sourceName
 				found = rule
 				break
 
 		if found == null
-			found = { source: sourceName, tableName: tableName, state: 0 }
+			found = { source: sourceName, tableName: @primaryTableName, state: 0 }
 			@sortRules = [ found ]
 
 		if sortMode? and sortMode == 0
@@ -758,7 +763,6 @@ class TableView
 		else
 			found.state = -1
 
-		console.log "Found=", found
 		@updateRowData()
 		return
 
@@ -869,22 +873,16 @@ class TableView
 		for col in columns
 			if not col.getVisible() then continue
 
-			found = 0
-			for name in @actionColListMove
-				if name == col.getSource()
-					found = 1
-					console.log "col=", col.getSource(), " found=", found
-					for acol in @actionColList
-						if acol.getSource() == name then found = 2
-					console.log "col=", col.getSource(), " found=", found
-					if found == 1
-						console.log "Adding action column:", @actionColList
-						@actionColList.push col
+			foundInActionCol = false
+			for acol in @actionColList
+				if acol.getSource() == col.getSource()
+					foundInActionCol = true
+					break
 
-			if found == 0
-				@colList.push(col)
+			if foundInActionCol then continue
 
-		console.log "ColList=", @colList
+			# if found == 0
+			@colList.push(col)
 
 		##|
 		##|  reset available columns and sort them
@@ -903,14 +901,6 @@ class TableView
 					break
 
 			if foundInGroup then continue
-
-			foundInActionCol = false
-			for acol in @actionColList
-				if acol.getSource() == col.getSource()
-					foundInActionCol = true
-					break
-
-			if foundInActionCol then continue
 
 			# console.log "colByNum[#{total}] = ", col.getName()
 			@colByNum[total] = col
@@ -1074,7 +1064,8 @@ class TableView
 		##|  Width of all fixed right action columns
 		total = 0
 		for col in @actionColList
-			total += col.width
+			total += col.getWidth()
+
 		return total
 
 	##|
@@ -1489,7 +1480,7 @@ class TableView
 			cell = @shadowCells[location.visibleRow].children[location.shadowVisibleCol]
 			cell.show()
 
-			cell.move location.x, 0, acol.width, location.rowHeight
+			cell.move location.x, 0, acol.getWidth(), location.rowHeight
 
 			cell.setClass "text-right", acol.getAlign() == "right"
 			cell.setClass "text-center", acol.getAlign() == "center"
@@ -1526,7 +1517,7 @@ class TableView
 				else
 					@updateVisibleActionRowText(location, acol, cell)
 
-			location.x += acol.width
+			location.x += acol.getWidth()
 			location.shadowVisibleCol++
 
 	##|
@@ -1634,6 +1625,19 @@ class TableView
 
 		if !@offsetShowingLeft? or @offsetShowingLeft < 0
 			@offsetShowingLeft = 0
+
+		if @rowDataRaw.length == 0
+
+			@updateScrollbarSettings()
+
+			if !@shadowCells[0]?
+				@shadowCells[0] = @elTheTable.addDiv "tableRow"
+				@shadowCells[0].setAbsolute()
+
+			@shadowCells[0].move(0,0, @elTableHolder.width(), @elTableHolder.height())
+			@shadowCells[0].html "No data available"
+			console.log "No row data"
+			return
 
 		y               = 0
 		groupState      = null
@@ -1976,6 +1980,8 @@ class TableView
 		##|
 		##|  Setup context menu on the header
 		@setupContextMenu @contextMenuCallbackFunction
+		globalTableEvents.on "resize", @onResize
+
 		true
 
 
@@ -1986,7 +1992,7 @@ class TableView
 	## @param [String] type it can be ASC|DESC
 	##
 	sortByColumn: (name) =>
-		@addSortRule @primaryTableName, name
+		@addSortRule name
 		true
 
 	##|

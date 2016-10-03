@@ -1,187 +1,209 @@
-#wrapper
-	padding-left 250px
-	transition all 0.4s ease 0s
-	&.active
-		padding-left 0
-		#sidebar-wrapper
-			left 0
+@import 'nib'
+@import 'nib/gradients'
+@import 'nib/reset'
+
+@import url(../fonts/usesf.css)
+
+global-reset()
+
+*
+    font-smoothing     : antialiased
+    -webkit-box-sizing : border-box;
+    -moz-box-sizing    : border-box;
+    box-sizing         : border-box;
+
+html
+    width       : 100%
+    height      : 100%
+
+body
+    font-family      : 'San Francisco Display', HelveticaNeue, sans-serif;
+    font-size        : 10pt
+    margin           : 0px
+    padding          : 0px
+    width            : 100%
+    background-color : #eeeeee
+
+    // overflow      : hidden; /* this is important to prevent the whole page to bounce */
+    // height        : 100%
+
+#busyMessage
+    position         : fixed
+    top              : 10px
+    left             : 50%
+    margin-left      : -200px
+    width            : 400px
+    min-width        : 400px
+    z-index          : 30000
+    padding-top      : 10px
+    padding-bottom   : 10px
+    padding-left     : 10px
+    padding-right    : 10px
+    background-color : rgba(231, 183, 71, 0.4)
+    color            : #000000
+    font-size        : 20px
+    border-radius    : 6px
+    opacity          : 0.8
+    display          : none;
 
 #header-navbar
-	margin:     0 auto;
-	padding:    13px 10px 1px;
-	max-width:  100%;
+    padding-top:    8px
+    padding-bottom: 8px
+    box-shadow:     0 1px 3px 0 rgba(0, 0, 0, 0.33);
+    display:        inline-table;
+    width:          100%
+    margin:         0 auto;
+    padding:        13px 10px 1px;
+    max-width:      100%;
 
-#sidebar-wrapper
-	margin-left -250px
-	left 250px
-	width 250px
-	background #2C343F
-	position fixed
-	height 100%
-	overflow-y auto
-	z-index 1000
-	transition all 0.4s ease 0s
+#main-container
+    background-color: #eeeeee
+    width: 100%
+    // margin-top: 50px
 
-#page-content-wrapper
-	width 100%
+#MainTitle
+    color:          #000000
+    font-size:      18px
+    padding:        0
+    margin:         0
+    padding-bottom: 4px
+    clear:          both
 
-.nav > li > a
+#MainTitle.alone
+    padding-top: 10px
 
-	padding-top: 0px
-	padding-bottom: 0px
+#SubTitle
+    display:     block
+    padding-top: 4px
+    clear:       both
 
-.sidebar-nav
-	position absolute
-	top 0
-	list-style none
-	margin 0
-	padding 0
-	width: 100%
+.screen
+    display: none
 
-	li
-		line-height 40px
-		text-indent 20px
+#logoHolder
+    padding-top: 0px
+    padding-left: 10px
+    padding-right: 10px
 
-		a
-			color #999999
-			display block
-			text-decoration none
+.sidebar-content .side-header
+    padding-top: 4px
 
-			span
+#connStatus
+    clear: both
+    display: block
+    color: #6F747D
 
-				&:before
-					position absolute
-					left 0
-					color #41484c
-					text-align center
-					width 20px
-					line-height 18px
+#btnAppSearchBarcode
+    cursor: pointer
 
-	& > .sidebar-brand
-		height 65px
-		line-height 60px
-		font-size 18px
+#btnAppSearch
+    cursor: pointer
 
-		a
-			color #999999
+#simpleTooltip
+    padding-top      : 10px
+    padding-bottom   : 10px
+    padding-left     : 20px
+    padding-right    : 20px
+    height           : 30px
+    background-color : #F4DFB4
+    color            : #9C3A1C
 
-			&:hover
-				color #fff
-				background none
+.canvasjs-chart-credit
+    display: none
 
-.sidebar-nav li a:hover,
-.sidebar-nav li.active
-	color #fff
-	background rgba(255,255,255,0.2)
-	text-decoration none
+.side-header
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.33);
 
-.sidebar-nav li a:active,
-.sidebar-nav li a:focus
-	text-decoration none
+.dashboard
+    padding: 10px
 
-.content-header
-	height 65px
-	line-height 65px
-	h1
-		margin 0
-		margin-left 20px
-		line-height 65px
-		display inline-block
+.headerFixedTop
+    width: 100%
+    height: 50px
+    background-color: #ffffff
+    position: fixed
+    top: 0px
+    display: none;
 
-#menu-toggle
-	text-decoration none
+#page-container
+    display: none
 
-.btn-menu
-	color #000
+.navbar
+    box-shadow : 0 1px 3px 0 rgba(0, 0, 0, 0.33);
+    border-radius: 0px
+    border: 0px
+    margin-bottom: 0px
 
-.inset
-	padding 20px
+.blocklyWidgetDiv
+    z-index: 1999
 
-@media (max-width:767px)
-	#wrapper
-		padding-left 0
-		&.active
-			position relative
-			left 250px
-			#sidebar-wrapper
-				left 250px
-				width 250px
-				transition all 0.4s ease 0s
-	#sidebar-wrapper
-		left 0
-	#menu-toggle
-		display inline-block
-	.inset
-		padding 15px
+.modal-backdrop
+    z-index: 21000;
 
-.main
-
-	padding: 20px
-
-.testTable
-
-	width: 100%
-
-	td
-		font-size: 10pt
-		font-family: Arial
-		border-bottom: 1px solid #bbbbbb
-		padding-bottom: 8px
-		padding-top: 8px
-		vertical-align: top
-
-	td.test_code
-		width: 800px
-		font-family: monospace
-		padding-right: 8px
-		padding-left: 8px
-		background-color: #f5f2f0
-
-	td.test_label
-		width: 200px
-		min-width: 200px
-		text-align: right
-		border-right: 1px solid #cccccc
-		padding-right: 8px
-
-	td.test_result
-		padding-left: 10px
-		padding-right: 10px
-		text-align: left
-		border-right: 1px solid #cccccc
-		min-width: 200px
-
-.exception
-
-	color: #ff3030
-	font-family: monospace
-
-.fage
-	padding-left: 20px
-
-pre
-	padding: 0px
-	border: 0px
-
-.selectize-control
-	.selectize_item
-		font-size: 12px
-		// background-color: #1b9dec;
-		// color: #ffffff
-		// padding-top: 4px
-		// padding-bottom: 4px
-		// padding-left: 10px
-		// padding-right: 4px
-		// line-height: 32px
-		// height: 32px
-		// width: 120px
-		// min-width: 120px
-		// padding-left: 10px
-		// padding-right: 10px
-
+.modal
+    z-index: 21050;
 
 @media screen and (min-width: 1000px)
-	.modal-dialog
-		width: 900px;
+
+    .modal-dialog
+        width: 900px;
+
+#blocklyDiv
+    width: 2000px
+    height: 4000px
+    position: absolute
+
+.bg-white-op
+    background-color: rgba(255, 255, 255, 0.075);
+
+.text-white
+    color: #ffffff
+
+.selectize-control
+    .item
+        font-size: 12px
+        line-height: 32px
+        height: 32px
+        width: 120px
+        min-width: 120px
+        padding-left: 10px
+        padding-right: 10px
+
+a.list-group-item
+    cursor: pointer
+
+a.list-group-item:hover
+    color: blue
+
+.block > .nav-tabs > li > a
+    border: 1px solid rgba(60,60,60,1.0)
+    // border: 1px solid rgba(60, 60, 60, 0.2)
+
+.nav-tabs
+    border: 0px
+
+
+.modal-body
+
+    h4
+        font-size: 18px
+        padding-bottom: 14px
+
+.nav-main a:hover
+    text-decoration: none
+
+.nav-main span
+    cursor: pointer
+
+.infoPanel
+    line-height      : 24px
+    padding-top      : 8px
+    padding-bottom   : 8px
+    font-size        : 16px
+    background-color : #f9f9ff
+
+    i
+        padding-left  : 10px
+        padding-right : 10px
 
 

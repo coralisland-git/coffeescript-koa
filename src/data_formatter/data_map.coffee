@@ -306,6 +306,8 @@ class DataMap
 			if keyName == "_id" then continue
 			if keyName == "loc" then continue
 			if keyName == "id" then continue
+			if keyName.charAt(0) == '_' then continue
+			if keyName == "hash" then continue
 
 			found = @types[tableName].getColumn(keyName)
 			if !found?
@@ -349,6 +351,9 @@ class DataMap
 			keepColumn = true
 			if reduceFunction?
 				keepColumn = reduceFunction(col)
+
+			if source.charAt(0) == "_"
+				keepColumn = false
 
 			if keepColumn
 				columns.push col

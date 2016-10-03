@@ -1,7 +1,4 @@
 ## -------------------------------------------------------------------------------------------------------------
-## class ErrorMessageBox to show the errors in the modal dialog
-##
-##
 ## @extends [ModalDialog]
 class ErrorMessageBox extends ModalDialog
 

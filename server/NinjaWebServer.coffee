@@ -150,10 +150,12 @@ class NinjaWebServer
         ##|
         ##|  Watch for changes
         if !server.fileWatch[f]?
-            server.fileWatch[f] = fs.watch f, {}, (event, filename) =>
+            server.fileWatch[f] = fs.watch f, {recursive:true}, (event, filename) =>
+                console.log "WATCH #{filename}:", event
+
                 if server.fileTimer[f]
                     clearTimeout server.fileTimer[f]
-                server.fileTimer[f] = setTimeout callback, 1000
+                server.fileTimer[f] = setTimeout callback, 1000, filename
 
         true
 
@@ -313,8 +315,12 @@ class NinjaWebServer
 
                 info = getClassInfo(file)
                 if info? and info.extends?
+                    for name in @ninjaCoffeeExtends
+                        if name == file then return true
                     @ninjaCoffeeExtends.push info
                 else
+                    for name in @ninjaCoffeeNormal
+                        if name == file then return true
                     @ninjaCoffeeNormal.push file
 
             else if /.styl/.test file
@@ -382,8 +388,14 @@ class NinjaWebServer
             yield @rebuildNinjaFile(file) for file in files
             @rebuildNinjaSave()
 
-            @setWatchTimer "../src/.", (a,b)->
-                console.log "rebuildNinja change event a=", a, "b=", b, "t=", this
+            @setWatchTimer "../src/.", (filename)=>
+                filename = "../src/#{filename}"
+                console.log "rebuildNinja change: #{filename}"
+                @rebuildNinjaFile(filename)
+                .then ()=>
+                    console.log "Resaving"
+                    @rebuildNinjaSave()
+
 
     constructor: () ->
 

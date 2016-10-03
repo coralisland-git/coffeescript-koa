@@ -28,6 +28,8 @@ class BusyDialog
     ##
     constructor:  () ->
 
+        console.log "CREATE NEW BUSY"
+
 # <div class="modal-header">
 #             </div>
         # @property [String] template the template to use in the BusyDialog
@@ -35,14 +37,16 @@ class BusyDialog
         <div class="hidex" id="pleaseWaitDialog">
             <div class="modal-body">
                 <h4 id='pleaseWaitDialogTitle'>{{content}}</h4>
+
                 <div class="progress" style='display: none;'>
                   <div id='busyProgressBar' class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
-                    <span class='progressText'>Loading</span>
                   </div>
                 </div>
                 <div class="spinner" style='display: none;'>
                     <i class='fa fa-3x fa-asterisk fa-spin'></i>
                 </div>
+
+                <div class='progressTextUnder'>Loading</div>
             </div>
         </div>
         '''
@@ -56,7 +60,7 @@ class BusyDialog
         # @property [JQueryElement] elTitle the element in which the dialog is rendered
         @elTitle        = $("#pleaseWaitDialogTitle")
         @elProgressBar  = $("#busyProgressBar")
-        @elProgressText = @modal.find(".progressText")
+        @elProgressText = @modal.find(".progressTextUnder")
         @elProgressDiv  = @modal.find(".progress")
         @elSpinner      = @modal.find(".spinner")
 

@@ -1513,7 +1513,17 @@ class DataFormatSimpleObject extends DataFormatterType
 	## @return [Object] data formatted data
 	##
 	format: (data,options,path) =>
-		return "View"
+		if !data?
+			return "Not set"
+
+		if data? and Array.isArray(data)
+			if data.length == 0
+				return "Not set"
+
+			if typeof data[0] == "string"
+				return data.sort().join(", ")
+
+		return "View:" + JSON.stringify(data)
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to unformat the currently formatted data
@@ -1550,7 +1560,7 @@ class DataFormatLink extends DataFormatterType
 	##
 	format: (data,options,path) =>
 		if !data? then return ""
-		if /wwww/.test data then return "Open Link"
+		if /www/.test data then return "Open Link"
 		if /^http/.test data then return "Open Link"
 		if /^ftp/.test data then return "Open FTP"
 		if data.length > 0

@@ -30,6 +30,7 @@ node_modules
 .idea
 
 #build generated folder
-ninja
+ninja.js
+ninja.css
 
 bower_components
