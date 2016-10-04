@@ -28,10 +28,6 @@ class BusyDialog
     ##
     constructor:  () ->
 
-        console.log "CREATE NEW BUSY"
-
-# <div class="modal-header">
-#             </div>
         # @property [String] template the template to use in the BusyDialog
         @template = Handlebars.compile '''
         <div class="hidex" id="pleaseWaitDialog">

@@ -18,7 +18,8 @@ class PopupMenuItem
 	## @param [String] name the name of the popup menu to display
 	## @param [String] className the class to be applied on the popup menu li
 	##
-	constructor: (@name,@className,id)->
+	constructor: (@name, @className, id)->
+
 		# @property [String] iconClass to store the class of icon
 		@iconClass = "fa fa-fw"
 
@@ -39,8 +40,8 @@ class PopupMenuItem
 	## @return [JqueryElement] jquery element including badge icons and applied settings
 	##
 	getRenderedElement: ->
-		spanBadge = if @badge then "<div class='badge pull-right bg-#{@textClass}' style='margin-top:12px;'>#{@badge}</div>" else ""
-		iconElement = if @iconClass.length then "<i class='#{@iconClass} pull-right text-#{@textClass}' style='margin-top: 14px;margin-left:10px;font-size:14'></i>" else ""
+		spanBadge = if @badge then "<div class='badge pull-right bg-#{@textClass}'>#{@badge}</div>" else ""
+		iconElement = if @iconClass.length then "<i class='#{@iconClass} pull-right text-#{@textClass}'></i>" else ""
 		if @textClass.length
 			@link.addClass "text-#{@textClass}"
 		@link.html "#{@name} #{iconElement} #{spanBadge}"
@@ -93,7 +94,7 @@ class PopupMenuItem
 class PopupMenu
 
 	# @property [Integer] popupWidth width of the popup default 300
-	popupWidth:  300
+	popupWidth:  200
 
 	# @property [Integer] popupHeight height of the popup default 0
 	popupHeight: 0
@@ -197,9 +198,13 @@ class PopupMenu
 			window.popupMenuHolder.show()
 		, 10
 
+
+		globalKeyboardEvents.once "global_mouse_down", @onGlobalMouseDown
+		globalKeyboardEvents.once "esc", @onGlobalEscKey
+
 		##|
 		##|  Setup with default sizeing
-		@resize 300
+		@resize @popupWidth
 		@colCount  = 1
 		@menuItems = {}
 		@menuData  = {}
@@ -208,10 +213,12 @@ class PopupMenu
 	## close the window after the mouse drifts away from it
 	##
 	closeTimer: () =>
-		console.log "Popup Hide"
 		window.popupMenuHolder.hide()
 		window.popupMenuVisible = false
 		window.popupMenuTimer = 0
+
+		globalKeyboardEvents.off "global_mouse_down", @onGlobalMouseDown
+		globalKeyboardEvents.off "esc", @onGlobalEscKey
 		false;
 
 	## -------------------------------------------------------------------------------------------------------------
@@ -220,7 +227,7 @@ class PopupMenu
 	## @param [Integer] colCount the number of columns
 	##
 	setMultiColumn: (@colCount, colWidth) =>
-		if !colWidth? then colWidth = 300
+		if !colWidth? then colWidth = @popupWidth
 		@resize (@colCount*colWidth)
 		window.popupMenuHolder.addClass("multicol")
 		$(".multicol").css "columnCount", @colCount
@@ -242,7 +249,7 @@ class PopupMenu
 		@menuData[id]  = callbackData
 
 		if typeof className == "undefined"
-			className = "item"
+			className = "popupMenuItem"
 
 		linkObject = new PopupMenuItem(name,className,id)
 		@linkObjects.push linkObject
@@ -257,8 +264,7 @@ class PopupMenu
 
 			##|
 			##|  Close popup
-			window.popupMenuHolder.hide()
-			window.popupMenuVisible = false
+			@closeTimer()
 
 			##|  Lookup the element selected, make a callback
 			dataId = $(e.target).attr("data-id")
@@ -270,24 +276,14 @@ class PopupMenu
 		@resize @popupWidth
 		linkObject
 
-$ ->
+	onGlobalEscKey: (e)=>
+		# console.log "POPUP MENU, onGlobalEscKey", window.popupMenuVisible
+		@closeTimer()
+		return false
 
-	## -------------------------------------------------------------------------------------------------------------
-	## setup an event to monitor all clicks, if someone clicks
-	## while the popup menu is open, close it
-	##
-	$(document).on "click", (e) =>
-		if window.popupMenuVisible
-			window.popupMenuHolder.hide()
-			window.popupMenuVisible = false
-		true
+	onGlobalMouseDown: (e)=>
+		console.log "POPUP MENU, onGlobalMouseDown", window.popupMenuVisible
+		if !window.popupMenuVisible then return false
+		setTimeout @closeTimer, 200
+		return false
 
-	## -------------------------------------------------------------------------------------------------------------
-	## close the popup with escape key
-	##
-	$(document).on "keypress", (e) =>
-		if e.keyCode == 13
-			if window.popupMenuVisible
-				window.popupMenuHolder.hide()
-				window.popupMenuVisible = false
-		true

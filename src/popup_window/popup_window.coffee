@@ -360,11 +360,12 @@ class PopupWindow
 		@windowBodyWrapperTop  = $ "<div />",
 			class: "windowbody"
 		.css
-				position: "absolute"
-				top:      @windowTitle.height() + 2
-				left:     0
-				right:    0
-				bottom:   0
+			position: "absolute"
+			top:      @windowTitle.outerHeight()
+			left:     0
+			right:    0
+			bottom:   0
+
 		.append @windowWrapper
 
 		@popupWindowHolder.append @windowBodyWrapperTop

@@ -15,9 +15,6 @@ class DataTypeCollection
     ##|
     ##|  Returns the column if defined by
     getColumn: (source)=>
-        if !@col[source]?
-            console.log "Missing #{source} in ", @col
-
         return @col[source]
 
     ##|
@@ -122,10 +119,6 @@ class DataTypeCollection
         seen = {}
         max  = 0
 
-        # for source, col of @col
-        #     order = col.getOrder()
-        #     console.log "FIRST PASS:", source, "=", order
-
         ##|
         ##|  For any columns with a known order
         for source, col of @col
@@ -133,7 +126,6 @@ class DataTypeCollection
             if order?
                 if seen[order]?
                     col.changeColumn "order", null
-                    console.log "Duplicate order for #{source}"
                 else
                     seen[order] = true
 

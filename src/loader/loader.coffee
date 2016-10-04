@@ -30,7 +30,7 @@ doLoadScript = (url) ->
             resolve(true)
 
         oScript.onload = ()->
-            console.log "Script loaded:", url
+            # console.log "Script loaded:", url
             resolve(true)
 
         head = document.head || document.getElementsByTagName("head")[0];

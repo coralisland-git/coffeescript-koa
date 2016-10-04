@@ -24,8 +24,6 @@ $ ->
             html: "Popup Test 2"
         .bind 'click', (e) ->
 
-            e.preventDefault()
-            e.stopPropagation()
 
             menu = new PopupMenu "Test Title", 30, 30
             menu.resize(500)
@@ -67,10 +65,8 @@ $ ->
             class: "btn btn-primary"
             html: "Popup menu"
         .bind 'click', (e) ->
-            e.preventDefault()
-            e.stopPropagation()
 
-            menu = new PopupMenu "Test Title", 30, 30
+            menu = new PopupMenu "Test Title", e
 
             (menu.addItem "Item 1", (data) ->
                 console.log "Clicked item 1: ", data

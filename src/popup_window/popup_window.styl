@@ -1,3 +1,5 @@
+@import "../theme.styl"
+
 .popupNavBar
 	position         : absolute
 	top              : 0px
@@ -44,88 +46,40 @@
 	width: 100%
 
 .PopupWindow
+	themePopupWindow()
 
-	position:         absolute
 	top:              0px
 	left:             0px
 	width:            300px
 	z-index:          5000
-	vertical-align:   baseline
-	margin:           0
-	padding:          0
-	border:           0
 	cursor:           arrow
-	box-sizing:       content-box
 	opacity: 		  1.0
-	background-color: #E3DFDA
-
-	touch-callout:       none
-	tap-highlight-color: rgb(0,0,0)
-	text-size-adjust:    none
-	user-select:         none
-	float:               none
-	outline:             none
-	box-shadow:          6px 6px 18px 4px rgba(0,0,0,0.75);
-	border:              1px solid rgba(40,40,40,0.75)
 
 	.title
+		themePopupWindowTitle()
 
 		width            : 100%
-		background-color : #535250
-		color            : #E5E1DC
-		line-height      : 26px
-		font-size        : 16px
-		padding-left     : 6px
-		padding-right    : 6px
-		padding-top      : 4px
-		padding-bottom   : 4px
 		cursor           : move
 
+		.title_text
+			padding-left: 8px
+
 		.closebutton
-			float: right
-			cursor: pointer
-			width: 40px
-			text-align: right
+			float      : right
+			cursor     : pointer
+			width      : 40px
+			text-align : right
+			padding-right: 8px
 
 	.windowbody
 
-		font-size:      14px
 		padding-left:   6px
 		padding-right:  6px
 		padding-top:    4px
 		padding-bottom: 4px
 
-		.tableview
-
-			tbody tr:hover td
-				background-color: rgba(237, 192, 80, 1.0)
-				cursor: pointer
-
-			tbody tr:nth-child(even)
-				background: #ffffff;
-
-			tbody tr:nth-child(odd)
-				background: #f8f8f8;
-
-			td
-				border-top: 1px dotted rgba(200, 200, 200, 0.3)
-				border-bottom: 1px dotted rgba(200, 200, 200, 0.3)
-				color: #101010
-				overflow: hidden;
-				font-size: 11px
-
-			td.checkable
-				width: 24px
-				padding: 8px
-
-			th
-				background-color: #FDFAF3
-				vertical-align: baseline
-				padding-top: 6px
-				color: #3E270D
-				font-size: 12px
-
 .scrollable
+
 	position:         absolute
 	z-index:          3
 	top: 			  0
@@ -134,9 +88,6 @@
 	overflow:         hidden
 	width:            100%
 	right:            0px
-	background-color: #f8f8f8
-	border-top:       1px solid rgba(30, 30, 30, 0.3)
-	color:            #000000
 
 	.resizeHandle
 		background: url(/images/resize-handle.png) 100% 100% no-repeat

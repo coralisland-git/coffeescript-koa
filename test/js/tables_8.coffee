@@ -36,3 +36,7 @@ $ ->
             console.log "run action:", row
 
     table.render()
+
+    setTimeout ()->
+        table.onRearrange()
+    , 1000

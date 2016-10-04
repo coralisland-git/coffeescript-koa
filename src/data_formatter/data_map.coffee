@@ -248,6 +248,12 @@ class DataMap
 		DataMap.setDataTypes tableName, [ config ]
 		dm = DataMap.getDataMap()
 
+		##|
+		##|  Save this new column entirely
+		##|
+		saveText = dm.types[tableName].toSave()
+		dm.emitEvent "table_change", [tableName, saveText]
+
 		return dm.types[tableName].col[config.source]
 
 	## -------------------------------------------------------------------------------------------------------------
@@ -406,7 +412,7 @@ class DataMap
 
 		col = dm.types[tableName].getColumn(sourceName)
 		if !col?
-			console.log "Warning: can't changeColumnAttribute for missing table #{tableName} column #{sourceName}"
+			console.log "Warning: can't changeColumnAttribute for missing table #{tableName} column #{sourceName} (#{field} = #{newValue})"
 			return false
 
 		dm.cachedFormat = {}
@@ -427,10 +433,8 @@ class DataMap
 
 		##|
 		##| Send chagne event
+		console.log "changeColumnAttribute #{tableName}, #{sourceName}, #{field}, #{newValue}"
 		globalTableEvents.emitEvent "table_change", [ tableName, sourceName, field, newValue ]
-
-		saveText = dm.types[tableName].toSave()
-		dm.emitEvent "table_change", [tableName, saveText]
 		return true
 
 	@addDataUpdateTable: (tableName, keyValue, newData) =>

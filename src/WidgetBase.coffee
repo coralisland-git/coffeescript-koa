@@ -226,6 +226,9 @@ class WidgetTag
         @cachedHeight = @el.height()
         return @cachedHeight
 
+    outerHeight: ()=>
+        return @el.outerHeight()
+
     width: ()=>
         if @cachedWidth? then return @cachedWidth
         @cachedWidth = @el.width()
@@ -329,7 +332,7 @@ class WidgetTag
         @el.bind eventName, (e)=>
 
             data = WidgetTag.getDataFromEvent(e)
-            console.log "bind DataFromEvent:", data
+            # console.log "bind DataFromEvent:", data
             for varName, value of data
                 e[varName] = value
 

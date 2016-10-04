@@ -1,0 +1,64 @@
+.tableColumnSortingList
+
+    min-height: 520px
+
+    li
+        font-size        : 11px
+        line-height      : 16px
+        background-color : #ffffe0
+        margin-top       : 3px
+        margin-bottom    : 3px
+        margin-left      : 0px
+        margin-right     : 6px
+        padding          : 0px
+        border           : 1px solid #bbbba0
+        width            : 164px
+        float            : left
+        position         : relative
+        cursor           : move
+
+        .colVisible
+            display        : inline
+            width          : 16px
+            padding-left   : 4px
+            padding-right  : 4px
+            padding-top    : 4px
+            padding-bottom : 0px
+            float          : left
+            cursor         : pointer
+
+        .colName
+            margin-left: 4px
+            padding       : 4px
+            overflow      : hidden
+            text-overflow : ellipsis
+            white-space   : nowrap
+            width         : 120px
+            display       : inline
+            float : left
+
+        .orderText
+            padding          : 4px
+            display          : inline
+            position         : relative
+            right            : 0
+            top              : 0
+            border-left      : 1px solid #bbbb90
+            background-color : #f2f2d5
+            width            : 22px
+            font-size        : 12px
+            float            : right
+            text-align       : right
+
+    li.notVisible
+        background-color: #eeeeee
+        border: 1px solid #cccccc
+
+        .orderText
+            border-left      : 1px solid #bbbbbb
+            background-color : #e2e2e2
+
+    li.placeholder
+        background-color: #eeeeb0
+        border: 1px dashed #909080
+        content: "Drop here"

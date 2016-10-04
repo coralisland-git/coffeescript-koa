@@ -1,0 +1,80 @@
+$colorPopupTitleBackground1 = #2980b9
+$colorPopupTitleBackground2 = #2c3e50
+$colorPopupBackground       = #F3F3F3
+$colorPopupText             = #143C60
+$colorPopupBorder           = #252A33
+$popupBoxShadow             = 4px 4px 8px 2px rgba(0,0,0,0.35)
+
+themeNoTap()
+    -webkit-touch-callout      : none
+    -moz-touch-callout         : none
+    -ms-touch-callout          : none
+    -o-touch-callout           : none
+    touch-callout              : none
+
+    webkit-tap-highlight-color : rgb(0,0,0)
+    tap-highlight-color        : rgb(0,0,0)
+
+    -webkit-text-size-adjust   : none
+    -moz-text-size-adjust      : none
+    -o-text-size-adjust        : none
+    text-size-adjust           : none
+
+    -webkit-user-select        : none
+    -moz-user-select           : none
+    -o-user-select             : none
+    user-select                : none
+
+    float                      : none
+    list-style                 : disc outside none
+    text-decoration            : none
+    font-size                  : 100%
+    outline                    : none
+
+themePopupWindow()
+
+    themeNoTap()
+    background-color : $colorPopupBackground
+    color            : $colorPopupText
+    font-size        : 1.0em
+    font-weight      : 300
+    box-shadow       : $popupBoxShadow
+    border           : 1px solid $colorPopupBorder
+    position         : absolute
+    margin           : 0
+    padding          : 0
+    vertical-align   : baseline
+    box-sizing       : content-box
+
+themePopupWindowTitle()
+
+    background-color : $colorPopupTitleBackground1
+    background       : linear-gradient(top, $colorPopupTitleBackground1, $colorPopupTitleBackground2)
+    color            : #ffffff
+    font-size        : 1.2em
+    font-weight      : 500
+    padding-top      : 6px
+    padding-bottom   : 6px
+
+themePopupWindowListItem()
+    width          : 100%
+    padding-top    : 6px
+    padding-bottom : 6px
+    padding-left   : 6px
+    padding-right  : 6px
+    margin         : 0
+    text-align     : left
+    text-indent    : 0
+    font-size      : 1.1em
+    font-weight    : 400
+
+themePopupWindowListItemHover()
+    background-color : darken($colorPopupBackground, 20)
+    color            : darken($colorPopupText, 20)
+
+$series-a = #007bc3;
+$series-b = #76b800;
+$series-c = #ffae00;
+$series-d = #ef4c00;
+$series-f = #430b62;
+$series-e = #a419b7;

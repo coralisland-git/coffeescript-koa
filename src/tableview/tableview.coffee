@@ -22,8 +22,9 @@ globalTableEvents    = new EvEmitter()
 globalTableAdmin     = true
 
 $(window).on "resize", (e)=>
-	console.log "Window Global Resize", e
-	globalTableEvents.emitEvent "resize", []
+	w = $(window).width()
+	h = $(window).height()
+	globalTableEvents.emitEvent "resize", [w, h]
 
 $(document).on "keyup", (e)=>
 
@@ -46,6 +47,9 @@ $(document).on "keyup", (e)=>
 		else if e.keyCode == 13
 			# console.log "DOC KEY [enter]"
 			globalKeyboardEvents.emitEvent "enter", [e]
+		else if e.keyCode == 27
+			# console.log "DOC KEY [esc]"
+			globalKeyboardEvents.emitEvent "esc", [e]
 
 	return true
 
@@ -55,9 +59,9 @@ $(document).on "mousedown", (e)=>
 
 class TableView
 
-	SORT_ASC  : 1
-	SORT_DESC : -1
-	SORT_NONE : 0
+	@SORT_ASC  : 1
+	@SORT_DESC : -1
+	@SORT_NONE : 0
 
 	# @property [String] imgChecked html to be used when checkbox is checked
 	imgChecked     : "<img src='images/checkbox.png' width='16' height='16' alt='Selected' />"
@@ -384,6 +388,7 @@ class TableView
 
 			@resetTimer = setTimeout ()=>
 				delete @resetTimer
+				@resetCachedFromSize()
 				@onResize()
 				@updateRowData()
 			, 50
@@ -394,10 +399,7 @@ class TableView
 	onGlobalTableChange: (tableName, sourceName, field, newValue)=>
 
 		if tableName == @primaryTableName
-			col = @findColumn(sourceName)
-			if col?
-				@onGlobalNewData(null)
-				return true
+			@onGlobalNewData(null)
 
 		true
 
@@ -639,34 +641,11 @@ class TableView
 		true
 
 	onRearrange: (e, source)=>
+
 		##|
 		##|  Open the re-arrange dialog
-		options = []
-		for col in @colList
-			if col.getOrder() < 0 then continue
-			options.push
-				title:  col.getName()
-				id:     col.getSource()
-				active: col.getVisible()
-				order:  col.getOrder()
-
-		m = new ModalSortItems("Rearrange Table Columns", options);
-		m.on "save", (active, inactive)=>
-
-			order = 0
-
-			for name in active
-				DataMap.changeColumnAttribute @primaryTableName, name, "visible", true
-				DataMap.changeColumnAttribute @primaryTableName, name, "order", order
-				console.log "SETTING #{name}=>#{order}"
-				order++
-
-			for name in inactive
-				DataMap.changeColumnAttribute @primaryTableName, name, "visible", false
-				DataMap.changeColumnAttribute @primaryTableName, name, "order", order
-				order++
-
-			true
+		m = new ModalSortItems(@primaryTableName);
+		true
 
 	onContextMenuHeader: (source, coords)=>
 
@@ -676,7 +655,7 @@ class TableView
 		for col in @colList
 			if col.getSource() == source
 
-				popupMenu = new PopupMenu "Column: #{col.getName()}", coords.x-150, coords.y
+				popupMenu = new PopupMenu "#{col.getName()}", coords.x-150, coords.y
 				popupMenu.addItem "Hide column", (e, source)=>
 					@setCustomVisible(source, false)
 					@updateRowData()
@@ -694,12 +673,12 @@ class TableView
 				##|  Allow table to reconfigure
 				if @showConfigTable
 
-					popupMenu.addItem "Rename", (e, source)=>
+					popupMenu.addItem "Rename Column", (e, source)=>
 						@onRenameField source
 						@updateVisibleText()
 					, source
 
-					popupMenu.addItem "Change Type", (e, source)=>
+					popupMenu.addItem "Change Column Type", (e, source)=>
 						@contextMenuChangeType source, coords
 						@updateRowData()
 					, source
@@ -2108,9 +2087,6 @@ class TableView
 			if col?
 				col.clickable = true
 				@updateVisibleText()
-			else
-				console.log "Warning: Didn't find column for #{eventName}:", m[1]
-				# @resetCachedFromScroll()
 
 		true
 
