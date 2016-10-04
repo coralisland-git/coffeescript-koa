@@ -103,25 +103,6 @@ class DataMap
 	##
 	updateScreenPathValue: (path, newValue, didDataChange) =>
 
-		# parts     = path.split '/'
-		# tableName = parts[1]
-		# keyValue  = parts[2]
-		# fieldName = parts[3]
-
-		# delete @cachedFormat[path]
-
-		# result = $("[data-path='#{path}']")
-		# if result.length > 0
-
-		# 	currentValue = newValue
-
-		# 	if @types[tableName]? and @types[tableName].col[fieldName]?
-		# 		formatter    = @types[tableName].col[fieldName].formatter
-		# 		currentValue = formatter.format currentValue, @types[tableName].col[fieldName].options, path
-		# 		result.html currentValue
-
-		# 	if didDataChange then result.addClass "dataChanged"
-
 		##|
 		##|  Broadcast the data change event
 		if globalKeyboardEvents? and didDataChange
@@ -434,19 +415,9 @@ class DataMap
 			renderText = DataTypeCollection.renderFunctionToString(newValue)
 			newValue   = DataTypeCollection.renderStringToFunction(renderText)
 
-		if field == "order"
-			for source, col of dm.types[tableName].col
-				if col.getOrder() >= newValue
-					# console.log "Move ", col.getName(), " to ", col.data.order+1
-					col.data.order++
-
 		##|
 		##|  Make the change
-		# console.log "BEFORE CHANGE:", col.data
 		col.changeColumn(field, newValue)
-		# console.log "CHANGE:", col.data
-
-		dm.types[tableName].verifyOrderIsUnique()
 
 		##|
 		##|  Send out events to those that need it unless we aren't sending events.

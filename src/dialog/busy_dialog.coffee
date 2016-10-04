@@ -206,7 +206,7 @@ class BusyDialog
         mw = @modal.width()
         mh = @modal.height()
 
-        console.log "Window (#{w} x #{h}) offset (#{otop}) modal (#{mw} x #{mh})"
+        # console.log "Window (#{w} x #{h}) offset (#{otop}) modal (#{mw} x #{mh})"
 
         left = (w-mw)/2
         top  = (h-mh)/2

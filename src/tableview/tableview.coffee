@@ -377,13 +377,14 @@ class TableView
 	onGlobalNewData: (e)=>
 
 		# console.log "table #{@gid} onGlobalNewData e=", e
-		if e.detail.tablename == @primaryTableName
+		if !e? or e.detail.tablename == @primaryTableName
 			# @resetCachedFromSize()
 			if @resetTimer?
 				clearTimeout(@resetTimer)
 
 			@resetTimer = setTimeout ()=>
 				delete @resetTimer
+				@onResize()
 				@updateRowData()
 			, 50
 
@@ -395,8 +396,7 @@ class TableView
 		if tableName == @primaryTableName
 			col = @findColumn(sourceName)
 			if col?
-				console.log "Table found that has #{sourceName} for change to #{field} (#{newValue})"
-				@updateRowData()
+				@onGlobalNewData(null)
 				return true
 
 		true
@@ -455,7 +455,6 @@ class TableView
 							DataMap.getDataMap().editValue path, @currentFocusCell.el
 
 				##|  Use the new event manager
-				console.log "FIRE click_#{fieldName}"
 				@emitEvent "click_#{fieldName}", [ row, e ]
 				@emitEvent "click_row", [ row, e ]
 
@@ -639,6 +638,36 @@ class TableView
 
 		true
 
+	onRearrange: (e, source)=>
+		##|
+		##|  Open the re-arrange dialog
+		options = []
+		for col in @colList
+			if col.getOrder() < 0 then continue
+			options.push
+				title:  col.getName()
+				id:     col.getSource()
+				active: col.getVisible()
+				order:  col.getOrder()
+
+		m = new ModalSortItems("Rearrange Table Columns", options);
+		m.on "save", (active, inactive)=>
+
+			order = 0
+
+			for name in active
+				DataMap.changeColumnAttribute @primaryTableName, name, "visible", true
+				DataMap.changeColumnAttribute @primaryTableName, name, "order", order
+				console.log "SETTING #{name}=>#{order}"
+				order++
+
+			for name in inactive
+				DataMap.changeColumnAttribute @primaryTableName, name, "visible", false
+				DataMap.changeColumnAttribute @primaryTableName, name, "order", order
+				order++
+
+			true
+
 	onContextMenuHeader: (source, coords)=>
 
 		console.log "Context on header:", source
@@ -655,6 +684,10 @@ class TableView
 
 				popupMenu.addItem "Group similar values", (e, source)=>
 					@groupBy(source)
+				, source
+
+				popupMenu.addItem "Rearrange Columns", (e, source)=>
+					@onRearrange(e, source)
 				, source
 
 				##|
@@ -676,7 +709,12 @@ class TableView
 							for col in @colList
 								if col.getSource() == source
 									console.log "Emitting open_editor"
-									globalTableEvents.emitEvent "open_editor", [ col.tableName ]
+									# globalTableEvents.emitEvent "open_editor", [ col.tableName ]
+
+									doPopupView "ShowTableEditor", "Editing table: #{@primaryTableName}", null, 1100, 400
+            						.then (view)=>
+                						view.showTableEditor @primaryTableName
+
 						, source
 
 		if popupMenu == null
@@ -868,7 +906,8 @@ class TableView
 		##|
 		##|  Find the columns for the specific table name
 		columns = DataMap.getColumnsFromTable(@primaryTableName, @columnReduceFunction)
-		# console.log "Columns found from #{@primaryTableName}:", @columnReduceFunction, columns
+		columns = columns.sort (a, b)->
+			return a.getOrder() - b.getOrder()
 
 		for col in columns
 			if not col.getVisible() then continue
@@ -882,6 +921,7 @@ class TableView
 			if foundInActionCol then continue
 
 			# if found == 0
+			# console.log "LIST #{col.getSource()} to order: #{col.getOrder()}"
 			@colList.push(col)
 
 		##|
@@ -890,9 +930,7 @@ class TableView
 		sortedColList = @colList.sort (a, b)->
 			return a.getOrder() - b.getOrder()
 
-		for col in @colList
-
-			if not col.getVisible() then continue
+		for col in sortedColList
 
 			foundInGroup = false
 			for source in @currentGroups

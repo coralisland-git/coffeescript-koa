@@ -15,6 +15,9 @@ class DataTypeCollection
     ##|
     ##|  Returns the column if defined by
     getColumn: (source)=>
+        if !@col[source]?
+            console.log "Missing #{source} in ", @col
+
         return @col[source]
 
     ##|
@@ -101,6 +104,9 @@ class DataTypeCollection
     ##            required: false
     ##
     configureColumn: (col) =>
+
+        if !col? or !col.source?
+            return
 
         if !@col[col.source]?
             @col[col.source] = new TableViewCol(@tableName)

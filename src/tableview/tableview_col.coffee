@@ -21,6 +21,7 @@ class TableViewCol extends TableViewColBase
 			@render = value
 			return true
 
+		# console.log "changeCol #{varName} to #{value} for #{@getSource()}"
 		@data[varName] = value
 		delete @formatter
 		delete @actualWidth

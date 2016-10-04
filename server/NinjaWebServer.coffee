@@ -155,6 +155,7 @@ class NinjaWebServer
 
                 if server.fileTimer[f]
                     clearTimeout server.fileTimer[f]
+                filename = filename.replace "\\", "/"
                 server.fileTimer[f] = setTimeout callback, 1000, filename
 
         true

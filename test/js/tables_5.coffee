@@ -1,6 +1,6 @@
 $ ->
 
-    testWithNewRows = true
+    testWithNewRows = !true
 
 
     delayAdd = (rec)->
@@ -56,12 +56,12 @@ $ ->
         ##|
         ##|  Tests
 
-        popupTest()
+        # popupTest()
 
         DataMap.getDataMap().updatePathValueEvent "/zipcode/02532/area_code", "TESTING"
         DataMap.changeColumnAttribute "zipcode", "area_code", "type", "memo"
 
-        DataMap.changeColumnAttribute "zipcode", "id", "visible", false
+        # DataMap.changeColumnAttribute "zipcode", "id", "visible", false
 
         addTest "Sorting, Fixed Header, Group By", ()->
             addHolder("renderTest1")
@@ -86,9 +86,6 @@ $ ->
             # DataMap.changeColumnAttribute "zipcode", "city", "render", (val, row)=>
             #     console.log "Render city val=", val, "row=", row
             #     return "City"
-
-
-            $("[data-id='38']").val("Beach")
 
             timerTest()
 

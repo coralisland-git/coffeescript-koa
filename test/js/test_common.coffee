@@ -124,11 +124,9 @@ $ ->
 	    console.log "globalTableEvents: table=#{tableName} source=#{source} field=#{field} new=", newValue
 	    true
 
-	DataMap.getDataMap().on "table_change", (tableName, config)->
-		console.log "DataMap.table_change tableName=#{tableName} config=", config
-		true
-
-	console.log "Test Framework Loaded"
+	# DataMap.getDataMap().on "table_change", (tableName, config)->
+	# 	console.log "DataMap.table_change tableName=#{tableName} config=", config
+	# 	true
 
 	##|
 	##|  Add a table to hold the results

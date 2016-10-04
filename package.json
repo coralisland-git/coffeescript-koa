@@ -35,5 +35,9 @@
   },
   "devDependencies": {
     "load-grunt-tasks": "^3.5.0"
+  },
+  "scripts":
+  {
+    "start" : "cd server && coffee NinjaServer.coffee"
   }
 }
