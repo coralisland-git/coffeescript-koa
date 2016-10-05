@@ -23,7 +23,7 @@ class TableViewDetailed extends TableView
         count = Object.keys(@colByNum).length
 
     getTableTotalCols: ()=>
-        return @totalAvailableRows
+        return @totalAvailableRows + 1
 
     ##|
     ##|  Number of visible columns
@@ -58,6 +58,8 @@ class TableViewDetailed extends TableView
 
     getColWidth: (location)=>
         if @showHeaders and location.visibleCol == 0 then return @leftWidth
+        if @totalAvailableRows == location.visibleCol
+            return @getTableVisibleWidth() - @leftWidth - (@dataWidth * (@totalAvailableRows-1))
         return @dataWidth
 
     getCellStriped: (location)=>
@@ -74,7 +76,9 @@ class TableViewDetailed extends TableView
     ##|  Return right/left/center - left is assumed by default
     getCellAlign: (location)=>
         if !@colByNum[location.rowNum]? then return null
-        return @colByNum[location.rowNum].getAlign()
+        if location.visibleCol == 0 then return 'right'
+        return 'left'
+        # return @colByNum[location.rowNum].getAlign()
 
     getCellTablename: (location)=>
         if !@colByNum[location.rowNum]? then return null

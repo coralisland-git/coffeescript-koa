@@ -1661,14 +1661,15 @@ class TableView
 
 		if @rowDataRaw.length == 0
 
-			@updateScrollbarSettings()
-
 			if !@shadowCells[0]?
 				@shadowCells[0] = @elTheTable.addDiv "tableRow"
 				@shadowCells[0].setAbsolute()
 
 			@shadowCells[0].move(0,0, @elTableHolder.width(), @elTableHolder.height())
-			@shadowCells[0].html "No data available: " + (new Date().toString()) + " for " + @primaryTableName
+			@shadowCells[0].html "No data available."
+
+			r1 = @virtualScrollV.setRange 0, 0, 0, 0
+			r2 = @virtualScrollH.setRange 0, 0, 0, 0
 			return
 
 		y               = 0

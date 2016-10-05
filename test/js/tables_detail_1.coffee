@@ -29,12 +29,8 @@ $ ->
         table = new TableView $("#renderTest1")
         table.addTable "zipcode"
         table.setFixedHeaderAndScrollable()
-        table.render (id)->
-            if id is '00544' then return true
-            return false
-        table.on "click_city", (row, e)=>
-            console.log "Table 1 - Click city:", row, " e=", e
-            return true
+        table.render()
+        table.updateRowData()
 
         addHolder("renderTestSpace");
         $("#renderTestSpace").css
@@ -52,9 +48,4 @@ $ ->
 
         table = new TableViewDetailed $("#renderTest2")
         table.addTable "zipcode"
-        table.render (id)->
-            if id is '00544' then return true
-            return false
-        table.on "click_city", (row, e)=>
-            console.log "Table 2 - Click city:", row, " e=", e
-            return true
+        table.render()

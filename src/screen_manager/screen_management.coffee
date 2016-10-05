@@ -143,6 +143,7 @@ doAppendView = (viewName, holderElement) ->
     new Promise (resolve, reject) ->
 
         className = "View" + viewName
+        console.log "Loading class #{className}"
 
         ##|
         ##|  See if the class is already loaded
