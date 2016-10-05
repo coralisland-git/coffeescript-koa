@@ -237,7 +237,6 @@ class WidgetTag
     ##|
     ##|  Call this function if the outside container changes size
     onResize: ()=>
-        console.log "WidgetTag onResize called"
         delete @cachedWidth
         delete @cachedHeight
         for c in @children

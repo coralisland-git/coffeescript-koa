@@ -1,58 +1,3 @@
-## -------------------------------------------------------------------------------------------------------------
-## class to create tab for tabs
-##
-class Tab
-
-	## -------------------------------------------------------------------------------------------------------------
-	## constructor
-	##
-	## @param [String] tabName the name of the tab
-	## @param [String] defaultHtml the html to be displayed inside tab
-	## @param [Integer] tabCount the count of current tab
-	constructor: (@tabName, @defaultHtml, tabCount) ->
-		@tabId = "tab#{tabCount}"
-		@tabLink = $ "<a />",
-			"data-toggle": "tab"
-			href: "##{@tabId}"
-			html: @tabName
-
-		@listElement = $ "<li />",
-			class: (tabCount == 0 ? "active": "")
-
-		@content = $ "<div />",
-			id: @tabId
-			class: "tab-pane " + (tabCount == 0 ? "active")
-
-		@listElement.append @tabLink
-		@content.html @defaultHtml
-
-		@tabLink.click ()->
-			$(this).tab('show')
-
-
-	## -------------------------------------------------------------------------------------------------------------
-	## function to show tab
-	##
-	show: () ->
-		@tabLink.tab('show')
-
-	## -------------------------------------------------------------------------------------------------------------
-	## function to set the badge on the tab
-	##
-	## @param [Integer] number the number to show inside badge
-	## @param [String] type the type of badge can be success|danger|warning|primary
-	## @param [String] direction the direction of the badge to display front or back
-	##
-	setBadge: (number, type = null, direction = 'front') ->
-		badgeHtml = "<span class='badge #{if type then 'badge-'+type else ''} #{if direction isnt 'front' then 'badge-right'}'>#{number}</span>"
-		@tabLink = $ "<a />",
-			"data-toggle": "tab"
-			href: "##{@tabId}"
-			html: "#{if direction == 'front' then badgeHtml + @tabName else @tabName + badgeHtml}"
-		@listElement.find("[href='##{@tabId}']").replaceWith(@tabLink)
-		@tabLink.click ()->
-			$(this).tab('show')
-
 
 ## -------------------------------------------------------------------------------------------------------------
 ## class to create tabs dynamically
@@ -69,20 +14,37 @@ class DynamicTabs
 	## @param [String] the id of the element in which tab should be rendered
 	##
 	constructor: (holderElement)->
-		@elHolder = $ "<div />"
 
-		@tabList = $ "<ul />",
-			"class": "nav nav-tabs"
-			"data-toggle": "tabs"
+		@tags       = {}
+		@tabCount   = 0
+		@activeTab  = null
+		@elHolder   = new WidgetTag("div", "ninja-tabs")
+		@tabList    = @elHolder.add "ul", "ninja-tab-list"
+		@elHolder.addDiv "clr"
+		@tabContent = @elHolder.add "div", "ninja-tab-content tab-content"
 
-		@tabContent = $ "<div />",
-			"class": "ninja-tab-content tab-content"
+		$(holderElement).append @elHolder.el
 
-		@elHolder.append @tabList
-		@elHolder.append @tabContent
-		$(holderElement).append @elHolder
+	onSetBadge: (num, classname)->
+		id = this.id
+		# console.log "onSetBadge num=#{num} classname=#{classname}", id, this.parent
+		@parent.tags[id].badge = num
+		@parent.tags[id].badgeText.addClass classname
+		@parent.updateTabs()
 
-		@tabCount = 0
+	onClickTab: (e)=>
+		if e? and e.path? then @show(e.path)
+		return true
+
+	show: (id)=>
+		if !id? then return false
+		if typeof id == "object" and id.id? then id = id.id
+		if @tags[id]?
+			@activeTab = id
+			@updateTabs()
+		else
+			console.log "Warning: DynamicTabs show(#{id}) invalid tab"
+		return true
 
 	## -------------------------------------------------------------------------------------------------------------
 	## Add a new tab to current instance
@@ -92,37 +54,65 @@ class DynamicTabs
 	## @return [Tab] the new tab Object which is created
 	##
 	addTab: (tabName, defaultHtml) =>
-		tab = new Tab(tabName, defaultHtml, @tabCount)
-		@tabList.append tab.listElement
-		@tabContent.append tab.content
-		if @tabCount == 0
-			tab.show()
 
-		@tabCount++
+		id = "tab#{@tabCount++}"
 
-		return tab
+		elTab = @tabList.add "li", "ninja-nav-tab"
+		elTab.setDataPath id
+		elTab.on "click", @onClickTab
 
+		elTabText = elTab.add "div", "ninja-tab-text"
+		elTabText.html tabName
 
-		# <li class="active">
-		#     <a href="#btabs-static-justified-home"><i class="fa fa-home"></i> Home</a>
-		# </li>
-		# <li>
-		#     <a href="#btabs-static-justified-profile"><i class="fa fa-pencil"></i> Profile</a>
-		# </li>
-		# <li>
-		#     <a href="#btabs-static-justified-settings"><i class="fa fa-cog"></i> Settings</a>
-		# </li>
+		elTabBadge = elTab.addDiv "ninja-badge"
+
+		elBody = @tabContent.add "div", "ninja-nav-body"
+		elBody.html defaultHtml
 
 
-		# <div class="tab-pane active" id="btabs-static-justified-home">
-		#     <h4 class="font-w300 push-15">Home Tab</h4>
-		#     <p>...</p>
-		# </div>
-		# <div class="tab-pane" id="btabs-static-justified-profile">
-		#     <h4 class="font-w300 push-15">Profile Tab</h4>
-		#     <p>...</p>
-		# </div>
-		# <div class="tab-pane" id="btabs-static-justified-settings">
-		#     <h4 class="font-w300 push-15">Settings Tab</h4>
-		#     <p>...</p>
-		# </div>
+		if !@activeTab?
+			@activeTab = id
+
+		@tags[id] =
+			id:        id
+			parent:    this
+			tab:       elTab
+			body:      elBody
+			tabText:   elTabText
+			badgeText: elTabBadge
+			setBadge:  @onSetBadge
+			show: ()=>
+				@activeTab = id
+				@updateTabs()
+
+		@updateTabs()
+
+		return @tags[id]
+
+	updateTabs: ()=>
+
+		for id, tag of @tags
+
+			if id == @activeTab
+				tag.tab.addClass "active"
+				tag.body.show()
+				if tag.body.onResize?
+					tag.body.onResize()
+
+				setTimeout ()->
+					w = $(window).width()
+					h = $(window).height()
+					globalTableEvents.emitEvent "resize", [w, h]
+				, 10
+
+			else
+				tag.tab.removeClass "active"
+				tag.body.hide()
+
+			if tag.badge?
+				tag.badgeText.html tag.badge
+				tag.badgeText.show()
+			else
+				tag.badgeText.hide()
+
+		true

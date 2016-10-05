@@ -157,6 +157,8 @@ class TableView
 		# @property [int] the max number of rows that can be selected
 		@checkboxLimit = 1
 
+		@renderReqired = true
+
 		# @property [Boolean] showCheckboxes if checkbox to be shown or not default false
 		if !@showCheckboxes? then @showCheckboxes = false
 
@@ -189,6 +191,7 @@ class TableView
 		globalKeyboardEvents.on "global_mouse_down", @onGlobalMouseDown
 		globalKeyboardEvents.on "change", @onGlobalDataChange
 		globalTableEvents.on "table_change", @onGlobalTableChange
+		globalTableEvents.on "resize", @onResize
 		window.addEventListener "new_data", @onGlobalNewData, false
 
 		##|
@@ -586,6 +589,7 @@ class TableView
 		true
 
 	onResize: ()=>
+		if !@isVisible() then return
 
 		@cachedVisibleWidth     = null
 		@cachedVisibleHeight    = null
@@ -597,8 +601,8 @@ class TableView
 			@elTableHolder.height(@fixedHeight);
 		else if @elTableHolder.width() > 0
 			@setHolderToBottom()
-			@updateRowData()
 
+		@updateRowData()
 		true
 
 	##|
@@ -930,6 +934,9 @@ class TableView
 	##
 	updateRowData: () =>
 
+		if !@isVisible() then return
+		if @renderReqired then @real_render();
+
 		@applyFilters()
 		@rowDataRaw = []
 		allData     = DataMap.getValuesFromTable @primaryTableName, @reduceFunction
@@ -1006,6 +1013,15 @@ class TableView
 	##| Enable a status bar along the bottom.
 	setStatusBarEnabled: (isEnabled = true)=>
 		@showStatusBar = isEnabled
+
+	isVisible: ()=>
+		pos = @elTableHolder.position()
+		tableWidth = @elTableHolder.outerWidth()
+
+		if pos.top == 0 and pos.left == 0 and tableWidth == 0
+			return false
+
+		return true
 
 	## -------------------------------------------------------------------------------------------------------------
 	## set the holder element to go to the bottom of the screen
@@ -1652,8 +1668,7 @@ class TableView
 				@shadowCells[0].setAbsolute()
 
 			@shadowCells[0].move(0,0, @elTableHolder.width(), @elTableHolder.height())
-			@shadowCells[0].html "No data available"
-			console.log "No row data"
+			@shadowCells[0].html "No data available: " + (new Date().toString()) + " for " + @primaryTableName
 			return
 
 		y               = 0
@@ -1937,7 +1952,15 @@ class TableView
 	## @example tableview.render()
 	## @return [Boolean]
 	##
+
 	render: () =>
+
+		@renderReqired = true
+		return true
+
+	real_render: () =>
+
+		@renderReqired = false
 
 		if !@shadowCells?
 			@shadowCells = {}
@@ -1997,7 +2020,6 @@ class TableView
 		##|
 		##|  Setup context menu on the header
 		@setupContextMenu @contextMenuCallbackFunction
-		globalTableEvents.on "resize", @onResize
 
 		true
 

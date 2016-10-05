@@ -15,7 +15,7 @@ class FloatingWindow
 			overflow : "hidden"
 			display  : "none"
 
-		console.log "FloatingWindow Creating window x=#{x}, y=#{y}, w=#{@w}, h=#{@h}"
+		# console.log "FloatingWindow Creating window x=#{x}, y=#{y}, w=#{@w}, h=#{@h}"
 
 		if parent?
 			$(parent).append @el

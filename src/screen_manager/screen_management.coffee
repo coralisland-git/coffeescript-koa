@@ -188,9 +188,6 @@ doAppendViewTab = (viewName, tabHolder, tabText, callbackWithView) ->
         doAppendView viewName, elViewHolder
         .then (view)=>
 
-            $('a[data-toggle="tab"]').on 'shown.bs.tab', (e)->
-                view.onResize()
-
             view.elHolder = elViewHolder
             callbackWithView(view, tabText)
             resolve(tab)
@@ -323,7 +320,9 @@ activateCurrentScreen = (optionalArgs, screenName) ->
     doReplaceScreenContent(screenName)
     Screens.current.onResetScreen()
 
-    $(window).trigger "resize"
+    w = $(window).width()
+    h = $(window).height()
+    globalTableEvents.emitEvent "resize", [w, h]
     window.scrollTo 0, 0
     Screens.current.onShowScreen(optionalArgs)
 

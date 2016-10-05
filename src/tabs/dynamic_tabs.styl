@@ -1,21 +1,90 @@
-li
-    .badge
-        margin-right: 10px
+@import "../theme.styl"
+
+.ninja-tabs
+    themeNoTap()
+
+    .clr
+        clear: both
+
+
+    ul
+        list-style:      none;
+        list-style-type: none;
+        margin:          0;
+        padding:         0;
+        width:           100%;
+        border-bottom:   1px solid $colorItemInactiveHighlight
+        background-color: #ffffff
+
+    li
+        height:         32px
+        font-size:      11px
+        cursor:         pointer
+        display:        inline-block;
+        margin-left:    0px
+        margin-right:   0px
+        margin-top:     0px
+        margin-bottom:  0px
+        padding-left:   8px
+        padding-right:  8px
+        padding-top:    4px
+        padding-bottom: 4px
+        color:          $colorItemText
+        vertical-align: middle
+        border-right:   1px solid #eeeeee
+
+        .badge
+            margin-right: 10px
+
         &.badge-warning
         	background-color: #f0ad4e
         	color: #fff
+
         &.badge-primary
         	background-color: #337ab7
         	color: #fff
+
         &.badge-success
         	background-color: #5cb85c
         	color: #fff
+
         &.badge-danger
         	background-color: #d9534f
         	color: #fff
+
         &.badge-info
         	background-color: #5bc0de
         	color: #fff
-    .badge-right
-        margin-left: 10px
-        margin-right: 0px
+
+        .ninja-tab-text
+            display: inline-block
+            line-height: 24px
+            font-size: 14px
+
+        .ninja-badge
+            display:          inline-block
+            margin-right:     4px
+            margin-left:      10px
+            border-radius:    50%
+            border:           1px solid #dddddd
+            background-color: #eeeeee
+            width:            20px;
+            height:           20px;
+            padding-top:      4px
+            text-align:       center;
+
+    li.active
+
+        border-bottom: 2px solid $colorItemActiveHighlight
+        color:         $colorItemActiveText
+        font-weight:   500
+
+        .ninja-badge
+            border: 1px solid darker($colorItemActiveHighlight, 30)
+            background-color: $colorItemActiveHighlight
+            color: #ffffff
+
+.ninja-nav-body
+    padding: 0
+    margin: 0
+    background-color: #ffffff

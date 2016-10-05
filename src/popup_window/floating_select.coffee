@@ -17,7 +17,7 @@ class FloatingSelect extends FloatingWindow
     show: ()=>
         @el.show()
         @showTable()
-        @table.onResize()
+        setTimeout @table.onResize, 10
         true
 
     onResize: ()=>

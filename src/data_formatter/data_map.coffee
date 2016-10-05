@@ -180,7 +180,7 @@ class DataMap
 			if typeof obj != "object" then continue
 			dm.types[tableName].configureColumns [ obj ]
 
-		console.log  "importDataTypes table=#{tableName}:", dm.types[tableName]
+		# console.log  "importDataTypes table=#{tableName}:", dm.types[tableName]
 
 		true
 
@@ -433,7 +433,7 @@ class DataMap
 
 		##|
 		##| Send chagne event
-		console.log "changeColumnAttribute #{tableName}, #{sourceName}, #{field}, #{newValue}"
+		# console.log "changeColumnAttribute #{tableName}, #{sourceName}, #{field}, #{newValue}"
 		globalTableEvents.emitEvent "table_change", [ tableName, sourceName, field, newValue ]
 		return true
 
@@ -448,12 +448,6 @@ class DataMap
 
 		updated = dm.setDataTypesFromSingleObject(tableName, newData)
 
-		if updated
-			saveText = dm.types[tableName].toSave()
-			dm.emitEvent "table_change", [tableName, saveText]
-
-		# console.log "Sending new data alert"
-		# dm.emitEvent "new_data", [ tableName, keyValue ]
 		ev = new CustomEvent("new_data", { detail: { tablename: tableName, id: keyValue }})
 		window.dispatchEvent ev
 

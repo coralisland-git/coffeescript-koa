@@ -246,21 +246,18 @@ class TableViewCol extends TableViewColBase
 		if !newData? then return null
 		if @data.type != "text" then return null
 
-		if /Date/i.test @getSource()
-			console.log "newData=", newData, typeof newData
-
 		if typeof newData == "string"
 
 			if reDate1.test newData
-				console.log "Match reDate1:", newData
+				# console.log "Match reDate1:", newData
 				@changeColumn "type", "timeago"
 				@changeColumn "width", 80
 				@data.skipDeduce = true
 				return
 
 			if reDate2.test newData
-				console.log "Match reDate2:", newData
-				@changeColumn "type", "datetime"
+				# console.log "Match reDate2:", newData
+				@changeColumn "type", "timeago"
 				@changeColumn "width", 110
 				@data.skipDeduce = true
 				true

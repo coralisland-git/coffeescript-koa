@@ -9,6 +9,8 @@ class TableDropdownMenu
             @elInputField.html row[col]
 
         @emitEvent "change", row[col]
+        @currentValue = row
+
 
     constructor: (HolderField, @tableName, @columns, options)->
 
@@ -24,6 +26,7 @@ class TableDropdownMenu
 
         $.extend @config, options
 
+        @currentValue = null
         @elInputField = $ "<div class='floatingDropdownValue'/>"
         @elCarot = $ "<i class='fa fa-arrow-down floatingDropdownIcon'></i>"
 
@@ -53,7 +56,9 @@ class TableDropdownMenu
             if tableRows? then @setValue tableRows.shift()
 
         @elInputField.on "click", (e)=>
+
             @win.show()
+
             ##|
             ##|  Setup an event so we can close this popup
             globalKeyboardEvents.once "global_mouse_down", (ee)=>
