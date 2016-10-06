@@ -10,44 +10,6 @@ Views        = {}
 Scripts      = {}
 StyleManager = {}
 
-class WindowManager
-
-    constructor: (holderElement)->
-
-        @elWindowManagerOutside = new WidgetTag "div", "windowManager outside"
-        @elToolbar = @elWindowManagerOutside.addDiv "toolbar"
-        @elContent = @elWindowManagerOutside.addDiv "windowcontent"
-
-        ##|
-        ##|  Create a widget for the outside of the window manager and then attach it to the base element
-        if typeof holderElement == "string"
-            @elHolder = $("#" + holderElement.replace("#",""))
-        else if typeof holderElement == "object" and holderElement.el?
-            @elHolder = holderElement.el
-        else
-            @elHolder = $(holderElement)
-
-        @elHolder.append(@elWindowManagerOutside.el)
-        @elHolder.on "resize", @onResizeHolder
-        @elContent.on "resize", @onResizeContent
-        @elWindowManagerOutside.on "resize", @onResizeContent2
-
-    onResizeContent2: (e)=>
-        console.log "WindowManager onResizeContent2:", e
-        true
-
-    onResizeContent: (e)=>
-        console.log "WindowManager onResizeContent:", e
-        true
-
-    onResizeHolder: (e)=>
-        console.log "WindowManager onResizeHolder:", e
-        true
-
-    setContent: (html)->
-
-        @elContent.html html
-
 
 ##|
 ##|  An instance of the Window Manager anchored in the area that screens will swap

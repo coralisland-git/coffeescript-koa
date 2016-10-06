@@ -694,7 +694,7 @@ class TableView
 									console.log "Emitting open_editor"
 									# globalTableEvents.emitEvent "open_editor", [ col.tableName ]
 
-									doPopupView "ShowTableEditor", "Editing table: #{@primaryTableName}", null, 1100, 400
+									doPopupView "ShowTableEditor", "Editing table: #{@primaryTableName}", null, 1100, 800
             						.then (view)=>
                 						view.showTableEditor @primaryTableName
 
@@ -935,7 +935,7 @@ class TableView
 	updateRowData: () =>
 
 		if !@isVisible() then return
-		if @renderReqired then @real_render();
+
 
 		@applyFilters()
 		@rowDataRaw = []
@@ -955,6 +955,7 @@ class TableView
 				@rowDataRaw.push { id: obj.id, group: null }
 
 			@totalAvailableRows = @rowDataRaw.length
+			if @renderReqired then @real_render();
 			@updateFullHeight()
 			@resetCachedFromSize()
 			return
@@ -1005,6 +1006,7 @@ class TableView
 					@rowDataRaw.push { id: id, visible: true, group: currentGroupNumber }
 
 		@totalAvailableRows = @rowDataRaw.length
+		if @renderReqired then @real_render();
 		@updateFullHeight()
 		@resetCachedFromSize()
 		return true
@@ -1661,16 +1663,19 @@ class TableView
 
 		if @rowDataRaw.length == 0
 
-			if !@shadowCells[0]?
-				@shadowCells[0] = @elTheTable.addDiv "tableRow"
-				@shadowCells[0].setAbsolute()
+			if !@noDataCell?
+				@noDataCell = @elTheTable.addDiv "tableRow"
+				@noDataCell.setAbsolute()
 
-			@shadowCells[0].move(0,0, @elTableHolder.width(), @elTableHolder.height())
-			@shadowCells[0].html "No data available."
+			@noDataCell.move(0,0, @elTableHolder.width(), @elTableHolder.height())
+			@noDataCell.html "No data available."
 
 			r1 = @virtualScrollV.setRange 0, 0, 0, 0
 			r2 = @virtualScrollH.setRange 0, 0, 0, 0
 			return
+
+		if @noDataCell?
+			@noDataCell.hide()
 
 		y               = 0
 		groupState      = null

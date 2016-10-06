@@ -63,9 +63,9 @@ root.DataSet = class DataSet
                         for i in rawData
 
                             if i.data?
-                                DataMap.addData @baseName, i.data.id, i.data
+                                DataMap.addDataUpdateTable @baseName, i.data.id, i.data
                             else
-                                DataMap.addData @baseName, i[@keyElement], i
+                                DataMap.addDataUpdateTable @baseName, i[@keyElement], i
 
                     else
 
@@ -77,7 +77,7 @@ root.DataSet = class DataSet
                                 key = i
 
                             if @useDataMap
-                                DataMap.addData @baseName, key, o
+                                DataMap.addDataUpdateTable @baseName, key, o
                             else
                                 @data[key] = o
 

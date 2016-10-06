@@ -106,7 +106,6 @@ class TableViewDetailed extends TableView
         return false
 
     isHeaderCell: (location)=>
-        if !@colByNum[location.rowNum]? then return false
         if @showHeaders and location.visibleCol == 0 then return true
         return false
 
@@ -133,6 +132,7 @@ class TableViewDetailed extends TableView
         location.cell.html ""
         if !@colByNum[location.rowNum]? then return false
         @colByNum[location.rowNum].RenderHeaderHorizontal location.cell, location
+        location.cell.setDataPath "/#{location.tableName}/Header/#{location.sourceName}"
 
     getCellSelected: (location)=>
         if @rowDataRaw[location.colNum]? and @rowDataRaw[location.colNum].row_selected

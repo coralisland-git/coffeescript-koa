@@ -33,6 +33,7 @@ $ ->
         table = new TableView $("#renderTest1")
         table.addTable "zipcode"
         table.render()
+        table.updateRowData()
         true
 
     addTestButton "Render table 2", "Open", ()->

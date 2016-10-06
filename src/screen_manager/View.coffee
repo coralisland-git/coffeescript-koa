@@ -31,6 +31,9 @@ class View
         ##|  Event manager for Event Emitter style events
         GlobalClassTools.addEventManager(this)
 
+        globalTableEvents.on "resize", @onResize
+
+
     ##|
     ##|  Returns a list of other files to be loaded
     getDependencyList: ()->
