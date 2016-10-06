@@ -203,6 +203,27 @@ class TableViewCol extends TableViewColBase
 		@data.deduceAttempts = 0
 		@data.foundOnlyNumbers = true
 
+		if / Date/i.test @data.name
+			@changeColumn "type", "age"
+			@changeColumn "width", 110
+			@changeColumn "align", "left"
+			@data.skipDeduce = true
+			return
+
+		if / Price/i.test @data.name
+			@changeColumn "type", "money"
+			@changeColumn "width", 90
+			@changeColumn "align", "left"
+			@data.skipDeduce = true
+			return
+
+		if /Is /i.test @data.name
+			@changeColumn "type", "boolean"
+			@changeColumn "width", 60
+			@changeColumn "align", "left"
+			@data.skipDeduce = true
+			return
+
 		if reYear.test @data.name
 			@changeColumn "type", "int"
 			@changeColumn "options", '####'

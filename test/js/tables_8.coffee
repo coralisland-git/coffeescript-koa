@@ -37,6 +37,6 @@ $ ->
 
     table.render()
 
-    setTimeout ()->
-        table.onRearrange()
-    , 1000
+    # setTimeout ()->
+    #     table.onRearrange()
+    # , 1000

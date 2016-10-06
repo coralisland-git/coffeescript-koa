@@ -28,7 +28,7 @@ class TableDropdownMenu
 
         @currentValue = null
         @elInputField = $ "<div class='floatingDropdownValue'/>"
-        @elCarot = $ "<i class='fa fa-arrow-down floatingDropdownIcon'></i>"
+        @elCarot      = $ "<i class='fa fa-arrow-down floatingDropdownIcon'></i>"
 
         @elHolder = $(HolderField)
         @elHolder.addClass "floatingDropdown"
@@ -38,17 +38,6 @@ class TableDropdownMenu
 
         GlobalClassTools.addEventManager(this)
 
-        scrollTop  = document.body.scrollTop
-        scrollLeft = document.body.scrollLeft
-
-        posTop     = @elInputField.offset().top
-        posLeft    = @elInputField.offset().left
-
-        width      = @elInputField.outerWidth(true)
-        height     = @elInputField.outerHeight(true)
-        if !@config.width?  then @config.width = width
-        if !@config.height? then @config.height = @config.rowHeight*@config.numRows
-
         if @config.allowEmpty? and @config.allowEmpty == false
             ##|
             ##|  Select the first row automatically
@@ -57,7 +46,7 @@ class TableDropdownMenu
 
         @elInputField.on "click", (e)=>
 
-            @win.show()
+            @initFloatingWindow()
 
             ##|
             ##|  Setup an event so we can close this popup
@@ -68,9 +57,26 @@ class TableDropdownMenu
                 , 1050
                 return false
 
-        @win = new FloatingSelect(posLeft + scrollLeft, posTop+scrollTop+height, @config.width, @config.height)
-        @win.setTable @tableName, @columns, @config
+    initFloatingWindow: ()=>
 
-        @win.on "select", (row)=>
-            @setValue row
-            @win.hide()
+        scrollTop  = document.body.scrollTop
+        scrollLeft = document.body.scrollLeft
+
+        posTop     = @elInputField.offset().top
+        posLeft    = @elInputField.offset().left
+
+        width      = @elInputField.outerWidth(true)
+        height     = @elInputField.outerHeight(true)
+        if !@config.width?  then @config.width  = width
+        if !@config.height? then @config.height = @config.rowHeight*@config.numRows
+
+        if !@win?
+
+            @win = new FloatingSelect(posLeft + scrollLeft, posTop+scrollTop+height, @config.width, @config.height)
+            @win.setTable @tableName, @columns, @config
+
+            @win.on "select", (row)=>
+                @setValue row
+                @win.hide()
+
+        @win.show()

@@ -683,8 +683,9 @@ class TableView
 					, source
 
 					popupMenu.addItem "Change Column Type", (e, source)=>
-						@contextMenuChangeType source, coords
-						@updateRowData()
+						setTimeout ()=>
+							@contextMenuChangeType source, coords
+						, 500
 					, source
 
 					if globalTableAdmin
@@ -989,7 +990,7 @@ class TableView
 
 		for value in Object.keys(groupedData).sort()
 			currentGroupNumber++
-			if currentGroupNumber > 7 then currentGroupNumber = 1
+			if currentGroupNumber > 7 then currentGπroupNumber = 1
 
 			filteredData = groupedData[value]
 			if filteredData.length > 0
@@ -1017,6 +1018,7 @@ class TableView
 		@showStatusBar = isEnabled
 
 	isVisible: ()=>
+		if !@elTableHolder? then return false
 		pos = @elTableHolder.position()
 		tableWidth = @elTableHolder.outerWidth()
 
@@ -1029,6 +1031,8 @@ class TableView
 	## set the holder element to go to the bottom of the screen
 	##
 	setHolderToBottom: (attemptCounter) =>
+
+		if @renderReqired then @real_render();
 
 		height = $(window).height()
 
@@ -1444,6 +1448,7 @@ class TableView
 		##|
 		##|  Align right/center as left is the default
 		location.cell.setClass "even", @getCellStriped(location)
+		location.cell.setClass "first-action", false
 
 		##|
 		##|  Apply alignment to the cell
@@ -1519,6 +1524,7 @@ class TableView
 
 			cell.setClass "text-right", acol.getAlign() == "right"
 			cell.setClass "text-center", acol.getAlign() == "center"
+			cell.setClass "first-action", count++ == 0
 
 			cell.removeClass "spacer"
 			cell.setClass "even", @getCellStriped(location)
@@ -1662,6 +1668,7 @@ class TableView
 			@offsetShowingLeft = 0
 
 		if @rowDataRaw.length == 0
+			return
 
 			if !@noDataCell?
 				@noDataCell = @elTheTable.addDiv "tableRow"

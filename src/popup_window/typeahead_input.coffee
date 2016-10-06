@@ -28,16 +28,14 @@ class TypeaheadInput
         @emitEvent "focus", [e]
         @clearIcon.show()
         @elInputField.select()
-        console.log "Showing window", @win
-        @win.show()
-        @win.onResize()
+        @initFloatingWindow()
         return true
 
     onBlur: (e)=>
         if ! @excludeBlurEvent
             @emitEvent "blur", [e]
             @clearIcon.hide()
-            # @win.hide()
+            if @win? then @win.hide()
         return true
 
     moveCellUp: (e)=>
@@ -60,9 +58,11 @@ class TypeaheadInput
 
     constructor: (InputField, @tableName, @columns, options) ->
 
-        config =
+        @config =
             rowHeight : 24
             numRows   : 10
+
+        $.extend @config, options
 
         @elInputField = $(InputField)
 
@@ -92,6 +92,10 @@ class TypeaheadInput
         # globalKeyboardEvents.on "up", @moveCellUp
         # globalKeyboardEvents.on "down", @moveCellDown
 
+
+
+    initFloatingWindow: ()=>
+
         scrollTop  = document.body.scrollTop
         scrollLeft = document.body.scrollLeft
 
@@ -106,22 +110,20 @@ class TypeaheadInput
 
         px = @elInputField.position()
 
-        console.log "Scroll=#{scrollLeft},#{scrollTop} pos=#{posLeft},#{posTop} px=", px
+        if !@win?
 
-        $.extend config, options
+            @win = new FloatingSelect(posLeft, posTop + height, width, @config.rowHeight*@config.numRows, @elInputField.parent())
+            @win.setTable @tableName, @columns
 
-        # @win = new FloatingSelect(posLeft + scrollLeft, posTop+scrollTop+height, width, config.rowHeight*config.numRows, @elInputField.parent())
-        @win = new FloatingSelect(posLeft, posTop + height, width, config.rowHeight*config.numRows, @elInputField.parent())
-        @win.setTable @tableName, @columns
+            @win.on "select", (row)=>
+                col = @columns[0]
+                @elInputField.val(row[col])
+                @emitEvent "change", row[col]
+                @win.hide()
 
-        @win.on "select", (row)=>
-            col = @columns[0]
-            @elInputField.val(row[col])
-            @emitEvent "change", row[col]
-            @win.hide()
+            @win.on "preselect", (value, itemRow)=>
+                @elInputField.val(value)
+                @elInputField.select()
 
-        @win.on "preselect", (value, itemRow)=>
-            @elInputField.val(value)
-            @elInputField.select()
-
-
+        @win.show()
+        @win.onResize()

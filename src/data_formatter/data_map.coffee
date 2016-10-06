@@ -178,7 +178,7 @@ class DataMap
 
 			if sourceName == "_lastModified" then continue
 			if typeof obj != "object" then continue
-			dm.types[tableName].configureColumns [ obj ]
+			dm.types[tableName].configureColumns([ obj ], true)
 
 		# console.log  "importDataTypes table=#{tableName}:", dm.types[tableName]
 

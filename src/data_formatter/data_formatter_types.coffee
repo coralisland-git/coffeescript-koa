@@ -236,6 +236,15 @@ class DataFormatText extends DataFormatterType
 		if !data?
 			return ""
 
+		if typeof data == "object"
+			if Array.isArray(data)
+				data = data.join(", ")
+			else
+				list = []
+				for varName, value of data
+					list.push "#{varName}=#{value}"
+				data = list.join(", ")
+
 		if data.length > 300
 			return data[0..300] + "..."
 
@@ -1215,7 +1224,7 @@ class DataFormatDistance extends DataFormatterType
 	width: 100
 
 	## -------------------------------------------------------------------------------------------------------------
-	## Takes miles in, returns a formatted string
+	## Takes meters in, returns a formatted string
 	##
 	## @param [Object] data data to be formatted
 	## @param [Object] options additonal options defined for the datatype
@@ -1223,7 +1232,8 @@ class DataFormatDistance extends DataFormatterType
 	## @return [Object] data formatted data
 	##
 	format: (data, options, path) =>
-		feet = 5280 * data
+		feet = 3.28084 * data
+		# feet = 5280 * data
 		if feet < 50 then return "< 50 ft"
 		if feet < 100 then return Math.ceil(feet) + " ft"
 		return numeral(data).format('#,###.##') + " mi"

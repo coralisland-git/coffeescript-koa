@@ -46,8 +46,8 @@ class ViewShowTableEditor extends View
         # if @editorTable.rowDataRaw.length == 0 then return
         h = @elHolder.parent().parent().height()
         # w = @elHolder.width()
-        @editorTable.elTableHolder.height h
-        @editorTable.onResize()
+        # @editorTable.elTableHolder.height h
+        # @editorTable.onResize()
         true
 
     ## -------------------------------------------------------------------------------------------------------------
@@ -62,13 +62,12 @@ class ViewShowTableEditor extends View
         @internalSetDataTypes()
 
         @editorTable = new TableView @elHolder.find(".viewTableHolder")
-        # @editorTable = new TableView @elHolder.find(".windowbody")
+        @editorTable.showConfigTable = false
+        @editorTable.showFilters = false
+        @editorTable.addTable "_editor"
+
         # @editorTable.elTableHolder.css "width", "100%"
         # @editorTable.elTableHolder.css "height", "400px"
-
-        @editorTable.showConfigTable = false
-        @editorTable.addTable "_editor"
-        @editorTable.setFixedHeaderAndScrollable()
 
         @editorTable.addActionColumn
             width  : 50
@@ -78,10 +77,9 @@ class ViewShowTableEditor extends View
                 console.log "Delete on:", row
 
         @editorTable.moveActionColumn "order"
-        @editorTable.sortByColumn("order")
+        # @editorTable.sortByColumn("order")
         @editorTable.render()
-
-        setTimeout @onResize, 500
+        @editorTable.updateRowData()
 
         ##|
         ##|  Save callback from the data map

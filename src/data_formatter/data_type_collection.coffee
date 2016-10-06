@@ -74,6 +74,7 @@ class DataTypeCollection
     toSave: ()=>
 
         output = {}
+        @verifyOrderIsUnique();
 
         for source, col of @col
             output[source] = col.serialize()
@@ -100,7 +101,7 @@ class DataTypeCollection
     ##            type: 'datetime'
     ##            required: false
     ##
-    configureColumn: (col) =>
+    configureColumn: (col, skipDeduce = false) =>
 
         if !col? or !col.source?
             return
@@ -109,7 +110,10 @@ class DataTypeCollection
             @col[col.source] = new TableViewCol(@tableName)
 
         @col[col.source].deserialize(col)
-        @col[col.source].deduceInitialColumnType()
+
+        if !skipDeduce? or skipDeduce == false
+            @col[col.source].deduceInitialColumnType()
+
         return @col[col.source]
 
     ##|
@@ -153,10 +157,9 @@ class DataTypeCollection
     ## @param [Array] columns columns to configure
     ## @return [Boolean]
     ##
-    configureColumns: (columns) =>
+    configureColumns: (columns, skipDeduce = false) =>
 
         for col in columns
-            @configureColumn(col)
+            @configureColumn(col, skipDeduce)
 
-        @verifyOrderIsUnique();
         true

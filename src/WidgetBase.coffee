@@ -226,13 +226,25 @@ class WidgetTag
         @cachedHeight = @el.height()
         return @cachedHeight
 
-    outerHeight: ()=>
-        return @el.outerHeight()
-
     width: ()=>
         if @cachedWidth? then return @cachedWidth
         @cachedWidth = @el.width()
         return @cachedWidth
+
+    outerWidth: ()=>
+        return @el.outerWidth()
+
+    outerHeight: ()=>
+        return @el.outerHeight()
+
+    offset: ()=>
+        return @el.offset()
+
+    append: (html)=>
+        ##|
+        ##|  Shouldn't really be used, add should be used instead
+        console.log "Warning: WidgetTag append called adding ", html
+        @el.append $(html)
 
     ##|
     ##|  Call this function if the outside container changes size
@@ -315,6 +327,11 @@ class WidgetTag
             @element.style.height = @h + "px"
 
         return this
+
+    position: ()=>
+        pos = @el.position()
+        console.log "Widget pos=", pos, " internal x=#{@x}, y=#{@y}"
+        return pos
 
     on: (eventName, callback)=>
         @bind(eventName, callback)
