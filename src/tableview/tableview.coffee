@@ -633,20 +633,20 @@ class TableView
 		for col in @colList
 			if col.getSource() == source
 
-		        m = new ModalDialog
-		            showOnCreate: false
-		            content:      "Enter a new name for this column"
-		            position:     "center"
-		            title:        "Name:"
-		            ok:           "Save"
+				m = new ModalDialog
+					showOnCreate: false
+					content:      "Enter a new name for this column"
+					position:     "center"
+					title:        "Name:"
+					ok:           "Save"
 
-		        m.getForm().addTextInput "input1", "Name", col.getName()
-		        m.getForm().onSubmit = (form) =>
-		            @setCustomName(source, form.input1)
-		            @updateVisibleText()
-		            m.hide()
+				m.getForm().addTextInput "input1", "Name", col.getName()
+				m.getForm().onSubmit = (form) =>
+					DataMap.changeColumnAttribute @primaryTableName, source, "name", form.input1
+					@updateVisibleText()
+					m.hide()
 
-		        m.show()
+				m.show()
 
 	contextMenuChangeType: (source, coords)=>
 
@@ -682,7 +682,8 @@ class TableView
 
 				popupMenu = new PopupMenu "#{col.getName()}", coords.x-150, coords.y
 				popupMenu.addItem "Hide column", (e, source)=>
-					@setCustomVisible(source, false)
+					DataMap.changeColumnAttribute @primaryTableName, source, "visible", false
+					# @setCustomVisible(source, false)
 					@updateRowData()
 				, source
 
@@ -717,8 +718,8 @@ class TableView
 									# globalTableEvents.emitEvent "open_editor", [ col.tableName ]
 
 									doPopupView "ShowTableEditor", "Editing table: #{@primaryTableName}", null, 1100, 800
-            						.then (view)=>
-                						view.showTableEditor @primaryTableName
+									.then (view)=>
+										view.showTableEditor @primaryTableName
 
 						, source
 
@@ -1219,14 +1220,15 @@ class TableView
 			# console.log "getColWidth Invalid col:", location.colNum, @colByNum
 			return 10
 
-		if !@colByNum[location.colNum].actualWidth?
-			return @colByNum[location.colNum].getWidth()
-
-		# console.log "getColWidth colNum=#{location.colNum} source=[#{location.sourceName}] set=", @colByNum[location.colNum].getWidth(), " width:", @colByNum[location.colNum].actualWidth
 		if @colByNum[location.colNum].actualWidth? and !isNaN(@colByNum[location.colNum].actualWidth)
+			# console.log "getColWidth actual ", @colByNum[location.colNum].getName(), "=",Math.floor(@colByNum[location.colNum].actualWidth)
 			return Math.floor(@colByNum[location.colNum].actualWidth)
 
-		# console.log "getColWdith rreturn ", @colByNum[location.colNum].getWidth()
+		# if !@colByNum[location.colNum].actualWidth?
+			# return @colByNum[location.colNum].getWidth()
+		# console.log "getColWidth colNum=#{location.colNum} source=[#{location.sourceName}] set=", @colByNum[location.colNum].getWidth(), " width:", @colByNum[location.colNum].actualWidth
+		# console.log "getColWdith return ", @colByNum[location.colNum].getWidth()
+
 		return @colByNum[location.colNum].getWidth()
 
 	##|
@@ -1855,6 +1857,10 @@ class TableView
 		@cachedBestFit[col.getSource()] = (max * 8)
 		return (max * 8)
 
+	setAutoFillWidth: ()=>
+		@autoFitWidth = true
+		delete @cachedLayoutShadowWidth
+		true
 
 	##|
 	##|  For a standard table, adjust the width of the columns to fit the space available
@@ -1866,107 +1872,42 @@ class TableView
 		if @cachedLayoutShadowWidth? and @cachedLayoutShadowWidth == maxWidth then return
 		@cachedLayoutShadowWidth = maxWidth
 
-		for i in @colList
-
-			if i.getAutoSize()
-				i.actualWidth = @findBestFit(i)
-
-		return
-
-		##|
-		##|  Look at all the columns, determine the likely width
-		widthLimit   = Math.trunc(maxWidth)
-		missingCount = 0
-		colNum       = 0
-
-		##|
-		##|  Look at all columns, if they have a desired with already
-		##|  use that value.  If not, mark the column's iActualWidth so
-		##|  the next stage can try to auto assign it.
-		##|
-		for i in @colList
-
-			if i.isGrouped? and i.isGrouped == true then continue
-
-			calcWidth = i.getWidth()
-			if i.getAutoSize()
-				missingCount++
-				i.actualWidth = null
-			else
-				# console.log "Setting actualWidth of ", i.getName(), " max=#{maxWidth}, calc=#{calcWidth}"
-				maxWidth -= calcWidth
-				i.actualWidth = calcWidth
-
-			colNum++
-
-		##|
-		##|  Split the remaining space
-		##|
-		# console.log "missingCount=", missingCount, "unallocated=", Math.ceil(maxWidth / missingCount)
-
-		if missingCount > 0
-			unallocatedSpace = Math.ceil(maxWidth / missingCount)
-			if unallocatedSpace < 60 then unallocatedSpace = 60
-
-		# console.log "layoutShadow, unallocatedSpace=#{unallocatedSpace} of max #{widthLimit}"
-
-		totalWidth            = 0
-		totalColCount         = 0
 		autoAdjustableColumns = []
 		for i in @colList
+			if i.getAutoSize()
+				if !i.actualWidth?
+					i.actualWidth = @findBestFit(i)
+				autoAdjustableColumns.push(i)
 
-			if totalColCount == colNum-1 and !i.actualWidth?
-				i.actualWidth = widthLimit - totalWidth
-				if i.actualWidth < 60
-					i.actualWidth = 60
+		if !@autoFitWidth? or @autoFitWidth == false then return false
 
-			if !i.actualWidth?
-				# console.log "Find best width for ", i.getSource()
-				i.actualWidth = @findBestFit(i)
-				# console.log "Setting actual", i.actualWidth
+		totalWidth = 0
 
-				autoAdjustableColumns.push i
+		colNum = 0
+		for i in @colList
 
-			totalWidth += i.actualWidth
-			totalColCount++
+			if i.isGrouped then continue
 
-		##|
-		##|  If nothing wants to be auto adjusted then force all the text fields
-		if autoAdjustableColumns.length == 0
-			for col in @colList
-				if not col.getVisible() then continue
-				if col.getFormatterName() != "text" then continue
-				autoAdjustableColumns.push col
+			location =
+				colNum     : colNum
+				visibleCol : colNum
+				tableName  : @primaryTableName
+				sourceName : i.getSource()
 
-		# console.log "Sized:", totalWidth, " vs max", widthLimit, Math.abs(totalWidth - widthLimit)
+			w = @getColWidth(location)
+			totalWidth += w
+			colNum++
 
-		##|
-		##|  Remove or add a pixel until we have the exact amount
-		##|  but only if we are smaller than available size or very close to it
-		if (widthLimit - totalWidth) > -50 and autoAdjustableColumns.length > 0
+		diffAmount = (maxWidth - totalWidth) / autoAdjustableColumns.length
+		# console.log "diffAmount=#{diffAmount}", (maxWidth - totalWidth)
 
-			attemptCounter = 0
-			while Math.ceil(totalWidth) != Math.ceil(widthLimit) and attemptCounter++ < 1500 and autoAdjustableColumns.length > 0
+		diffAmount = Math.floor(diffAmount)
 
-				adjustAmount = Math.abs(Math.floor((widthLimit-totalWidth)/autoAdjustableColumns.length))
-				# console.log "WW=", widthLimit, totalWidth, "==>", adjustAmount
+		for col in autoAdjustableColumns
+			col.actualWidth += diffAmount
 
-				if isNaN(adjustAmount) then break
-				if adjustAmount == 0 then adjustAmount = 1
-
-				for i in autoAdjustableColumns
-					if Math.ceil(totalWidth) == Math.ceil(widthLimit) then break
-
-					if totalWidth > widthLimit
-						# console.log "Adjust #{i.getName()} W=#{i.actualWidth} by #{adjustAmount}"
-						i.actualWidth -= adjustAmount
-						totalWidth -= adjustAmount
-					else if totalWidth < widthLimit
-						# console.log "Adjust #{i.getName()} W=#{i.actualWidth} by #{adjustAmount}"
-						i.actualWidth += adjustAmount
-						totalWidth += adjustAmount
-
-
+		# console.log "layoutShadow maxWidth=#{maxWidth} totalWidth=#{totalWidth}", autoAdjustableColumns
+		# console.log "diffAmount=#{diffAmount}"
 		true
 
 	updateStatusText: (message...)=>

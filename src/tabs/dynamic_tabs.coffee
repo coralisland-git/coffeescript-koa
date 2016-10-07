@@ -74,6 +74,7 @@ class DynamicTabs
 			@activeTab = id
 
 		@tags[id] =
+			name:      tabName
 			id:        id
 			parent:    this
 			tab:       elTab

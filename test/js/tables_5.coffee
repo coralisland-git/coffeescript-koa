@@ -68,6 +68,7 @@ $ ->
             $('#renderTest1').height(400); ##| to add scroll the height is fix
             table = new TableView $("#renderTest1"), true
             table.addTable "zipcode"
+            table.setAutoFillWidth()
             table.setStatusBarEnabled(true)
             table.setFixedHeaderAndScrollable()
             table.groupBy("county")
