@@ -80,3 +80,4 @@ class TableDropdownMenu
                 @win.hide()
 
         @win.show()
+

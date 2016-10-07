@@ -1,24 +1,85 @@
 
 class FloatingWindow
 
-	constructor: (x, y, @w, @h, parent)->
+	width  : 300
+	height : 200
+	parent : null
+	top    : 0
+	left   : 0
 
-		@el = $ "<div class='floatingWindow'/>"
-		@el.css
-			position : "absolute"
-			left     : x
-			top      : y
-			width    : @w
-			height   : @h
-			zIndex   : 1503432
-			border   : "1px solid blue"
-			overflow : "hidden"
-			display  : "none"
+	##|
+	##|  The actual element isn't created until show() is called
+	##|  and it's hidden on hide.   It's destroyed on close()
+	##|
+	constructor: (x, y, w, h, parentHolder, options)->
 
-		# console.log "FloatingWindow Creating window x=#{x}, y=#{y}, w=#{@w}, h=#{@h}"
+		if options? then $.extend this, options
 
-		if parent?
-			$(parent).append @el
+		if w? then @width  = w
+		if h? then @height = h
+		if y? then @top    = y
+		if x? then @left   = x
+
+		if parentHolder?
+			@parent = $(parentHolder)
 		else
-			$(document.body).append @el
+			@parent = $("body")
+
+		@floatingWin = null
+
+	internalCreateElement: ()=>
+
+		if @floatingWin? then return
+
+		console.log "FloatingWindow Creating window x=#{@left}, y=#{@top}, w=#{@width}, h=#{@height}"
+		console.log "global.temp1=", this
+		window.temp1 = this
+
+		@floatingWin = new WidgetTag "div", "floatingWindow"
+		@floatingWin.move(@left, @top, @width, @height)
+		@floatingWin.appendTo @parent
+		@floatingWin.hide()
+
+		@elHolder = @floatingWin.addDiv "floatingWinBody"
+		true
+
+	show: ()=>
+		@internalCreateElement()
+		@floatingWin.show()
+
+	hide: ()=>
+		@floatingWin.hide()
+
+	moveTo: (x, y)=>
+		return
+		@top  = y
+		@left = x
+		@floatingWin.move(@left, @top, @width, @height)
+		true
+
+	setSize: (w, h)=>
+		return
+		@width = w
+		@height = h
+		@floatingWin.move(@left, @top, @width, @height)
+		true
+
+	##|
+	##|  Removes the entire floating window and all traces of it.
+	##|
+	destroy: ()=>
+		@floatingWin.destroy()
+		delete @floatingWin
+
+	##|
+	##|  move to the top right corner with some padding
+	##|
+	dockTopRight: (newWidth = 300, newHeight = 120)=>
+
+		w = $(window).width()
+		h = $(window).height()
+		@setSize newWidth, newHeight
+		@moveTo (w-newWidth-20), 20
+		true
+
 

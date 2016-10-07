@@ -124,6 +124,8 @@ class TableView
 	##
 	constructor: (@elTableHolder, @showCheckboxes) ->
 
+		GlobalClassTools.addEventManager(this)
+
 		# @property [Array] list of columns as array
 		@colList           = []
 		@actionColList     = []
@@ -179,7 +181,6 @@ class TableView
 
 		##|
 		##|  Event manager for Event Emitter style events
-		GlobalClassTools.addEventManager(this)
 		@on "added_event", @onAddedEvent
 
 		globalKeyboardEvents.on "up", @moveCellUp
@@ -430,7 +431,7 @@ class TableView
 
 	pressEnter: (e)=>
 
-		console.log "pressEnter cell=", @currentFocusCell, "path=", @currentFocusPath
+		# console.log "pressEnter cell=", @currentFocusCell, "path=", @currentFocusPath
 
 		if @currentFocusCell? and !@currentFocusPath?
 			##|
@@ -466,11 +467,32 @@ class TableView
 		true
 
 	onColumnResizeDrag: (diffX, diffY, e)=>
-		@setCustomWidth(@resizingRow, @resizingColumn, @resizingBefore + diffX)
+
+		##|
+		##|  Locally and temporary change width
+		##|
+
+		source = @colByNum[@resizingColumn].getSource()
+		col    = @findColumn(source)
+		newWidth = @resizingBefore + diffX
+		if newWidth < 10 then newWidth = 10
+		if newWidth > 800 then newWidth = 800
+		col.changeColumn("width", newWidth)
+		@resetCachedFromSize()
+		@updateVisibleText()
+
+		# @setCustomWidth(@resizingRow, @resizingColumn, @resizingBefore + diffX)
 		true
 
 	onColumnResizeFinished: (diffX, diffY, e)=>
-		console.log "Resize complete."
+
+		source = @colByNum[@resizingColumn].getSource()
+		col    = @findColumn(source)
+		newWidth = @resizingBefore + diffX
+		if newWidth < 10 then newWidth = 10
+		if newWidth > 800 then newWidth = 800
+
+		DataMap.changeColumnAttribute col.tableName, col.getSource(), "width", newWidth
 		delete @resizingColumn
 		true
 
@@ -498,7 +520,6 @@ class TableView
 			##|
 			##|  Check for a resize start
 			data = WidgetTag.getDataFromEvent e
-			console.log "elTheTable.on mousedown data=", data
 			if data.path? and data.path == "grab"
 				##|
 				##|  Start resizing, save the location that was selected at the start
@@ -600,7 +621,7 @@ class TableView
 			@elTableHolder.width(@fixedWidth)
 			@elTableHolder.height(@fixedHeight);
 		else if @elTableHolder.width() > 0
-			@setHolderToBottom()
+			@updateFixedPosition()
 
 		@updateRowData()
 		true
@@ -1030,9 +1051,18 @@ class TableView
 	## -------------------------------------------------------------------------------------------------------------
 	## set the holder element to go to the bottom of the screen
 	##
-	setHolderToBottom: (attemptCounter) =>
+	setHolderToBottom: () =>
 
 		if @renderReqired then @real_render();
+		@isFixedBottom = true
+		@updateFixedPosition()
+
+	##|
+	##|  Move to the bottom location fully
+	updateFixedPosition: (attemptCounter = 0)=>
+
+		if !@isFixedBottom? or @isFixedBottom != true
+			return
 
 		height = $(window).height()
 
@@ -1046,7 +1076,7 @@ class TableView
 			if attemptCounter? and attemptCounter == 3 then return
 			setTimeout ()=>
 				if !attemptCounter? then attemptCounter = 0
-				@setHolderToBottom(attemptCounter+1)
+				@updateFixedPosition(attemptCounter+1)
 			, 10
 			return
 
@@ -1076,27 +1106,6 @@ class TableView
 	## @param [Boolean] customizableColumns
 	##
 	allowCustomize: (@customizableColumns = true) ->
-
-	setCustomName: (source, newName)=>
-		col    = @findColumn(source)
-		DataMap.changeColumnAttribute col.tableName, col.getSource(), "name", newName
-		true
-
-	setCustomVisible: (source, shouldShow)=>
-		if !shouldShow? then shouldShow = false
-		col    = @findColumn(source)
-		DataMap.changeColumnAttribute col.tableName, col.getSource(), "visible", shouldShow
-		true
-
-	##|
-	##|  Assign a custom width to a column
-	setCustomWidth: (rowNum, colNum, newWidth)=>
-		source = @colByNum[colNum].getSource()
-		col    = @findColumn(source)
-		if newWidth < 10 then newWidth = 10
-		if newWidth > 800 then newWidth = 800
-		DataMap.changeColumnAttribute col.tableName, col.getSource(), "width", newWidth
-		true
 
 	getTotalActionWidth: ()=>
 		##|
@@ -1460,11 +1469,11 @@ class TableView
 
 	incrementColumn: (location, showSpacer)=>
 
-		if location.x + location.colWidth > location.maxWidth
-			location.colWidth = location.maxWidth - location.x
+		# if location.x + location.colWidth > location.maxWidth
+		# 	location.colWidth = location.maxWidth - location.x
 
-		if (location.cellType == "data" or location.cellType == "locked") and location.colNum + 1 == location.totalColCount
-			location.colWidth = location.maxWidth - location.x
+		# if (location.cellType == "data" or location.cellType == "locked") and location.colNum + 1 == location.totalColCount
+		# 	location.colWidth = location.maxWidth - location.x
 
 		if location.spacer?
 
@@ -1779,7 +1788,7 @@ class TableView
 		@cachedTotalVisibleRows  = null
 		@cachedVisibleWidth      = null
 		@cachedVisibleHeight     = null
-		# @cachedLayoutShadowWidth = null
+		@cachedLayoutShadowWidth = null
 
 		for col in @colList
 			col.currentCol = null
@@ -1836,7 +1845,7 @@ class TableView
 		source = col.getSource()
 		for obj in @rowDataRaw
 			if !obj.id? then continue
-			value = DataMap.getDataField col.tableName, obj.id, source
+			value = DataMap.getDataFieldFormatted col.tableName, obj.id, source
 			if !value? then continue
 			len   = value.toString().length
 			if len > max then max = len
@@ -1856,6 +1865,13 @@ class TableView
 		maxWidth   = @getTableVisibleWidth()
 		if @cachedLayoutShadowWidth? and @cachedLayoutShadowWidth == maxWidth then return
 		@cachedLayoutShadowWidth = maxWidth
+
+		for i in @colList
+
+			if i.getAutoSize()
+				i.actualWidth = @findBestFit(i)
+
+		return
 
 		##|
 		##|  Look at all the columns, determine the likely width
@@ -1968,7 +1984,9 @@ class TableView
 
 	render: () =>
 
-		@renderReqired = true
+		if !@widgetBase?
+			@renderReqired = true
+
 		return true
 
 	real_render: () =>
@@ -2310,6 +2328,15 @@ class TableView
 					return cell
 
 		return null
+
+	show: ()=>
+		return
+
+	hide: ()=>
+		return
+
+	destroy: ()=>
+		return
 
 
 	## -------------------------------------------------------------------------------------------------------------

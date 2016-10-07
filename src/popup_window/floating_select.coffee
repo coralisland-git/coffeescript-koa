@@ -1,39 +1,40 @@
 class FloatingSelect extends FloatingWindow
 
-    getOptionHeight: ()=>
-        return 24
+    table        : null
+    optionHeight : 24
 
-    close: ()=>
-        if @table?
-            @el.remove()
-            delete @table
+    getOptionHeight: ()=>
+        return @optionHeight
+
+    destroy: ()=>
+        if @table? then @table.destroy()
+        delete @table
+        super()
+        return true
 
     hide: ()=>
-        @el.hide();
-        if @table?
-            console.log "Hiding, removing table?", @el
+        if @table? then @table.hide()
+        super()
         return true
 
     show: ()=>
-        @el.show()
+        console.log "FloatingSelect show"
+        super.show()
         @showTable()
         setTimeout @table.onResize, 10
         true
 
     onResize: ()=>
-        @el.show()
         if @table? then @table.onResize()
+        true
 
     setTable: (@tableName, @columns, config)=>
         GlobalClassTools.addEventManager(this)
 
     showTable: ()=>
+        if @table? then return @table
 
-        if @table?
-            console.log "Table already setup"
-            return @table
-
-        @table = new TableView(@el, false)
+        @table = new TableView(@elHolder.el, false)
         @table.showGroupPadding = false
         @table.showResize       = false
 
@@ -61,7 +62,8 @@ class FloatingSelect extends FloatingWindow
             @table.showHeaders = true
             # @table.showFilters = true
 
-        @table.setFixedSize(@w, @h)
+        @table.setFixedSize(@width, @height)
         @table.render()
         @table.onResize()
 
+        true

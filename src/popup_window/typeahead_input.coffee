@@ -112,6 +112,7 @@ class TypeaheadInput
 
         if !@win?
 
+            console.log "posTop=", posTop, " height=", height
             @win = new FloatingSelect(posLeft, posTop + height, width, @config.rowHeight*@config.numRows, @elInputField.parent())
             @win.setTable @tableName, @columns
 

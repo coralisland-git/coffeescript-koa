@@ -76,6 +76,10 @@ class WidgetTag
         @visible = true
 
         ##|
+        ##|  Absolute positioned element @see setAbsolute()
+        @isAbsolute = false
+
+        ##|
         ##|  All tags have an id number referenced into the globalTagData
         @element.dataset.id = @gid
 
@@ -137,9 +141,30 @@ class WidgetTag
         return globalTagData[@gid][name]
 
     ##|
+    ##|  Give the element a new zindex value
+    ##|  Can be any of number, auto, initial, inherit
+    ##|  see http://www.w3schools.com/jsref/prop_style_zindex.asp
+    setZ: (newZIndex = "auto")=>
+        if !@isAbsolute? or @isAbsolute != true
+            console.log "Warning: WidgetBase setting z index without absolute position"
+
+        @element.style.zIndex = newZIndex
+
+    getZ: ()=>
+        return @element.style.zIndex
+
+    ##|
     ##|  Add the "absolute" style to an element
-    setAbsolute: ()=>
-        @element.style.position = "absolute"
+    ##|  you can also specify something else such as inline, relative, etc
+    ##|
+    setAbsolute: (newIsAbsolute = true)=>
+        if newIsAbsolute == @isAbsolute then return
+        if newIsAbsolute
+            @element.style.position = "absolute"
+        else
+            @element.style.position = newIsAbsolute
+
+        @isAbsolute = newIsAbsolute
         true
 
     ##|
@@ -240,6 +265,11 @@ class WidgetTag
     offset: ()=>
         return @el.offset()
 
+    ##|
+    ##|  Append this widget element to a jquery element
+    appendTo: (jqueryElement)=>
+        $(jqueryElement).append @el
+
     append: (html)=>
         ##|
         ##|  Shouldn't really be used, add should be used instead
@@ -330,8 +360,10 @@ class WidgetTag
 
     position: ()=>
         pos = @el.position()
-        console.log "Widget pos=", pos, " internal x=#{@x}, y=#{@y}"
         return pos
+
+    find: (str)=>
+        return @el.find(str)
 
     on: (eventName, callback)=>
         @bind(eventName, callback)
@@ -360,6 +392,28 @@ class WidgetTag
             return false
 
         return this
+
+    ##|  Destroy an element, remove all children and destroy them.
+    ##|  Remove global variables and cleanup the DOM after.
+    ##|  Sends a resize message globally.
+    ##|
+    destroy: ()=>
+        ##|
+        ##|  remove this element and remove it from the DOM
+        if !@el? then return
+
+        for c in @children
+            c.destroy()
+
+        delete globalTagData @gid
+        delete globalTagPath @gid
+        @el.remove()
+        delete @el
+        delete @children
+        for varName, value of this
+            console.log "destroy #{@gid} var=#{varName}, value=", value
+
+        return true
 
 class WidgetBase extends WidgetTag
 
