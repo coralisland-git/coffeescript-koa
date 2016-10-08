@@ -14,6 +14,8 @@ $ ->
         # if !newData.id? then continue
         # id = newData.id
         newData.distance = Math.random() * 10
+        newData.Something1 = ""
+        newData.Another = null
         DataMap.addDataUpdateTable theTable, id, newData
 
     addHolder("renderTest1");

@@ -926,6 +926,8 @@ class TableView
 
 			if foundInActionCol then continue
 
+			if @isColumnEmpty(col) then continue
+
 			# if found == 0
 			# console.log "LIST #{col.getSource()} to order: #{col.getOrder()}"
 			@colList.push(col)
@@ -964,8 +966,6 @@ class TableView
 		@rowDataRaw = []
 		allData     = DataMap.getValuesFromTable @primaryTableName, @reduceFunction
 
-		@updateColumnList()
-
 		##|
 		##|  Path 1 - There are no groups defined so just quickly sort and filter
 		##|
@@ -978,6 +978,7 @@ class TableView
 				@rowDataRaw.push { id: obj.id, group: null }
 
 			@totalAvailableRows = @rowDataRaw.length
+			@updateColumnList()
 			if @renderReqired then @real_render();
 			@updateFullHeight()
 			@resetCachedFromSize()
@@ -1029,6 +1030,7 @@ class TableView
 					@rowDataRaw.push { id: id, visible: true, group: currentGroupNumber }
 
 		@totalAvailableRows = @rowDataRaw.length
+		@updateColumnList()
 		if @renderReqired then @real_render();
 		@updateFullHeight()
 		@resetCachedFromSize()
@@ -1828,12 +1830,31 @@ class TableView
 
 		##|
 		##|  Scrollbar settings show/hide
-
-
 		r1 = @virtualScrollV.setRange 0, maxAvailableRows, currentVisibleRows, @offsetShowingTop
 		r2 = @virtualScrollH.setRange 0, maxAvailableCols, currentVisibleCols, @offsetShowingLeft
 		if r1 or r2
 			@resetCachedFromSize()
+
+	##|
+	##|  Return true if a column is empty
+	##|
+	isColumnEmpty: (col)=>
+
+		if !@cachedColumnEmpty? then @cachedColumnEmpty = {}
+		if @cachedColumnEmpty[col.getSource()]? then return @cachedColumnEmpty[col.getSource()]
+		@cachedColumnEmpty[col.getSource()] = false
+
+		source = col.getSource()
+		for obj in @rowDataRaw
+			if !obj.id? then continue
+			value = DataMap.getDataField col.tableName, obj.id, source
+			if !value? then continue
+
+			if typeof value == "string" and value.length > 0 then return false
+			if typeof value == "number" and value > 0 then return false
+
+		@cachedColumnEmpty[col.getSource()] = true
+		return true
 
 	##|
 	##|  Find the best fit for the data in a given column
