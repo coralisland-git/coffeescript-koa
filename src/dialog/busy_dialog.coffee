@@ -122,9 +122,11 @@ class BusyDialog
         if !amount? or typeof amount != "number" then amount = 1
         if @currentState.max == 0 then @currentState.max = 100
         @currentState.pos++
+        if @currentState.pos > @currentState.max
+            @currentState.pos = @currentState.max
         @updatePercent()
 
-    setMinMax: (min, max, newPos = null)=>
+    setMinMax: (min, max, newPos = 0)=>
 
         @currentState.min = min
         @currentState.max = max
@@ -150,7 +152,7 @@ class BusyDialog
             percent = Math.floor((@currentState.pos / @currentState.max) * 100) + "%"
             if @currentState.pos+1 == @currentState.max then percent = "100%"
 
-            @elProgressText.html "#{@currentState.pos+1} of #{@currentState.max} (#{percent})"
+            @elProgressText.html "#{@currentState.pos} of #{@currentState.max} (#{percent})"
             @elProgressBar.css("width", percent)
             @elProgressBar.attr
                 "aria-valuenow" : @currentState.pos
