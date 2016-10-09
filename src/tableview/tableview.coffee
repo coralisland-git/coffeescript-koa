@@ -832,11 +832,11 @@ class TableView
 			for rule in @sortRules
 				if rule.state == 0 then continue
 
-				# console.log "Get ", @primaryTableName, "key=", a.id,  "source=", rule.source
+				# console.log "Get ", @primaryTableName, "key=", a.id,  b.id, "source=", rule.source
 				aValue = DataMap.getDataField @primaryTableName, a.id, rule.source
 				bValue = DataMap.getDataField @primaryTableName, b.id, rule.source
 
-				# console.log "Sort a=", aValue, "b=", bValue
+				console.log "Sort a=", aValue, "b=", bValue, rule.state
 
 				if rule.state == -1 and aValue < bValue then return 1
 				if rule.state == -1 and aValue > bValue then return -1
