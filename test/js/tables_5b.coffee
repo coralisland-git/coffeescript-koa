@@ -33,6 +33,7 @@ $ ->
         table.addTable "zipcode"
         table.setStatusBarEnabled(true)
         table.setFixedHeaderAndScrollable()
+        table.addLock("Z28216")
         # table.groupBy("state")
         table.addSortRule("Active", -1)
         table.render()

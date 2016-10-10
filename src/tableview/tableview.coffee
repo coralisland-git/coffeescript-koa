@@ -147,6 +147,7 @@ class TableView
 		@currentFilters    = {}
 		@currentGroups     = []
 		@sortRules         = []
+		@lockList          = {}
 		@showGroupPadding  = false
 		@groupPaddingWidth = 10
 
@@ -342,9 +343,15 @@ class TableView
 		if val? and val == true then return true
 		return false
 
+	getRowLocked: (id)=>
+		if @lockList[id]? then return true
+		return false
+
 	##|
 	##| Toggle a row as selected/not selected
 	toggleRowSelected: (row) =>
+
+		if @getRowLocked(row.id) then return false
 
 		val = @getRowSelected row.id
 		newVal = val == false
@@ -800,6 +807,8 @@ class TableView
 			found.state = 0
 		else if sortMode? and sortMode == 1
 			found.state = 1
+		else if sortMode? and sortMode == -1
+			found.state = -1
 		else if found.state == -1
 			found.state = 0
 		else if found.state == 0
@@ -810,6 +819,11 @@ class TableView
 		@updateRowData()
 		return
 
+	##|
+	##|  Lock a given value at the top, does not matter what the sort is
+	addLock: (id)=>
+		@lockList[id] = true
+		return true
 
 	## -------------------------------------------------------------------------------------------------------------
 	## internal function to apply sorting on table with column and sorting type
@@ -819,13 +833,13 @@ class TableView
 	##
 	applySorting: (rowData) =>
 
-		if @sortRules.length == 0 then return rowData
+		@numLockedRows = Object.keys(@lockList).length
+		if @sortRules.length == 0 and @numLockedRows == 0 then return rowData
 
 		# console.log "applySorting", @sortRules, rowData
 
-		if !@sortRules? or @sortRules.length == 0
-			console.log "applySorting return 1"
-			return rowData
+		if !@sortRules?
+			@sortRules = []
 
 		sorted = rowData.sort (a, b)=>
 
@@ -836,7 +850,7 @@ class TableView
 				aValue = DataMap.getDataField @primaryTableName, a.id, rule.source
 				bValue = DataMap.getDataField @primaryTableName, b.id, rule.source
 
-				console.log "Sort a=", aValue, "b=", bValue, rule.state
+				# console.log "Sort a=", aValue, "b=", bValue, rule.state
 
 				if rule.state == -1 and aValue < bValue then return 1
 				if rule.state == -1 and aValue > bValue then return -1
@@ -845,6 +859,18 @@ class TableView
 				if rule.state == 1 and aValue > bValue then return 1
 
 			return 0
+
+		if @numLockedRows > 0
+			finalList = []
+			for rec in sorted
+				if @lockList[rec.id]?
+					finalList.push rec
+					rec.locked = true
+
+			for rec in sorted
+				if !@lockList[rec.id]? then finalList.push rec
+			return finalList
+
 
 		# console.log "applySorting return:", sorted
 		return sorted
@@ -1376,7 +1402,9 @@ class TableView
 		col = @colByNum[location.colNum]
 		if col.getSource() == "row_selected"
 
-			if @getRowSelected(@rowDataRaw[location.rowNum].id)
+			if @getRowLocked(@rowDataRaw[location.rowNum].id)
+				location.cell.html "<i class='fa fa-lock'></i>"
+			else if @getRowSelected(@rowDataRaw[location.rowNum].id)
 				location.cell.html @imgChecked
 			else
 				location.cell.html @imgNotChecked
@@ -1647,6 +1675,7 @@ class TableView
 				location.cell.setClass "clickable",   @getCellClickable(location)
 				location.cell.setClass "editable",    @getCellEditable(location)
 				location.cell.setClass "row_checked", @getRowSelected(location.recordId)
+				location.cell.setClass "row_locked",  @getRowLocked(location.recordId)
 
 				location.cell.setDataPath @getCellDataPath(location)
 				@setDataField(location)
@@ -1712,13 +1741,23 @@ class TableView
 
 		location =
 			visibleRow    : 0
-			rowNum        : @offsetShowingTop
+			rowNum        : 0
 			totalColCount : @getTableTotalCols()
 			maxWidth      : @getTableVisibleWidth()
 			actionWidth   : @getTotalActionWidth()
 
+		lockRowsRemain = @numLockedRows
+		hasFinishedLockedRows = false
+		# @offsetShowingTop
+
 		# console.log "updateVisibleText offsetShowingTop=", @offsetShowingTop, " offsetShowingLeft=", @offsetShowingLeft, " maxRow=", totalRowCount, "maxCol=", totalColCount
 		while y < maxHeight
+
+			if lockRowsRemain ==0 and !hasFinishedLockedRows
+				hasFinishedLockedRows = true
+				console.log "HERE ROW=", location.rowNum
+				location.rowNum += @offsetShowingTop
+
 
 			location.rowHeight = @getRowHeight(location)
 			location.state     = @getRowType(location)
@@ -1761,6 +1800,7 @@ class TableView
 				@shadowCells[location.visibleRow].addClass "tableRow"
 				@updateVisibleTextRow location
 				location.rowNum++
+				if lockRowsRemain > 0 then lockRowsRemain--
 
 			else
 				console.log "Unknown state at v=#{visibleRow}, r=#{rowNum}:", location.state
