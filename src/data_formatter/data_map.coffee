@@ -431,7 +431,7 @@ class DataMap
 		if ignoreEvents? and ignoreEvents == true or !globalTableEvents?
 			return true
 
-		##|
+		##|doGetCursor
 		##| Send chagne event
 		# console.log "changeColumnAttribute #{tableName}, #{sourceName}, #{field}, #{newValue}"
 		globalTableEvents.emitEvent "table_change", [ tableName, sourceName, field, newValue ]
@@ -440,7 +440,8 @@ class DataMap
 	@addDataUpdateTable: (tableName, keyValue, newData) =>
 
 		path = "/#{tableName}/#{keyValue}"
-		doc = DataMap.getDataMap().engine.set path, newData
+		# doc = DataMap.getDataMap().engine.set path, newData
+		doc = DataMap.getDataMap().engine.setFastDocument tableName, keyValue, newData
 
 		dm = DataMap.getDataMap()
 		if !dm.types[tableName]?

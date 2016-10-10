@@ -23,10 +23,10 @@ class ModalSortItems extends ModalDialog
     # @property [Boolean] showOnCreate
     showOnCreate: false
 
-    imgChecked     : "<img src='images/checkbox.png' width='16' height='16' alt='Selected' />"
+    imgChecked     : "<img src='/images/checkbox.png' width='16' height='16' alt='Selected' />"
 
     # @property [String] imgNotChecked html to be used when checkbox is not checked
-    imgNotChecked  : "<img src='images/checkbox_no.png' width='16' height='16' alt='Selected' />"
+    imgNotChecked  : "<img src='/images/checkbox_no.png' width='16' height='16' alt='Selected' />"
 
     updateColumnText: ()=>
 

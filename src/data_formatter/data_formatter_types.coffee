@@ -500,6 +500,9 @@ class DataFormatInt extends DataFormatterType
 	## @return [Object] data formatted data
 	##
 	format: (data, options, path) =>
+		if !data?
+			return ""
+
 		if data == null or (typeof data == "string" and data.length == 0)
 			return ""
 
@@ -542,6 +545,9 @@ class DataFormatNumber extends DataFormatterType
 	## @return [Object] data formatted data
 	##
 	format: (data, options, path) =>
+		if !data?
+			return ""
+
 		num = DataFormatter.getNumber data
 
 		if data == null or (typeof data == "string" and data.length == 0)

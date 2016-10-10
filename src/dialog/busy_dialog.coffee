@@ -128,6 +128,8 @@ class BusyDialog
 
     setMinMax: (min, max, newPos = 0)=>
 
+        @elProgressText.html ""
+        @lastPercent = -1
         @currentState.min = min
         @currentState.max = max
         @updatePercent(newPos)
@@ -146,10 +148,12 @@ class BusyDialog
             @elSpinner.show()
             @elProgressBar.attr("aria-valuenow", 0).css("width", 0)
         else
+            percent = Math.floor((@currentState.pos / @currentState.max) * 100) + "%"
+            if percent == @lastPercent then return
+
             @elProgressDiv.show()
             @elSpinner.hide()
 
-            percent = Math.floor((@currentState.pos / @currentState.max) * 100) + "%"
             if @currentState.pos+1 == @currentState.max then percent = "100%"
 
             @elProgressText.html "#{@currentState.pos} of #{@currentState.max} (#{percent})"
@@ -172,6 +176,7 @@ class BusyDialog
         state = new BusyState()
         state.text = strText
 
+        @lastPercent = -1
         @busyStack.push state
         @currentState = state
 

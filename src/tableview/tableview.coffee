@@ -64,10 +64,10 @@ class TableView
 	@SORT_NONE : 0
 
 	# @property [String] imgChecked html to be used when checkbox is checked
-	imgChecked     : "<img src='images/checkbox.png' width='16' height='16' alt='Selected' />"
+	imgChecked     : "<img src='/images/checkbox.png' width='16' height='16' alt='Selected' />"
 
 	# @property [String] imgNotChecked html to be used when checkbox is not checked
-	imgNotChecked  : "<img src='images/checkbox_no.png' width='16' height='16' alt='Selected' />"
+	imgNotChecked  : "<img src='/images/checkbox_no.png' width='16' height='16' alt='Selected' />"
 
 	##|
 	##| ******************************[ Events and event related functions or notes ]*******************************
@@ -850,6 +850,10 @@ class TableView
 				aValue = DataMap.getDataField @primaryTableName, a.id, rule.source
 				bValue = DataMap.getDataField @primaryTableName, b.id, rule.source
 
+				if aValue? and !bValue then return rule.state
+				if bValue? and !aValue then return rule.state * -1
+				if !aValue? and !bValue? then return 0
+
 				# console.log "Sort a=", aValue, "b=", bValue, rule.state
 
 				if rule.state == -1 and aValue < bValue then return 1
@@ -952,7 +956,9 @@ class TableView
 
 			if foundInActionCol then continue
 
-			if @isColumnEmpty(col) then continue
+			if @isColumnEmpty(col)
+				# console.log "Column is empty:", col.getSource()
+				continue
 
 			# if found == 0
 			# console.log "LIST #{col.getSource()} to order: #{col.getOrder()}"
@@ -1755,9 +1761,7 @@ class TableView
 
 			if lockRowsRemain ==0 and !hasFinishedLockedRows
 				hasFinishedLockedRows = true
-				console.log "HERE ROW=", location.rowNum
 				location.rowNum += @offsetShowingTop
-
 
 			location.rowHeight = @getRowHeight(location)
 			location.state     = @getRowType(location)
@@ -1880,6 +1884,8 @@ class TableView
 	##|
 	isColumnEmpty: (col)=>
 
+		if @rowDataRaw.length == 0 then return false
+
 		if !@cachedColumnEmpty? then @cachedColumnEmpty = {}
 		if @cachedColumnEmpty[col.getSource()]? then return @cachedColumnEmpty[col.getSource()]
 		@cachedColumnEmpty[col.getSource()] = false
@@ -1892,6 +1898,8 @@ class TableView
 
 			if typeof value == "string" and value.length > 0 then return false
 			if typeof value == "number" and value > 0 then return false
+			if typeof value == "boolean" then return false
+			if typeof value == "object" then return false
 
 		@cachedColumnEmpty[col.getSource()] = true
 		return true

@@ -73,6 +73,7 @@ class DataMapMemoryCollection
 
         if idValue? and @data[idValue]?
             @data[idValue][subKey] = newValue
+
         return
 
     ##|
@@ -99,9 +100,10 @@ class DataMapMemoryCollection
 
     upsert: (doc) =>
         strKey = @getDocumentKey(doc)
-        # @data[strKey] = doc.extend(true, {}, doc);
+        isKeyNew = @data[strKey]?
+        # console.log "upsert #{strKey}:", doc
         @data[strKey] = doc
-        @count = Object.keys(@data).length
+        if isKeyNew then @count++
         return @data[strKey]
 
     ##|
@@ -289,6 +291,15 @@ class DataMapEngine
                     lhs  : o
 
         return diffs
+
+    ##|
+    ##|  Set an entire document
+    setFastDocument: (tableName, keyValue, newData)=>
+
+        c = @internalGetCollection tableName
+        if keyValue? then newData.id = keyValue
+        c.upsert newData
+        true
 
 
     ##| -------------------------------------------------------------------------------------------------------------
