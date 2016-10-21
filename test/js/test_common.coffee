@@ -153,6 +153,10 @@ $ ->
 		console.log "globalTableEvents: table=#{tableName} source=#{source} field=#{field} new=", newValue
 		true
 
+	globalTableEvents.on "row_selected", (tableName, id, status)=>
+		console.log "globalTableEvents: rowSelected tableName=#{tableName}, id=#{id}, status=#{status}"
+		true
+
 	# DataMap.getDataMap().on "table_change", (tableName, config)->
 	# 	console.log "DataMap.table_change tableName=#{tableName} config=", config
 	# 	true

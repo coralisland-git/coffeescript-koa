@@ -358,6 +358,8 @@ class TableView
 
 		if val
 
+			globalTableEvents.emitEvent "row_selected", [ @primaryTableName, row.id, false ]
+
 			row.row_selected = false
 			DataMap.getDataMap().updatePathValueEvent "/#{@primaryTableName}/#{row.id}/row_selected", false
 			delete @rowDataSelected[row.id]
@@ -366,11 +368,14 @@ class TableView
 
 			if @checkboxLimit == 1
 				for id in Object.keys(@rowDataSelected)
+					globalTableEvents.emitEvent "row_selected", [ @primaryTableName, row.id, false ]
 					DataMap.getDataMap().updatePathValueEvent "/#{@primaryTableName}/#{id}/row_selected", false
+
 				@rowDataSelected = {}
 
 			console.log "Setting /#{@primaryTableName}/#{row.id}/row_selected = true"
 			DataMap.getDataMap().updatePathValueEvent "/#{@primaryTableName}/#{row.id}/row_selected", true
+			globalTableEvents.emitEvent "row_selected", [ @primaryTableName, row.id, true ]
 			@rowDataSelected[row.id] = true
 
 		@resetChecked()
@@ -637,6 +642,36 @@ class TableView
 
 			false
 
+	onCopyToClipboard: (e, value)=>
+		console.log "Copy to clipboard:", value
+		copyToClipboard(value)
+		true
+
+	onContextMenuData: (e)=>
+
+		data = WidgetTag.getDataFromEvent(e)
+		row  = @findRowFromPath data.path
+		col  = @findColFromPath data.path
+
+		console.log "ROW=", row
+		console.log "COL=", col
+
+		popupMenu = new PopupMenu "Options", e
+
+		aValue = DataMap.getDataField @primaryTableName, row.id, col
+		if aValue?
+			aValue = aValue.toString().trim()
+			popupMenu.addItem "Copy '#{aValue}'", @onCopyToClipboard, aValue
+
+		bValue = DataMap.getDataFieldFormatted @primaryTableName, row.id, col
+		if bValue? and bValue != aValue
+			popupMenu.addItem "Copy '#{bValue}'", @onCopyToClipboard, bValue
+
+		if @showCheckboxes and row.id?
+			popupMenu.addItem "Copy '#{row.id}'", @onCopyToClipboard, row.id
+
+		true
+
 	##|
 	##|  Called when context menu on a group row
 	onContextMenuGroup: (rowNum, coords)=>
@@ -825,6 +860,7 @@ class TableView
 				return false
 
 			console.log "Context menu for #{data.path}"
+			@onContextMenuData(e)
 			return false
 
 		true

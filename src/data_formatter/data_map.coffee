@@ -110,7 +110,6 @@ class DataMap
 
 		true
 
-
 	## -------------------------------------------------------------------------------------------------------------
 	## works as the event triggered at the update of the value
 	##
@@ -530,7 +529,8 @@ class DataMap
 		##|
 		##|  TODO Fix Row Data
 		rowData = {}
-		currentValue = dm.types[tableName].col[fieldName].renderValue(currentValue, keyValue, rowData)
+		if dm.types[tableName].col[fieldName]?
+			currentValue = dm.types[tableName].col[fieldName].renderValue(currentValue, keyValue, rowData)
 
 		if !currentValue? or currentValue == null
 			currentValue = ""

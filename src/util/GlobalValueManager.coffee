@@ -17,6 +17,7 @@ class GlobalValueManager
 	# @property [Object] globalData
     @globalData      : {}
 
+
 	## -------------------------------------------------------------------------------------------------------------
 	## returns a sequential number unique across the app. used to generate id numbers
 	## for new html elements

@@ -27,7 +27,27 @@ window.newPromise = (callFunction, context)->
 
             resolve(value)
 
+##|
+##|  Copy text to the clipboard
+##|
+window.copyToClipboard = (data)->
+
+    el = document.getElementById("clipboardHolder")
+    if !el?
+        $("body").append "<input id='clipboardHolder'></input>"
+        el = document.getElementById("clipboardHolder")
+
+    $(el).show()
+    $(el).val(data)
+    $(el).select()
+    document.execCommand("copy")
+    $(el).blur()
+    $(el).hide()
+
+    return
+
 class GlobalClassTools
+
 
     ##|
     ##|  Add an event manager object based on EvEmitter
