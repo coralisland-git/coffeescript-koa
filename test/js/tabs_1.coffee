@@ -24,4 +24,20 @@ $ ->
 		tab2.setBadge(2,'danger','back') ## direction of the badge it can be front (default) or back
 		return 1
 
+	addTestButton "Tabs with tables", "Open", (e)->
+		addHolder("renderTest1")
+		$("#renderTest1").height(800)
+
+		newPromise ()->
+
+			yield loadZipcodes()
+			yield loadStockData()
+
+			tabs = new DynamicTabs("#renderTest1")
+			yield tabs.doAddTableTab "zipcode", "Zipcodes"
+			yield tabs.doAddTableTab "stocks", "Stock Data"
+
+		.then ()->
+			console.log "Done."
+
 	go()

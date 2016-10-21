@@ -16,6 +16,7 @@ class DynamicTabs
 	constructor: (holderElement)->
 
 		@tags       = {}
+		@tabs       = {}
 		@tabCount   = 0
 		@activeTab  = null
 		@elHolder   = new WidgetTag("div", "ninja-tabs")
@@ -46,6 +47,13 @@ class DynamicTabs
 			console.log "Warning: DynamicTabs show(#{id}) invalid tab"
 		return true
 
+	getTab: (tabName) =>
+
+		##|
+		##|  Return existing tab
+		if @tabs[tabName]? then return @tabs[tabName]
+		return null
+
 	## -------------------------------------------------------------------------------------------------------------
 	## Add a new tab to current instance
 	##
@@ -54,6 +62,10 @@ class DynamicTabs
 	## @return [Tab] the new tab Object which is created
 	##
 	addTab: (tabName, defaultHtml) =>
+
+		##|
+		##|  Return existing tab
+		if @tabs[tabName]? then return @tabs[tabName]
 
 		id = "tab#{@tabCount++}"
 
@@ -86,6 +98,10 @@ class DynamicTabs
 				@activeTab = id
 				@updateTabs()
 
+		##|
+		##|  A reference to the data by name
+		@tabs[tabName] = @tags[id]
+
 		@updateTabs()
 
 		return @tags[id]
@@ -117,3 +133,50 @@ class DynamicTabs
 				tag.badgeText.hide()
 
 		true
+
+	##|
+	##|  Add a view to a tab
+	##|  Return (resolves) with the tab
+	##|  Calls callbackWithView with the new view
+	##|  The promise is only complete after the callback completes.
+	##|
+	doAddViewTab : (viewName, tabText, callbackWithView) =>
+
+		new Promise (resolve, reject) =>
+
+			gid          = GlobalValueManager.NextGlobalID()
+			content      = "<div id='tab_#{gid}' class='tab_content'></div>"
+			tab          = @addTab tabText, content
+			elViewHolder = $("#tab_#{gid}")
+			doAppendView viewName, elViewHolder
+			.then (view)=>
+
+				view.elHolder = elViewHolder
+				callbackWithView(view, tabText)
+				resolve(tab)
+
+	##|
+	##|  Add a table to a tab which is a common function so we
+	##|  we have included management for tabs with tables globally
+	##|
+	doAddTableTab : (tableName, tabText) =>
+
+		new Promise (resolve, reject)=>
+
+			@doAddViewTab "Table", tabText, (view, viewText)=>
+
+				if !@tables? then @tables = {}
+				table = view.loadTable tableName
+				table.showCheckboxes = true
+				table.setStatusBarEnabled()
+				@tables[tableName] = table
+				@tabs[tabText].table = table
+
+			.then (tab)=>
+
+				# total = @tabs[tabText].table.getTableTotalRows()
+				# console.log "Setting Badge [#{tabText}] to #{total}:", @tabs[tabText].table
+				# @tabs[tabText].setBadge(total)
+				resolve(@tabs[tabText])
+
+

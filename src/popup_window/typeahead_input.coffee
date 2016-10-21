@@ -29,6 +29,7 @@ class TypeaheadInput
         @clearIcon.show()
         @elInputField.select()
         @initFloatingWindow()
+        @setFilter @elInputField.val()
         return true
 
     onBlur: (e)=>
@@ -93,6 +94,11 @@ class TypeaheadInput
         # globalKeyboardEvents.on "down", @moveCellDown
 
 
+    showWindow:()=>
+        @win.show()
+
+    hideWindow:()=>
+        @win.hide()
 
     initFloatingWindow: ()=>
 
@@ -107,6 +113,13 @@ class TypeaheadInput
 
         width      = @elInputField.outerWidth(true)
         height     = @elInputField.outerHeight(true)
+
+        if @config.width? then width = @config.width
+        if @config.height? then height = @config.height
+
+        winWidth = $(window).width()
+        if posLeft + width > winWidth
+            posLeft = winWidth - 10 - width
 
         px = @elInputField.position()
 

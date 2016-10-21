@@ -24,18 +24,24 @@ class ViewShowTableEditor extends View
             m.getForm().onSubmit = (form) =>
 
                 data =
-                    name     : form.name
-                    source   : form.source
+                    name       : form.name
+                    source     : form.source
+                    visible    : true
+                    editable   : true
+                    type       : "text"
+                    "autosize" : true
 
                 DataMap.addColumn @editedTableKey, data
                 DataMap.changeColumnAttribute @editedTableKey, form.source, "type", "text"
-                DataMap.changeColumnAttribute @editedTableKey, form.source, "autoresize", true
+                DataMap.changeColumnAttribute @editedTableKey, form.source, "autosize", true
+                @updateData()
+                @closePopup()
 
                 true
 
             m.show()
 
-        # @addtoBoolbar [ navButtonCreateNew ]
+        @addToolbar [ navButtonCreateNew ]
         true
 
     onShowScreen: ()=>
@@ -48,6 +54,11 @@ class ViewShowTableEditor extends View
         # w = @elHolder.width()
         # @editorTable.elTableHolder.height h
         # @editorTable.onResize()
+        true
+
+    updateData: ()=>
+        @rowsList = DataMap.getColumnsFromTable(@editedTableKey, null)
+        @internalSetDataTypes()
         true
 
     ## -------------------------------------------------------------------------------------------------------------
@@ -65,12 +76,13 @@ class ViewShowTableEditor extends View
         @editorTable.showConfigTable = false
         @editorTable.showFilters = false
         @editorTable.addTable "_editor"
+        @editorTable.setAutoFillWidth()
 
         # @editorTable.elTableHolder.css "width", "100%"
         # @editorTable.elTableHolder.css "height", "400px"
 
         @editorTable.addActionColumn
-            width  : 50
+            width  : 80
             source : "delete",
             name   : "Delete"
             callback: (row)=>
@@ -129,6 +141,7 @@ class ViewShowTableEditor extends View
                     editable : true
                     required : true
                     width    : 140
+                    autosize : true
                 ,
                     name     : "Source"
                     source   : "source"
@@ -136,6 +149,7 @@ class ViewShowTableEditor extends View
                     type     : "text"
                     editable : true
                     width    : 120
+                    autosize : true
                 ,
                     name     : "Visible"
                     source   : "visible"
@@ -167,6 +181,13 @@ class ViewShowTableEditor extends View
                 ,
                     name     : "Autosize"
                     source   : "autosize"
+                    visible  : true,
+                    type     : "boolean"
+                    editable : true
+                    width    : 60
+                ,
+                    name     : "Calculation"
+                    source   : "calculation"
                     visible  : true,
                     type     : "boolean"
                     editable : true
@@ -205,6 +226,7 @@ class ViewShowTableEditor extends View
                     type     : "text"
                     editable : true
                     width    : 120
+                    autosize : true
                 ,
                     name     : "Formula/Code"
                     source   : "render"
@@ -212,6 +234,7 @@ class ViewShowTableEditor extends View
                     type     : "sourcecode"
                     editable : true
                     width    : 120
+                    autosize : true
                     render:  (val)=>
                         if val? then return "Edit source"
                         return ""
@@ -219,6 +242,7 @@ class ViewShowTableEditor extends View
             ]
 
         ##| add row data to dataMap about current column configurations
+        DataMap.removeTableData("_editor")
         for row in @rowsList
             DataMap.addData "_editor", row.getSource(), row.serialize()
 

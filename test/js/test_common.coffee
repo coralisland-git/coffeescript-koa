@@ -1,6 +1,35 @@
 allTests = []
 counter  = 0
 
+##|
+##|  Common function to load test data
+##|  Load a list of zipcodes
+loadZipcodes = ()->
+
+    ##|
+    ##|  Load the zipcode data before the test begins
+    new Promise (resolve, reject) ->
+
+        $.get "/js/test_data/zipcodes.json", (allData)->
+
+            counter = 0
+            for rec in allData.data
+                rec.Weather = "https://www.wunderground.com/cgi-bin/findweather/getForecast?query=pz:#{rec.code}&zip=1"
+                DataMap.addDataUpdateTable "zipcode", rec.code, rec
+
+            resolve(true)
+
+loadStockData = ()->
+
+	new Promise (resolve, reject)->
+
+		$.get "/js/test_data/stocks.json", (allData)->
+			for idx, rec of allData
+				delete rec._id
+				DataMap.addDataUpdateTable "stocks", rec.Ticker, rec
+
+			resolve(true)
+
 addHolder = (name) ->
 
     $("#" + name).remove()

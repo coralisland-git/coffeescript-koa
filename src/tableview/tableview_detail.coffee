@@ -123,7 +123,8 @@ class TableViewDetailed extends TableView
     ##|
     getRowType: (location)=>
         if !@colByNum[location.rowNum]?
-            console.log "returning invalid getRowType: #{location.rowNum}"
+            return "invalid'"
+            # console.log "returning invalid getRowType: #{location.rowNum}"
 
         if !@colByNum[location.rowNum]? then return "invalid"
         return "data"

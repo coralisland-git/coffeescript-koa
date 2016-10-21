@@ -1,5 +1,7 @@
 ## -------------------------------------------------------------------------------------------------------------
 ## class ModalMessageBox to show modal as message box
+
+
 ##
 ## @extends [ModalDialog]
 ##
@@ -31,6 +33,8 @@ class ModalSortItems extends ModalDialog
     updateColumnText: ()=>
 
         for col in @columns
+            if col.getAlwaysHidden() then continue
+
             col.tagName.html col.getName()
             col.tagOrderText.html col.getOrder()+1
             if col.getVisible()
@@ -40,10 +44,13 @@ class ModalSortItems extends ModalDialog
                 col.tagCheck.html @imgNotChecked
                 col.tag.addClass "notVisible"
 
+            col.tag.setClass "calculation", col.getIsCalculation()
+
         true
 
     onClickVisible: (e)=>
         for col in @columns
+            if col.getAlwaysHidden() then continue
             if col.getSource() != e.path then continue
             DataMap.changeColumnAttribute @tableName, e.path, "visible", (col.getVisible() == false)
             @updateColumnText()
@@ -80,6 +87,8 @@ class ModalSortItems extends ModalDialog
             return a.getOrder() - b.getOrder()
 
         for col in @columns
+            if col.getAlwaysHidden() then continue
+
             col.tag          = @sortItemsList.add "li", "columnItem"
             col.gid = col.tag.gid
 
@@ -104,6 +113,7 @@ class ModalSortItems extends ModalDialog
                 id = $(el).data("id")
 
                 for col in @columns
+                    if col.getAlwaysHidden() then continue
                     if col.gid != id then continue
 
                     oldOrder = col.getOrder()

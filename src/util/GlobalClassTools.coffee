@@ -11,6 +11,22 @@ String.prototype.ucwords = ()->
         ($1)->
             return $1.toUpperCase();
 
+window.newPromise = (callFunction, context)->
+
+    return new Promise (resolve, reject) ->
+
+        if !callFunction?
+            resolve(true)
+
+        ##|
+        ##|  parameter is a generator or something that co supports
+        co(callFunction).call (context || this), (err, value)->
+            if err
+                console.log "ERR:", err
+                reject(err)
+
+            resolve(value)
+
 class GlobalClassTools
 
     ##|

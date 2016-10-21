@@ -10,27 +10,6 @@ $ ->
             DataMap.addDataUpdateTable "zipcode", rec.code, rec
         , timeValue
 
-    loadZipcodes = ()->
-#
-
-        ##|
-        ##|  Load the zipcode data before the test begins
-        new Promise (resolve, reject) ->
-
-            $.get "/js/test_data/zipcodes.json", (allData)->
-
-                counter = 0
-                for rec in allData.data
-                    rec.Weather = "https://www.wunderground.com/cgi-bin/findweather/getForecast?query=pz:#{rec.code}&zip=1"
-                    rec.love_it = new Date().getTime() % 2 == 1
-
-                    if testWithNewRows and ++counter > 5
-                        delayAdd(rec)
-                    else
-                        DataMap.addDataUpdateTable "zipcode", rec.code, rec
-
-                resolve(true)
-
     timerTest = ()->
         return
 

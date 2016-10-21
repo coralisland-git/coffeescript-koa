@@ -503,6 +503,41 @@ class TableView
 		delete @resizingColumn
 		true
 
+	onMouseHover: (e)=>
+		coords = GlobalValueManager.GetCoordsFromEvent(e)
+		if !e.path?
+			@tooltipWindow.hide()
+			return
+
+		@tooltipShowing = false
+		row  = @findRowFromPath e.path
+		col  = @findColFromPath e.path
+
+		for c in @colList
+			if c.getSource() == col
+				w = @tooltipWindow.getBodyWidget()
+				w.resetClasses "ninjaTooltipBody"
+				@tooltipWindow.floatingWin.addClass "ninjaTooltip"
+
+				result = c.renderTooltip(row, row[col], @tooltipWindow)
+				console.log "RESULT=", result, c
+				if result == true
+					@tooltipWindow.moveTo(coords.x - (@tooltipWindow.width/2), coords.y - 10 - @tooltipWindow.height)
+					@tooltipWindow.show()
+					@tooltipShowing = true
+
+		console.log "HOVER:", e.path, coords, "col=", col, "row=", row
+
+	onMouseOut: (e)=>
+
+		if @mouseHoverTimer?
+			clearTimeout @mouseHoverTimer
+			delete @mouseHoverTimer
+
+		if @tooltipShowing? and @tooltipShowing == true
+			@tooltipShowing = false
+			@tooltipWindow.hide()
+
 	## -------------------------------------------------------------------------------------------------------------
 	## to setup event internally for the table
 	##
@@ -516,6 +551,18 @@ class TableView
 		@virtualScrollH.on "scroll_to", (amount)=>
 			@offsetShowingLeft = amount
 			@resetCachedFromScroll()
+			true
+
+		@elTheTable.on "mouseout", @onMouseOut
+			true
+
+		@elTheTable.on "mousemove", (e)=>
+			if @mouseHoverTimer? then clearTimeout @mouseHoverTimer
+			@mouseHoverTimer = setTimeout @onMouseHover, 1000, e
+			if @tooltipShowing? and @tooltipShowing == true
+				coords = GlobalValueManager.GetCoordsFromEvent(e)
+				@tooltipWindow.moveTo(coords.x - (@tooltipWindow.width/2), coords.y - 10 - @tooltipWindow.height)
+
 			true
 
 		@elTheTable.on "mousedown", (e)=>
@@ -791,7 +838,7 @@ class TableView
 
 	addSortRule: (sourceName, sortMode)=>
 
-		console.log "adding sort rule table=#{@primaryTableName}, source=#{sourceName}, mode=#{sortMode}"
+		# console.log "adding sort rule table=#{@primaryTableName}, source=#{sourceName}, mode=#{sortMode}"
 
 		found = null
 		for rule in @sortRules
@@ -1040,12 +1087,12 @@ class TableView
 			if !groupedData[key]?
 				groupedData[key] = []
 
-			groupedData[key].push item.id
+			groupedData[key].push item
 
 
 		for value in Object.keys(groupedData).sort()
 			currentGroupNumber++
-			if currentGroupNumber > 7 then currentGπroupNumber = 1
+			if currentGroupNumber > 7 then currentGroupNumber = 1
 
 			filteredData = groupedData[value]
 			if filteredData.length > 0
@@ -1058,8 +1105,12 @@ class TableView
 					group  : currentGroupNumber
 					count  : filteredData.length
 
-				for id in @applySorting(filteredData)
-					@rowDataRaw.push { id: id, visible: true, group: currentGroupNumber }
+				filteredData = @applySorting(filteredData)
+				for obj in filteredData
+					@rowDataRaw.push { id: obj.id, group: currentGroupNumber, visible: true}
+
+				# for id in @applySorting()
+					# @rowDataRaw.push { id: id, visible: true, group: currentGroupNumber }
 
 		@totalAvailableRows = @rowDataRaw.length
 		@updateColumnList()
@@ -1076,6 +1127,7 @@ class TableView
 	isVisible: ()=>
 		if !@elTableHolder? then return false
 		pos = @elTableHolder.position()
+		if !pos? then return false
 		tableWidth = @elTableHolder.outerWidth()
 
 		if pos.top == 0 and pos.left == 0 and tableWidth == 0
@@ -1312,6 +1364,11 @@ class TableView
 		if location.cellType != "data" then return @primaryTableName
 		return @colByNum[location.colNum].tableName
 
+	getCellCalculation: (location)->
+		if location.cellType == "invalid" then return null
+		if !@colByNum[location.colNum]? then return null
+		return @colByNum[location.colNum].getIsCalculation()
+
 	getCellSource: (location)=>
 		if location.cellType == "invalid" then return null
 		if !@colByNum[location.colNum]? then return null
@@ -1503,12 +1560,16 @@ class TableView
 		location.cell.setClass "text-right", (location.align == "right")
 		location.cell.setClass "text-center", (location.align == "center")
 
+		##|
+		##|  Fixed calculation
+		location.cell.setClass "calculation", @getCellCalculation(location)
+
 		true
 
 	incrementColumn: (location, showSpacer)=>
 
-		# if location.x + location.colWidth > location.maxWidth
-		# 	location.colWidth = location.maxWidth - location.x
+		if location.x + location.colWidth > location.maxWidth
+			location.colWidth = location.maxWidth - location.x
 
 		# if (location.cellType == "data" or location.cellType == "locked") and location.colNum + 1 == location.totalColCount
 		# 	location.colWidth = location.maxWidth - location.x
@@ -1807,7 +1868,7 @@ class TableView
 				if lockRowsRemain > 0 then lockRowsRemain--
 
 			else
-				console.log "Unknown state at v=#{visibleRow}, r=#{rowNum}:", location.state
+				# console.log "Unknown state at v=#{visibleRow}, r=#{rowNum}:", location.state
 				location.rowNum++
 
 			y += location.rowHeight
@@ -1829,6 +1890,7 @@ class TableView
 		@cachedTotalVisibleCols  = null
 		@cachedTotalVisibleRows  = null
 		@updateVisibleText()
+		@onMouseOut()
 		true
 
 	resetCachedFromSize: ()=>
@@ -1843,6 +1905,7 @@ class TableView
 
 		@layoutShadow()
 		@updateVisibleText()
+		@onMouseOut()
 		true
 
 	##|
@@ -1885,6 +1948,7 @@ class TableView
 	isColumnEmpty: (col)=>
 
 		if @rowDataRaw.length == 0 then return false
+		if col.getEditable() == true then return false
 
 		if !@cachedColumnEmpty? then @cachedColumnEmpty = {}
 		if @cachedColumnEmpty[col.getSource()]? then return @cachedColumnEmpty[col.getSource()]
@@ -2061,6 +2125,8 @@ class TableView
 		##|
 		##|  Setup context menu on the header
 		@setupContextMenu @contextMenuCallbackFunction
+
+		@tooltipWindow = new FloatingWindow(0, 0, 100, 100, @elTableHolder)
 
 		true
 
@@ -2377,8 +2443,6 @@ class TableView
 		tableName = parts[1]
 		keyValue  = parts[2]
 		colName   = parts[3]
-
-		console.log "Here findRowFromPath keyValue=", keyValue
 
 		if keyValue == "Filter"
 			return "Filter"

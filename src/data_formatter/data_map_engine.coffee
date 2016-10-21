@@ -19,6 +19,11 @@ class DataMapMemoryCollection
         @count = 0
 
     ##|
+    ##|  Export the entire collection
+    export: ()=>
+        return @data
+
+    ##|
     ##|  Look at all documents and find the one that filter
     ##|  filter returns TRUE to keep the record, false to skip it
     ##|
@@ -164,6 +169,10 @@ class DataMapEngine
     ##|  Erase all the data in a given table
     eraseCollection: (collectionName) =>
         @memData[collectionName] = new DataMapMemoryCollection(collectionName)
+
+    export: (collectionName)=>
+        c    = @internalGetCollection collectionName
+        return c.export()
 
     delete: (pathText) =>
 

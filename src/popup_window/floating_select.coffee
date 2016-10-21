@@ -18,7 +18,6 @@ class FloatingSelect extends FloatingWindow
         return true
 
     show: ()=>
-        console.log "FloatingSelect show"
         super.show()
         @showTable()
         setTimeout @table.onResize, 10
@@ -37,6 +36,7 @@ class FloatingSelect extends FloatingWindow
         @table = new TableView(@elHolder.el, false)
         @table.showGroupPadding = false
         @table.showResize       = false
+        @table.setAutoFillWidth()
 
         @table.addTable @tableName, (colName)=>
             ##|

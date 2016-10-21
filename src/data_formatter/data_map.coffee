@@ -230,18 +230,19 @@ class DataMap
 	@addColumn: (tableName, options) =>
 
 		config =
-			name     : "New Column"
-			source   : "newcol"
-			visible  : true
-			hideable : false
-			editable : false
-			sortable : true
-			required : false
-			align    : "left"
-			type     : "text"
-			width    : null
-			tooltip  : ""
-			render   : null
+			name        : "New Column"
+			source      : "newcol"
+			visible     : true
+			hideable    : false
+			editable    : false
+			sortable    : true
+			required    : false
+			align       : "left"
+			type        : "text"
+			width       : null
+			tooltip     : ""
+			render      : null
+			calculation : false
 
 		$.extend config, options
 
@@ -253,7 +254,6 @@ class DataMap
 		##|
 		saveText = dm.types[tableName].toSave()
 		dm.emitEvent "table_change", [tableName, saveText]
-
 		return dm.types[tableName].col[config.source]
 
 	## -------------------------------------------------------------------------------------------------------------
@@ -302,6 +302,9 @@ class DataMap
 				colName = keyName.replace(/([a-z])([A-Z])/g, "$1 $2")
 				colName = colName.replace /_/g, " "
 				colName = colName.ucwords()
+
+				if /sqft/i.test(colName) or /sqft/i.test(keyName)
+					console.log "Not found: #{keyName}"
 
 				config =
 					name   : colName
@@ -372,6 +375,12 @@ class DataMap
 	@setDataCallback: (tableName, methodName, callback)=>
 		return DataMap.getDataMap().engine.setDataCallback tableName, methodName, callback
 
+	##|
+	##|  Export a table / return all data as a single object
+	##|
+	@exportTable: (tableName)=>
+		return DataMap.getDataMap().engine.export(tableName)
+
 	## -------------------------------------------------------------------------------------------------------------
 	## get the values of the columns which will be retured true by reduceFunction
 	##
@@ -407,7 +416,7 @@ class DataMap
 
 		dm = DataMap.getDataMap()
 		if !dm.types[tableName]?
-			console.log "Warning: can't changeColumnAttribute for missing table #{tableName}"
+			# console.log "Warning: can't changeColumnAttribute for missing table #{tableName}"
 			return false
 
 		col = dm.types[tableName].getColumn(sourceName)
@@ -449,8 +458,21 @@ class DataMap
 
 		updated = dm.setDataTypesFromSingleObject(tableName, newData)
 
-		ev = new CustomEvent("new_data", { detail: { tablename: tableName, id: keyValue }})
-		window.dispatchEvent ev
+		##|
+		##|  Remove any cached values that happen to exist
+		for varName, value of newData
+			delete dm.cachedFormat["/#{tableName}/#{keyValue}/#{varName}"]
+
+		if dm.types[tableName].evWaiting?
+			clearTimeout dm.types[tableName].evWaiting
+
+		##|
+		##|  Set a timer to let everyone know there is new data
+		dm.types[tableName].evWaiting = setTimeout ()=>
+			ev = new CustomEvent("new_data", { detail: { tablename: tableName, id: keyValue }})
+			window.dispatchEvent ev
+			delete dm.types[tableName].evWaiting
+		, 10
 
 		return doc
 
@@ -476,6 +498,11 @@ class DataMap
 	@getDataForKey: (tableName, keyValue) =>
 		dm = DataMap.getDataMap()
 		return dm.engine.getFastRow tableName, keyValue
+
+	##|
+	##|  Delete a key
+	@deleteDataForkey: (tableName, keyValue)=>
+		console.log "TODO: Not Implemented"
 
 	## -------------------------------------------------------------------------------------------------------------
 	## get the single column|field value using the key and column name

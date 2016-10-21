@@ -238,10 +238,11 @@ class DataFormatText extends DataFormatterType
 
 		if typeof data == "object"
 			if Array.isArray(data)
-				data = data.join(", ")
+				data = data.filter((a)->a?).join(", ")
 			else
 				list = []
 				for varName, value of data
+					if !value? then continue
 					list.push "#{varName}=#{value}"
 				data = list.join(", ")
 
@@ -249,6 +250,24 @@ class DataFormatText extends DataFormatterType
 			return data[0..300] + "..."
 
 		return data
+
+	renderTooltip: (row, value, tooltipWindow)=>
+		if !value? then return false
+
+		if typeof value == "string"
+			h = 60
+			w = 320
+			if value.length > 100 then w = 440
+			if value.length > 200 then w = 640
+			if value.length > 300 then h = 440
+
+			tooltipWindow.setSize(w, h)
+			tooltipWindow.getBodyWidget().addClass "text"
+			tooltipWindow.html value
+			return true
+
+		console.log "renderTooltip row=", row, "value=", value
+		return false
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to unformat the currently formatted data
@@ -852,12 +871,12 @@ class DataFormatTags extends DataFormatterType
 			currentValue = currentValue.split ','
 
 		if Array.isArray(currentValue)
-			return currentValue.join(", ")
+			return currentValue.sort().join(", ")
 
 		values = []
 		for idx, obj of currentValue
 			values.push obj
-		return values.join(", ")
+		return values.sort().join(", ")
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to unformat the currently unformatted data
@@ -1468,7 +1487,7 @@ class DataFormatDuration extends DataFormatterType
 	name: "duration"
 
 	# @property [Integer] width
-	width: 70
+	width: 90
 
 	align: "right"
 
@@ -1481,6 +1500,9 @@ class DataFormatDuration extends DataFormatterType
 	## @return [Object] data formatted data
 	##
 	format: (data, options, path) =>
+		if !data?
+			return ""
+
 		if typeof data == "string"
 			data = parseFloat options
 
@@ -1537,9 +1559,35 @@ class DataFormatSimpleObject extends DataFormatterType
 				return "Not set"
 
 			if typeof data[0] == "string"
-				return data.sort().join(", ")
+				return data.sort().filter((a)->a?).join(", ")
 
-		return "View:" + JSON.stringify(data)
+		return "View"
+		# return "View:" + JSON.stringify(data)
+
+	renderTooltip: (row, value, tooltipWindow)=>
+
+		if !value? then return false
+
+		height = 20
+		str = "<table>"
+		for varName, val of value
+			str += "<tr><td>"
+			str += varName
+			str += "</td><td>"
+			str += val
+			str += "</tr>"
+			height += 20
+
+		str += "</table>"
+
+		tooltipWindow.html str
+		tooltipWindow.setSize(400, height)
+		return true
+
+	onFocus: (e, col, data) =>
+		console.log "e=", e
+		console.log "col=", col
+		console.log "data=", data
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to unformat the currently formatted data

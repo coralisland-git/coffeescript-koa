@@ -1,3 +1,9 @@
+@import 'https://fonts.googleapis.com/css?family=Roboto+Condensed';
+
+// font-family: 'Ubuntu Mono', monospace;
+// font-family: 'Ubuntu', sans-serif;
+// font-family: 'Source Sans Pro', sans-serif;
+
 span#ruler
     visibility: hidden
     white-space: nowrap
@@ -67,7 +73,7 @@ span#ruler
         top              : 0
         width            : 90px
         font-size        : 14px
-        font-family      : 'San Francisco Display', "Segoe UI", "Tahoma", "Arial";
+        font-family: 'Roboto Condensed', sans-serif;
         border-left      : 1px solid #bbbbbb
 
 .tableview
@@ -83,6 +89,7 @@ span#ruler
 
     div.text-right
         padding-right: 6px
+        font-family: 'Roboto Condensed', sans-serif;
 
     .header
         border: 1px solid blue
@@ -119,6 +126,34 @@ span#ruler
         background-color: #D60006
         color: white
 
+    .groupRowChart8
+        background-color: #4573A7
+        color: white
+
+    .groupRowChart9
+        background-color: #AA4644
+        color: white
+
+    .groupRowChart10
+        background-color: #71588F
+        color: white
+
+    .groupRowChart11
+        background-color: #89A54E
+        color: white
+
+    .groupRowChart12
+        background-color: #4298AF
+        color: white
+
+    .groupRowChart13
+        background-color: #D09392
+        color: white
+
+    .groupRowChart14
+        background-color: #D60006
+        color: white
+
 
     div.cellfocus
         border:1px solid #4040CC !important
@@ -130,19 +165,19 @@ span#ruler
     //     padding-right: 6px
 
     div
-        position       : absolute
-        display        : block
-        font-family    : 'San Francisco Text', "Segoe UI", "Tahoma", "Arial";
-        color          : black
-        font-weight    : 300
-        font-size      : 12px
-        padding-top    : 0px
-        padding-bottom : 0px
-        padding-left   : 4px
-        padding-right  : 4px
-        line-height    : 22px
-        overflow       : hidden
-        background     : #ffffff;
+        position:       absolute
+        display:        block
+        font-family:    'Ubuntu', sans-serif;
+        color:          black
+        font-weight:    300
+        font-size:      12px
+        padding-top:    0px
+        padding-bottom: 0px
+        padding-left:   4px
+        padding-right:  4px
+        line-height:    22px
+        overflow:       hidden
+        background:     #ffffff;
 
     div.spacer.dragging
         background-color: blue
@@ -160,12 +195,20 @@ span#ruler
         background-color: #007F4A
 
     div.tableHeaderField
-        background-color: #EEEEEE
-        background-image: linear-gradient(to bottom, #ffffff, #f2f2f2);
-        font-size: 12px
-        font-weight: 400px
-        line-height: 20px
-        margin-top: 4px
+        background-color : #EEEEEE
+        background-image : linear-gradient(to bottom, #ffffff, #f2f2f2);
+        font-size        : 12px
+        font-weight      : 400px
+        line-height      : 20px
+        margin-top       : 4px
+        cursor           : pointer
+
+    div.tableHeaderField.calculation
+        background-color: #D1EEF2
+        background-image: linear-gradient(to bottom, #E6FCFD, #E3F5F7);
+
+    div.tableHeaderField.editable
+        background-color: rgba(229, 252, 242, 0.4)
 
     div.tableHeaderFieldHoriz
         background-color: #EEEEEE
@@ -178,6 +221,9 @@ span#ruler
     div.tableHeaderField i
         font-size: 10px
         padding-top: 6px
+
+    .tableRow .cell.even.calculation
+        background-color: rgba(209, 238, 242, 0.4)
 
     div.even
         background: #f8f8f8;
@@ -242,6 +288,9 @@ span#ruler
             width: 18px
             color: rgba(0, 0, 0, 0.2)
 
+    .tableRow .cell.calculation
+        background-color: rgba(209, 238, 242, 0.2)
+
     .tableRow .cell.first-action
         border-left: 1px solid #E7B041 !important
 
@@ -256,6 +305,10 @@ span#ruler
         padding-top      : 2px
         color            : #004F0A
         cursor           : ibeam
+        background-color: rgba(209, 252, 222, 0.2)
+
+    .tableRow .cell.even.editable
+        background-color: rgba(209, 252, 222, 0.4)
 
     .tableRow .cell.clickable
         color            : #0000BB

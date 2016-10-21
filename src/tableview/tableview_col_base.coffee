@@ -67,13 +67,16 @@ class TableViewColBase
     getRequired: ()=>
         return false
 
-    getHideable: ()=>
+    getAlwaysHidden: ()=>
         return false
 
     getSystemColumn: ()=>
         return false
 
     getAutoSize: ()=>
+        return false
+
+    getIsCalculation: ()=>
         return false
 
     ##|
@@ -94,6 +97,9 @@ class TableViewColBase
 
     getRenderFunction: ()=>
         return null
+
+    renderTooltip: (row, value, tooltipWindow)=>
+        return false
 
     ##|
     ##|  Given some new data, see if we need to automatically change
@@ -120,11 +126,13 @@ class TableViewColBase
         obj.align     = @getAlign()
         obj.source    = @getSource()
         obj.required  = @getRequired()
-        obj.hideable  = @getHideable()
+        obj.hideable  = @getAlwaysHidden()
         obj.system    = @getSystemColumn()
         obj.autosize  = @getAutoSize()
         obj.order     = @getOrder()
         obj.render    = @getRenderFunction()
+        obj.calculate = @getIsCalculation()
+
         return obj
 
     deserialize: (obj)=>

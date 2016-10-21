@@ -28,6 +28,20 @@ class TableViewCol extends TableViewColBase
 		return true
 
 	##|
+	##|  Check to see if there is a formatter that wants to create a tooltip
+	##|
+	renderTooltip: (row, value, tooltipWindow)=>
+		console.log "HERE renderTooltip"
+		f = @getFormatter()
+		if f? and f.renderTooltip?
+			console.log "Checking ", f.renderTooltip
+			return f.renderTooltip(row, value, tooltipWindow)
+		else
+			console.log "not found", f
+
+		return false
+
+	##|
 	##|  By default check for a render function defined
 	##|  and use that,  if no render function is defined
 	##|  then use the formatter if defined.
@@ -42,8 +56,11 @@ class TableViewCol extends TableViewColBase
 		return value
 
 	getRenderFunction: ()=>
+
 		if @render? and typeof @render == "function"
 			return @render
+
+		return null
 
 	##|
 	##|  Return the name of the column
@@ -58,13 +75,23 @@ class TableViewCol extends TableViewColBase
 	getOrder: ()=>
 		return @data.order
 
+	getIsCalculation: ()=>
+		if @data? and @data.calculation? and @data.calculation == true
+			return true
+
+		if @getRenderFunction() != null
+			return true
+
+		return false
+
 	getVisible: ()=>
+		if @getAlwaysHidden() == true then return false
 		if @isGrouped?    and @isGrouped == true then return false
 		if @data.visible? and @data.visible == true then return true
 		if @data.visible? and @data.visible == false then return false
 		return true
 
-	getHideable: ()=>
+	getAlwaysHidden: ()=>
 		if @data.hideable? and @data.hideable == true then return true
 		return false
 
@@ -213,7 +240,7 @@ class TableViewCol extends TableViewColBase
 		if / Price/i.test @data.name
 			@changeColumn "type", "money"
 			@changeColumn "width", 90
-			@changeColumn "align", "left"
+			@changeColumn "align", "right"
 			@data.skipDeduce = true
 			return
 
@@ -329,9 +356,18 @@ class TableViewCol extends TableViewColBase
 
 		else if typeof newData == "object"
 
-			@changeColumn "type", "simpleobject"
-			@changeColumn "width", null
-			@data.skipDeduce = true
+			if newData.getTime?
+				@changeColumn "type", "age"
+				@changeColumn "width", "130"
+				@data.skipDeduce = true
+			else if Array.isArray(newData)
+				@changeColumn "type", "tags"
+				@changeColumn "autosize", true
+				@changeColumn "width", null
+			else
+				@changeColumn "type", "simpleobject"
+				@changeColumn "width", null
+				@data.skipDeduce = true
 			return true
 
 		return null

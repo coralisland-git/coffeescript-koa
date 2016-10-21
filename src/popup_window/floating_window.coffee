@@ -43,25 +43,33 @@ class FloatingWindow
 		@elHolder = @floatingWin.addDiv "floatingWinBody"
 		true
 
+	getBodyWidget: ()=>
+		@internalCreateElement()
+		return @elHolder
+
+	html: (html)=>
+		@getBodyWidget().html html
+
 	show: ()=>
 		@internalCreateElement()
 		@floatingWin.show()
 
 	hide: ()=>
-		@floatingWin.hide()
+		if @floatingWin?
+			@floatingWin.hide()
 
 	moveTo: (x, y)=>
-		return
 		@top  = y
 		@left = x
-		@floatingWin.move(@left, @top, @width, @height)
+		if @floatingWin?
+			@floatingWin.move(@left, @top, @width, @height)
 		true
 
 	setSize: (w, h)=>
-		return
 		@width = w
 		@height = h
-		@floatingWin.move(@left, @top, @width, @height)
+		if @floatingWin?
+			@floatingWin.move(@left, @top, @width, @height)
 		true
 
 	##|

@@ -216,6 +216,10 @@ class WidgetTag
 
         true
 
+    resetClasses: (newListText) =>
+        @classes = newListText.split(" ")
+        @element.className = @classes.join ' '
+
     ##|
     ##|  Add an enable a class name
     addClass: (className) =>

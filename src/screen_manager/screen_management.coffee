@@ -136,26 +136,6 @@ doAppendView = (viewName, holderElement) ->
                 appendView(className, resolve)
 
 ##|
-##|  Add a view to a tab
-##|  Return (resolves) with the tab
-##|  Calls callbackWithView with the new view
-##|
-doAppendViewTab = (viewName, tabHolder, tabText, callbackWithView) ->
-
-    new Promise (resolve, reject) ->
-
-        gid          = GlobalValueManager.NextGlobalID()
-        content      = "<div id='tab_#{gid}' class='tab_content'></div>"
-        tab          = tabHolder.addTab tabText, content
-        elViewHolder = $("#tab_#{gid}")
-        doAppendView viewName, elViewHolder
-        .then (view)=>
-
-            view.elHolder = elViewHolder
-            callbackWithView(view, tabText)
-            resolve(tab)
-
-##|
 ##|  Popup a view and then return control to the caller
 doPopupView = (viewName, title, settingsName, w, h) ->
 

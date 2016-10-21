@@ -15,7 +15,15 @@ class DataTypeCollection
     ##|
     ##|  Returns the column if defined by
     getColumn: (source)=>
-        return @col[source]
+        if @col[source]?
+            return @col[source]
+
+        s = source.toLowerCase().replace("_", " ")
+        for id, col of @col
+            if col.getName().toLowerCase().replace("_", " ") == s then return col
+            if col.getSource().toLowerCase().replace("_", " ") == s then return col
+
+        return null
 
     ##|
     ##|  Convert some javascript into a function for render() call
@@ -109,6 +117,8 @@ class DataTypeCollection
         if !@col[col.source]?
             @col[col.source] = new TableViewCol(@tableName)
 
+        if !col.order? then col.order = Object.keys(@col).length
+
         @col[col.source].deserialize(col)
 
         if !skipDeduce? or skipDeduce == false
@@ -158,6 +168,8 @@ class DataTypeCollection
     ## @return [Boolean]
     ##
     configureColumns: (columns, skipDeduce = false) =>
+
+        # console.log "configureColumns:", columns
 
         for col in columns
             @configureColumn(col, skipDeduce)
