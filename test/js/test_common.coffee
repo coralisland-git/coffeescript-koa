@@ -6,18 +6,18 @@ counter  = 0
 ##|  Load a list of zipcodes
 loadZipcodes = ()->
 
-    ##|
-    ##|  Load the zipcode data before the test begins
-    new Promise (resolve, reject) ->
+	##|
+	##|  Load the zipcode data before the test begins
+	new Promise (resolve, reject) ->
 
-        $.get "/js/test_data/zipcodes.json", (allData)->
+		$.get "/js/test_data/zipcodes.json", (allData)->
 
-            counter = 0
-            for rec in allData.data
-                rec.Weather = "https://www.wunderground.com/cgi-bin/findweather/getForecast?query=pz:#{rec.code}&zip=1"
-                DataMap.addDataUpdateTable "zipcode", rec.code, rec
+			counter = 0
+			for rec in allData.data
+				rec.Weather = "https://www.wunderground.com/cgi-bin/findweather/getForecast?query=pz:#{rec.code}&zip=1"
+				DataMap.addDataUpdateTable "zipcode", rec.code, rec
 
-            resolve(true)
+			resolve(true)
 
 loadStockData = ()->
 
@@ -32,9 +32,9 @@ loadStockData = ()->
 
 addHolder = (name) ->
 
-    $("#" + name).remove()
-    $("#testCase").append($("<div id='" + name + "' style='padding-top: 20px;' />"))
-    true
+	$("#" + name).remove()
+	$("#testCase").append($("<div id='" + name + "' style='padding-top: 20px;' />"))
+	true
 
 ##|
 ##|  Very simple call that takes a label (some notes for the user) and
@@ -150,8 +150,8 @@ go = () ->
 $ ->
 
 	globalTableEvents.on "set_custom", (tableName, source, field, newValue)=>
-	    console.log "globalTableEvents: table=#{tableName} source=#{source} field=#{field} new=", newValue
-	    true
+		console.log "globalTableEvents: table=#{tableName} source=#{source} field=#{field} new=", newValue
+		true
 
 	# DataMap.getDataMap().on "table_change", (tableName, config)->
 	# 	console.log "DataMap.table_change tableName=#{tableName} config=", config

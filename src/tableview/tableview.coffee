@@ -538,6 +538,8 @@ class TableView
 			@tooltipShowing = false
 			@tooltipWindow.hide()
 
+		true
+
 	## -------------------------------------------------------------------------------------------------------------
 	## to setup event internally for the table
 	##
@@ -554,7 +556,6 @@ class TableView
 			true
 
 		@elTheTable.on "mouseout", @onMouseOut
-			true
 
 		@elTheTable.on "mousemove", (e)=>
 			if @mouseHoverTimer? then clearTimeout @mouseHoverTimer
