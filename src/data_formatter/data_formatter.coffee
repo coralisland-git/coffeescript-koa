@@ -56,6 +56,9 @@ root.DataFormatter = class DataFormatter
 			if data.match /\d\d-\d\d-\d\d\d\d/
 				return moment(data, "MM-DD-YYYY")
 
+			if typeof data == "object" and data['$date']?
+				return moment(new Date(data['$date']))
+
 		catch e
 
 			console.log "Unable to get date from [", data, "]"

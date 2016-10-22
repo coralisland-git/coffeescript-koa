@@ -89,7 +89,7 @@ class ViewShowTableEditor extends View
             callback: (row)=>
                 console.log "Delete on:", row
 
-        @editorTable.moveActionColumn "order"
+        # @editorTable.moveActionColumn "order"
         # @editorTable.sortByColumn("order")
         @editorTable.render()
         @editorTable.updateRowData()
@@ -112,6 +112,7 @@ class ViewShowTableEditor extends View
                 console.log "Global....", path, newValue
                 @editorTable.updateRowData()
 
+
     ## -------------------------------------------------------------------------------------------------------------
     ## function to get the created table instance
     ##
@@ -131,119 +132,129 @@ class ViewShowTableEditor extends View
     ##
     internalSetDataTypes: () ->
 
-        if !DataMap.getDataMap().types["_editor"]?
+        DataMap.removeTable("_editor")
 
-            ##| These data type will be same for all the table editor
-            DataMap.setDataTypes "_editor", [
-                    name     : "Name"
-                    source   : "name"
-                    visible  : true,
-                    type     : "text"
-                    editable : true
-                    required : true
-                    width    : 140
-                    autosize : true
-                ,
-                    name     : "Source"
-                    source   : "source"
-                    visible  : true,
-                    type     : "text"
-                    editable : true
-                    width    : 120
-                    autosize : true
-                ,
-                    name     : "Visible"
-                    source   : "visible"
-                    visible  : true,
-                    type     : "boolean"
-                    editable : true
-                    width    : 60
-                ,
-                    name     : "Ignored"
-                    source   : "hideable"
-                    visible  : true,
-                    type     : "boolean"
-                    editable : true
-                    width    : 60
-                ,
-                    name     : "Editable"
-                    source   : "editable"
-                    visible  : true,
-                    type     : "boolean"
-                    editable : true
-                    width    : 60
-                ,
-                    name     : "Required"
-                    source   : "required"
-                    visible  : true,
-                    type     : "boolean"
-                    editable : true
-                    width    : 60
-                ,
-                    name     : "Autosize"
-                    source   : "autosize"
-                    visible  : true,
-                    type     : "boolean"
-                    editable : true
-                    width    : 60
-                ,
-                    name     : "Calculation"
-                    source   : "calculation"
-                    visible  : true,
-                    type     : "boolean"
-                    editable : true
-                    width    : 60
-                ,
-                    name     : "Align"
-                    source   : "align"
-                    visible  : true,
-                    type     : "enum"
-                    editable : true
-                    required : false
-                    width    : 90,
-                    element  : "select",
-                    options  : [ '', 'left', 'right', 'center' ]
-                ,
-                    name     : "Type"
-                    source   : "type"
-                    visible  : true,
-                    type     : "enum"
-                    editable : true
-                    required : true
-                    width    : 90,
-                    element  : "select",
-                    options  : Object.keys globalDataFormatter.formats
-                ,
-                    name     : "Width"
-                    source   : "width"
-                    visible  : true,
-                    type     : "int"
-                    editable : true
-                    width    : 60
-                ,
-                    name     : "Options"
-                    source   : "options"
-                    visible  : true,
-                    type     : "text"
-                    editable : true
-                    width    : 120
-                    autosize : true
-                ,
-                    name     : "Formula/Code"
-                    source   : "render"
-                    visible  : true,
-                    type     : "sourcecode"
-                    editable : true
-                    width    : 120
-                    autosize : true
-                    render:  (val)=>
-                        if val? then return "Edit source"
-                        return ""
+        ##| These data type will be same for all the table editor
+        DataMap.setDataTypes "_editor", [
+                name:     ""
+                source:   "order"
+                visible:  true
+                type:     "text"
+                width:    36
+                editable: false
+                autosize: false
+                render: (val)->
+                    return "<i class='dragHandle fa fa-list-ul '></i> #{val}"
+            ,
+                name     : "Name"
+                source   : "name"
+                visible  : true,
+                type     : "text"
+                editable : true
+                required : true
+                width    : 140
+                autosize : true
+            ,
+                name     : "Source"
+                source   : "source"
+                visible  : true,
+                type     : "text"
+                editable : true
+                width    : 120
+                autosize : true
+            ,
+                name     : "Visible"
+                source   : "visible"
+                visible  : true,
+                type     : "boolean"
+                editable : true
+                width    : 60
+            ,
+                name     : "Ignored"
+                source   : "hideable"
+                visible  : true,
+                type     : "boolean"
+                editable : true
+                width    : 60
+            ,
+                name     : "Editable"
+                source   : "editable"
+                visible  : true,
+                type     : "boolean"
+                editable : true
+                width    : 60
+            ,
+                name     : "Required"
+                source   : "required"
+                visible  : true,
+                type     : "boolean"
+                editable : true
+                width    : 60
+            ,
+                name     : "Autosize"
+                source   : "autosize"
+                visible  : true,
+                type     : "boolean"
+                editable : true
+                width    : 60
+            ,
+                name     : "Calculation"
+                source   : "calculation"
+                visible  : true,
+                type     : "boolean"
+                editable : true
+                width    : 60
+            ,
+                name     : "Align"
+                source   : "align"
+                visible  : true,
+                type     : "enum"
+                editable : true
+                required : false
+                width    : 90,
+                element  : "select",
+                options  : [ '', 'left', 'right', 'center' ]
+            ,
+                name     : "Type"
+                source   : "type"
+                visible  : true,
+                type     : "enum"
+                editable : true
+                required : true
+                width    : 90,
+                element  : "select",
+                options  : Object.keys globalDataFormatter.formats
+            ,
+                name     : "Width"
+                source   : "width"
+                visible  : true,
+                type     : "int"
+                editable : true
+                width    : 60
+            ,
+                name     : "Options"
+                source   : "options"
+                visible  : true,
+                type     : "text"
+                editable : true
+                width    : 120
+                autosize : true
+            ,
+                name     : "Formula/Code"
+                source   : "render"
+                visible  : true,
+                type     : "sourcecode"
+                editable : true
+                width    : 120
+                autosize : true
+                calculation: false
+                render:  (val)=>
+                    if val? then return "Edit source"
+                    return ""
 
-            ]
+        ]
 
         ##| add row data to dataMap about current column configurations
-        DataMap.removeTableData("_editor")
         for row in @rowsList
             DataMap.addData "_editor", row.getSource(), row.serialize()
 

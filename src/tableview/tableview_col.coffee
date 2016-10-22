@@ -342,10 +342,16 @@ class TableViewCol extends TableViewColBase
 
 		else if typeof newData == "number"
 
-			if @data.foundOnlyNumbers
+			if @data.type == "text"
 				@changeColumn "type", "int"
 				@changeColumn "align", "right"
 				@changeColumn "width", 80
+
+			if Math.floor(newData) != Math.ceil(newData)
+				@changeColumn "type", "decimal"
+				@changeColumn "align", "right"
+				@changeColumn "width", 80
+				@changeColumn "options", "#,###.###"
 
 		else if typeof newData == "boolean"
 

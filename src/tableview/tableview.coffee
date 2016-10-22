@@ -807,7 +807,7 @@ class TableView
 									console.log "Emitting open_editor"
 									# globalTableEvents.emitEvent "open_editor", [ col.tableName ]
 
-									doPopupView "ShowTableEditor", "Editing table: #{@primaryTableName}", null, 1100, 800
+									doPopupView "ShowTableEditor", "Editing table: #{@primaryTableName}", null, 1300, 800
 									.then (view)=>
 										view.showTableEditor @primaryTableName
 
@@ -1098,6 +1098,7 @@ class TableView
 			if @renderReqired then @real_render();
 			@updateFullHeight()
 			@resetCachedFromSize()
+			globalTableEvents.emitEvent "row_count", [ @primaryTableName, @totalAvailableRows ]
 			return
 
 		##|
@@ -1154,6 +1155,8 @@ class TableView
 		if @renderReqired then @real_render();
 		@updateFullHeight()
 		@resetCachedFromSize()
+		globalTableEvents.emitEvent "row_count", [ @primaryTableName, @totalAvailableRows ]
+
 		return true
 
 	##| -------------------------------------------------------------------------------------------------------------

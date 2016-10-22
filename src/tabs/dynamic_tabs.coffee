@@ -26,6 +26,8 @@ class DynamicTabs
 
 		$(holderElement).append @elHolder.el
 
+		globalTableEvents.on "row_count", @onCheckTableUpdateRowcount
+
 	onSetBadge: (num, classname)->
 		id = this.id
 		# console.log "onSetBadge num=#{num} classname=#{classname}", id, this.parent
@@ -170,6 +172,8 @@ class DynamicTabs
 				table.showCheckboxes = true
 				table.setStatusBarEnabled()
 				@tables[tableName] = table
+				@tables[tableName].tab = @tabs[tabText]
+
 				@tabs[tabText].table = table
 
 			.then (tab)=>
@@ -178,5 +182,15 @@ class DynamicTabs
 				# console.log "Setting Badge [#{tabText}] to #{total}:", @tabs[tabText].table
 				# @tabs[tabText].setBadge(total)
 				resolve(@tabs[tabText])
+
+	onCheckTableUpdateRowcount: (tableName, newRowCount)=>
+
+		console.log "onCheckTableUpdateRowcount table=#{tableName} new=#{newRowCount}"
+		if @tables[tableName]?
+			@tables[tableName].tab.badgeText.html newRowCount
+			@tables[tableName].tab.badgeText.show()
+			@tables[tableName].tab.badge = newRowCount
+
+		true
 
 
