@@ -31,13 +31,12 @@ class TableViewCol extends TableViewColBase
 	##|  Check to see if there is a formatter that wants to create a tooltip
 	##|
 	renderTooltip: (row, value, tooltipWindow)=>
-		console.log "HERE renderTooltip"
 		f = @getFormatter()
 		if f? and f.renderTooltip?
 			console.log "Checking ", f.renderTooltip
 			return f.renderTooltip(row, value, tooltipWindow)
 		else
-			console.log "not found", f
+			console.log "renderTooltip formatter not found:", f
 
 		return false
 
@@ -55,7 +54,15 @@ class TableViewCol extends TableViewColBase
 
 		return value
 
+	internalMathRender: (a, b, c)=>
+		console.log "INTERNAL MATH RENDER:", @data, "a=", a, "b=", b, "c=", c
+		return "X"
+
 	getRenderFunction: ()=>
+
+		if @data.render? and typeof @data.render == "string" and @data.render.charAt(0) == '='
+			console.log "Found math.js internal"
+			return @internalMathRender
 
 		if @render? and typeof @render == "function"
 			return @render
@@ -135,6 +142,9 @@ class TableViewCol extends TableViewColBase
 		return "text"
 
 	getAlign: ()=>
+		if @data.type == "money"
+			@data.align = "right"
+
 		if @data.align? and @data.align.length > 0
 			return @data.align
 

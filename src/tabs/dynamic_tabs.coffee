@@ -185,7 +185,9 @@ class DynamicTabs
 
 	onCheckTableUpdateRowcount: (tableName, newRowCount)=>
 
-		console.log "onCheckTableUpdateRowcount table=#{tableName} new=#{newRowCount}"
+		if !@tables? then return
+		# console.log "onCheckTableUpdateRowcount table=#{tableName} new=#{newRowCount}"
+
 		if @tables[tableName]?
 			@tables[tableName].tab.badgeText.html newRowCount
 			@tables[tableName].tab.badgeText.show()

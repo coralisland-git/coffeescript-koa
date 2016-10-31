@@ -31,6 +31,28 @@ class DataTypeCollection
     ##|
     @renderStringToFunction: (renderText)->
         try
+            if renderText.charAt(0) == '='
+                console.log "Creating mathjs formula:", renderText
+                evalFunction = renderText[1..]
+                renderFunction = (val, tableName, fieldName, id)=>
+                    console.log "renderStringToFunction val=", val, "tableName=", tableName, "fieldName", fieldName, "id", id
+                    console.log "renderString Text =", renderText
+
+                    ##|
+                    ##|  Get the row
+                    row    = DataMap.getDataForKey tableName, id
+                    calc   = MathEngine.getEngine()
+                    result = calc.calculate evalFunction, row
+
+                    dm = DataMap.getDataMap()
+                    if dm.types[tableName].col[fieldName]?
+                        f = dm.types[tableName].col[fieldName].getFormatter()
+                        if f? then result = f.format(result, dm.types[tableName].col[fieldName].getOptions(), tableName, id)
+
+                    return result
+
+                return renderFunction
+
             template = '''
                 try {  // toStringWrapper
                 XXCODEXX

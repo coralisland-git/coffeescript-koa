@@ -142,6 +142,7 @@ class TableView
 		@allowSelectCell = true
 		@showResize      = true
 		@showConfigTable = true
+		@enableMouseOver = false
 
 		# @property [Object] currentFilters current applied filters to the table
 		@currentFilters    = {}
@@ -535,6 +536,10 @@ class TableView
 
 	onMouseOut: (e)=>
 
+		if @lastMouseMovePath? and @enableMouseOver
+			@lastMouseMovePath = null
+			globalTableEvents.emitEvent "mouseover", [ @primaryTableName, null, null, null ]
+
 		if @mouseHoverTimer?
 			clearTimeout @mouseHoverTimer
 			delete @mouseHoverTimer
@@ -545,6 +550,25 @@ class TableView
 
 		true
 
+	onMouseMove: (e)=>
+
+		if e? and e.path? and @enableMouseOver
+			##|
+			##|  If mouseover events are enabled
+			##|  Emit the event as Table Name, Path, Row Data, col
+			##|
+			if e.path != @lastMouseMovePath
+				row = @findRowFromPath e.path
+				col = @findColFromPath e.path
+				globalTableEvents.emitEvent "mouseover", [ @primaryTableName, e.path, row, col ]
+				@lastMouseMovePath = e.path
+
+		if @mouseHoverTimer? then clearTimeout @mouseHoverTimer
+		@mouseHoverTimer = setTimeout @onMouseHover, 1000, e
+		if @tooltipShowing? and @tooltipShowing == true
+			coords = GlobalValueManager.GetCoordsFromEvent(e)
+			@tooltipWindow.moveTo(coords.x - (@tooltipWindow.width/2), coords.y - 10 - @tooltipWindow.height)
+
 	## -------------------------------------------------------------------------------------------------------------
 	## to setup event internally for the table
 	##
@@ -552,24 +576,19 @@ class TableView
 
 		@virtualScrollV.on "scroll_to", (amount)=>
 			@offsetShowingTop = amount
+			@updateScrollbarSettings()
 			@resetCachedFromScroll()
 			true
 
 		@virtualScrollH.on "scroll_to", (amount)=>
 			@offsetShowingLeft = amount
+			@updateScrollbarSettings()
 			@resetCachedFromScroll()
 			true
 
 		@elTheTable.on "mouseout", @onMouseOut
 
-		@elTheTable.on "mousemove", (e)=>
-			if @mouseHoverTimer? then clearTimeout @mouseHoverTimer
-			@mouseHoverTimer = setTimeout @onMouseHover, 1000, e
-			if @tooltipShowing? and @tooltipShowing == true
-				coords = GlobalValueManager.GetCoordsFromEvent(e)
-				@tooltipWindow.moveTo(coords.x - (@tooltipWindow.width/2), coords.y - 10 - @tooltipWindow.height)
-
-			true
+		@elTheTable.on "mousemove", @onMouseMove
 
 		@elTheTable.on "mousedown", (e)=>
 
@@ -623,6 +642,7 @@ class TableView
 			if row == "Header"
 				##|
 				##|  TODO: Add sorting here
+				@sortByColumn col
 				return false
 
 			if col == "row_selected"
@@ -652,9 +672,6 @@ class TableView
 		data = WidgetTag.getDataFromEvent(e)
 		row  = @findRowFromPath data.path
 		col  = @findColFromPath data.path
-
-		console.log "ROW=", row
-		console.log "COL=", col
 
 		popupMenu = new PopupMenu "Options", e
 
@@ -1272,6 +1289,26 @@ class TableView
 		@cachedVisibleHeight = maxHeight
 
 	##|
+	##|  Returns the maximum rows visible starting at the end of the rows
+	getTableMaxVisibleRows: ()=>
+		if @cachedMaxTotalVisibleRows? then return @cachedMaxTotalVisibleRows
+
+		y           = 0
+		visRowCount = 0
+		maxHeight   = @getTableVisibleHeight()
+		rowNum      = @getTableTotalRows() - 1
+
+		while y < maxHeight
+
+			if rowNum < 0 then break
+			y = y + @getRowHeight({rowNum:rowNum, visibleRow:visRowCount})
+			rowNum--
+			visRowCount++
+
+		if visRowCount > 0 then @cachedMaxTotalVisibleRows = visRowCount
+		return visRowCount
+
+	##|
 	##|  Number of visible rows
 	getTableVisibleRows: ()=>
 		if @cachedTotalVisibleRows? then return @cachedTotalVisibleRows
@@ -1293,6 +1330,37 @@ class TableView
 
 		if visRowCount > 0 then @cachedTotalVisibleRows = visRowCount
 		return visRowCount
+
+	getTableMaxVisibleCols: ()=>
+
+		if @cachedMaxTotalVisibleCol? then return @cachedMaxTotalVisibleCol
+
+		visColCount = 0
+		x           = 0
+		colNum      = @getTableTotalCols()-1
+		maxWidth    = @getTableVisibleWidth()
+
+		while x < maxWidth and colNum >= 0
+
+			col = @colByNum[colNum]
+			location =
+				colNum     : colNum
+				tableName  : col.tableName
+				sourceName : col.getSource()
+				visibleCol : colNum
+
+			if (colNum > 0) and @shouldSkipCol(location)
+				colNum--
+				continue
+
+			col.currentWidth = @getColWidth(location)
+			x = x + col.currentWidth
+			visColCount++
+			colNum--
+
+		if visColCount > 0 then @cachedMaxTotalVisibleCol = visColCount
+		return visColCount
+
 
 	##|
 	##|  Number of visible columns
@@ -1927,8 +1995,10 @@ class TableView
 		true
 
 	resetCachedFromScroll: ()=>
-		@cachedTotalVisibleCols  = null
-		@cachedTotalVisibleRows  = null
+		@cachedTotalVisibleCols    = null
+		@cachedTotalVisibleRows    = null
+		@cachedMaxTotalVisibleCol  = null
+		@cachedMaxTotalVisibleRows = null
 		@updateVisibleText()
 		@onMouseOut()
 		true
@@ -1952,8 +2022,10 @@ class TableView
 	##|  Up the visibility and settings of the scrollbars
 	updateScrollbarSettings: ()=>
 
-		currentVisibleCols = @getTableVisibleCols()
-		currentVisibleRows = @getTableVisibleRows()
+		# currentVisibleCols = @getTableVisibleCols()
+		# currentVisibleRows = @getTableVisibleRows()
+		currentVisibleCols = @getTableMaxVisibleCols()
+		currentVisibleRows = @getTableMaxVisibleRows()
 
 		maxAvailableRows = @getTableTotalRows()
 		maxAvailableCols = @getTableTotalCols()
@@ -1962,18 +2034,18 @@ class TableView
 			@elStatusScrollTextRows.html "Rows #{@offsetShowingTop+1} - #{@offsetShowingTop+currentVisibleRows} of #{maxAvailableRows}"
 			@elStatusScrollTextCols.html "Cols #{@offsetShowingLeft+1}-#{@offsetShowingLeft+currentVisibleCols} of #{maxAvailableCols}"
 
-		# console.log "updateScrollbarSettings H:(#{currentVisibleCols} vs #{maxAvailableCols}) V:(#{currentVisibleRows} vs #{maxAvailableRows})"
+		# console.log "#{@primaryTableName} updateScrollbarSettings H:(#{currentVisibleCols} vs #{maxAvailableCols}) V:(#{currentVisibleRows} vs #{maxAvailableRows})"
 
 		##|
 		##|  Don't show more rows than fit on the screen
-		if @offsetShowingTop >= maxAvailableRows - currentVisibleRows
-			# console.log "updateScrollbarSettings offsetShowingTop #{@offsetShowingTop} >= #{maxAvailableRows} - #{currentVisibleRows}"
+		if @offsetShowingTop >= maxAvailableRows - currentVisibleRows - 1
+			# console.log "#{@primaryTableName} updateScrollbarSettings offsetShowingTop #{@offsetShowingTop} >= #{maxAvailableRows} - #{currentVisibleRows}"
 			@offsetShowingTop = maxAvailableRows - currentVisibleRows
 
-		if @offsetShowingLeft >= maxAvailableCols - currentVisibleCols
-			# console.log "updateScrollbarSettings offsetShowingLeft #{@offsetShowingLeft} >= #{maxAvailableCols} - #{currentVisibleCols}"
+		if @offsetShowingLeft >= maxAvailableCols - currentVisibleCols - 1
+			# console.log "#{@primaryTableName} updateScrollbarSettings offsetShowingLeft #{@offsetShowingLeft} >= #{maxAvailableCols} - #{currentVisibleCols}"
 			@offsetShowingLeft = maxAvailableCols - currentVisibleCols
-			# console.log "updateScrollbarSettings, reset offsetShowingLeft to ", @offsetShowingLeft
+			# console.log "#{@primaryTableName} updateScrollbarSettings, reset offsetShowingLeft to ", @offsetShowingLeft
 
 		##|
 		##|  Scrollbar settings show/hide
@@ -1989,6 +2061,7 @@ class TableView
 
 		if @rowDataRaw.length == 0 then return false
 		if col.getEditable() == true then return false
+		if col.getIsCalculation() == true then return false
 
 		if !@cachedColumnEmpty? then @cachedColumnEmpty = {}
 		if @cachedColumnEmpty[col.getSource()]? then return @cachedColumnEmpty[col.getSource()]
@@ -2001,7 +2074,7 @@ class TableView
 			if !value? then continue
 
 			if typeof value == "string" and value.length > 0 then return false
-			if typeof value == "number" and value > 0 then return false
+			if typeof value == "number" and value != 0 then return false
 			if typeof value == "boolean" then return false
 			if typeof value == "object" then return false
 
@@ -2488,7 +2561,6 @@ class TableView
 			return "Filter"
 
 		if keyValue == "Header"
-			@sortByColumn colName
 			return "Header"
 
 		data = {}

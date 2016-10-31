@@ -1257,10 +1257,17 @@ class DataFormatDistance extends DataFormatterType
 	## @return [Object] data formatted data
 	##
 	format: (data, options, path) =>
+		if data == 0 then return 0
+
+		##|
+		##|  DATA is in METERS
+		##|
+
 		feet = 3.28084 * data
 		# feet = 5280 * data
 		if feet < 50 then return "< 50 ft"
-		if feet < 100 then return Math.ceil(feet) + " ft"
+		if feet < 1000 then return Math.ceil(feet) + " ft"
+		data = feet / 5280
 		return numeral(data).format('#,###.##') + " mi"
 
 	## -------------------------------------------------------------------------------------------------------------

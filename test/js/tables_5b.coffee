@@ -87,6 +87,17 @@ $ ->
         DataMap.changeColumnAttribute "zipcode", "Expired", "order", 10
         DataMap.changeColumnAttribute "zipcode", "Active", "order", 5
 
+        DataMap.addColumn "zipcode",
+            name    : "TotalProp"
+            source  : "TotalProp"
+            type    : "int"
+            align   : "right"
+            render  : "=Active+Expired+Value"
+            order   : 2
+            visible : true
+
+        DataMap.changeColumnAttribute "zipcode", "TotalProp", "order", 3
+
         # table.groupBy("city")
         table.addActionColumn
             name: "Run"

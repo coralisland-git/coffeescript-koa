@@ -127,14 +127,19 @@ class DataMap
 		keyValue  = parts[2]
 		fieldName = parts[3]
 
-		delete @cachedFormat[path]
+		##|
+		##|  Remove any cached values that happen to exist
+		dm = DataMap.getDataMap()
+		for col in DataMap.getColumnsFromTable(tableName)
+			delete dm.cachedFormat["/#{tableName}/#{keyValue}/#{col.getSource()}"]
+
 		existingValue = @engine.getFast tableName, keyValue, fieldName
 
 		##| check if the existing type is boolean
 		if typeof existingValue == 'boolean' and existingValue == Boolean(newValue) then return true
 		if existingValue == newValue then return true
 
-		DataMap.getDataMap().engine.setFast tableName, keyValue, fieldName, newValue
+		dm.engine.setFast tableName, keyValue, fieldName, newValue
 		@updateScreenPathValue path, newValue, true
 
 		if @onSave[tableName]?

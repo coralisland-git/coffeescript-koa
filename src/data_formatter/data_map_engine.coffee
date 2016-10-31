@@ -236,7 +236,7 @@ class DataMapEngine
             keyValue = parseFloat keyValue
 
         c = @internalGetCollection collectionName
-        return c.findFastRow keyValue, subPath
+        return c.findFastRow keyValue, "/"
 
     ##| -------------------------------------------------------------------------------------------------------------
     ##|
