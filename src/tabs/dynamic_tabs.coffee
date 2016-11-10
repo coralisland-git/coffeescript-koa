@@ -26,6 +26,7 @@ class DynamicTabs
 
 		$(holderElement).append @elHolder.el
 
+		GlobalClassTools.addEventManager(this)
 		globalTableEvents.on "row_count", @onCheckTableUpdateRowcount
 
 	onSetBadge: (num, classname)->
@@ -36,13 +37,19 @@ class DynamicTabs
 		@parent.updateTabs()
 
 	onClickTab: (e)=>
+		console.log "dnymictabs onClicktab"
 		if e? and e.path? then @show(e.path)
 		return true
 
+	getActiveTab: ()=>
+		return @tags[@activeTab]
+
 	show: (id)=>
+		console.log "dynamic tabs show #{id}"
 		if !id? then return false
 		if typeof id == "object" and id.id? then id = id.id
 		if @tags[id]?
+			@emitEvent "showtab", [ id, @tags[id] ]
 			@activeTab = id
 			@updateTabs()
 		else
@@ -83,7 +90,6 @@ class DynamicTabs
 		elBody = @tabContent.add "div", "ninja-nav-body"
 		elBody.html defaultHtml
 
-
 		if !@activeTab?
 			@activeTab = id
 
@@ -108,6 +114,11 @@ class DynamicTabs
 
 		return @tags[id]
 
+	onResize: (w, h)=>
+		##|
+		##|  Received resize event
+		# console.log "DynamicTabs onResize w=#{w} h=#{h}"
+
 	updateTabs: ()=>
 
 		for id, tag of @tags
@@ -116,7 +127,9 @@ class DynamicTabs
 				tag.tab.addClass "active"
 				tag.body.show()
 				if tag.body.onResize?
-					tag.body.onResize()
+					##|
+					##|  Todo: check on this
+					tag.body.onResize(-1, -1)
 
 				setTimeout ()->
 					w = $(window).width()

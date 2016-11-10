@@ -1584,6 +1584,25 @@ class TableView
 			displayValue = DataMap.getDataFieldFormatted col.tableName, location.recordId, location.sourceName
 			location.cell.html displayValue
 
+		if @lockList? and @lockList.length > 0
+
+
+			aValue = DataMap.getDataField col.tableName, location.recordId, location.sourceName
+			if typeof aValue == "number"
+				bValue = DataMap.getDataField col.tableName, @lockList[0], location.sourceName
+				if aValue > bValue
+					location.cell.addClass "valueHigher"
+					location.cell.removeClass "valueLower"
+				else if aValue < bValue
+					location.cell.addClass "valueLower"
+					location.cell.removeClass "valueHigher"
+				else
+					location.cell.removeClass "valueLower"
+					location.cell.removeClass "valueHigher"
+			else
+				location.cell.removeClass "valueLower"
+				location.cell.removeClass "valueHigher"
+
 		true
 
 	shouldSkipCol: (location)=>
@@ -2565,11 +2584,8 @@ class TableView
 
 		data = {}
 		colNum = 0
-		for col in @colList
-
-			fieldName = col.getSource()
-			fieldValue = DataMap.getDataField col.tableName, keyValue, fieldName
-			data[fieldName] = fieldValue
-
+		data = DataMap.getDataForKey @primaryTableName, keyValue
+		if !data? then return null
 		data["id"] = keyValue
+
 		return data

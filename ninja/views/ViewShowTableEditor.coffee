@@ -23,6 +23,9 @@ class ViewShowTableEditor extends View
 
             m.getForm().onSubmit = (form) =>
 
+                if !form.source? or form.source.length == 0
+                    form.source = form.name.replace(" ", "_").replace(/[^a-zA-Z0-9]/g, "_").toLowerCase()
+
                 data =
                     name       : form.name
                     source     : form.source

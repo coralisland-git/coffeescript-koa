@@ -180,8 +180,15 @@ class View
     onHideScreen  : () =>
         @screenHidden = true
 
-    onResize: ()=>
-        @emitEvent "resize", []
+    onResize: (a, b)=>
+        w = 0
+        h = 0
+        if @elHolder?
+            w = @elHolder.width()
+            h = @elHolder.height()
+            # console.log "View.coffee onResize a=#{a} b=#{b} w=#{w} h=#{h}:", @elHolder
+
+        @emitEvent "resize", [ w, h ]
 
     ## called when the screen is reset due to logout or otherwise
     ## no action is required in most cases

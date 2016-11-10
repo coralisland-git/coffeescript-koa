@@ -431,8 +431,8 @@ class DataMap
 		dm.cachedFormat = {}
 
 		if field == "render"
-			renderText = DataTypeCollection.renderFunctionToString(newValue)
-			newValue   = DataTypeCollection.renderStringToFunction(renderText)
+			new ErrorMessageBox("Field 'render' is no longer used, see renderCode, change #{tableName}, source=#{sourceName}, field=#{field} new=#{newValue}")
+			return
 
 		##|
 		##|  Make the change

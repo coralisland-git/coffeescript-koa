@@ -133,6 +133,11 @@ class TableViewColBase
         obj.render    = @getRenderFunction()
         obj.calculate = @getIsCalculation()
 
+        # console.log "SERIALIZE:", @data
+
+        if @data.render? and typeof @data.render == "string" and @data.render.charAt(0) == '='
+            obj.render = @data.render
+
         return obj
 
     deserialize: (obj)=>

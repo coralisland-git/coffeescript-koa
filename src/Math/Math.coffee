@@ -25,6 +25,8 @@ class MathEngine
 
         for varName, value of scope
 
+            if !value? then continue
+
             txt = prefix + varName.replace(/[^a-zA-Z0-9]/g, "").toLowerCase()
             if typeof value == "object"
                 if value.getTime?
@@ -32,7 +34,7 @@ class MathEngine
                 else
                     @setValues value, txt + "_"
             else
-                console.log "Setting [#{txt}] = #{value}"
+                # console.log "Setting [#{txt}] = #{value}"
                 @parser.set txt, value
 
         true

@@ -12,14 +12,9 @@ class TableViewCol extends TableViewColBase
 	changeColumn: (varName, value)=>
 		if @data[varName] == value then return
 
-		if varName == "render"
-			if value? and typeof value != "function"
-				console.log "changeColumn ", @data.name, "render=", value
-				functionText = DataTypeCollection.renderFunctionToString(value)
-				value = DataTypeCollection.renderStringToFunction(functionText)
-
-			@render = value
-			return true
+		if varName == "renderFunction"
+			@renderFunctionCache = null
+			@render              = value
 
 		# console.log "changeCol #{varName} to #{value} for #{@getSource()}"
 		@data[varName] = value
@@ -60,14 +55,22 @@ class TableViewCol extends TableViewColBase
 
 	getRenderFunction: ()=>
 
-		if @data.render? and typeof @data.render == "string" and @data.render.charAt(0) == '='
-			console.log "Found math.js internal"
+		if @renderFunctionCache?
+			return @renderFunctionCache
+
+		if !@data.renderCode? then return null
+
+		if typeof @data.renderCode == "string" and @data.renderCode.charAt(0) == '='
 			return @internalMathRender
 
-		if @render? and typeof @render == "function"
-			return @render
+		template = '''
+            try {  // toStringWrapper
+            XXCODEXX
+            } catch (e) { console.log("Render error:",e); console.log("val=",val,"tableName=",tableName,"fieldName=",fieldName,"id=",id); return "Error"; }
+        '''
 
-		return null
+		@renderFunctionCache = new Function("val", "tableName", "fieldName", "id", "row", template.replace("XXCODEXX", renderText))
+		return @renderFunctionCache
 
 	##|
 	##|  Return the name of the column

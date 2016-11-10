@@ -448,10 +448,13 @@ class DataFormatSourceCode extends DataFormatText
 		w = $(window).width()
 		h = $(window).height()
 
-		if width > w then width = w
-		if height > h then height = h
-		if left + width > w then left = 0
-		if top + height > h then top = 0
+		width = 800
+		height = 600
+		if width > w then width = w - 10
+		if height > h then height = h - 10
+
+		top  = (h-height)/2
+		left = (w-width)/2
 
 		popup = new PopupWindow("Source Code");
 		popup.resize w, h
@@ -485,7 +488,7 @@ class DataFormatSourceCode extends DataFormatText
 		if !currentValue
 			code = ''
 		else if typeof currentValue isnt 'string'
-			code = DataTypeCollection.renderFunctionToString(currentValue)
+			code = currentValue.toString()
 		else
 			code = currentValue
 
