@@ -107,6 +107,8 @@ class BusyDialog
         @showBusy strText
         new Promise (resolve, reject)=>
 
+            @setMinMax(0,0,0)
+
             if !timeout? then timeout = 30
             timerValue = setTimeout ()=>
                 console.log "Timeout waiting on promise:", strText

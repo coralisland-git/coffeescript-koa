@@ -307,9 +307,6 @@ class DataMap
 				colName = colName.replace /_/g, " "
 				colName = colName.ucwords()
 
-				if /sqft/i.test(colName) or /sqft/i.test(keyName)
-					console.log "Not found: #{keyName}"
-
 				config =
 					name   : colName
 					source : keyName
@@ -425,7 +422,7 @@ class DataMap
 
 		col = dm.types[tableName].getColumn(sourceName)
 		if !col?
-			console.log "Warning: can't changeColumnAttribute for missing table #{tableName} column #{sourceName} (#{field} = #{newValue})"
+			# console.log "Warning: can't changeColumnAttribute for missing table #{tableName} column #{sourceName} (#{field} = #{newValue})"
 			return false
 
 		dm.cachedFormat = {}

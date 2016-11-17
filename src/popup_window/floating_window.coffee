@@ -31,9 +31,9 @@ class FloatingWindow
 
 		if @floatingWin? then return
 
-		console.log "FloatingWindow Creating window x=#{@left}, y=#{@top}, w=#{@width}, h=#{@height}"
-		console.log "global.temp1=", this
-		window.temp1 = this
+		# console.log "FloatingWindow Creating window x=#{@left}, y=#{@top}, w=#{@width}, h=#{@height}"
+		# console.log "global.temp1=", this
+		# window.temp1 = this
 
 		@floatingWin = new WidgetTag "div", "floatingWindow"
 		@floatingWin.move(@left, @top, @width, @height)

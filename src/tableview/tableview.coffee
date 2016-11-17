@@ -525,14 +525,15 @@ class TableView
 				w.resetClasses "ninjaTooltipBody"
 				@tooltipWindow.floatingWin.addClass "ninjaTooltip"
 
-				result = c.renderTooltip(row, row[col], @tooltipWindow)
-				console.log "RESULT=", result, c
-				if result == true
-					@tooltipWindow.moveTo(coords.x - (@tooltipWindow.width/2), coords.y - 10 - @tooltipWindow.height)
-					@tooltipWindow.show()
-					@tooltipShowing = true
+				if row? and row[col]?
+					result = c.renderTooltip(row, row[col], @tooltipWindow)
+					console.log "RESULT=", result, c
+					if result == true
+						@tooltipWindow.moveTo(coords.x - (@tooltipWindow.width/2), coords.y - 10 - @tooltipWindow.height)
+						@tooltipWindow.show()
+						@tooltipShowing = true
 
-		console.log "HOVER:", e.path, coords, "col=", col, "row=", row
+		# console.log "HOVER:", e.path, coords, "col=", col, "row=", row
 
 	onMouseOut: (e)=>
 
@@ -1216,7 +1217,7 @@ class TableView
 		tableWidth = @elTableHolder.outerWidth()
 		tableHeight = @elTableHolder.outerHeight()
 
-		if pos.top == 0 and pos.left == 0 and tableWidth == 0
+		if !pos? or !offset? or pos.top == 0 and pos.left == 0 and tableWidth == 0
 			if attemptCounter? and attemptCounter == 3 then return
 			setTimeout ()=>
 				if !attemptCounter? then attemptCounter = 0

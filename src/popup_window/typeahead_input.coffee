@@ -82,6 +82,7 @@ class TypeaheadInput
             @excludeBlurEvent = true
         .on 'mouseleave', () =>
             @excludeBlurEvent = false
+
         ##|
         ##|
         GlobalClassTools.addEventManager(this)
@@ -125,17 +126,19 @@ class TypeaheadInput
 
         if !@win?
 
-            console.log "posTop=", posTop, " height=", height
+            # console.log "posTop=", posTop, " height=", height
             @win = new FloatingSelect(posLeft, posTop + height, width, @config.rowHeight*@config.numRows, @elInputField.parent())
             @win.setTable @tableName, @columns
 
             @win.on "select", (row)=>
+                console.log "initFloatingWindow win.on 'select':", row
                 col = @columns[0]
                 @elInputField.val(row[col])
                 @emitEvent "change", row[col]
                 @win.hide()
 
             @win.on "preselect", (value, itemRow)=>
+                console.log "initFloatingWindow preselect:", value
                 @elInputField.val(value)
                 @elInputField.select()
 

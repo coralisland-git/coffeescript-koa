@@ -240,10 +240,20 @@ doShowScreen = (screenName, optionalArgs) ->
     if !window.hashHistory?
         window.hashHistory = []
 
+    afterSlash = ""
+
     if document.location.hash? and document.location.hash.length > 1
+        if /\//.test document.location.hash
+            parts = document.location.hash.split('/', 2)
+            afterSlash = parts[1]
         window.hashHistory.push document.location.hash.replace('#','')
 
-    document.location.hash = "#" + screenName
+
+    if afterSlash.length > 0
+        document.location.hash = "#" + screenName + "/" + afterSlash
+    else
+        document.location.hash = "#" + screenName
+
     Screens.current = Screens[screenName];
     activateCurrentScreen(optionalArgs, screenName);
     return
