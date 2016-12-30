@@ -7,6 +7,7 @@ Read these documents:
 - [Understanding the data model](UnderstandingData.md)
 - [Undrestanding the source](UnderstandingNinja.md)
 - [Understanding the widget](UndrestandingWidget.md)
+- [Understanding the docs](UnderstandingDocs.md)
 
 Description
 --------------------------------------------------

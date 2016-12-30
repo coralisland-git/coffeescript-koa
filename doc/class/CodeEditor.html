@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset='UTF-8'>
+  <title>CoffeeScript API Documentation</title>
+  <script src='../javascript/application.js'></script>
+  <script src='../javascript/search.js'></script>
+  <link rel='stylesheet' href='../stylesheets/application.css' type='text/css'>
+</head>
+  <body>
+    <div id='base' data-path='../'></div>
+<div id='header'>
+  <div id='menu'>
+    <a href='../extra/README.md.html' title='NinjaCommon'>
+      NinjaCommon
+    </a>
+    &raquo;
+    <a href='../alphabetical_index.html' title='Index'>
+      Index
+    </a>
+    &raquo;
+    <span class='title'>CodeEditor</span>
+  </div>
+</div>
+    <div id='content'>
+      <h1>
+        Class:
+        CodeEditor
+      </h1>
+      <table class='box'>
+        <tr>
+          <td>Defined in:</td>
+          <td>src\code_editor\code_editor.coffee</td>
+        </tr>
+      </table>
+      <h2>Instance Method Summary</h2>
+      <ul class='summary'>
+  <li>
+    <span class='signature'>
+      <a href='#setMode-dynamic'>
+        #
+(void)
+<b>setMode</b><span>(languageMode)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- set the different mode in the editor make sure it should find the necessary js file to load the specified mode
+#
+@example ce.setMode &quot;php&quot; it will automatically prepend the ace/mode/ in the string
+@param [String] languageMode the mode of language to select
+@return [CodeEditor] this returns current instance
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setTheme-dynamic'>
+        #
+(void)
+<b>setTheme</b><span>(themeName)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- set the theme of the current editor instance
+#
+@example ce.setTheme &quot;tomorrow_night_eighties&quot; it will automatically prepend the ace/theme/ in the name
+@param [String] themeName theme to set in the editor ace/theme prefix will be added automatically
+@return [CodeEditor] this
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setOptions-dynamic'>
+        #
+(void)
+<b>setOptions</b><span>(_options)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- set the options to the ace editor, all the valid ace options can be passed
+#
+@example ce.setOptions
+enableBasicAutocompletion: true
+@param [Object] options options to set in the editor
+@return [CodeEditor] this returns the current instance
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#popupMode-dynamic'>
+        #
+(void)
+<b>popupMode</b><span>(popupMode = true)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- make the editor in popup mode to handle tooltip and resize adjustment
+#
+@example ce.popupMode()
+@param [Boolean] popupMode
+@return [CodeEditor] this returns the current instance
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getInstance-dynamic'>
+        #
+(void)
+<b>getInstance</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- to get the raw ace editor instance
+#
+@returns [ace] editor
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getContent-dynamic'>
+        #
+(void)
+<b>getContent</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- to get the current contents of the editor
+#
+@return [String] content current content of the code editor
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setContent-dynamic'>
+        #
+(void)
+<b>setContent</b><span>(content)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- to set the new content in the editor
+#
+@param [String] content content to be set
+@return [CodeEditor] this current instance
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#insert-dynamic'>
+        #
+(void)
+<b>insert</b><span>(content)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- to insert content at the current cursor position
+#
+@param [String] content content to be inserted
+@return [CodeEditor] this current instance
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#onChange-dynamic'>
+        #
+(void)
+<b>onChange</b><span>(changeCallback)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- to register the change handler with editor
+#
+@example ce.onChange (content,editor) -&gt;
+content will be new updated content
+@param [Function] changeCallback function to be called on the change with content and editor as argument
+@return [CodeEditor] this current instance
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#addToHistory-dynamic'>
+        #
+(void)
+<b>addToHistory</b><span>(code)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- to add the code into most recent history
+#
+@example ce.addToHistory &quot;select * from users&quot;
+@param [String] code code to insert into recent history
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#saveHistory-dynamic'>
+        #
+(void)
+<b>saveHistory</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- to save history to the local storage
+#
+@example ce.saveHistory() it will save the current history items in the local storage
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getHistories-dynamic'>
+        #
+(void)
+<b>getHistories</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- to get save histories from the localstorage
+#
+@example ce.getHistories()
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#internalMoveHistoryItem-dynamic'>
+        #
+(void)
+<b>internalMoveHistoryItem</b><span>(oldIndex, newIndex)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- internal function to move order of the array item from one index to another
+#
+@param [Integer] oldIndex current index from where to pick element
+@param [Integer] newIndex desired index where element should be moved
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#renderHistories-dynamic'>
+        #
+(void)
+<b>renderHistories</b><span>(holder = null, changedCallback = null)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- to render the recent histories in select
+#
+@example ce.renderHistories $(&quot;.select&quot;), (value,element) -&gt;
+ce.setContent value
+@param [JqueryElement] holder [JqueryElement] reference to jquery element where select should be rendered default it will prepend to code editor holder
+@param [Function] changedCallback function to call when select box value is changed
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#internalGetOptionsForSelect-dynamic'>
+        #
+(void)
+<b>internalGetOptionsForSelect</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- internal function to get the options for the available histories
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#refreshHistories-dynamic'>
+        #
+(void)
+<b>refreshHistories</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- to refresh the list in select box
+#
+@example ce.refreshHistories()
+#
+
+    </span>
+  </li>
+</ul>
+      <h2>Constructor Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='constructor-dynamic'>
+      #
+(void)
+<b>constructor</b><span>(elementHolder, languageMode = &quot;mysql&quot;)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">----------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="constructor-to-initialize-the-object-of-the-class">constructor to initialize the object of the class</h1><p>#</p><h1 id="-example-ce-new-codeeditor-editor-mysql-">@example ce = new CodeEditor $(&quot;#editor&quot;), &quot;mysql&quot;</h1>
+<h1 id="-param-elementholder-jquery-element-the-referenced-element-that-will-hold-the-editor">@param elementHolder [jQuery Element] the $() referenced element that will hold the editor</h1>
+<h1 id="-param-languagemode-string-the-language-mode-of-the-editor-default-is-mysql">@param languageMode [String] the language mode of the editor default is mysql</h1>
+<h1 id="-return-this-codeeditor-returns-instance">@return this [CodeEditor] returns instance</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+</div>
+      <h2>Instance Method Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='setMode-dynamic'>
+      #
+(void)
+<b>setMode</b><span>(languageMode)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="set-the-different-mode-in-the-editor-make-sure-it-should-find-the-necessary-js-file-to-load-the-specified-mode">set the different mode in the editor make sure it should find the necessary js file to load the specified mode</h1><p>#</p><h1 id="-example-ce-setmode-php-it-will-automatically-prepend-the-ace-mode-in-the-string">@example ce.setMode &quot;php&quot; it will automatically prepend the ace/mode/ in the string</h1>
+<h1 id="-param-string-languagemode-the-mode-of-language-to-select">@param [String] languageMode the mode of language to select</h1>
+<h1 id="-return-codeeditor-this-returns-current-instance">@return [CodeEditor] this returns current instance</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setTheme-dynamic'>
+      #
+(void)
+<b>setTheme</b><span>(themeName)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="set-the-theme-of-the-current-editor-instance">set the theme of the current editor instance</h1><p>#</p><h1 id="-example-ce-settheme-tomorrow_night_eighties-it-will-automatically-prepend-the-ace-theme-in-the-name">@example ce.setTheme &quot;tomorrow_night_eighties&quot; it will automatically prepend the ace/theme/ in the name</h1>
+<h1 id="-param-string-themename-theme-to-set-in-the-editor-ace-theme-prefix-will-be-added-automatically">@param [String] themeName theme to set in the editor ace/theme prefix will be added automatically</h1>
+<h1 id="-return-codeeditor-this">@return [CodeEditor] this</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setOptions-dynamic'>
+      #
+(void)
+<b>setOptions</b><span>(_options)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="set-the-options-to-the-ace-editor-all-the-valid-ace-options-can-be-passed">set the options to the ace editor, all the valid ace options can be passed</h1><p>#</p><h1 id="-example-ce-setoptions">@example ce.setOptions</h1>
+<h1 id="enablebasicautocompletion-true">enableBasicAutocompletion: true</h1>
+<h1 id="-param-object-options-options-to-set-in-the-editor">@param [Object] options options to set in the editor</h1>
+<h1 id="-return-codeeditor-this-returns-the-current-instance">@return [CodeEditor] this returns the current instance</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='popupMode-dynamic'>
+      #
+(void)
+<b>popupMode</b><span>(popupMode = true)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="make-the-editor-in-popup-mode-to-handle-tooltip-and-resize-adjustment">make the editor in popup mode to handle tooltip and resize adjustment</h1><p>#</p><h1 id="-example-ce-popupmode-">@example ce.popupMode()</h1>
+<h1 id="-param-boolean-popupmode">@param [Boolean] popupMode</h1>
+<h1 id="-return-codeeditor-this-returns-the-current-instance">@return [CodeEditor] this returns the current instance</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getInstance-dynamic'>
+      #
+(void)
+<b>getInstance</b><span>()</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="to-get-the-raw-ace-editor-instance">to get the raw ace editor instance</h1><p>#</p><h1 id="-returns-ace-editor">@returns [ace] editor</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getContent-dynamic'>
+      #
+(void)
+<b>getContent</b><span>()</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="to-get-the-current-contents-of-the-editor">to get the current contents of the editor</h1><p>#</p><h1 id="-return-string-content-current-content-of-the-code-editor">@return [String] content current content of the code editor</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setContent-dynamic'>
+      #
+(void)
+<b>setContent</b><span>(content)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="to-set-the-new-content-in-the-editor">to set the new content in the editor</h1><p>#</p><h1 id="-param-string-content-content-to-be-set">@param [String] content content to be set</h1>
+<h1 id="-return-codeeditor-this-current-instance">@return [CodeEditor] this current instance</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='insert-dynamic'>
+      #
+(void)
+<b>insert</b><span>(content)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="to-insert-content-at-the-current-cursor-position">to insert content at the current cursor position</h1><p>#</p><h1 id="-param-string-content-content-to-be-inserted">@param [String] content content to be inserted</h1>
+<h1 id="-return-codeeditor-this-current-instance">@return [CodeEditor] this current instance</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='onChange-dynamic'>
+      #
+(void)
+<b>onChange</b><span>(changeCallback)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="to-register-the-change-handler-with-editor">to register the change handler with editor</h1><p>#</p><h1 id="-example-ce-onchange-content-editor-">@example ce.onChange (content,editor) -&gt;</h1><p>content will be new updated content</p><h1 id="-param-function-changecallback-function-to-be-called-on-the-change-with-content-and-editor-as-argument">@param [Function] changeCallback function to be called on the change with content and editor as argument</h1>
+<h1 id="-return-codeeditor-this-current-instance">@return [CodeEditor] this current instance</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='addToHistory-dynamic'>
+      #
+(void)
+<b>addToHistory</b><span>(code)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="to-add-the-code-into-most-recent-history">to add the code into most recent history</h1><p>#</p><h1 id="-example-ce-addtohistory-select-from-users-">@example ce.addToHistory &quot;select * from users&quot;</h1>
+<h1 id="-param-string-code-code-to-insert-into-recent-history">@param [String] code code to insert into recent history</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='saveHistory-dynamic'>
+      #
+(void)
+<b>saveHistory</b><span>()</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="to-save-history-to-the-local-storage">to save history to the local storage</h1><p>#</p><h1 id="-example-ce-savehistory-it-will-save-the-current-history-items-in-the-local-storage">@example ce.saveHistory() it will save the current history items in the local storage</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getHistories-dynamic'>
+      #
+(void)
+<b>getHistories</b><span>()</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="to-get-save-histories-from-the-localstorage">to get save histories from the localstorage</h1><p>#</p><h1 id="-example-ce-gethistories-">@example ce.getHistories()</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='internalMoveHistoryItem-dynamic'>
+      #
+(void)
+<b>internalMoveHistoryItem</b><span>(oldIndex, newIndex)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="internal-function-to-move-order-of-the-array-item-from-one-index-to-another">internal function to move order of the array item from one index to another</h1><p>#</p><h1 id="-param-integer-oldindex-current-index-from-where-to-pick-element">@param [Integer] oldIndex current index from where to pick element</h1>
+<h1 id="-param-integer-newindex-desired-index-where-element-should-be-moved">@param [Integer] newIndex desired index where element should be moved</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='renderHistories-dynamic'>
+      #
+(void)
+<b>renderHistories</b><span>(holder = null, changedCallback = null)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="to-render-the-recent-histories-in-select">to render the recent histories in select</h1><p>#</p><h1 id="-example-ce-renderhistories-select-value-element-">@example ce.renderHistories $(&quot;.select&quot;), (value,element) -&gt;</h1>
+<h1 id="ce-setcontent-value">ce.setContent value</h1>
+<h1 id="-param-jqueryelement-holder-jqueryelement-reference-to-jquery-element-where-select-should-be-rendered-default-it-will-prepend-to-code-editor-holder">@param [JqueryElement] holder [JqueryElement] reference to jquery element where select should be rendered default it will prepend to code editor holder</h1>
+<h1 id="-param-function-changedcallback-function-to-call-when-select-box-value-is-changed">@param [Function] changedCallback function to call when select box value is changed</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='internalGetOptionsForSelect-dynamic'>
+      #
+(void)
+<b>internalGetOptionsForSelect</b><span>()</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="internal-function-to-get-the-options-for-the-available-histories">internal function to get the options for the available histories</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='refreshHistories-dynamic'>
+      #
+(void)
+<b>refreshHistories</b><span>()</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="to-refresh-the-list-in-select-box">to refresh the list in select box</h1><p>#</p><h1 id="-example-ce-refreshhistories-">@example ce.refreshHistories()</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+</div>
+    </div>
+    <div id='footer'>
+  By
+  <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
+    Codo
+  </a>
+  2.1.2
+  &#10034;
+  Press H to see the keyboard shortcuts
+  &#10034;
+  <a href='http://twitter.com/netzpirat' target='_parent'>@netzpirat</a>
+  &#10034;
+  <a href='http://twitter.com/_inossidabile' target='_parent'>@_inossidabile</a>
+</div>
+<iframe id='search_frame'></iframe>
+<div id='fuzzySearch'>
+  <input type='text'>
+  <ol></ol>
+</div>
+<div id='help'>
+  <p>
+    Quickly fuzzy find classes, mixins, methods, file:
+  </p>
+  <ul>
+    <li>
+      <span>T</span>
+      Open fuzzy finder dialog
+    </li>
+  </ul>
+  <p>
+    Control the navigation frame:
+  </p>
+  <ul>
+    <li>
+      <span>L</span>
+      Toggle list view
+    </li>
+    <li>
+      <span>C</span>
+      Show class list
+    </li>
+    <li>
+      <span>I</span>
+      Show mixin list
+    </li>
+    <li>
+      <span>F</span>
+      Show file list
+    </li>
+    <li>
+      <span>M</span>
+      Show method list
+    </li>
+    <li>
+      <span>E</span>
+      Show extras list
+    </li>
+  </ul>
+  <p>
+    You can focus and blur the search input:
+  </p>
+  <ul>
+    <li>
+      <span>S</span>
+      Focus search input
+    </li>
+    <li>
+      <span>Esc</span>
+      Blur search input
+    </li>
+  </ul>
+</div>
+  </body>
+</html>

@@ -19,93 +19,91 @@
       Index
     </a>
     &raquo;
-    <span class='title'>TableEditor</span>
+    <span class='title'>DataAxis</span>
   </div>
 </div>
     <div id='content'>
       <h1>
         Class:
-        TableEditor
+        DataAxis
       </h1>
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>src\tableview\table_editor.coffee</td>
+          <td>src\chart\DataAxis.coffee</td>
         </tr>
       </table>
-      <h2>Variables Summary</h2>
-      <dl class='constants'>
-  <dt id='allowButtons-variable'>
-    allowButtons
-    =
-  </dt>
-  <dd>
-    <pre><code class='coffeescript'>true</code></pre>
-    
-  </dd>
-  <dt id='onCreate-variable'>
-    onCreate
-    =
-  </dt>
-  <dd>
-    <pre><code class='coffeescript'>false</code></pre>
-    
-  </dd>
-</dl>
       <h2>Instance Method Summary</h2>
       <ul class='summary'>
   <li>
     <span class='signature'>
-      <a href='#clear-dynamic'>
+      <a href='#setTitle-dynamic'>
         #
 (void)
-<b>clear</b><span>()</span>
+<b>setTitle</b><span>(title)</span>
       </a>
     </span>
+    <span class='bound note title'>Bound</span>
     <span class='desc'>
     </span>
   </li>
   <li>
     <span class='signature'>
-      <a href='#setDataTypes-dynamic'>
+      <a href='#setRange-dynamic'>
         #
 (void)
-<b>setDataTypes</b><span>()</span>
+<b>setRange</b><span>(minvalue, maxvalue)</span>
       </a>
     </span>
+    <span class='bound note title'>Bound</span>
     <span class='desc'>
     </span>
   </li>
   <li>
     <span class='signature'>
-      <a href='#filterRowValues-dynamic'>
+      <a href='#setFormatString-dynamic'>
         #
 (void)
-<b>filterRowValues</b><span>(_row)</span>
+<b>setFormatString</b><span>(str)</span>
       </a>
     </span>
+    <span class='bound note title'>Bound</span>
     <span class='desc'>
     </span>
   </li>
   <li>
     <span class='signature'>
-      <a href='#createButtons-dynamic'>
+      <a href='#setPrefix-dynamic'>
         #
 (void)
-<b>createButtons</b><span>()</span>
+<b>setPrefix</b><span>(str)</span>
       </a>
     </span>
+    <span class='bound note title'>Bound</span>
     <span class='desc'>
     </span>
   </li>
   <li>
     <span class='signature'>
-      <a href='#setButtonEvents-dynamic'>
+      <a href='#setFormatMoney-dynamic'>
         #
 (void)
-<b>setButtonEvents</b><span>()</span>
+<b>setFormatMoney</b><span>()</span>
       </a>
     </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#addStripLine-dynamic'>
+        #
+(void)
+<b>addStripLine</b><span>(startValue, endValue, options)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
     <span class='desc'>
     </span>
   </li>
@@ -116,7 +114,7 @@
     <p class='signature' id='constructor-dynamic'>
       #
 (void)
-<b>constructor</b><span>(tableHolder, editedTableKey)</span>
+<b>constructor</b><span>(options)</span>
       <br>
     </p>
     
@@ -125,46 +123,61 @@
       <h2>Instance Method Details</h2>
       <div class='methods'>
   <div class='method_details'>
-    <p class='signature' id='clear-dynamic'>
+    <p class='signature' id='setTitle-dynamic'>
       #
 (void)
-<b>clear</b><span>()</span>
+<b>setTitle</b><span>(title)</span>
+      <span class='bound note'>Bound</span>
       <br>
     </p>
     
   </div>
   <div class='method_details'>
-    <p class='signature' id='setDataTypes-dynamic'>
+    <p class='signature' id='setRange-dynamic'>
       #
 (void)
-<b>setDataTypes</b><span>()</span>
+<b>setRange</b><span>(minvalue, maxvalue)</span>
+      <span class='bound note'>Bound</span>
       <br>
     </p>
     
   </div>
   <div class='method_details'>
-    <p class='signature' id='filterRowValues-dynamic'>
+    <p class='signature' id='setFormatString-dynamic'>
       #
 (void)
-<b>filterRowValues</b><span>(_row)</span>
+<b>setFormatString</b><span>(str)</span>
+      <span class='bound note'>Bound</span>
       <br>
     </p>
     
   </div>
   <div class='method_details'>
-    <p class='signature' id='createButtons-dynamic'>
+    <p class='signature' id='setPrefix-dynamic'>
       #
 (void)
-<b>createButtons</b><span>()</span>
+<b>setPrefix</b><span>(str)</span>
+      <span class='bound note'>Bound</span>
       <br>
     </p>
     
   </div>
   <div class='method_details'>
-    <p class='signature' id='setButtonEvents-dynamic'>
+    <p class='signature' id='setFormatMoney-dynamic'>
       #
 (void)
-<b>setButtonEvents</b><span>()</span>
+<b>setFormatMoney</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='addStripLine-dynamic'>
+      #
+(void)
+<b>addStripLine</b><span>(startValue, endValue, options)</span>
+      <span class='bound note'>Bound</span>
       <br>
     </p>
     
@@ -176,7 +189,7 @@
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>
-  2.1.0
+  2.1.2
   &#10034;
   Press H to see the keyboard shortcuts
   &#10034;

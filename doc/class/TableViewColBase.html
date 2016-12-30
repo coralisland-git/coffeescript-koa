@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset='UTF-8'>
+  <title>CoffeeScript API Documentation</title>
+  <script src='../javascript/application.js'></script>
+  <script src='../javascript/search.js'></script>
+  <link rel='stylesheet' href='../stylesheets/application.css' type='text/css'>
+</head>
+  <body>
+    <div id='base' data-path='../'></div>
+<div id='header'>
+  <div id='menu'>
+    <a href='../extra/README.md.html' title='NinjaCommon'>
+      NinjaCommon
+    </a>
+    &raquo;
+    <a href='../alphabetical_index.html' title='Index'>
+      Index
+    </a>
+    &raquo;
+    <span class='title'>TableViewColBase</span>
+  </div>
+</div>
+    <div id='content'>
+      <h1>
+        Class:
+        TableViewColBase
+      </h1>
+      <table class='box'>
+        <tr>
+          <td>Defined in:</td>
+          <td>src\tableview\tableview_col_base.coffee</td>
+        </tr>
+      </table>
+      <h2>Direct Known Subclasses</h2>
+      <p class='children'>
+        <a href='../class/TableViewCol.html'>TableViewCol</a>
+        <a href='../class/TableViewColButton.html'>TableViewColButton</a>
+        <a href='../class/TableViewColCheckbox.html'>TableViewColCheckbox</a>
+      </p>
+      <h2>Instance Method Summary</h2>
+      <ul class='summary'>
+  <li>
+    <span class='signature'>
+      <a href='#getName-dynamic'>
+        #
+(void)
+<b>getName</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getSource-dynamic'>
+        #
+(void)
+<b>getSource</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getOrder-dynamic'>
+        #
+(void)
+<b>getOrder</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getOptions-dynamic'>
+        #
+(void)
+<b>getOptions</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getClickable-dynamic'>
+        #
+(void)
+<b>getClickable</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getEditable-dynamic'>
+        #
+(void)
+<b>getEditable</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getAlign-dynamic'>
+        #
+(void)
+<b>getAlign</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getWidth-dynamic'>
+        #
+(void)
+<b>getWidth</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#RenderHeader-dynamic'>
+        #
+(void)
+<b>RenderHeader</b><span>(parent, location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#RenderHeaderHorizontal-dynamic'>
+        #
+(void)
+<b>RenderHeaderHorizontal</b><span>(parent, location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#UpdateSortIcon-dynamic'>
+        #
+(void)
+<b>UpdateSortIcon</b><span>(newSort)</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getVisible-dynamic'>
+        #
+(void)
+<b>getVisible</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getType-dynamic'>
+        #
+(void)
+<b>getType</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getFormatter-dynamic'>
+        #
+(void)
+<b>getFormatter</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getFormatterName-dynamic'>
+        #
+(void)
+<b>getFormatterName</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#onFocus-dynamic'>
+        #
+(void)
+<b>onFocus</b><span>(e, col, data)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getRequired-dynamic'>
+        #
+(void)
+<b>getRequired</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getAlwaysHidden-dynamic'>
+        #
+(void)
+<b>getAlwaysHidden</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getSystemColumn-dynamic'>
+        #
+(void)
+<b>getSystemColumn</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getAutoSize-dynamic'>
+        #
+(void)
+<b>getAutoSize</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getIsCalculation-dynamic'>
+        #
+(void)
+<b>getIsCalculation</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#renderValue-dynamic'>
+        #
+(void)
+<b>renderValue</b><span>(value, keyValue, row)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Return html to display
+#|  @param value [mixed] Whatever the current value is in database format
+#|  @param value [mixed] The key value on the row for this record if any
+#|  @param value [object] The row object if any
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#changeColumn-dynamic'>
+        #
+(void)
+<b>changeColumn</b><span>(varName, value)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Update configuration of the column
+#|  The varName / value should be the same as defined
+#|  in the &quot;serialize&quot; function but we allow one update
+#|  function we can adjust the related fields in the subclasses.
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getRenderFunction-dynamic'>
+        #
+(void)
+<b>getRenderFunction</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#renderTooltip-dynamic'>
+        #
+(void)
+<b>renderTooltip</b><span>(row, value, tooltipWindow)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#deduceColumnType-dynamic'>
+        #
+(void)
+<b>deduceColumnType</b><span>(newData)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Given some new data, see if we need to automatically change
+#|  the data type on this column.
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#deduceInitialColumnType-dynamic'>
+        #
+(void)
+<b>deduceInitialColumnType</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Called once when the column is created to see if the
+#|  class wants to update the information on the column type
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#serialize-dynamic'>
+        #
+(void)
+<b>serialize</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#deserialize-dynamic'>
+        #
+(void)
+<b>deserialize</b><span>(obj)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+</ul>
+      <h2>Instance Method Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='getName-dynamic'>
+      #
+(void)
+<b>getName</b><span>()</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getSource-dynamic'>
+      #
+(void)
+<b>getSource</b><span>()</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getOrder-dynamic'>
+      #
+(void)
+<b>getOrder</b><span>()</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getOptions-dynamic'>
+      #
+(void)
+<b>getOptions</b><span>()</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getClickable-dynamic'>
+      #
+(void)
+<b>getClickable</b><span>()</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getEditable-dynamic'>
+      #
+(void)
+<b>getEditable</b><span>()</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getAlign-dynamic'>
+      #
+(void)
+<b>getAlign</b><span>()</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getWidth-dynamic'>
+      #
+(void)
+<b>getWidth</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='RenderHeader-dynamic'>
+      #
+(void)
+<b>RenderHeader</b><span>(parent, location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='RenderHeaderHorizontal-dynamic'>
+      #
+(void)
+<b>RenderHeaderHorizontal</b><span>(parent, location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='UpdateSortIcon-dynamic'>
+      #
+(void)
+<b>UpdateSortIcon</b><span>(newSort)</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getVisible-dynamic'>
+      #
+(void)
+<b>getVisible</b><span>()</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getType-dynamic'>
+      #
+(void)
+<b>getType</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getFormatter-dynamic'>
+      #
+(void)
+<b>getFormatter</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getFormatterName-dynamic'>
+      #
+(void)
+<b>getFormatterName</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='onFocus-dynamic'>
+      #
+(void)
+<b>onFocus</b><span>(e, col, data)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getRequired-dynamic'>
+      #
+(void)
+<b>getRequired</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getAlwaysHidden-dynamic'>
+      #
+(void)
+<b>getAlwaysHidden</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getSystemColumn-dynamic'>
+      #
+(void)
+<b>getSystemColumn</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getAutoSize-dynamic'>
+      #
+(void)
+<b>getAutoSize</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getIsCalculation-dynamic'>
+      #
+(void)
+<b>getIsCalculation</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='renderValue-dynamic'>
+      #
+(void)
+<b>renderValue</b><span>(value, keyValue, row)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Return html to display</p><p>#|  @param value [mixed] Whatever the current value is in database format</p><p>#|  @param value [mixed] The key value on the row for this record if any</p><p>#|  @param value [object] The row object if any</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='changeColumn-dynamic'>
+      #
+(void)
+<b>changeColumn</b><span>(varName, value)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Update configuration of the column</p><p>#|  The varName / value should be the same as defined</p><p>#|  in the &quot;serialize&quot; function but we allow one update</p><p>#|  function we can adjust the related fields in the subclasses.</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getRenderFunction-dynamic'>
+      #
+(void)
+<b>getRenderFunction</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='renderTooltip-dynamic'>
+      #
+(void)
+<b>renderTooltip</b><span>(row, value, tooltipWindow)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='deduceColumnType-dynamic'>
+      #
+(void)
+<b>deduceColumnType</b><span>(newData)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Given some new data, see if we need to automatically change</p><p>#|  the data type on this column.</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='deduceInitialColumnType-dynamic'>
+      #
+(void)
+<b>deduceInitialColumnType</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Called once when the column is created to see if the</p><p>#|  class wants to update the information on the column type</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='serialize-dynamic'>
+      #
+(void)
+<b>serialize</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='deserialize-dynamic'>
+      #
+(void)
+<b>deserialize</b><span>(obj)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+</div>
+    </div>
+    <div id='footer'>
+  By
+  <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
+    Codo
+  </a>
+  2.1.2
+  &#10034;
+  Press H to see the keyboard shortcuts
+  &#10034;
+  <a href='http://twitter.com/netzpirat' target='_parent'>@netzpirat</a>
+  &#10034;
+  <a href='http://twitter.com/_inossidabile' target='_parent'>@_inossidabile</a>
+</div>
+<iframe id='search_frame'></iframe>
+<div id='fuzzySearch'>
+  <input type='text'>
+  <ol></ol>
+</div>
+<div id='help'>
+  <p>
+    Quickly fuzzy find classes, mixins, methods, file:
+  </p>
+  <ul>
+    <li>
+      <span>T</span>
+      Open fuzzy finder dialog
+    </li>
+  </ul>
+  <p>
+    Control the navigation frame:
+  </p>
+  <ul>
+    <li>
+      <span>L</span>
+      Toggle list view
+    </li>
+    <li>
+      <span>C</span>
+      Show class list
+    </li>
+    <li>
+      <span>I</span>
+      Show mixin list
+    </li>
+    <li>
+      <span>F</span>
+      Show file list
+    </li>
+    <li>
+      <span>M</span>
+      Show method list
+    </li>
+    <li>
+      <span>E</span>
+      Show extras list
+    </li>
+  </ul>
+  <p>
+    You can focus and blur the search input:
+  </p>
+  <ul>
+    <li>
+      <span>S</span>
+      Focus search input
+    </li>
+    <li>
+      <span>Esc</span>
+      Blur search input
+    </li>
+  </ul>
+</div>
+  </body>
+</html>

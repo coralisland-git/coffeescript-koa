@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset='UTF-8'>
+  <title>CoffeeScript API Documentation</title>
+  <script src='../javascript/application.js'></script>
+  <script src='../javascript/search.js'></script>
+  <link rel='stylesheet' href='../stylesheets/application.css' type='text/css'>
+</head>
+  <body>
+    <div id='base' data-path='../'></div>
+<div id='header'>
+  <div id='menu'>
+    <a href='../extra/README.md.html' title='NinjaCommon'>
+      NinjaCommon
+    </a>
+    &raquo;
+    <a href='../alphabetical_index.html' title='Index'>
+      Index
+    </a>
+    &raquo;
+    <span class='title'>DataMap</span>
+  </div>
+</div>
+    <div id='content'>
+      <h1>
+        Class:
+        DataMap
+      </h1>
+      <table class='box'>
+        <tr>
+          <td>Defined in:</td>
+          <td>src\data_formatter\data_map.coffee</td>
+        </tr>
+      </table>
+      <h2>Overview</h2>
+      <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="class-datamap">class DataMap</h1>
+<h1 id="this-is-the-class-to-handle-and-map-the-data-into-application-including-custom-data-types-and-data-for-that-datatypes">this is the class to handle and map the data into application including custom data types and data for that datatypes</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+      <h2>Class Method Summary</h2>
+      <ul class='summary'>
+  <li>
+    <span class='signature'>
+      <a href='#getDataMap-static'>
+        .
+(void)
+<b>getDataMap</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- function to get singleton global instance of data map
+#
+@return [DataMap] globalDataMap global instance of dataMap
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setSaveCallback-static'>
+        .
+(void)
+<b>setSaveCallback</b><span>(tableName, callbackFunction)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- Call this function to set a callback when an editable field changes
+due to an inline editor.   The callback receives
+Table Name, Key, Old Value, New Value
+#
+@param [String] tableName tableName to associate callback with
+@param [Function] callbackFunction funtion to execute on save
+@return [Boolean]
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#importDataTypes-static'>
+        .
+(void)
+<b>importDataTypes</b><span>(tableName, savedConfig)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- Import the given data types from a saved selection
+#
+@param [String] tableName table name for which the new data type is being set
+@param [Object] columns containing data types
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setDataTypes-static'>
+        .
+(void)
+<b>setDataTypes</b><span>(tableName, columns)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- Set the data type for a given type of data Called statically to
+#
+@param [String] tableName table name for which the new data type is being set
+@param [Object] columns array of the columns to set as data type
+@return [Boolean]
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#removeTableData-static'>
+        .
+(void)
+<b>removeTableData</b><span>(tableName)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Remove the table&#39;s data but leave all column types
+#|
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#removeTable-static'>
+        .
+(void)
+<b>removeTable</b><span>(tableName)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Entirely remove a table including all data and all
+#|  data types.
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#addColumn-static'>
+        .
+(void)
+<b>addColumn</b><span>(tableName, options)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Add a column data type
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setDataTypesFromObject-static'>
+        .
+(void)
+<b>setDataTypesFromObject</b><span>(tableName, objects)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- Reset the columns for a table based on some object
+#
+@param [String] tableName table name for which the new data type is being set
+@param [Object] columns array of the columns to set as data type
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getColumnsFromTable-static'>
+        .
+(void)
+<b>getColumnsFromTable</b><span>(tableName, reduceFunction)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- Return the columns associated with a given table
+reduceFunction is called with every table name and return the columns that return true
+#
+@param [String] tableName table name for which the new data type is being set
+@param [Function] reduceFunction function to validate the column if returns true column will be included
+@return [Array] columns array of included columns
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#importDataFromObjects-static'>
+        .
+(void)
+<b>importDataFromObjects</b><span>(tableName, objects)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- Quickly import an entire array of objects into table clears the table first
+#
+@param [String] tableName table name for which the new data type is being set
+@param [Array] objects array of objects to set in the table in form of 2d array
+@return [Boolean]
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setDataCallback-static'>
+        .
+(void)
+<b>setDataCallback</b><span>(tableName, methodName, callback)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#exportTable-static'>
+        .
+(void)
+<b>exportTable</b><span>(tableName)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Export a table / return all data as a single object
+#|
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getValuesFromTable-static'>
+        .
+(void)
+<b>getValuesFromTable</b><span>(tableName, reduceFunction)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- get the values of the columns which will be retured true by reduceFunction
+#
+@param [String] tableName table name for which the new data type is being set
+@param [Function] reduceFunction function that will called on each column and if returns true then it will considered
+@return [Array] results the array of the data included using reduceFunction
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#addData-static'>
+        .
+(void)
+<b>addData</b><span>(tableName, keyValue, newData)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- add data to the dataMap and update the occurence on the currently rendered screen
+#
+@param [String] tableName name of the table in which the data is being added
+@param [String] keyValue unique key to track the data row inside the DataMap
+@param [Object] values values of the row in form of object
+@return [Boolean]
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#changeColumnAttribute-static'>
+        .
+(void)
+<b>changeColumnAttribute</b><span>(tableName, sourceName, field, newValue, ignoreEvents)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- Change an attribute from an active table
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#addDataUpdateTable-static'>
+        .
+(void)
+<b>addDataUpdateTable</b><span>(tableName, keyValue, newData)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#deleteDataByKey-static'>
+        .
+(void)
+<b>deleteDataByKey</b><span>(tableName, keyValue)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- delete row form the screen and dataMap using the keyvale
+#
+@param [String] tableName name of the table in which the data is being added
+@param [String] keyValue unique key to track the data row inside the DataMap
+@return [Boolean]
+#
+&gt;&gt;&gt; RETURNS A PROMISE
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getDataForKey-static'>
+        .
+(void)
+<b>getDataForKey</b><span>(tableName, keyValue)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- get the data for a given key
+#
+@param [String] tableName name of the table in which the data is being added
+@param [String] keyValue unique key to track the data row inside the DataMap
+@return [String]
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#deleteDataForkey-static'>
+        .
+(void)
+<b>deleteDataForkey</b><span>(tableName, keyValue)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Delete a key
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getDataField-static'>
+        .
+(void)
+<b>getDataField</b><span>(tableName, keyValue, fieldName)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- get the single column|field value using the key and column name
+#
+@param [String] tableName name of the table in which the data is being added
+@param [String] keyValue unique key to track the data row inside the DataMap
+@param [String] fieldName name of the column to return the value of
+@return [String]
+#
+&gt;&gt;&gt; RETURNS A PROMISE
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getDataFieldFormatted-static'>
+        .
+(void)
+<b>getDataFieldFormatted</b><span>(tableName, keyValue, fieldName)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+</ul>
+      <h2>Instance Method Summary</h2>
+      <ul class='summary'>
+  <li>
+    <span class='signature'>
+      <a href='#editValue-dynamic'>
+        #
+(void)
+<b>editValue</b><span>(path, el)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- initiate the edit of the data using editor defined in the data type
+#
+@param [String] path indicating the location of the data beign edited
+@param [JqueryElement] el element in which to open editor
+@return [Boolean]
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#updateScreenPathValue-dynamic'>
+        #
+(void)
+<b>updateScreenPathValue</b><span>(path, newValue, didDataChange)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- update the occurence of the path value with the updated value on currently rendered screen
+#
+@param [String] path indicating the location of the data to be updated
+@param [Object] newValue new value to be set instead of old data
+@param [Boolean] didDataChange if data is different from the previous value
+@return [Boolean]
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#updatePathValueEvent-dynamic'>
+        #
+(void)
+<b>updatePathValueEvent</b><span>(path, newValue)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- works as the event triggered at the update of the value
+#
+@param [String] path indicating the location of the data to be updated
+@param [Object] newValue new value to be set instead of old data
+@event updatePathValueEvent
+@return [Boolean]
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setDataTypesFromSingleObject-dynamic'>
+        #
+(void)
+<b>setDataTypesFromSingleObject</b><span>(tableName, newData)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+</ul>
+      <h2>Class Method Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='getDataMap-static'>
+      .
+(void)
+<b>getDataMap</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="function-to-get-singleton-global-instance-of-data-map">function to get singleton global instance of data map</h1><p>#</p><h1 id="-return-datamap-globaldatamap-global-instance-of-datamap">@return [DataMap] globalDataMap global instance of dataMap</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setSaveCallback-static'>
+      .
+(void)
+<b>setSaveCallback</b><span>(tableName, callbackFunction)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="call-this-function-to-set-a-callback-when-an-editable-field-changes">Call this function to set a callback when an editable field changes</h1>
+<h1 id="due-to-an-inline-editor-the-callback-receives">due to an inline editor.   The callback receives</h1>
+<h1 id="table-name-key-old-value-new-value">Table Name, Key, Old Value, New Value</h1><p>#</p><h1 id="-param-string-tablename-tablename-to-associate-callback-with">@param [String] tableName tableName to associate callback with</h1>
+<h1 id="-param-function-callbackfunction-funtion-to-execute-on-save">@param [Function] callbackFunction funtion to execute on save</h1>
+<h1 id="-return-boolean-">@return [Boolean]</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='importDataTypes-static'>
+      .
+(void)
+<b>importDataTypes</b><span>(tableName, savedConfig)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="import-the-given-data-types-from-a-saved-selection">Import the given data types from a saved selection</h1><p>#</p><h1 id="-param-string-tablename-table-name-for-which-the-new-data-type-is-being-set">@param [String] tableName table name for which the new data type is being set</h1>
+<h1 id="-param-object-columns-containing-data-types">@param [Object] columns containing data types</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setDataTypes-static'>
+      .
+(void)
+<b>setDataTypes</b><span>(tableName, columns)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="set-the-data-type-for-a-given-type-of-data-called-statically-to">Set the data type for a given type of data Called statically to</h1><p>#</p><h1 id="-param-string-tablename-table-name-for-which-the-new-data-type-is-being-set">@param [String] tableName table name for which the new data type is being set</h1>
+<h1 id="-param-object-columns-array-of-the-columns-to-set-as-data-type">@param [Object] columns array of the columns to set as data type</h1>
+<h1 id="-return-boolean-">@return [Boolean]</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='removeTableData-static'>
+      .
+(void)
+<b>removeTableData</b><span>(tableName)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Remove the table&#39;s data but leave all column types</p><p>#|</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='removeTable-static'>
+      .
+(void)
+<b>removeTable</b><span>(tableName)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Entirely remove a table including all data and all</p><p>#|  data types.</p><p>#|</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='addColumn-static'>
+      .
+(void)
+<b>addColumn</b><span>(tableName, options)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Add a column data type</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setDataTypesFromObject-static'>
+      .
+(void)
+<b>setDataTypesFromObject</b><span>(tableName, objects)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="reset-the-columns-for-a-table-based-on-some-object">Reset the columns for a table based on some object</h1><p>#</p><h1 id="-param-string-tablename-table-name-for-which-the-new-data-type-is-being-set">@param [String] tableName table name for which the new data type is being set</h1>
+<h1 id="-param-object-columns-array-of-the-columns-to-set-as-data-type">@param [Object] columns array of the columns to set as data type</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getColumnsFromTable-static'>
+      .
+(void)
+<b>getColumnsFromTable</b><span>(tableName, reduceFunction)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="return-the-columns-associated-with-a-given-table">Return the columns associated with a given table</h1>
+<h1 id="reducefunction-is-called-with-every-table-name-and-return-the-columns-that-return-true">reduceFunction is called with every table name and return the columns that return true</h1><p>#</p><h1 id="-param-string-tablename-table-name-for-which-the-new-data-type-is-being-set">@param [String] tableName table name for which the new data type is being set</h1>
+<h1 id="-param-function-reducefunction-function-to-validate-the-column-if-returns-true-column-will-be-included">@param [Function] reduceFunction function to validate the column if returns true column will be included</h1>
+<h1 id="-return-array-columns-array-of-included-columns">@return [Array] columns array of included columns</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='importDataFromObjects-static'>
+      .
+(void)
+<b>importDataFromObjects</b><span>(tableName, objects)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="quickly-import-an-entire-array-of-objects-into-table-clears-the-table-first">Quickly import an entire array of objects into table clears the table first</h1><p>#</p><h1 id="-param-string-tablename-table-name-for-which-the-new-data-type-is-being-set">@param [String] tableName table name for which the new data type is being set</h1>
+<h1 id="-param-array-objects-array-of-objects-to-set-in-the-table-in-form-of-2d-array">@param [Array] objects array of objects to set in the table in form of 2d array</h1>
+<h1 id="-return-boolean-">@return [Boolean]</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setDataCallback-static'>
+      .
+(void)
+<b>setDataCallback</b><span>(tableName, methodName, callback)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='exportTable-static'>
+      .
+(void)
+<b>exportTable</b><span>(tableName)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Export a table / return all data as a single object</p><p>#|</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getValuesFromTable-static'>
+      .
+(void)
+<b>getValuesFromTable</b><span>(tableName, reduceFunction)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="get-the-values-of-the-columns-which-will-be-retured-true-by-reducefunction">get the values of the columns which will be retured true by reduceFunction</h1><p>#</p><h1 id="-param-string-tablename-table-name-for-which-the-new-data-type-is-being-set">@param [String] tableName table name for which the new data type is being set</h1>
+<h1 id="-param-function-reducefunction-function-that-will-called-on-each-column-and-if-returns-true-then-it-will-considered">@param [Function] reduceFunction function that will called on each column and if returns true then it will considered</h1>
+<h1 id="-return-array-results-the-array-of-the-data-included-using-reducefunction">@return [Array] results the array of the data included using reduceFunction</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='addData-static'>
+      .
+(void)
+<b>addData</b><span>(tableName, keyValue, newData)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="add-data-to-the-datamap-and-update-the-occurence-on-the-currently-rendered-screen">add data to the dataMap and update the occurence on the currently rendered screen</h1><p>#</p><h1 id="-param-string-tablename-name-of-the-table-in-which-the-data-is-being-added">@param [String] tableName name of the table in which the data is being added</h1>
+<h1 id="-param-string-keyvalue-unique-key-to-track-the-data-row-inside-the-datamap">@param [String] keyValue unique key to track the data row inside the DataMap</h1>
+<h1 id="-param-object-values-values-of-the-row-in-form-of-object">@param [Object] values values of the row in form of object</h1>
+<h1 id="-return-boolean-">@return [Boolean]</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='changeColumnAttribute-static'>
+      .
+(void)
+<b>changeColumnAttribute</b><span>(tableName, sourceName, field, newValue, ignoreEvents)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="change-an-attribute-from-an-active-table">Change an attribute from an active table</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='addDataUpdateTable-static'>
+      .
+(void)
+<b>addDataUpdateTable</b><span>(tableName, keyValue, newData)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='deleteDataByKey-static'>
+      .
+(void)
+<b>deleteDataByKey</b><span>(tableName, keyValue)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="delete-row-form-the-screen-and-datamap-using-the-keyvale">delete row form the screen and dataMap using the keyvale</h1><p>#</p><h1 id="-param-string-tablename-name-of-the-table-in-which-the-data-is-being-added">@param [String] tableName name of the table in which the data is being added</h1>
+<h1 id="-param-string-keyvalue-unique-key-to-track-the-data-row-inside-the-datamap">@param [String] keyValue unique key to track the data row inside the DataMap</h1>
+<h1 id="-return-boolean-">@return [Boolean]</h1><p>#</p><h1 id="-returns-a-promise">&gt;&gt;&gt; RETURNS A PROMISE</h1>
+
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getDataForKey-static'>
+      .
+(void)
+<b>getDataForKey</b><span>(tableName, keyValue)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="get-the-data-for-a-given-key">get the data for a given key</h1><p>#</p><h1 id="-param-string-tablename-name-of-the-table-in-which-the-data-is-being-added">@param [String] tableName name of the table in which the data is being added</h1>
+<h1 id="-param-string-keyvalue-unique-key-to-track-the-data-row-inside-the-datamap">@param [String] keyValue unique key to track the data row inside the DataMap</h1>
+<h1 id="-return-string-">@return [String]</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='deleteDataForkey-static'>
+      .
+(void)
+<b>deleteDataForkey</b><span>(tableName, keyValue)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Delete a key</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getDataField-static'>
+      .
+(void)
+<b>getDataField</b><span>(tableName, keyValue, fieldName)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="get-the-single-column-field-value-using-the-key-and-column-name">get the single column|field value using the key and column name</h1><p>#</p><h1 id="-param-string-tablename-name-of-the-table-in-which-the-data-is-being-added">@param [String] tableName name of the table in which the data is being added</h1>
+<h1 id="-param-string-keyvalue-unique-key-to-track-the-data-row-inside-the-datamap">@param [String] keyValue unique key to track the data row inside the DataMap</h1>
+<h1 id="-param-string-fieldname-name-of-the-column-to-return-the-value-of">@param [String] fieldName name of the column to return the value of</h1>
+<h1 id="-return-string-">@return [String]</h1><p>#</p><h1 id="-returns-a-promise">&gt;&gt;&gt; RETURNS A PROMISE</h1>
+
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getDataFieldFormatted-static'>
+      .
+(void)
+<b>getDataFieldFormatted</b><span>(tableName, keyValue, fieldName)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+</div>
+      <h2>Constructor Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='constructor-dynamic'>
+      #
+(void)
+<b>constructor</b><span>(dataSetName)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="constructor">constructor</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+</div>
+      <h2>Instance Method Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='editValue-dynamic'>
+      #
+(void)
+<b>editValue</b><span>(path, el)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="initiate-the-edit-of-the-data-using-editor-defined-in-the-data-type">initiate the edit of the data using editor defined in the data type</h1><p>#</p><h1 id="-param-string-path-indicating-the-location-of-the-data-beign-edited">@param [String] path indicating the location of the data beign edited</h1>
+<h1 id="-param-jqueryelement-el-element-in-which-to-open-editor">@param [JqueryElement] el element in which to open editor</h1>
+<h1 id="-return-boolean-">@return [Boolean]</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='updateScreenPathValue-dynamic'>
+      #
+(void)
+<b>updateScreenPathValue</b><span>(path, newValue, didDataChange)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="update-the-occurence-of-the-path-value-with-the-updated-value-on-currently-rendered-screen">update the occurence of the path value with the updated value on currently rendered screen</h1><p>#</p><h1 id="-param-string-path-indicating-the-location-of-the-data-to-be-updated">@param [String] path indicating the location of the data to be updated</h1>
+<h1 id="-param-object-newvalue-new-value-to-be-set-instead-of-old-data">@param [Object] newValue new value to be set instead of old data</h1>
+<h1 id="-param-boolean-diddatachange-if-data-is-different-from-the-previous-value">@param [Boolean] didDataChange if data is different from the previous value</h1>
+<h1 id="-return-boolean-">@return [Boolean]</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='updatePathValueEvent-dynamic'>
+      #
+(void)
+<b>updatePathValueEvent</b><span>(path, newValue)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="works-as-the-event-triggered-at-the-update-of-the-value">works as the event triggered at the update of the value</h1><p>#</p><h1 id="-param-string-path-indicating-the-location-of-the-data-to-be-updated">@param [String] path indicating the location of the data to be updated</h1>
+<h1 id="-param-object-newvalue-new-value-to-be-set-instead-of-old-data">@param [Object] newValue new value to be set instead of old data</h1>
+<h1 id="-event-updatepathvalueevent">@event updatePathValueEvent</h1>
+<h1 id="-return-boolean-">@return [Boolean]</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setDataTypesFromSingleObject-dynamic'>
+      #
+(void)
+<b>setDataTypesFromSingleObject</b><span>(tableName, newData)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+</div>
+    </div>
+    <div id='footer'>
+  By
+  <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
+    Codo
+  </a>
+  2.1.2
+  &#10034;
+  Press H to see the keyboard shortcuts
+  &#10034;
+  <a href='http://twitter.com/netzpirat' target='_parent'>@netzpirat</a>
+  &#10034;
+  <a href='http://twitter.com/_inossidabile' target='_parent'>@_inossidabile</a>
+</div>
+<iframe id='search_frame'></iframe>
+<div id='fuzzySearch'>
+  <input type='text'>
+  <ol></ol>
+</div>
+<div id='help'>
+  <p>
+    Quickly fuzzy find classes, mixins, methods, file:
+  </p>
+  <ul>
+    <li>
+      <span>T</span>
+      Open fuzzy finder dialog
+    </li>
+  </ul>
+  <p>
+    Control the navigation frame:
+  </p>
+  <ul>
+    <li>
+      <span>L</span>
+      Toggle list view
+    </li>
+    <li>
+      <span>C</span>
+      Show class list
+    </li>
+    <li>
+      <span>I</span>
+      Show mixin list
+    </li>
+    <li>
+      <span>F</span>
+      Show file list
+    </li>
+    <li>
+      <span>M</span>
+      Show method list
+    </li>
+    <li>
+      <span>E</span>
+      Show extras list
+    </li>
+  </ul>
+  <p>
+    You can focus and blur the search input:
+  </p>
+  <ul>
+    <li>
+      <span>S</span>
+      Focus search input
+    </li>
+    <li>
+      <span>Esc</span>
+      Blur search input
+    </li>
+  </ul>
+</div>
+  </body>
+</html>

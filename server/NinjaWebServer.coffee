@@ -440,6 +440,7 @@ class NinjaWebServer
         staticPathMiddleware @app, ["../ninja/images/", "../test/images/" ], "/images"
         staticPathMiddleware @app, ["../ninja/vendor/", "../test/vendor/" ], "/vendor"
         staticPathMiddleware @app, "../../CoffeeNinjaCommon/ninja/", "/ninja"
+        staticPathMiddleware @app, ["../doc/",  "../doc/" ], "/doc"
 
         @dynamicJavascript()
         @setupStatic()
