@@ -39,6 +39,14 @@
           </td>
         </tr>
       </table>
+      <h2>Overview</h2>
+      <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="class-tableviewdetailed-widget-to-display-the-table-in-vertical-manner-it-mostly-used-to-display-single-row">class TableViewDetailed widget to display the table in vertical manner it mostly used to display single row</h1>
+<h1 id="including-all-data-for-the-single-row">including all data for the single row</h1><p>#</p><h1 id="-extends-tableview-">@extends [TableView]</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
       <h2>Variables Summary</h2>
       <dl class='constants'>
   <dt id='leftWidth-variable'>
@@ -46,7 +54,15 @@
     =
   </dt>
   <dd>
-    <pre><code class='coffeescript'>140</code></pre>
+    <pre><code class='coffeescript'>100</code></pre>
+    
+  </dd>
+  <dt id='dataWidth-variable'>
+    dataWidth
+    =
+  </dt>
+  <dd>
+    <pre><code class='coffeescript'>120</code></pre>
     
   </dd>
 </dl>
@@ -55,6 +71,8 @@
         <a href='../class/TableView.html'>TableView</a>
       </h3>
       <p class='inherited'>
+        <a href='../class/TableView.html#SORT_ASC-variable'>SORT_ASC</a>
+        <a href='../class/TableView.html#SORT_NONE-variable'>SORT_NONE</a>
         <a href='../class/TableView.html#imgChecked-variable'>imgChecked</a>
         <a href='../class/TableView.html#imgNotChecked-variable'>imgNotChecked</a>
       </p>
@@ -62,10 +80,253 @@
       <ul class='summary'>
   <li>
     <span class='signature'>
-      <a href='#realRender-dynamic'>
+      <a href='#getTableTotalRows-dynamic'>
         #
 (void)
-<b>realRender</b><span>()</span>
+<b>getTableTotalRows</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getTableTotalCols-dynamic'>
+        #
+(void)
+<b>getTableTotalCols</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getTableVisibleCols-dynamic'>
+        #
+(void)
+<b>getTableVisibleCols</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Number of visible columns
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getColWidth-dynamic'>
+        #
+(void)
+<b>getColWidth</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getCellStriped-dynamic'>
+        #
+(void)
+<b>getCellStriped</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getCellEditable-dynamic'>
+        #
+(void)
+<b>getCellEditable</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Return true if a cell is editable
+#|
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getCellAlign-dynamic'>
+        #
+(void)
+<b>getCellAlign</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Return right/left/center - left is assumed by default
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getCellTablename-dynamic'>
+        #
+(void)
+<b>getCellTablename</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getCellSource-dynamic'>
+        #
+(void)
+<b>getCellSource</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getCellRecordID-dynamic'>
+        #
+(void)
+<b>getCellRecordID</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getCellFormatterName-dynamic'>
+        #
+(void)
+<b>getCellFormatterName</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#shouldSkipRow-dynamic'>
+        #
+(void)
+<b>shouldSkipRow</b><span>(rowNum)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#shouldSkipCol-dynamic'>
+        #
+(void)
+<b>shouldSkipCol</b><span>(colNum)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#isHeaderCell-dynamic'>
+        #
+(void)
+<b>isHeaderCell</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#shouldAdvanceCol-dynamic'>
+        #
+(void)
+<b>shouldAdvanceCol</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getRowType-dynamic'>
+        #
+(void)
+<b>getRowType</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Returns a state record for the current row
+#|  data - Cells of data
+#|  locked - Cells of header or locked content
+#|  group - Starting a new group
+#|  skip - Skip this row
+#|  invalid - Invalid row
+#|
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setHeaderField-dynamic'>
+        #
+(void)
+<b>setHeaderField</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getCellSelected-dynamic'>
+        #
+(void)
+<b>getCellSelected</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getCellType-dynamic'>
+        #
+(void)
+<b>getCellType</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setDataField-dynamic'>
+        #
+(void)
+<b>setDataField</b><span>(location)</span>
       </a>
     </span>
     <span class='bound note title'>Bound</span>
@@ -80,47 +341,355 @@
           <a href='../class/TableView.html'>TableView</a>
         </h3>
         <p class='inherited'>
-          <a href='../class/TableView.html#onSetCheckbox-dynamic'>#onSetCheckbox</a>
-          <a href='../class/TableView.html#size-dynamic'>#size</a>
-          <a href='../class/TableView.html#numberChecked-dynamic'>#numberChecked</a>
-          <a href='../class/TableView.html#addJoinTable-dynamic'>#addJoinTable</a>
-          <a href='../class/TableView.html#addTable-dynamic'>#addTable</a>
-          <a href='../class/TableView.html#addInlineSortingSupport-dynamic'>#addInlineSortingSupport</a>
           <a href='../class/TableView.html#defaultRowClick-dynamic'>#defaultRowClick</a>
-          <a href='../class/TableView.html#resetChecked-dynamic'>#resetChecked</a>
-          <a href='../class/TableView.html#renderCheckable-dynamic'>#renderCheckable</a>
-          <a href='../class/TableView.html#setupEvents-dynamic'>#setupEvents</a>
-          <a href='../class/TableView.html#internalSetupMouseEvents-dynamic'>#internalSetupMouseEvents</a>
-          <a href='../class/TableView.html#setupContextMenu-dynamic'>#setupContextMenu</a>
-          <a href='../class/TableView.html#setupContextMenuHeader-dynamic'>#setupContextMenuHeader</a>
-          <a href='../class/TableView.html#setTableCacheName-dynamic'>#setTableCacheName</a>
-          <a href='../class/TableView.html#applySorting-dynamic'>#applySorting</a>
-          <a href='../class/TableView.html#onContextMenuHeader-dynamic'>#onContextMenuHeader</a>
+          <a href='../class/TableView.html#onSetCheckbox-dynamic'>#onSetCheckbox</a>
           <a href='../class/TableView.html#onConfigureColumns-dynamic'>#onConfigureColumns</a>
-          <a href='../class/TableView.html#filterFunction-dynamic'>#filterFunction</a>
-          <a href='../class/TableView.html#updateRowData-dynamic'>#updateRowData</a>
-          <a href='../class/TableView.html#fixedHeaderAndScrollable-dynamic'>#fixedHeaderAndScrollable</a>
-          <a href='../class/TableView.html#render-dynamic'>#render</a>
-          <a href='../class/TableView.html#renderRow-dynamic'>#renderRow</a>
-          <a href='../class/TableView.html#sortByColumn-dynamic'>#sortByColumn</a>
-          <a href='../class/TableView.html#bindInlineSortingEvents-dynamic'>#bindInlineSortingEvents</a>
-          <a href='../class/TableView.html#filterKeypress-dynamic'>#filterKeypress</a>
+          <a href='../class/TableView.html#numberChecked-dynamic'>#numberChecked</a>
+          <a href='../class/TableView.html#addTable-dynamic'>#addTable</a>
+          <a href='../class/TableView.html#findColumn-dynamic'>#findColumn</a>
+          <a href='../class/TableView.html#moveActionColumn-dynamic'>#moveActionColumn</a>
+          <a href='../class/TableView.html#addActionColumn-dynamic'>#addActionColumn</a>
+          <a href='../class/TableView.html#setTableCacheName-dynamic'>#setTableCacheName</a>
+          <a href='../class/TableView.html#setSimpleAndFixed-dynamic'>#setSimpleAndFixed</a>
+          <a href='../class/TableView.html#setFixedSize-dynamic'>#setFixedSize</a>
+          <a href='../class/TableView.html#setFixedHeaderAndScrollable-dynamic'>#setFixedHeaderAndScrollable</a>
+          <a href='../class/TableView.html#onClickSimpleObject-dynamic'>#onClickSimpleObject</a>
+          <a href='../class/TableView.html#openSimpleObject-dynamic'>#openSimpleObject</a>
+          <a href='../class/TableView.html#resetChecked-dynamic'>#resetChecked</a>
+          <a href='../class/TableView.html#getRowSelected-dynamic'>#getRowSelected</a>
+          <a href='../class/TableView.html#getRowLocked-dynamic'>#getRowLocked</a>
+          <a href='../class/TableView.html#toggleRowSelected-dynamic'>#toggleRowSelected</a>
+          <a href='../class/TableView.html#scrollUp-dynamic'>#scrollUp</a>
+          <a href='../class/TableView.html#scrollRight-dynamic'>#scrollRight</a>
+          <a href='../class/TableView.html#onGlobalNewData-dynamic'>#onGlobalNewData</a>
+          <a href='../class/TableView.html#onGlobalTableChange-dynamic'>#onGlobalTableChange</a>
+          <a href='../class/TableView.html#onGlobalDataChange-dynamic'>#onGlobalDataChange</a>
+          <a href='../class/TableView.html#onGlobalMouseDown-dynamic'>#onGlobalMouseDown</a>
+          <a href='../class/TableView.html#setColumnFilterAsPopup-dynamic'>#setColumnFilterAsPopup</a>
+          <a href='../class/TableView.html#pressEnter-dynamic'>#pressEnter</a>
+          <a href='../class/TableView.html#onColumnResizeDrag-dynamic'>#onColumnResizeDrag</a>
+          <a href='../class/TableView.html#onColumnResizeFinished-dynamic'>#onColumnResizeFinished</a>
+          <a href='../class/TableView.html#onMouseHover-dynamic'>#onMouseHover</a>
+          <a href='../class/TableView.html#onMouseOut-dynamic'>#onMouseOut</a>
+          <a href='../class/TableView.html#onMouseMove-dynamic'>#onMouseMove</a>
+          <a href='../class/TableView.html#internalSetupMouseEvents-dynamic'>#internalSetupMouseEvents</a>
+          <a href='../class/TableView.html#onCopyToClipboard-dynamic'>#onCopyToClipboard</a>
+          <a href='../class/TableView.html#onContextMenuData-dynamic'>#onContextMenuData</a>
+          <a href='../class/TableView.html#onContextMenuGroup-dynamic'>#onContextMenuGroup</a>
+          <a href='../class/TableView.html#onResize-dynamic'>#onResize</a>
+          <a href='../class/TableView.html#onRenameField-dynamic'>#onRenameField</a>
+          <a href='../class/TableView.html#contextMenuChangeType-dynamic'>#contextMenuChangeType</a>
+          <a href='../class/TableView.html#onRearrange-dynamic'>#onRearrange</a>
+          <a href='../class/TableView.html#onContextMenuHeader-dynamic'>#onContextMenuHeader</a>
+          <a href='../class/TableView.html#setupContextMenu-dynamic'>#setupContextMenu</a>
+          <a href='../class/TableView.html#addSortRule-dynamic'>#addSortRule</a>
+          <a href='../class/TableView.html#addLock-dynamic'>#addLock</a>
+          <a href='../class/TableView.html#applySorting-dynamic'>#applySorting</a>
           <a href='../class/TableView.html#applyFilters-dynamic'>#applyFilters</a>
+          <a href='../class/TableView.html#updateFullHeight-dynamic'>#updateFullHeight</a>
+          <a href='../class/TableView.html#updateColumnList-dynamic'>#updateColumnList</a>
+          <a href='../class/TableView.html#updateRowData-dynamic'>#updateRowData</a>
+          <a href='../class/TableView.html#setStatusBarEnabled-dynamic'>#setStatusBarEnabled</a>
+          <a href='../class/TableView.html#isVisible-dynamic'>#isVisible</a>
+          <a href='../class/TableView.html#setHolderToBottom-dynamic'>#setHolderToBottom</a>
+          <a href='../class/TableView.html#updateFixedPosition-dynamic'>#updateFixedPosition</a>
+          <a href='../class/TableView.html#allowCustomize-dynamic'>#allowCustomize</a>
+          <a href='../class/TableView.html#getTotalActionWidth-dynamic'>#getTotalActionWidth</a>
+          <a href='../class/TableView.html#getTableTotalRows-dynamic'>#getTableTotalRows</a>
+          <a href='../class/TableView.html#getTableTotalCols-dynamic'>#getTableTotalCols</a>
+          <a href='../class/TableView.html#getTableVisibleWidth-dynamic'>#getTableVisibleWidth</a>
+          <a href='../class/TableView.html#getTableVisibleHeight-dynamic'>#getTableVisibleHeight</a>
+          <a href='../class/TableView.html#getTableMaxVisibleRows-dynamic'>#getTableMaxVisibleRows</a>
+          <a href='../class/TableView.html#getTableVisibleRows-dynamic'>#getTableVisibleRows</a>
+          <a href='../class/TableView.html#getTableMaxVisibleCols-dynamic'>#getTableMaxVisibleCols</a>
+          <a href='../class/TableView.html#getTableVisibleCols-dynamic'>#getTableVisibleCols</a>
+          <a href='../class/TableView.html#getColWidth-dynamic'>#getColWidth</a>
+          <a href='../class/TableView.html#getRowHeight-dynamic'>#getRowHeight</a>
+          <a href='../class/TableView.html#getCellEditable-dynamic'>#getCellEditable</a>
+          <a href='../class/TableView.html#getCellClickable-dynamic'>#getCellClickable</a>
+          <a href='../class/TableView.html#getCellStriped-dynamic'>#getCellStriped</a>
+          <a href='../class/TableView.html#getCellGroupNumber-dynamic'>#getCellGroupNumber</a>
+          <a href='../class/TableView.html#getCellAlign-dynamic'>#getCellAlign</a>
+          <a href='../class/TableView.html#getCellTablename-dynamic'>#getCellTablename</a>
+          <a href='../class/TableView.html#getCellCalculation-dynamic'>#getCellCalculation</a>
+          <a href='../class/TableView.html#getCellSource-dynamic'>#getCellSource</a>
+          <a href='../class/TableView.html#getCellRecordID-dynamic'>#getCellRecordID</a>
+          <a href='../class/TableView.html#getCellFormatterName-dynamic'>#getCellFormatterName</a>
+          <a href='../class/TableView.html#shouldAdvanceCol-dynamic'>#shouldAdvanceCol</a>
+          <a href='../class/TableView.html#getCellDataPath-dynamic'>#getCellDataPath</a>
+          <a href='../class/TableView.html#setHeaderFilterField-dynamic'>#setHeaderFilterField</a>
+          <a href='../class/TableView.html#setHeaderField-dynamic'>#setHeaderField</a>
+          <a href='../class/TableView.html#setHeaderGroupField-dynamic'>#setHeaderGroupField</a>
+          <a href='../class/TableView.html#setDataField-dynamic'>#setDataField</a>
+          <a href='../class/TableView.html#shouldSkipCol-dynamic'>#shouldSkipCol</a>
+          <a href='../class/TableView.html#getRowType-dynamic'>#getRowType</a>
+          <a href='../class/TableView.html#getCellType-dynamic'>#getCellType</a>
+          <a href='../class/TableView.html#isHeaderCell-dynamic'>#isHeaderCell</a>
+          <a href='../class/TableView.html#isResizable-dynamic'>#isResizable</a>
+          <a href='../class/TableView.html#initializeSpacerCell-dynamic'>#initializeSpacerCell</a>
+          <a href='../class/TableView.html#updateCellClasses-dynamic'>#updateCellClasses</a>
+          <a href='../class/TableView.html#incrementColumn-dynamic'>#incrementColumn</a>
+          <a href='../class/TableView.html#updateVisibleActionRowText-dynamic'>#updateVisibleActionRowText</a>
+          <a href='../class/TableView.html#updateVisibleActionRow-dynamic'>#updateVisibleActionRow</a>
+          <a href='../class/TableView.html#updateVisibleTextRow-dynamic'>#updateVisibleTextRow</a>
+          <a href='../class/TableView.html#updateVisibleText-dynamic'>#updateVisibleText</a>
+          <a href='../class/TableView.html#resetCachedFromScroll-dynamic'>#resetCachedFromScroll</a>
+          <a href='../class/TableView.html#resetCachedFromSize-dynamic'>#resetCachedFromSize</a>
+          <a href='../class/TableView.html#updateScrollbarSettings-dynamic'>#updateScrollbarSettings</a>
+          <a href='../class/TableView.html#isColumnEmpty-dynamic'>#isColumnEmpty</a>
+          <a href='../class/TableView.html#findBestFit-dynamic'>#findBestFit</a>
+          <a href='../class/TableView.html#setAutoFillWidth-dynamic'>#setAutoFillWidth</a>
+          <a href='../class/TableView.html#layoutShadow-dynamic'>#layoutShadow</a>
+          <a href='../class/TableView.html#updateStatusText-dynamic'>#updateStatusText</a>
+          <a href='../class/TableView.html#render-dynamic'>#render</a>
+          <a href='../class/TableView.html#real_render-dynamic'>#real_render</a>
+          <a href='../class/TableView.html#sortByColumn-dynamic'>#sortByColumn</a>
+          <a href='../class/TableView.html#groupBy-dynamic'>#groupBy</a>
+          <a href='../class/TableView.html#onFilterKeypress-dynamic'>#onFilterKeypress</a>
           <a href='../class/TableView.html#addMessageRow-dynamic'>#addMessageRow</a>
           <a href='../class/TableView.html#clear-dynamic'>#clear</a>
           <a href='../class/TableView.html#reset-dynamic'>#reset</a>
-          <a href='../class/TableView.html#setFilterFunction-dynamic'>#setFilterFunction</a>
-          <a href='../class/TableView.html#findRowFromElement-dynamic'>#findRowFromElement</a>
-          <a href='../class/TableView.html#setAutoHideColumn-dynamic'>#setAutoHideColumn</a>
+          <a href='../class/TableView.html#onAddedEvent-dynamic'>#onAddedEvent</a>
+          <a href='../class/TableView.html#moveCellRight-dynamic'>#moveCellRight</a>
+          <a href='../class/TableView.html#moveCellLeft-dynamic'>#moveCellLeft</a>
+          <a href='../class/TableView.html#moveCellUp-dynamic'>#moveCellUp</a>
+          <a href='../class/TableView.html#moveCellDown-dynamic'>#moveCellDown</a>
+          <a href='../class/TableView.html#setFocusFirstCell-dynamic'>#setFocusFirstCell</a>
+          <a href='../class/TableView.html#onActionCopyCell-dynamic'>#onActionCopyCell</a>
+          <a href='../class/TableView.html#setFocusCell-dynamic'>#setFocusCell</a>
+          <a href='../class/TableView.html#findPathVisible-dynamic'>#findPathVisible</a>
+          <a href='../class/TableView.html#show-dynamic'>#show</a>
+          <a href='../class/TableView.html#hide-dynamic'>#hide</a>
+          <a href='../class/TableView.html#destroy-dynamic'>#destroy</a>
+          <a href='../class/TableView.html#findColFromPath-dynamic'>#findColFromPath</a>
+          <a href='../class/TableView.html#findRowFromPath-dynamic'>#findRowFromPath</a>
         </p>
       </h2>
+      <h2>Constructor Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='constructor-dynamic'>
+      #
+(void)
+<b>constructor</b><span>(elTableHolder, showCheckboxes)</span>
+      <br>
+    </p>
+    
+  </div>
+</div>
       <h2>Instance Method Details</h2>
       <div class='methods'>
   <div class='method_details'>
-    <p class='signature' id='realRender-dynamic'>
+    <p class='signature' id='getTableTotalRows-dynamic'>
       #
 (void)
-<b>realRender</b><span>()</span>
+<b>getTableTotalRows</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getTableTotalCols-dynamic'>
+      #
+(void)
+<b>getTableTotalCols</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getTableVisibleCols-dynamic'>
+      #
+(void)
+<b>getTableVisibleCols</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Number of visible columns</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getColWidth-dynamic'>
+      #
+(void)
+<b>getColWidth</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getCellStriped-dynamic'>
+      #
+(void)
+<b>getCellStriped</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getCellEditable-dynamic'>
+      #
+(void)
+<b>getCellEditable</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Return true if a cell is editable</p><p>#|</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getCellAlign-dynamic'>
+      #
+(void)
+<b>getCellAlign</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Return right/left/center - left is assumed by default</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getCellTablename-dynamic'>
+      #
+(void)
+<b>getCellTablename</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getCellSource-dynamic'>
+      #
+(void)
+<b>getCellSource</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getCellRecordID-dynamic'>
+      #
+(void)
+<b>getCellRecordID</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getCellFormatterName-dynamic'>
+      #
+(void)
+<b>getCellFormatterName</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='shouldSkipRow-dynamic'>
+      #
+(void)
+<b>shouldSkipRow</b><span>(rowNum)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='shouldSkipCol-dynamic'>
+      #
+(void)
+<b>shouldSkipCol</b><span>(colNum)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='isHeaderCell-dynamic'>
+      #
+(void)
+<b>isHeaderCell</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='shouldAdvanceCol-dynamic'>
+      #
+(void)
+<b>shouldAdvanceCol</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getRowType-dynamic'>
+      #
+(void)
+<b>getRowType</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Returns a state record for the current row</p><p>#|  data - Cells of data</p><p>#|  locked - Cells of header or locked content</p><p>#|  group - Starting a new group</p><p>#|  skip - Skip this row</p><p>#|  invalid - Invalid row</p><p>#|</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setHeaderField-dynamic'>
+      #
+(void)
+<b>setHeaderField</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getCellSelected-dynamic'>
+      #
+(void)
+<b>getCellSelected</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getCellType-dynamic'>
+      #
+(void)
+<b>getCellType</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setDataField-dynamic'>
+      #
+(void)
+<b>setDataField</b><span>(location)</span>
       <span class='bound note'>Bound</span>
       <br>
     </p>
@@ -133,7 +702,7 @@
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>
-  2.1.0
+  2.1.2
   &#10034;
   Press H to see the keyboard shortcuts
   &#10034;

@@ -35,43 +35,67 @@
         <tr>
           <td>Inherits:</td>
           <td>
-            ModalDialog
+            <a href='../class/ModalDialog.html'>ModalDialog</a>
           </td>
         </tr>
       </table>
       <h2>Overview</h2>
       <div class='docstring'>
-  <p>#| class to get PopupForm</p>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="class-to-handle-form-in-the-popup">class to handle form in the popup</h1><p>#</p><h1 id="-extends-modaldialog-">@extends [ModalDialog]</h1><p>#</p>
 </div>
 <div class='tags'>
 </div>
-      <h2>Variables Summary</h2>
-      <dl class='constants'>
-  <dt id='showOnCreate-variable'>
-    showOnCreate
-    =
-  </dt>
-  <dd>
-    <pre><code class='coffeescript'>false</code></pre>
-    
-  </dd>
-  <dt id='content-variable'>
-    content
-    =
-  </dt>
-  <dd>
-    <pre><code class='coffeescript'>&quot;&quot;</code></pre>
-    
-  </dd>
-  <dt id='close-variable'>
-    close
-    =
-  </dt>
-  <dd>
-    <pre><code class='coffeescript'>&quot;Cancel&quot;</code></pre>
-    
-  </dd>
-</dl>
+      <h2>Property Summary</h2>
+      <dl class='properties'>
+        <dt id='showOnCreate-property'>
+          <span class='signature'>
+            (Boolean)
+            <b>
+              showOnCreate
+            </b>
+          </span>
+        </dt>
+        <dd class='desc'>
+          showOnCreate if to show automatically 
+        </dd>
+        <dt id='content-property'>
+          <span class='signature'>
+            (String)
+            <b>
+              content
+            </b>
+          </span>
+        </dt>
+        <dd class='desc'>
+          content the html of the current form 
+        </dd>
+        <dt id='close-property'>
+          <span class='signature'>
+            (String)
+            <b>
+              close
+            </b>
+          </span>
+        </dt>
+        <dd class='desc'>
+          close the content of the close button 
+        </dd>
+      </dl>
+      <h3 class='inherited'>
+        Properties inherited from
+        <a href='../class/ModalDialog.html'>ModalDialog</a>
+      </h3>
+      <p class='inherited'>
+        <a href='../class/ModalDialog.html#content-property'>content</a>
+        <a href='../class/ModalDialog.html#title-property'>title</a>
+        <a href='../class/ModalDialog.html#ok-property'>ok</a>
+        <a href='../class/ModalDialog.html#close-property'>close</a>
+        <a href='../class/ModalDialog.html#showFooter-property'>showFooter</a>
+        <a href='../class/ModalDialog.html#showOnCreate-property'>showOnCreate</a>
+        <a href='../class/ModalDialog.html#position-property'>position</a>
+        <a href='../class/ModalDialog.html#formWrapper-property'>formWrapper</a>
+      </p>
       <h2>Instance Method Summary</h2>
       <ul class='summary'>
   <li>
@@ -83,6 +107,10 @@
       </a>
     </span>
     <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- function to create input fields
+#
+#
+
     </span>
   </li>
   <li>
@@ -94,9 +122,32 @@
       </a>
     </span>
     <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- function to be executed on the click of button2
+#
+@param [Event] e the event object
+@param [Object] form the values filled in the input as object
+@event onButton2
+#
+
     </span>
   </li>
 </ul>
+      <h2>
+        <small>Inherited Method Summary</small>
+        <h3 class='inherited'>
+          Methods inherited from
+          <a href='../class/ModalDialog.html'>ModalDialog</a>
+        </h3>
+        <p class='inherited'>
+          <a href='../class/ModalDialog.html#makeFormDialog-dynamic'>#makeFormDialog</a>
+          <a href='../class/ModalDialog.html#getForm-dynamic'>#getForm</a>
+          <a href='../class/ModalDialog.html#onClose-dynamic'>#onClose</a>
+          <a href='../class/ModalDialog.html#onButton1-dynamic'>#onButton1</a>
+          <a href='../class/ModalDialog.html#onButton2-dynamic'>#onButton2</a>
+          <a href='../class/ModalDialog.html#hide-dynamic'>#hide</a>
+          <a href='../class/ModalDialog.html#show-dynamic'>#show</a>
+        </p>
+      </h2>
       <h2>Constructor Details</h2>
       <div class='methods'>
   <div class='method_details'>
@@ -106,7 +157,16 @@
 <b>constructor</b><span>(tableName, keyElement, key, columns, defaults)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="constructor-to-create-new-popupform">constructor to create new popupform</h1><p>#</p><h1 id="-param-string-tablename-name-of-the-table-for-which-form-is-used">@param [String] tableName name of the table for which form is used</h1>
+<h1 id="-param-string-keyelement-name-of-the-key-property-used-to-track-single-row-in-the-table">@param [String] keyElement name of the key property used to track single row in the table</h1>
+<h1 id="-param-string-key-current-key-value-which-is-being-edited">@param [String] key current key value which is being edited</h1>
+<h1 id="-param-array-columns-the-array-of-the-columns-which-should-be-included-in-the-form">@param [Array] columns the array of the columns which should be included in the form</h1>
+<h1 id="-param-object-defualts-the-default-values-for-each-column-in-the-input">@param [Object] defualts the default values for each column in the input</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
   </div>
 </div>
       <h2>Instance Method Details</h2>
@@ -118,7 +178,13 @@
 <b>createInputFields</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="function-to-create-input-fields">function to create input fields</h1><p>#
+#</p>
+</div>
+<div class='tags'>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='onButton2-dynamic'>
@@ -127,7 +193,14 @@
 <b>onButton2</b><span>(e, form)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="function-to-be-executed-on-the-click-of-button2">function to be executed on the click of button2</h1><p>#</p><h1 id="-param-event-e-the-event-object">@param [Event] e the event object</h1>
+<h1 id="-param-object-form-the-values-filled-in-the-input-as-object">@param [Object] form the values filled in the input as object</h1>
+<h1 id="-event-onbutton2">@event onButton2</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
   </div>
 </div>
     </div>
@@ -136,7 +209,7 @@
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>
-  2.1.0
+  2.1.2
   &#10034;
   Press H to see the keyboard shortcuts
   &#10034;

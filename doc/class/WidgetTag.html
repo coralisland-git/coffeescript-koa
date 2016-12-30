@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset='UTF-8'>
+  <title>CoffeeScript API Documentation</title>
+  <script src='../javascript/application.js'></script>
+  <script src='../javascript/search.js'></script>
+  <link rel='stylesheet' href='../stylesheets/application.css' type='text/css'>
+</head>
+  <body>
+    <div id='base' data-path='../'></div>
+<div id='header'>
+  <div id='menu'>
+    <a href='../extra/README.md.html' title='NinjaCommon'>
+      NinjaCommon
+    </a>
+    &raquo;
+    <a href='../alphabetical_index.html' title='Index'>
+      Index
+    </a>
+    &raquo;
+    <span class='title'>WidgetTag</span>
+  </div>
+</div>
+    <div id='content'>
+      <h1>
+        Class:
+        WidgetTag
+      </h1>
+      <table class='box'>
+        <tr>
+          <td>Defined in:</td>
+          <td>src\WidgetBase.coffee</td>
+        </tr>
+      </table>
+      <h2>Direct Known Subclasses</h2>
+      <p class='children'>
+        <a href='../class/WidgetBase.html'>WidgetBase</a>
+      </p>
+      <h2>Class Method Summary</h2>
+      <ul class='summary'>
+  <li>
+    <span class='signature'>
+      <a href='#getDataFromEvent-static'>
+        .
+(void)
+<b>getDataFromEvent</b><span>(e)</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+</ul>
+      <h2>Instance Method Summary</h2>
+      <ul class='summary'>
+  <li>
+    <span class='signature'>
+      <a href='#add-dynamic'>
+        #
+(void)
+<b>add</b><span>(tagName, classes, id, attributes)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Adds a new child tag under this one of a given type
+#|  with a default class, id, and attributes
+#|
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#addDiv-dynamic'>
+        #
+(void)
+<b>addDiv</b><span>(classes, id, attributes)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Shortcut to add a div
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#resetDataValues-dynamic'>
+        #
+(void)
+<b>resetDataValues</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setDataPath-dynamic'>
+        #
+(void)
+<b>setDataPath</b><span>(keyVal)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Shortcut to setting a data value for the path
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setDataValue-dynamic'>
+        #
+(void)
+<b>setDataValue</b><span>(name, value)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Set the &quot;data-&quot; values within the element, cache
+#|  then and only update the DOM if there is a change
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getDataValue-dynamic'>
+        #
+(void)
+<b>getDataValue</b><span>(name)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Use the cache to get any elements
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setZ-dynamic'>
+        #
+(void)
+<b>setZ</b><span>(newZIndex = &quot;auto&quot;)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Give the element a new zindex value
+#|  Can be any of number, auto, initial, inherit
+#|  see <a href="http://www.w3schools.com/jsref/prop_style_zindex.asp">http://www.w3schools.com/jsref/prop_style_zindex.asp</a>
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getZ-dynamic'>
+        #
+(void)
+<b>getZ</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setAbsolute-dynamic'>
+        #
+(void)
+<b>setAbsolute</b><span>(newIsAbsolute = true)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Add the &quot;absolute&quot; style to an element
+#|  you can also specify something else such as inline, relative, etc
+#|
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setAttribute-dynamic'>
+        #
+(void)
+<b>setAttribute</b><span>(keyName, keyVal)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Set an attribute
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setClass-dynamic'>
+        #
+(void)
+<b>setClass</b><span>(className, enabled)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Toggle a CSS class either on off as needed
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setClassOne-dynamic'>
+        #
+(void)
+<b>setClassOne</b><span>(validClass, patternForGroup)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Make sure only one of a given type of class is enabled
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#resetClasses-dynamic'>
+        #
+(void)
+<b>resetClasses</b><span>(newListText)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#addClass-dynamic'>
+        #
+(void)
+<b>addClass</b><span>(className)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Add an enable a class name
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#removeClass-dynamic'>
+        #
+(void)
+<b>removeClass</b><span>(className)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Remove a class
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#height-dynamic'>
+        #
+(void)
+<b>height</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#width-dynamic'>
+        #
+(void)
+<b>width</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#outerWidth-dynamic'>
+        #
+(void)
+<b>outerWidth</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#outerHeight-dynamic'>
+        #
+(void)
+<b>outerHeight</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#offset-dynamic'>
+        #
+(void)
+<b>offset</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#appendTo-dynamic'>
+        #
+(void)
+<b>appendTo</b><span>(jqueryElement)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Append this widget element to a jquery element
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#append-dynamic'>
+        #
+(void)
+<b>append</b><span>(html)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#onResize-dynamic'>
+        #
+(void)
+<b>onResize</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Call this function if the outside container changes size
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#text-dynamic'>
+        #
+(void)
+<b>text</b><span>(str)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|   Set the text value or get the text value if nothing passed in
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#html-dynamic'>
+        #
+(void)
+<b>html</b><span>(str)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Set or get the current html value
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#val-dynamic'>
+        #
+(void)
+<b>val</b><span>(str)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Get the value (for input style elements)
+#|
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#show-dynamic'>
+        #
+(void)
+<b>show</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#hide-dynamic'>
+        #
+(void)
+<b>hide</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#move-dynamic'>
+        #
+(void)
+<b>move</b><span>(x, y, w, h)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Reposition aboslute elements
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#position-dynamic'>
+        #
+(void)
+<b>position</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#find-dynamic'>
+        #
+(void)
+<b>find</b><span>(str)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#on-dynamic'>
+        #
+(void)
+<b>on</b><span>(eventName, callback)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#bind-dynamic'>
+        #
+(void)
+<b>bind</b><span>(eventName, callback)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Bind helper function, does a jQuery bind but first
+#|  sets the path and other data elements before calling
+#|  the target callback function.
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#destroy-dynamic'>
+        #
+(void)
+<b>destroy</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #|  Destroy an element, remove all children and destroy them. 
+    </span>
+  </li>
+</ul>
+      <h2>Class Method Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='getDataFromEvent-static'>
+      .
+(void)
+<b>getDataFromEvent</b><span>(e)</span>
+      <br>
+    </p>
+    
+  </div>
+</div>
+      <h2>Constructor Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='constructor-dynamic'>
+      #
+(void)
+<b>constructor</b><span>(tagName, classes, id, attributes)</span>
+      <br>
+    </p>
+    
+  </div>
+</div>
+      <h2>Instance Method Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='add-dynamic'>
+      #
+(void)
+<b>add</b><span>(tagName, classes, id, attributes)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Adds a new child tag under this one of a given type</p><p>#|  with a default class, id, and attributes</p><p>#|</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='addDiv-dynamic'>
+      #
+(void)
+<b>addDiv</b><span>(classes, id, attributes)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Shortcut to add a div</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='resetDataValues-dynamic'>
+      #
+(void)
+<b>resetDataValues</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setDataPath-dynamic'>
+      #
+(void)
+<b>setDataPath</b><span>(keyVal)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Shortcut to setting a data value for the path</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setDataValue-dynamic'>
+      #
+(void)
+<b>setDataValue</b><span>(name, value)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Set the &quot;data-&quot; values within the element, cache</p><p>#|  then and only update the DOM if there is a change</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getDataValue-dynamic'>
+      #
+(void)
+<b>getDataValue</b><span>(name)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Use the cache to get any elements</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setZ-dynamic'>
+      #
+(void)
+<b>setZ</b><span>(newZIndex = &quot;auto&quot;)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Give the element a new zindex value</p><p>#|  Can be any of number, auto, initial, inherit</p><p>#|  see <a href="http://www.w3schools.com/jsref/prop_style_zindex.asp">http://www.w3schools.com/jsref/prop_style_zindex.asp</a></p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getZ-dynamic'>
+      #
+(void)
+<b>getZ</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setAbsolute-dynamic'>
+      #
+(void)
+<b>setAbsolute</b><span>(newIsAbsolute = true)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Add the &quot;absolute&quot; style to an element</p><p>#|  you can also specify something else such as inline, relative, etc</p><p>#|</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setAttribute-dynamic'>
+      #
+(void)
+<b>setAttribute</b><span>(keyName, keyVal)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Set an attribute</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setClass-dynamic'>
+      #
+(void)
+<b>setClass</b><span>(className, enabled)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Toggle a CSS class either on off as needed</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setClassOne-dynamic'>
+      #
+(void)
+<b>setClassOne</b><span>(validClass, patternForGroup)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Make sure only one of a given type of class is enabled</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='resetClasses-dynamic'>
+      #
+(void)
+<b>resetClasses</b><span>(newListText)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='addClass-dynamic'>
+      #
+(void)
+<b>addClass</b><span>(className)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Add an enable a class name</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='removeClass-dynamic'>
+      #
+(void)
+<b>removeClass</b><span>(className)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Remove a class</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='height-dynamic'>
+      #
+(void)
+<b>height</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='width-dynamic'>
+      #
+(void)
+<b>width</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='outerWidth-dynamic'>
+      #
+(void)
+<b>outerWidth</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='outerHeight-dynamic'>
+      #
+(void)
+<b>outerHeight</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='offset-dynamic'>
+      #
+(void)
+<b>offset</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='appendTo-dynamic'>
+      #
+(void)
+<b>appendTo</b><span>(jqueryElement)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Append this widget element to a jquery element</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='append-dynamic'>
+      #
+(void)
+<b>append</b><span>(html)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='onResize-dynamic'>
+      #
+(void)
+<b>onResize</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Call this function if the outside container changes size</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='text-dynamic'>
+      #
+(void)
+<b>text</b><span>(str)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|   Set the text value or get the text value if nothing passed in</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='html-dynamic'>
+      #
+(void)
+<b>html</b><span>(str)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Set or get the current html value</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='val-dynamic'>
+      #
+(void)
+<b>val</b><span>(str)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Get the value (for input style elements)</p><p>#|</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='show-dynamic'>
+      #
+(void)
+<b>show</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='hide-dynamic'>
+      #
+(void)
+<b>hide</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='move-dynamic'>
+      #
+(void)
+<b>move</b><span>(x, y, w, h)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Reposition aboslute elements</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='position-dynamic'>
+      #
+(void)
+<b>position</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='find-dynamic'>
+      #
+(void)
+<b>find</b><span>(str)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='on-dynamic'>
+      #
+(void)
+<b>on</b><span>(eventName, callback)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='bind-dynamic'>
+      #
+(void)
+<b>bind</b><span>(eventName, callback)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Bind helper function, does a jQuery bind but first</p><p>#|  sets the path and other data elements before calling</p><p>#|  the target callback function.</p><p>#|</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='destroy-dynamic'>
+      #
+(void)
+<b>destroy</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|  Destroy an element, remove all children and destroy them.</p><p>#|  Remove global variables and cleanup the DOM after.</p><p>#|  Sends a resize message globally.</p><p>#|</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+</div>
+    </div>
+    <div id='footer'>
+  By
+  <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
+    Codo
+  </a>
+  2.1.2
+  &#10034;
+  Press H to see the keyboard shortcuts
+  &#10034;
+  <a href='http://twitter.com/netzpirat' target='_parent'>@netzpirat</a>
+  &#10034;
+  <a href='http://twitter.com/_inossidabile' target='_parent'>@_inossidabile</a>
+</div>
+<iframe id='search_frame'></iframe>
+<div id='fuzzySearch'>
+  <input type='text'>
+  <ol></ol>
+</div>
+<div id='help'>
+  <p>
+    Quickly fuzzy find classes, mixins, methods, file:
+  </p>
+  <ul>
+    <li>
+      <span>T</span>
+      Open fuzzy finder dialog
+    </li>
+  </ul>
+  <p>
+    Control the navigation frame:
+  </p>
+  <ul>
+    <li>
+      <span>L</span>
+      Toggle list view
+    </li>
+    <li>
+      <span>C</span>
+      Show class list
+    </li>
+    <li>
+      <span>I</span>
+      Show mixin list
+    </li>
+    <li>
+      <span>F</span>
+      Show file list
+    </li>
+    <li>
+      <span>M</span>
+      Show method list
+    </li>
+    <li>
+      <span>E</span>
+      Show extras list
+    </li>
+  </ul>
+  <p>
+    You can focus and blur the search input:
+  </p>
+  <ul>
+    <li>
+      <span>S</span>
+      Focus search input
+    </li>
+    <li>
+      <span>Esc</span>
+      Blur search input
+    </li>
+  </ul>
+</div>
+  </body>
+</html>

@@ -30,15 +30,25 @@
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>src\tableview\popup_form.coffee</td>
+          <td>src\tableview\popup_form_wrapper.coffee</td>
         </tr>
         <tr>
           <td>Inherits:</td>
           <td>
-            FormWrapper
+            <a href='../class/FormWrapper.html'>FormWrapper</a>
           </td>
         </tr>
       </table>
+      <h2>Overview</h2>
+      <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="popup-window-with-form-widget">Popup window with Form widget</h1>
+<h1 id="this-class-creates-a-popup-window-with-form-that-can-be-used-to-edit-table-row-">This class creates a popup window with form that can be used to edit table row.</h1><p>#</p><h1 id="-example">@example</h1>
+<h1 id="popup-new-popupform-tablename-keycolumnsource-key-columns-defaultvalues-">popup = new PopupForm(tableName, keyColumnSource, Key, columns, defaultValues)</h1>
+<h1 id="-extends-formwrapper-">@extends [FormWrapper]</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
       <h2>Instance Method Summary</h2>
       <ul class='summary'>
   <li>
@@ -51,10 +61,31 @@
     </span>
     <span class='bound note title'>Bound</span>
     <span class='desc'>
-      #| <p>#|  Generate HTML</p>
+      ------------------------------------------------------------------------------------------------------------- get the html of the current form in form of string
+#
+@return [String] content the html string of the current form
+#
+
     </span>
   </li>
 </ul>
+      <h2>
+        <small>Inherited Method Summary</small>
+        <h3 class='inherited'>
+          Methods inherited from
+          <a href='../class/FormWrapper.html'>FormWrapper</a>
+        </h3>
+        <p class='inherited'>
+          <a href='../class/FormWrapper.html#addTextInput-dynamic'>#addTextInput</a>
+          <a href='../class/FormWrapper.html#addTagsInput-dynamic'>#addTagsInput</a>
+          <a href='../class/FormWrapper.html#addMultiselect-dynamic'>#addMultiselect</a>
+          <a href='../class/FormWrapper.html#addInput-dynamic'>#addInput</a>
+          <a href='../class/FormWrapper.html#getHtml-dynamic'>#getHtml</a>
+          <a href='../class/FormWrapper.html#onSubmit-dynamic'>#onSubmit</a>
+          <a href='../class/FormWrapper.html#onSubmitAction-dynamic'>#onSubmitAction</a>
+          <a href='../class/FormWrapper.html#onAfterShow-dynamic'>#onAfterShow</a>
+        </p>
+      </h2>
       <h2>Constructor Details</h2>
       <div class='methods'>
   <div class='method_details'>
@@ -64,7 +95,12 @@
 <b>constructor</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="constructor">constructor</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
   </div>
 </div>
       <h2>Instance Method Details</h2>
@@ -78,7 +114,8 @@
       <br>
     </p>
     <div class='docstring'>
-  <p>#|</p><p>#|  Generate HTML</p>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="get-the-html-of-the-current-form-in-form-of-string">get the html of the current form in form of string</h1><p>#</p><h1 id="-return-string-content-the-html-string-of-the-current-form">@return [String] content the html string of the current form</h1><p>#</p>
 </div>
 <div class='tags'>
 </div>
@@ -90,7 +127,7 @@
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>
-  2.1.0
+  2.1.2
   &#10034;
   Press H to see the keyboard shortcuts
   &#10034;

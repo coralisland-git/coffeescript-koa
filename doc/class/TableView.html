@@ -33,21 +33,34 @@
           <td>src\tableview\tableview.coffee</td>
         </tr>
       </table>
-      <h2>Overview</h2>
-      <div class='docstring'>
-  <p>A Table manager class that is designed to quickly build scrollable tables
-    new TableView $(&#39;.tableHolder&#39;)</p>
-</div>
-<div class='tags'>
-</div>
+      <h2>Direct Known Subclasses</h2>
+      <p class='children'>
+        <a href='../class/TableViewDetailed.html'>TableViewDetailed</a>
+      </p>
       <h2>Variables Summary</h2>
       <dl class='constants'>
+  <dt id='SORT_ASC-variable'>
+    SORT_ASC
+    =
+  </dt>
+  <dd>
+    <pre><code class='coffeescript'>1</code></pre>
+    
+  </dd>
+  <dt id='SORT_NONE-variable'>
+    SORT_NONE
+    =
+  </dt>
+  <dd>
+    <pre><code class='coffeescript'>0</code></pre>
+    
+  </dd>
   <dt id='imgChecked-variable'>
     imgChecked
     =
   </dt>
   <dd>
-    <pre><code class='coffeescript'>&quot;&lt;img src=&#39;images&#47;checkbox.png&#39; width=&#39;16&#39; height=&#39;16&#39; alt=&#39;Selected&#39; &#47;&gt;&quot;</code></pre>
+    <pre><code class='coffeescript'>&quot;&lt;img src=&#39;&#47;images&#47;checkbox.png&#39; width=&#39;16&#39; height=&#39;16&#39; alt=&#39;Selected&#39; &#47;&gt;&quot;</code></pre>
     
   </dd>
   <dt id='imgNotChecked-variable'>
@@ -55,12 +68,32 @@
     =
   </dt>
   <dd>
-    <pre><code class='coffeescript'>&quot;&lt;img src=&#39;images&#47;checkbox_no.png&#39; width=&#39;16&#39; height=&#39;16&#39; alt=&#39;Selected&#39; &#47;&gt;&quot;</code></pre>
+    <pre><code class='coffeescript'>&quot;&lt;img src=&#39;&#47;images&#47;checkbox_no.png&#39; width=&#39;16&#39; height=&#39;16&#39; alt=&#39;Selected&#39; &#47;&gt;&quot;</code></pre>
     
   </dd>
 </dl>
       <h2>Instance Method Summary</h2>
       <ul class='summary'>
+  <li>
+    <span class='signature'>
+      <a href='#defaultRowClick-dynamic'>
+        #
+(void)
+<b>defaultRowClick</b><span>(row, e)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- to add the default table row click event
+#
+@param [Object] row the data of row in form object that is clicked
+@param [Event] the clicked jquery event object
+@event defaultRowClick
+@return [Boolean]
+#
+
+    </span>
+  </li>
   <li>
     <span class='signature'>
       <a href='#onSetCheckbox-dynamic'>
@@ -71,219 +104,12 @@
     </span>
     <span class='bound note title'>Bound</span>
     <span class='desc'>
-      $tableView.onSetCheckbox checkboxKey,value 
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#size-dynamic'>
-        #
-(Integer)
-<b>size</b><span>()</span>
-      </a>
-    </span>
-    <span class='bound note title'>Bound</span>
-    <span class='desc'>
-      tableView.size() 
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#numberChecked-dynamic'>
-        #
-(Integer)
-<b>numberChecked</b><span>()</span>
-      </a>
-    </span>
-    <span class='bound note title'>Bound</span>
-    <span class='desc'>
-      returns the number of rows checked     tableView.numberChecked()
+      ------------------------------------------------------------------------------------------------------------- function to execute when one of the checkbox is checked
+#
+@param [String] checkbox_key to identify the checkbox key
+@param [String] value to identify the checkbox
+#
 
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#addJoinTable-dynamic'>
-        #
-(?)
-<b>addJoinTable</b><span>(tableName, columnReduceFunction, sourceField)</span>
-      </a>
-    </span>
-    <span class='bound note title'>Bound</span>
-    <span class='desc'>
-      <p>to add the join table with current rendered table     table.addJoinTable &quot;county&quot;, null, &quot;county&quot;
-@param String tableName the table to add as join table from datamap
-@param Function|null columnReduceFunction function to filter the join table columns
-@param String sourceField column to find as common in both table</p>
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#addTable-dynamic'>
-        #
-(?)
-<b>addTable</b><span>(tableName, columnReduceFunction, reduceFunction)</span>
-      </a>
-    </span>
-    <span class='bound note title'>Bound</span>
-    <span class='desc'>
-      <p>to add the table in the view from datamap     tableView &quot;zipcode&quot;,null,null
-@param String tableName name of the table inside datamap
-@param Function|null columnReduceFunction function to filter the column
-@param Function|null reduceFunction function to filter the data</p>
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#addInlineSortingSupport-dynamic'>
-        #
-(void)
-<b>addInlineSortingSupport</b><span>()</span>
-      </a>
-    </span>
-    <span class='bound note title'>Bound</span>
-    <span class='desc'>
-      add support for inline sorting when clicking on the column header     tableView.addInlineSortingSupport()
-
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#defaultRowClick-dynamic'>
-        #
-(?)
-<b>defaultRowClick</b><span>(row, e)</span>
-      </a>
-    </span>
-    <span class='bound note title'>Bound</span>
-    <span class='desc'>
-      <p>to add the default table row click event     tableView.defaultRowClick = (rowData,eventObject) -&gt;
-@param Object row the data of row in form object that is clicked
-@param Object the object of click event</p>
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#resetChecked-dynamic'>
-        #
-(?)
-<b>resetChecked</b><span>(bookmarkArray)</span>
-      </a>
-    </span>
-    <span class='bound note title'>Bound</span>
-    <span class='desc'>
-      <p>Remove the checkbox for all items except those included in the bookmark array that comes from the server     tableView.resetChecked [1,2,3]
-@param Array bookmarkArray the array of key to consider as bookmark</p>
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#renderCheckable-dynamic'>
-        #
-(?)
-<b>renderCheckable</b><span>(obj)</span>
-      </a>
-    </span>
-    <span class='bound note title'>Bound</span>
-    <span class='desc'>
-      render the checkable row with checkbox as first column     tableView.renderCheckable dataRowObject
-
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#setupEvents-dynamic'>
-        #
-(void)
-<b>setupEvents</b><span>(rowCallback, rowMouseover)</span>
-      </a>
-    </span>
-    <span class='bound note title'>Bound</span>
-    <span class='desc'>
-      <p>set up events callback     tableView.setUpEvents (rowData,e)-&gt; , (rowData,eventType)-&gt;
-@param Function rowCallback callback to execute at the row click
-@param Function rowMouseOver callback to execute at the mouse over|out event</p>
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#internalSetupMouseEvents-dynamic'>
-        #
-(void)
-<b>internalSetupMouseEvents</b><span>()</span>
-      </a>
-    </span>
-    <span class='bound note title'>Bound</span>
-    <span class='desc'>
-      to setup event internally for the table 
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#setupContextMenu-dynamic'>
-        #
-(void)
-<b>setupContextMenu</b><span>(contextMenuCallbackFunction)</span>
-      </a>
-    </span>
-    <span class='bound note title'>Bound</span>
-    <span class='desc'>
-      <p>to add context menu with header column click     tableView.setupContextMenu (coordinates,data) -&gt;
-@param Function contextMenuCallbackFunction function to execute on the click of context menu item</p>
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#setupContextMenuHeader-dynamic'>
-        #
-(void)
-<b>setupContextMenuHeader</b><span>()</span>
-      </a>
-    </span>
-    <span class='bound note title'>Bound</span>
-    <span class='desc'>
-      Internal function called to setup the context menu on the header 
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#setTableCacheName-dynamic'>
-        #
-(void)
-<b>setTableCacheName</b><span>(tableCacheName)</span>
-      </a>
-    </span>
-    <span class='bound note title'>Bound</span>
-    <span class='desc'>
-      Table cache name is set, this allows saving/loading table configuration @param String tableCacheName the cache name to attach with table
-
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#applySorting-dynamic'>
-        #
-(void)
-<b>applySorting</b><span>(column, type = &#39;ASC&#39;)</span>
-      </a>
-    </span>
-    <span class='bound note title'>Bound</span>
-    <span class='desc'>
-      <p>internal function to apply sorting on table with column and sorting type @param Object column column on which sorting should be applied
-@param String type it can be ASC|DESC</p>
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#onContextMenuHeader-dynamic'>
-        #
-(void)
-<b>onContextMenuHeader</b><span>(coords, column)</span>
-      </a>
-    </span>
-    <span class='bound note title'>Bound</span>
-    <span class='desc'>
-      Internal function called when there is a right click context menu event on a header column. 
     </span>
   </li>
   <li>
@@ -296,118 +122,577 @@
     </span>
     <span class='bound note title'>Bound</span>
     <span class='desc'>
-      <p>Display a popup to adjust the columns of the table     tableView.onConfigureColumns x:200    y:300
-@param Object coords coordinates x and y where to show the menu</p>
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#filterFunction-dynamic'>
-        #
-(void)
-<b>filterFunction</b><span>(row)</span>
-      </a>
-    </span>
-    <span class='bound note title'>Bound</span>
-    <span class='desc'>
-      <p>function to filter rows If return&#39;s true, then the row is skipped     tableView.filterFunction (row)-&gt;
-@param Object row the current row which is in the process</p>
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#updateRowData-dynamic'>
-        #
-(void)
-<b>updateRowData</b><span>()</span>
-      </a>
-    </span>
-    <span class='bound note title'>Bound</span>
-    <span class='desc'>
-      to update the row data on the screen if new data has been added in datamapper they can be considered here     tableView.updateRowData()
+      ------------------------------------------------------------------------------------------------------------- Display a popup to adjust the column of the table
+#
+@param [Object] coords coordinates including x and y
+@event onConfigureColumns
+#
 
     </span>
   </li>
   <li>
     <span class='signature'>
-      <a href='#fixedHeaderAndScrollable-dynamic'>
+      <a href='#numberChecked-dynamic'>
         #
 (void)
-<b>fixedHeaderAndScrollable</b><span>(fixedHeader = true)</span>
+<b>numberChecked</b><span>()</span>
       </a>
     </span>
+    <span class='bound note title'>Bound</span>
     <span class='desc'>
-      make the table with fixed header and scrollable     tableView.fixedHeaderAndScrollable()
+      ------------------------------------------------------------------------------------------------------------- returns the numbe of rows checked
+#
+@return [Integer] no of rows checked in current table
+#
 
     </span>
   </li>
   <li>
     <span class='signature'>
-      <a href='#render-dynamic'>
+      <a href='#addTable-dynamic'>
         #
 (void)
-<b>render</b><span>()</span>
+<b>addTable</b><span>(tableName, columnReduceFunction, overallReduceFunction)</span>
       </a>
     </span>
     <span class='bound note title'>Bound</span>
     <span class='desc'>
-      function to render the added table inside the table holder element     tableView.render()
+      ------------------------------------------------------------------------------------------------------------- to add the table in the view from datamap
+#
+@example tableView.addTable &quot;zipcode&quot;
+@param [String] tableName name of the table to consider from datamap
+@param [Function] columnReduceFunction will be applied to each row and each column and if returns true then only column will be included
+@param [Function] reduceFunction will be applied to each row and if returns true then only row will be included
+@return [Boolean]
+#
 
     </span>
   </li>
   <li>
     <span class='signature'>
-      <a href='#renderRow-dynamic'>
+      <a href='#findColumn-dynamic'>
         #
-(?)
-<b>renderRow</b><span>(counter, i, isNewRow = false)</span>
+(void)
+<b>findColumn</b><span>(source)</span>
       </a>
     </span>
     <span class='bound note title'>Bound</span>
     <span class='desc'>
-      <p>internal function to get the html of a single row @param Integer counter the position of the row
-@param Object dataElement the data element with key as property retrived from data mapper</p>
+      #| #| Return a column from source name
+
     </span>
   </li>
   <li>
     <span class='signature'>
-      <a href='#sortByColumn-dynamic'>
+      <a href='#moveActionColumn-dynamic'>
         #
 (void)
-<b>sortByColumn</b><span>(_name, _type = &#39;ASC&#39;)</span>
+<b>moveActionColumn</b><span>(sourceName)</span>
       </a>
     </span>
     <span class='bound note title'>Bound</span>
     <span class='desc'>
-      <p>function to sort the table based on column and type     tableView.sortByColumn &quot;state&quot;,&quot;DESC&quot;
-@param string name name of column to apply sorting on
-@param string type type of sorting it can be ASC|DESC</p>
+      #|------------------------------------------------------------------------------------------------------------- #| Convert one of the columns into an action column
+#|
+
     </span>
   </li>
   <li>
     <span class='signature'>
-      <a href='#bindInlineSortingEvents-dynamic'>
+      <a href='#addActionColumn-dynamic'>
         #
 (void)
-<b>bindInlineSortingEvents</b><span>()</span>
+<b>addActionColumn</b><span>(options)</span>
       </a>
     </span>
     <span class='bound note title'>Bound</span>
     <span class='desc'>
-      internal function to bind the table header row click event which are called withing inlineSortingSupport 
+      #|------------------------------------------------------------------------------------------------------------- #| Add a column to the end of the table
+#|
+
     </span>
   </li>
   <li>
     <span class='signature'>
-      <a href='#filterKeypress-dynamic'>
+      <a href='#setTableCacheName-dynamic'>
         #
 (void)
-<b>filterKeypress</b><span>(e)</span>
+<b>setTableCacheName</b><span>(tableCacheName)</span>
       </a>
     </span>
     <span class='bound note title'>Bound</span>
     <span class='desc'>
-      internal event Key press in a filter field, that executes during the filter text box keypress event 
+      ------------------------------------------------------------------------------------------------------------- Table cache name is set, this allows saving/loading table configuration
+#
+@param [String] tableCacheName the cache name to attach with table
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setSimpleAndFixed-dynamic'>
+        #
+(void)
+<b>setSimpleAndFixed</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- make the table with fixed header and scrollable
+#
+@param [Boolean] fixedHeader if header is fixed or not
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setFixedSize-dynamic'>
+        #
+(void)
+<b>setFixedSize</b><span>(w, h)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setFixedHeaderAndScrollable-dynamic'>
+        #
+(void)
+<b>setFixedHeaderAndScrollable</b><span>(fixedHeader = true)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- make the table with fixed header and scrollable
+#
+@param [Boolean] fixedHeader if header is fixed or not
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#onClickSimpleObject-dynamic'>
+        #
+(void)
+<b>onClickSimpleObject</b><span>(row, e)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#openSimpleObject-dynamic'>
+        #
+(void)
+<b>openSimpleObject</b><span>(path, coords)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Open a popup view of a simple object
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#resetChecked-dynamic'>
+        #
+(void)
+<b>resetChecked</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- remove the checkbox for all items except those included in the bookmark array that comes from the server
+#
+@param [Array] bookmarkArray the array of key to consider as bookmark
+@return [Boolean]
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getRowSelected-dynamic'>
+        #
+(void)
+<b>getRowSelected</b><span>(id)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getRowLocked-dynamic'>
+        #
+(void)
+<b>getRowLocked</b><span>(id)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#toggleRowSelected-dynamic'>
+        #
+(void)
+<b>toggleRowSelected</b><span>(row)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #| Toggle a row as selected/not selected
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#scrollUp-dynamic'>
+        #
+(void)
+<b>scrollUp</b><span>(amount)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#scrollRight-dynamic'>
+        #
+(void)
+<b>scrollRight</b><span>(amount)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#onGlobalNewData-dynamic'>
+        #
+(void)
+<b>onGlobalNewData</b><span>(e)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  New data from the server
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#onGlobalTableChange-dynamic'>
+        #
+(void)
+<b>onGlobalTableChange</b><span>(tableName, sourceName, field, newValue)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Event triggered when any tableview has a column change
+#|  so that we can see if we need to update the view
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#onGlobalDataChange-dynamic'>
+        #
+(void)
+<b>onGlobalDataChange</b><span>(path, newData)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#onGlobalMouseDown-dynamic'>
+        #
+(void)
+<b>onGlobalMouseDown</b><span>(e)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setColumnFilterAsPopup-dynamic'>
+        #
+(void)
+<b>setColumnFilterAsPopup</b><span>(sourceName)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Set a column&#39;s filter to show a popup instead of clear typing
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#pressEnter-dynamic'>
+        #
+(void)
+<b>pressEnter</b><span>(e)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#onColumnResizeDrag-dynamic'>
+        #
+(void)
+<b>onColumnResizeDrag</b><span>(diffX, diffY, e)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#onColumnResizeFinished-dynamic'>
+        #
+(void)
+<b>onColumnResizeFinished</b><span>(diffX, diffY, e)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#onMouseHover-dynamic'>
+        #
+(void)
+<b>onMouseHover</b><span>(e)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#onMouseOut-dynamic'>
+        #
+(void)
+<b>onMouseOut</b><span>(e)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#onMouseMove-dynamic'>
+        #
+(void)
+<b>onMouseMove</b><span>(e)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#internalSetupMouseEvents-dynamic'>
+        #
+(void)
+<b>internalSetupMouseEvents</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- to setup event internally for the table
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#onCopyToClipboard-dynamic'>
+        #
+(void)
+<b>onCopyToClipboard</b><span>(e, value)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#onContextMenuData-dynamic'>
+        #
+(void)
+<b>onContextMenuData</b><span>(e)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#onContextMenuGroup-dynamic'>
+        #
+(void)
+<b>onContextMenuGroup</b><span>(rowNum, coords)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Called when context menu on a group row
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#onResize-dynamic'>
+        #
+(void)
+<b>onResize</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#onRenameField-dynamic'>
+        #
+(void)
+<b>onRenameField</b><span>(source)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Dialog to rename a column
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#contextMenuChangeType-dynamic'>
+        #
+(void)
+<b>contextMenuChangeType</b><span>(source, coords)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#onRearrange-dynamic'>
+        #
+(void)
+<b>onRearrange</b><span>(e, source)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#onContextMenuHeader-dynamic'>
+        #
+(void)
+<b>onContextMenuHeader</b><span>(source, coords)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setupContextMenu-dynamic'>
+        #
+(void)
+<b>setupContextMenu</b><span>(contextMenuCallbackFunction)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- Internal function that enables context menus
+#|
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#addSortRule-dynamic'>
+        #
+(void)
+<b>addSortRule</b><span>(sourceName, sortMode)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#addLock-dynamic'>
+        #
+(void)
+<b>addLock</b><span>(id)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Lock a given value at the top, does not matter what the sort is
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#applySorting-dynamic'>
+        #
+(void)
+<b>applySorting</b><span>(rowData)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- internal function to apply sorting on table with column and sorting type
+#
+@param [Object] column column on which sorting should be applied
+@param [String] type it can be ASC|DESC
+#
+
     </span>
   </li>
   <li>
@@ -420,7 +705,809 @@
     </span>
     <span class='bound note title'>Bound</span>
     <span class='desc'>
-      Apply the filters stored in &quot;currentFilters&quot; to each column and show/hide the rows 
+      ------------------------------------------------------------------------------------------------------------- Apply filters stored in &quot;currentFilters&quot; to each column and show/hide the rows
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#updateFullHeight-dynamic'>
+        #
+(void)
+<b>updateFullHeight</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  If this table is not a &quot;fixed size&quot; table then we have to adjust the
+#|  widget height to allow all rows to show.
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#updateColumnList-dynamic'>
+        #
+(void)
+<b>updateColumnList</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Refresh the list of available columns
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#updateRowData-dynamic'>
+        #
+(void)
+<b>updateRowData</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- function to update row data on the screen if new data has been added in datamapper they can be considered
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setStatusBarEnabled-dynamic'>
+        #
+(void)
+<b>setStatusBarEnabled</b><span>(isEnabled = true)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| ------------------------------------------------------------------------------------------------------------- #| Enable a status bar along the bottom.
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#isVisible-dynamic'>
+        #
+(void)
+<b>isVisible</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setHolderToBottom-dynamic'>
+        #
+(void)
+<b>setHolderToBottom</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- set the holder element to go to the bottom of the screen
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#updateFixedPosition-dynamic'>
+        #
+(void)
+<b>updateFixedPosition</b><span>(attemptCounter = 0)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Move to the bottom location fully
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#allowCustomize-dynamic'>
+        #
+(void)
+<b>allowCustomize</b><span>(customizableColumns = true)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- function to make column customizable in the popup
+#
+@example
+table.allowCustomize()
+@param [Boolean] customizableColumns
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getTotalActionWidth-dynamic'>
+        #
+(void)
+<b>getTotalActionWidth</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getTableTotalRows-dynamic'>
+        #
+(void)
+<b>getTableTotalRows</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Total available rows to display excluding headers
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getTableTotalCols-dynamic'>
+        #
+(void)
+<b>getTableTotalCols</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getTableVisibleWidth-dynamic'>
+        #
+(void)
+<b>getTableVisibleWidth</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getTableVisibleHeight-dynamic'>
+        #
+(void)
+<b>getTableVisibleHeight</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getTableMaxVisibleRows-dynamic'>
+        #
+(void)
+<b>getTableMaxVisibleRows</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Returns the maximum rows visible starting at the end of the rows
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getTableVisibleRows-dynamic'>
+        #
+(void)
+<b>getTableVisibleRows</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Number of visible rows
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getTableMaxVisibleCols-dynamic'>
+        #
+(void)
+<b>getTableMaxVisibleCols</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getTableVisibleCols-dynamic'>
+        #
+(void)
+<b>getTableVisibleCols</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Number of visible columns
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getColWidth-dynamic'>
+        #
+(void)
+<b>getColWidth</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Compute the width of a given column
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getRowHeight-dynamic'>
+        #
+(void)
+<b>getRowHeight</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Compute the height of a given row
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getCellEditable-dynamic'>
+        #
+(void)
+<b>getCellEditable</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Return true if a cell is editable
+#|
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getCellClickable-dynamic'>
+        #
+(void)
+<b>getCellClickable</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getCellStriped-dynamic'>
+        #
+(void)
+<b>getCellStriped</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Returns true if the row/column should have the darker color
+#|  background (striped rows on a table)
+#|
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getCellGroupNumber-dynamic'>
+        #
+(void)
+<b>getCellGroupNumber</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getCellAlign-dynamic'>
+        #
+(void)
+<b>getCellAlign</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Return right/left/center - left is assumed by default
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getCellTablename-dynamic'>
+        #
+(void)
+<b>getCellTablename</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getCellCalculation-dynamic'>
+        #
+(void)
+<b>getCellCalculation</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getCellSource-dynamic'>
+        #
+(void)
+<b>getCellSource</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getCellRecordID-dynamic'>
+        #
+(void)
+<b>getCellRecordID</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getCellFormatterName-dynamic'>
+        #
+(void)
+<b>getCellFormatterName</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#shouldAdvanceCol-dynamic'>
+        #
+(void)
+<b>shouldAdvanceCol</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getCellDataPath-dynamic'>
+        #
+(void)
+<b>getCellDataPath</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setHeaderFilterField-dynamic'>
+        #
+(void)
+<b>setHeaderFilterField</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setHeaderField-dynamic'>
+        #
+(void)
+<b>setHeaderField</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setHeaderGroupField-dynamic'>
+        #
+(void)
+<b>setHeaderGroupField</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setDataField-dynamic'>
+        #
+(void)
+<b>setDataField</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#shouldSkipCol-dynamic'>
+        #
+(void)
+<b>shouldSkipCol</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getRowType-dynamic'>
+        #
+(void)
+<b>getRowType</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Returns a state record for the current row
+#|  data - Cells of data
+#|  locked - Cells of header or locked content
+#|  group - Starting a new group
+#|  skip - Skip this row
+#|  invalid - Invalid row
+#|
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getCellType-dynamic'>
+        #
+(void)
+<b>getCellType</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#isHeaderCell-dynamic'>
+        #
+(void)
+<b>isHeaderCell</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#isResizable-dynamic'>
+        #
+(void)
+<b>isResizable</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#initializeSpacerCell-dynamic'>
+        #
+(void)
+<b>initializeSpacerCell</b><span>(location, spacer)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Setup the spacer cell for a location
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#updateCellClasses-dynamic'>
+        #
+(void)
+<b>updateCellClasses</b><span>(location, div)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#incrementColumn-dynamic'>
+        #
+(void)
+<b>incrementColumn</b><span>(location, showSpacer)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#updateVisibleActionRowText-dynamic'>
+        #
+(void)
+<b>updateVisibleActionRowText</b><span>(location, acol, cell)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#updateVisibleActionRow-dynamic'>
+        #
+(void)
+<b>updateVisibleActionRow</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#updateVisibleTextRow-dynamic'>
+        #
+(void)
+<b>updateVisibleTextRow</b><span>(location)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Draw a single row, returns the next rowNum.
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#updateVisibleText-dynamic'>
+        #
+(void)
+<b>updateVisibleText</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#resetCachedFromScroll-dynamic'>
+        #
+(void)
+<b>resetCachedFromScroll</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#resetCachedFromSize-dynamic'>
+        #
+(void)
+<b>resetCachedFromSize</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#updateScrollbarSettings-dynamic'>
+        #
+(void)
+<b>updateScrollbarSettings</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Up the visibility and settings of the scrollbars
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#isColumnEmpty-dynamic'>
+        #
+(void)
+<b>isColumnEmpty</b><span>(col)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Return true if a column is empty
+#|
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#findBestFit-dynamic'>
+        #
+(void)
+<b>findBestFit</b><span>(col)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Find the best fit for the data in a given column
+#|
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setAutoFillWidth-dynamic'>
+        #
+(void)
+<b>setAutoFillWidth</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#layoutShadow-dynamic'>
+        #
+(void)
+<b>layoutShadow</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  For a standard table, adjust the width of the columns to fit the space available
+#|  and if it&#39;s not a close fit, then scroll the table instead
+#|
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#updateStatusText-dynamic'>
+        #
+(void)
+<b>updateStatusText</b><span>(message...)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#render-dynamic'>
+        #
+(void)
+<b>render</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#real_render-dynamic'>
+        #
+(void)
+<b>real_render</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#sortByColumn-dynamic'>
+        #
+(void)
+<b>sortByColumn</b><span>(name)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- function to sort the table base on column and type
+#
+@param [String] name name of the column to apply sorting on
+@param [String] type it can be ASC|DESC
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#groupBy-dynamic'>
+        #
+(void)
+<b>groupBy</b><span>(columnSource)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Add a group by condition
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#onFilterKeypress-dynamic'>
+        #
+(void)
+<b>onFilterKeypress</b><span>(e)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      -----------------------------------------------------------------------------------------------ƒmove-------------- intenal event key press in a filter field, that executes during the filter text box keypress event
+#
+@event onFilterKeypress
+@param [Event] e jquery event keypress object
+@return [Boolean]
+#
+
     </span>
   </li>
   <li>
@@ -433,7 +1520,11 @@
     </span>
     <span class='bound note title'>Bound</span>
     <span class='desc'>
-      Add a row that takes the full width using colspan 
+      ------------------------------------------------------------------------------------------------------------- add a row that takes the full width using colspan
+#
+@param [String] message the message that should be displayed in column
+#
+
     </span>
   </li>
   <li>
@@ -446,7 +1537,8 @@
     </span>
     <span class='bound note title'>Bound</span>
     <span class='desc'>
-      clear the table using jquery .html &quot;&quot;     tableView.clear() will remove all the html of table
+      ------------------------------------------------------------------------------------------------------------- clear the table using jquery .html &quot;&quot;
+#
 
     </span>
   </li>
@@ -460,48 +1552,199 @@
     </span>
     <span class='bound note title'>Bound</span>
     <span class='desc'>
-      clear the html and also remove the associated column and rows reference     tableView.reset()
+      ------------------------------------------------------------------------------------------------------------- clear the html and also remove the associated column and rows reference
+#
 
     </span>
   </li>
   <li>
     <span class='signature'>
-      <a href='#setFilterFunction-dynamic'>
+      <a href='#onAddedEvent-dynamic'>
         #
 (void)
-<b>setFilterFunction</b><span>(filterFunction)</span>
+<b>onAddedEvent</b><span>(eventName, callback)</span>
       </a>
     </span>
     <span class='bound note title'>Bound</span>
     <span class='desc'>
-      add custom filter function which will be called on the key press of filter field @param Function callback to be called in keypress
+      ------------------------------------------------------------------------------------------------------------- #|
+#|  Called when an even has been added using the event manager
 
     </span>
   </li>
   <li>
     <span class='signature'>
-      <a href='#findRowFromElement-dynamic'>
+      <a href='#moveCellRight-dynamic'>
         #
 (void)
-<b>findRowFromElement</b><span>(e, stackCount)</span>
+<b>moveCellRight</b><span>()</span>
       </a>
     </span>
     <span class='bound note title'>Bound</span>
     <span class='desc'>
-      internal function to find the row Element from the event object 
     </span>
   </li>
   <li>
     <span class='signature'>
-      <a href='#setAutoHideColumn-dynamic'>
+      <a href='#moveCellLeft-dynamic'>
         #
 (void)
-<b>setAutoHideColumn</b><span>(width = 32)</span>
+<b>moveCellLeft</b><span>()</span>
       </a>
     </span>
     <span class='bound note title'>Bound</span>
     <span class='desc'>
-      add responsive capabilities by adding auto hide columns having width less than passed thresold @param Integer width default is 32 so columns having width less than 32 will be hidden if space is not enough
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#moveCellUp-dynamic'>
+        #
+(void)
+<b>moveCellUp</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#moveCellDown-dynamic'>
+        #
+(void)
+<b>moveCellDown</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setFocusFirstCell-dynamic'>
+        #
+(void)
+<b>setFocusFirstCell</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Auto select the first visible cell
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#onActionCopyCell-dynamic'>
+        #
+(void)
+<b>onActionCopyCell</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Copy to clipboard the current cell
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setFocusCell-dynamic'>
+        #
+(void)
+<b>setFocusCell</b><span>(visibleRow, visColNum, e)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Focus on a path cell
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#findPathVisible-dynamic'>
+        #
+(void)
+<b>findPathVisible</b><span>(path)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Returns true if a path is visible
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#show-dynamic'>
+        #
+(void)
+<b>show</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#hide-dynamic'>
+        #
+(void)
+<b>hide</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#destroy-dynamic'>
+        #
+(void)
+<b>destroy</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#findColFromPath-dynamic'>
+        #
+(void)
+<b>findColFromPath</b><span>(path)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- internal function to find the col name from the event object
+#
+@param [Event] e the jquery Event object
+@param [Integer] stackCount number of checking round
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#findRowFromPath-dynamic'>
+        #
+(void)
+<b>findRowFromPath</b><span>(path)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- internal function to find the row element from the event object
+#
+@param [Event] e the jquery Event object
+@param [Integer] stackCount number of checking round
+#
 
     </span>
   </li>
@@ -516,39 +1759,35 @@
       <br>
     </p>
     <div class='docstring'>
-  <p>Initialize the class by sending in the ID of the tag you want to become a managed table.
-This should be a simple <table id='something'> tag.
-    tableView.numberChecked()</p>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="initialize-the-class-by-sending-in-the-id-of-the-tag-you-want-to-beccome-a-managed-table-">Initialize the class by sending in the ID of the tag you want to beccome a managed table.</h1>
+<h1 id="this-should-be-a-simple-table-id-something-tag-">This should be a simple <table id='something'> tag.</h1><p>#</p><h1 id="-param-jqueryelement-eltableholder-the-referenced-element-that-will-hold-the-table">@param [JQueryElement] elTableHolder the $() referenced element that will hold the table</h1>
+<h1 id="-param-boolean-showcheckbox-if-check-boxes-are-visible-or-not">@param [Boolean] showCheckbox if check boxes are visible or not</h1><p>#</p>
 </div>
 <div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='name'>elTableHolder</span>
-      <span class='type'>
-        (
-          <tt>jQuery Element</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>the $() referenced element that will hold the table </span>
-    </li>
-    <li>
-      <span class='name'>showCheckbox</span>
-      <span class='type'>
-        (
-          <tt>boolean</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>weather to show checkbox as first column </span>
-    </li>
-  </ul>
 </div>
   </div>
 </div>
       <h2>Instance Method Details</h2>
       <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='defaultRowClick-dynamic'>
+      #
+(void)
+<b>defaultRowClick</b><span>(row, e)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="to-add-the-default-table-row-click-event">to add the default table row click event</h1><p>#</p><h1 id="-param-object-row-the-data-of-row-in-form-object-that-is-clicked">@param [Object] row the data of row in form object that is clicked</h1>
+<h1 id="-param-event-the-clicked-jquery-event-object">@param [Event] the clicked jquery event object</h1>
+<h1 id="-event-defaultrowclick">@event defaultRowClick</h1>
+<h1 id="-return-boolean-">@return [Boolean]</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
   <div class='method_details'>
     <p class='signature' id='onSetCheckbox-dynamic'>
       #
@@ -558,341 +1797,9 @@ This should be a simple <table id='something'> tag.
       <br>
     </p>
     <div class='docstring'>
-  <p>$tableView.onSetCheckbox checkboxKey,value</p>
-</div>
-<div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='name'>checkbox_key</span>
-      <span class='type'>
-        (
-          <tt>String</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>to identify the checkbox key </span>
-    </li>
-    <li>
-      <span class='name'>value</span>
-      <span class='type'>
-        (
-          <tt>String</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>to identify the value of checkbox </span>
-    </li>
-  </ul>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='size-dynamic'>
-      #
-(Integer)
-<b>size</b><span>()</span>
-      <span class='bound note'>Bound</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>tableView.size()</p>
-</div>
-<div class='tags'>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'></span>
-      (
-        <tt>Integer</tt>
-      )
-      &mdash;
-      <span class='desc'>the length of the rows in table </span>
-    </li>
-  </ul>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='numberChecked-dynamic'>
-      #
-(Integer)
-<b>numberChecked</b><span>()</span>
-      <span class='bound note'>Bound</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>returns the number of rows checked
-    tableView.numberChecked()</p>
-</div>
-<div class='tags'>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'></span>
-      (
-        <tt>Integer</tt>
-      )
-      &mdash;
-      <span class='desc'>the number of rows that are checked </span>
-    </li>
-  </ul>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='addJoinTable-dynamic'>
-      #
-(?)
-<b>addJoinTable</b><span>(tableName, columnReduceFunction, sourceField)</span>
-      <span class='bound note'>Bound</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>to add the join table with current rendered table
-    table.addJoinTable &quot;county&quot;, null, &quot;county&quot;
-@param String tableName the table to add as join table from datamap
-@param Function|null columnReduceFunction function to filter the join table columns
-@param String sourceField column to find as common in both table</p>
-</div>
-<div class='tags'>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'></span>
-      (
-        <tt>?</tt>
-      )
-      &mdash;
-      <span class='desc'>boolean to ensure join added </span>
-    </li>
-  </ul>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='addTable-dynamic'>
-      #
-(?)
-<b>addTable</b><span>(tableName, columnReduceFunction, reduceFunction)</span>
-      <span class='bound note'>Bound</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>to add the table in the view from datamap
-    tableView &quot;zipcode&quot;,null,null
-@param String tableName name of the table inside datamap
-@param Function|null columnReduceFunction function to filter the column
-@param Function|null reduceFunction function to filter the data</p>
-</div>
-<div class='tags'>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'></span>
-      (
-        <tt>?</tt>
-      )
-      &mdash;
-      <span class='desc'>boolean </span>
-    </li>
-  </ul>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='addInlineSortingSupport-dynamic'>
-      #
-(void)
-<b>addInlineSortingSupport</b><span>()</span>
-      <span class='bound note'>Bound</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>add support for inline sorting when clicking on the column header
-    tableView.addInlineSortingSupport()</p>
-</div>
-<div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='defaultRowClick-dynamic'>
-      #
-(?)
-<b>defaultRowClick</b><span>(row, e)</span>
-      <span class='bound note'>Bound</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>to add the default table row click event
-    tableView.defaultRowClick = (rowData,eventObject) -&gt;
-@param Object row the data of row in form object that is clicked
-@param Object the object of click event</p>
-</div>
-<div class='tags'>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'></span>
-      (
-        <tt>?</tt>
-      )
-      &mdash;
-      <span class='desc'>boolean weather event is succeed </span>
-    </li>
-  </ul>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='resetChecked-dynamic'>
-      #
-(?)
-<b>resetChecked</b><span>(bookmarkArray)</span>
-      <span class='bound note'>Bound</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>Remove the checkbox for all items except those included in the bookmark array that comes from the server
-    tableView.resetChecked [1,2,3]
-@param Array bookmarkArray the array of key to consider as bookmark</p>
-</div>
-<div class='tags'>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'></span>
-      (
-        <tt>?</tt>
-      )
-      &mdash;
-      <span class='desc'>boolean </span>
-    </li>
-  </ul>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='renderCheckable-dynamic'>
-      #
-(?)
-<b>renderCheckable</b><span>(obj)</span>
-      <span class='bound note'>Bound</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>render the checkable row with checkbox as first column
-    tableView.renderCheckable dataRowObject</p>
-</div>
-<div class='tags'>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'></span>
-      (
-        <tt>?</tt>
-      )
-      &mdash;
-      <span class='desc'>String html the html of the row as string </span>
-    </li>
-  </ul>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='setupEvents-dynamic'>
-      #
-(void)
-<b>setupEvents</b><span>(rowCallback, rowMouseover)</span>
-      <span class='bound note'>Bound</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>set up events callback
-    tableView.setUpEvents (rowData,e)-&gt; , (rowData,eventType)-&gt;
-@param Function rowCallback callback to execute at the row click
-@param Function rowMouseOver callback to execute at the mouse over|out event</p>
-</div>
-<div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='internalSetupMouseEvents-dynamic'>
-      #
-(void)
-<b>internalSetupMouseEvents</b><span>()</span>
-      <span class='bound note'>Bound</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>to setup event internally for the table</p>
-</div>
-<div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='setupContextMenu-dynamic'>
-      #
-(void)
-<b>setupContextMenu</b><span>(contextMenuCallbackFunction)</span>
-      <span class='bound note'>Bound</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>to add context menu with header column click
-    tableView.setupContextMenu (coordinates,data) -&gt;
-@param Function contextMenuCallbackFunction function to execute on the click of context menu item</p>
-</div>
-<div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='setupContextMenuHeader-dynamic'>
-      #
-(void)
-<b>setupContextMenuHeader</b><span>()</span>
-      <span class='bound note'>Bound</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>Internal function called to setup the context menu on the header</p>
-</div>
-<div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='setTableCacheName-dynamic'>
-      #
-(void)
-<b>setTableCacheName</b><span>(tableCacheName)</span>
-      <span class='bound note'>Bound</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>Table cache name is set, this allows saving/loading table configuration
-@param String tableCacheName the cache name to attach with table</p>
-</div>
-<div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='applySorting-dynamic'>
-      #
-(void)
-<b>applySorting</b><span>(column, type = &#39;ASC&#39;)</span>
-      <span class='bound note'>Bound</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>internal function to apply sorting on table with column and sorting type
-@param Object column column on which sorting should be applied
-@param String type it can be ASC|DESC</p>
-</div>
-<div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='onContextMenuHeader-dynamic'>
-      #
-(void)
-<b>onContextMenuHeader</b><span>(coords, column)</span>
-      <span class='bound note'>Bound</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>Internal function called when there is a right click context menu event on a header column.   This will display the column options.</p>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="function-to-execute-when-one-of-the-checkbox-is-checked">function to execute when one of the checkbox is checked</h1><p>#</p><h1 id="-param-string-checkbox_key-to-identify-the-checkbox-key">@param [String] checkbox_key to identify the checkbox key</h1>
+<h1 id="-param-string-value-to-identify-the-checkbox">@param [String] value to identify the checkbox</h1><p>#</p>
 </div>
 <div class='tags'>
 </div>
@@ -906,141 +1813,519 @@ This should be a simple <table id='something'> tag.
       <br>
     </p>
     <div class='docstring'>
-  <p>Display a popup to adjust the columns of the table
-    tableView.onConfigureColumns x:200    y:300
-@param Object coords coordinates x and y where to show the menu</p>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="display-a-popup-to-adjust-the-column-of-the-table">Display a popup to adjust the column of the table</h1><p>#</p><h1 id="-param-object-coords-coordinates-including-x-and-y">@param [Object] coords coordinates including x and y</h1>
+<h1 id="-event-onconfigurecolumns">@event onConfigureColumns</h1><p>#</p>
 </div>
 <div class='tags'>
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='filterFunction-dynamic'>
+    <p class='signature' id='numberChecked-dynamic'>
       #
 (void)
-<b>filterFunction</b><span>(row)</span>
+<b>numberChecked</b><span>()</span>
       <span class='bound note'>Bound</span>
       <br>
     </p>
     <div class='docstring'>
-  <p>function to filter rows If return&#39;s true, then the row is skipped
-    tableView.filterFunction (row)-&gt;
-@param Object row the current row which is in the process</p>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="returns-the-numbe-of-rows-checked">returns the numbe of rows checked</h1><p>#</p><h1 id="-return-integer-no-of-rows-checked-in-current-table">@return [Integer] no of rows checked in current table</h1><p>#</p>
 </div>
 <div class='tags'>
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='updateRowData-dynamic'>
+    <p class='signature' id='addTable-dynamic'>
       #
 (void)
-<b>updateRowData</b><span>()</span>
+<b>addTable</b><span>(tableName, columnReduceFunction, overallReduceFunction)</span>
       <span class='bound note'>Bound</span>
       <br>
     </p>
     <div class='docstring'>
-  <p>to update the row data on the screen if new data has been added in datamapper they can be considered here
-    tableView.updateRowData()</p>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="to-add-the-table-in-the-view-from-datamap">to add the table in the view from datamap</h1><p>#</p><h1 id="-example-tableview-addtable-zipcode-">@example tableView.addTable &quot;zipcode&quot;</h1>
+<h1 id="-param-string-tablename-name-of-the-table-to-consider-from-datamap">@param [String] tableName name of the table to consider from datamap</h1>
+<h1 id="-param-function-columnreducefunction-will-be-applied-to-each-row-and-each-column-and-if-returns-true-then-only-column-will-be-included">@param [Function] columnReduceFunction will be applied to each row and each column and if returns true then only column will be included</h1>
+<h1 id="-param-function-reducefunction-will-be-applied-to-each-row-and-if-returns-true-then-only-row-will-be-included">@param [Function] reduceFunction will be applied to each row and if returns true then only row will be included</h1>
+<h1 id="-return-boolean-">@return [Boolean]</h1><p>#</p>
 </div>
 <div class='tags'>
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='fixedHeaderAndScrollable-dynamic'>
+    <p class='signature' id='findColumn-dynamic'>
       #
 (void)
-<b>fixedHeaderAndScrollable</b><span>(fixedHeader = true)</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>make the table with fixed header and scrollable
-    tableView.fixedHeaderAndScrollable()</p>
-</div>
-<div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='render-dynamic'>
-      #
-(void)
-<b>render</b><span>()</span>
+<b>findColumn</b><span>(source)</span>
       <span class='bound note'>Bound</span>
       <br>
     </p>
     <div class='docstring'>
-  <p>function to render the added table inside the table holder element
-    tableView.render()</p>
+  <p>#|</p><p>#| Return a column from source name</p>
 </div>
 <div class='tags'>
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='renderRow-dynamic'>
-      #
-(?)
-<b>renderRow</b><span>(counter, i, isNewRow = false)</span>
-      <span class='bound note'>Bound</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>internal function to get the html of a single row
-@param Integer counter the position of the row
-@param Object dataElement the data element with key as property retrived from data mapper</p>
-</div>
-<div class='tags'>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'></span>
-      (
-        <tt>?</tt>
-      )
-      &mdash;
-      <span class='desc'>String html the html of the row </span>
-    </li>
-  </ul>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='sortByColumn-dynamic'>
+    <p class='signature' id='moveActionColumn-dynamic'>
       #
 (void)
-<b>sortByColumn</b><span>(_name, _type = &#39;ASC&#39;)</span>
+<b>moveActionColumn</b><span>(sourceName)</span>
       <span class='bound note'>Bound</span>
       <br>
     </p>
     <div class='docstring'>
-  <p>function to sort the table based on column and type
-    tableView.sortByColumn &quot;state&quot;,&quot;DESC&quot;
-@param string name name of column to apply sorting on
-@param string type type of sorting it can be ASC|DESC</p>
+  <p>#|-------------------------------------------------------------------------------------------------------------</p><p>#| Convert one of the columns into an action column</p><p>#|</p>
 </div>
 <div class='tags'>
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='bindInlineSortingEvents-dynamic'>
+    <p class='signature' id='addActionColumn-dynamic'>
       #
 (void)
-<b>bindInlineSortingEvents</b><span>()</span>
+<b>addActionColumn</b><span>(options)</span>
       <span class='bound note'>Bound</span>
       <br>
     </p>
     <div class='docstring'>
-  <p>internal function to bind the table header row click event which are called withing inlineSortingSupport</p>
+  <p>#|-------------------------------------------------------------------------------------------------------------</p><p>#| Add a column to the end of the table</p><p>#|</p>
 </div>
 <div class='tags'>
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='filterKeypress-dynamic'>
+    <p class='signature' id='setTableCacheName-dynamic'>
       #
 (void)
-<b>filterKeypress</b><span>(e)</span>
+<b>setTableCacheName</b><span>(tableCacheName)</span>
       <span class='bound note'>Bound</span>
       <br>
     </p>
     <div class='docstring'>
-  <p>internal event Key press in a filter field, that executes during the filter text box keypress event</p>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="table-cache-name-is-set-this-allows-saving-loading-table-configuration">Table cache name is set, this allows saving/loading table configuration</h1><p>#</p><h1 id="-param-string-tablecachename-the-cache-name-to-attach-with-table">@param [String] tableCacheName the cache name to attach with table</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setSimpleAndFixed-dynamic'>
+      #
+(void)
+<b>setSimpleAndFixed</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="make-the-table-with-fixed-header-and-scrollable">make the table with fixed header and scrollable</h1><p>#</p><h1 id="-param-boolean-fixedheader-if-header-is-fixed-or-not">@param [Boolean] fixedHeader if header is fixed or not</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setFixedSize-dynamic'>
+      #
+(void)
+<b>setFixedSize</b><span>(w, h)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setFixedHeaderAndScrollable-dynamic'>
+      #
+(void)
+<b>setFixedHeaderAndScrollable</b><span>(fixedHeader = true)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="make-the-table-with-fixed-header-and-scrollable">make the table with fixed header and scrollable</h1><p>#</p><h1 id="-param-boolean-fixedheader-if-header-is-fixed-or-not">@param [Boolean] fixedHeader if header is fixed or not</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='onClickSimpleObject-dynamic'>
+      #
+(void)
+<b>onClickSimpleObject</b><span>(row, e)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='openSimpleObject-dynamic'>
+      #
+(void)
+<b>openSimpleObject</b><span>(path, coords)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Open a popup view of a simple object</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='resetChecked-dynamic'>
+      #
+(void)
+<b>resetChecked</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="remove-the-checkbox-for-all-items-except-those-included-in-the-bookmark-array-that-comes-from-the-server">remove the checkbox for all items except those included in the bookmark array that comes from the server</h1><p>#</p><h1 id="-param-array-bookmarkarray-the-array-of-key-to-consider-as-bookmark">@param [Array] bookmarkArray the array of key to consider as bookmark</h1>
+<h1 id="-return-boolean-">@return [Boolean]</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getRowSelected-dynamic'>
+      #
+(void)
+<b>getRowSelected</b><span>(id)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getRowLocked-dynamic'>
+      #
+(void)
+<b>getRowLocked</b><span>(id)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='toggleRowSelected-dynamic'>
+      #
+(void)
+<b>toggleRowSelected</b><span>(row)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#| Toggle a row as selected/not selected</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='scrollUp-dynamic'>
+      #
+(void)
+<b>scrollUp</b><span>(amount)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='scrollRight-dynamic'>
+      #
+(void)
+<b>scrollRight</b><span>(amount)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='onGlobalNewData-dynamic'>
+      #
+(void)
+<b>onGlobalNewData</b><span>(e)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  New data from the server</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='onGlobalTableChange-dynamic'>
+      #
+(void)
+<b>onGlobalTableChange</b><span>(tableName, sourceName, field, newValue)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Event triggered when any tableview has a column change</p><p>#|  so that we can see if we need to update the view</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='onGlobalDataChange-dynamic'>
+      #
+(void)
+<b>onGlobalDataChange</b><span>(path, newData)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='onGlobalMouseDown-dynamic'>
+      #
+(void)
+<b>onGlobalMouseDown</b><span>(e)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setColumnFilterAsPopup-dynamic'>
+      #
+(void)
+<b>setColumnFilterAsPopup</b><span>(sourceName)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Set a column&#39;s filter to show a popup instead of clear typing</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='pressEnter-dynamic'>
+      #
+(void)
+<b>pressEnter</b><span>(e)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='onColumnResizeDrag-dynamic'>
+      #
+(void)
+<b>onColumnResizeDrag</b><span>(diffX, diffY, e)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='onColumnResizeFinished-dynamic'>
+      #
+(void)
+<b>onColumnResizeFinished</b><span>(diffX, diffY, e)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='onMouseHover-dynamic'>
+      #
+(void)
+<b>onMouseHover</b><span>(e)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='onMouseOut-dynamic'>
+      #
+(void)
+<b>onMouseOut</b><span>(e)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='onMouseMove-dynamic'>
+      #
+(void)
+<b>onMouseMove</b><span>(e)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='internalSetupMouseEvents-dynamic'>
+      #
+(void)
+<b>internalSetupMouseEvents</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="to-setup-event-internally-for-the-table">to setup event internally for the table</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='onCopyToClipboard-dynamic'>
+      #
+(void)
+<b>onCopyToClipboard</b><span>(e, value)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='onContextMenuData-dynamic'>
+      #
+(void)
+<b>onContextMenuData</b><span>(e)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='onContextMenuGroup-dynamic'>
+      #
+(void)
+<b>onContextMenuGroup</b><span>(rowNum, coords)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Called when context menu on a group row</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='onResize-dynamic'>
+      #
+(void)
+<b>onResize</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='onRenameField-dynamic'>
+      #
+(void)
+<b>onRenameField</b><span>(source)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Dialog to rename a column</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='contextMenuChangeType-dynamic'>
+      #
+(void)
+<b>contextMenuChangeType</b><span>(source, coords)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='onRearrange-dynamic'>
+      #
+(void)
+<b>onRearrange</b><span>(e, source)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='onContextMenuHeader-dynamic'>
+      #
+(void)
+<b>onContextMenuHeader</b><span>(source, coords)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setupContextMenu-dynamic'>
+      #
+(void)
+<b>setupContextMenu</b><span>(contextMenuCallbackFunction)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="internal-function-that-enables-context-menus">Internal function that enables context menus</h1><p>#|</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='addSortRule-dynamic'>
+      #
+(void)
+<b>addSortRule</b><span>(sourceName, sortMode)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='addLock-dynamic'>
+      #
+(void)
+<b>addLock</b><span>(id)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Lock a given value at the top, does not matter what the sort is</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='applySorting-dynamic'>
+      #
+(void)
+<b>applySorting</b><span>(rowData)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="internal-function-to-apply-sorting-on-table-with-column-and-sorting-type">internal function to apply sorting on table with column and sorting type</h1><p>#</p><h1 id="-param-object-column-column-on-which-sorting-should-be-applied">@param [Object] column column on which sorting should be applied</h1>
+<h1 id="-param-string-type-it-can-be-asc-desc">@param [String] type it can be ASC|DESC</h1><p>#</p>
 </div>
 <div class='tags'>
 </div>
@@ -1054,7 +2339,720 @@ This should be a simple <table id='something'> tag.
       <br>
     </p>
     <div class='docstring'>
-  <p>Apply the filters stored in &quot;currentFilters&quot; to each column and show/hide the rows</p>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="apply-filters-stored-in-currentfilters-to-each-column-and-show-hide-the-rows">Apply filters stored in &quot;currentFilters&quot; to each column and show/hide the rows</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='updateFullHeight-dynamic'>
+      #
+(void)
+<b>updateFullHeight</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  If this table is not a &quot;fixed size&quot; table then we have to adjust the</p><p>#|  widget height to allow all rows to show.</p><p>#|</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='updateColumnList-dynamic'>
+      #
+(void)
+<b>updateColumnList</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Refresh the list of available columns</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='updateRowData-dynamic'>
+      #
+(void)
+<b>updateRowData</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="function-to-update-row-data-on-the-screen-if-new-data-has-been-added-in-datamapper-they-can-be-considered">function to update row data on the screen if new data has been added in datamapper they can be considered</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setStatusBarEnabled-dynamic'>
+      #
+(void)
+<b>setStatusBarEnabled</b><span>(isEnabled = true)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#| -------------------------------------------------------------------------------------------------------------</p><p>#| Enable a status bar along the bottom.</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='isVisible-dynamic'>
+      #
+(void)
+<b>isVisible</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setHolderToBottom-dynamic'>
+      #
+(void)
+<b>setHolderToBottom</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="set-the-holder-element-to-go-to-the-bottom-of-the-screen">set the holder element to go to the bottom of the screen</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='updateFixedPosition-dynamic'>
+      #
+(void)
+<b>updateFixedPosition</b><span>(attemptCounter = 0)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Move to the bottom location fully</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='allowCustomize-dynamic'>
+      #
+(void)
+<b>allowCustomize</b><span>(customizableColumns = true)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="function-to-make-column-customizable-in-the-popup">function to make column customizable in the popup</h1><p>#</p><h1 id="-example">@example</h1>
+<h1 id="table-allowcustomize-">table.allowCustomize()</h1>
+<h1 id="-param-boolean-customizablecolumns">@param [Boolean] customizableColumns</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getTotalActionWidth-dynamic'>
+      #
+(void)
+<b>getTotalActionWidth</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getTableTotalRows-dynamic'>
+      #
+(void)
+<b>getTableTotalRows</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Total available rows to display excluding headers</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getTableTotalCols-dynamic'>
+      #
+(void)
+<b>getTableTotalCols</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getTableVisibleWidth-dynamic'>
+      #
+(void)
+<b>getTableVisibleWidth</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getTableVisibleHeight-dynamic'>
+      #
+(void)
+<b>getTableVisibleHeight</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getTableMaxVisibleRows-dynamic'>
+      #
+(void)
+<b>getTableMaxVisibleRows</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Returns the maximum rows visible starting at the end of the rows</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getTableVisibleRows-dynamic'>
+      #
+(void)
+<b>getTableVisibleRows</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Number of visible rows</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getTableMaxVisibleCols-dynamic'>
+      #
+(void)
+<b>getTableMaxVisibleCols</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getTableVisibleCols-dynamic'>
+      #
+(void)
+<b>getTableVisibleCols</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Number of visible columns</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getColWidth-dynamic'>
+      #
+(void)
+<b>getColWidth</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Compute the width of a given column</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getRowHeight-dynamic'>
+      #
+(void)
+<b>getRowHeight</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Compute the height of a given row</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getCellEditable-dynamic'>
+      #
+(void)
+<b>getCellEditable</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Return true if a cell is editable</p><p>#|</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getCellClickable-dynamic'>
+      #
+(void)
+<b>getCellClickable</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getCellStriped-dynamic'>
+      #
+(void)
+<b>getCellStriped</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Returns true if the row/column should have the darker color</p><p>#|  background (striped rows on a table)</p><p>#|</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getCellGroupNumber-dynamic'>
+      #
+(void)
+<b>getCellGroupNumber</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getCellAlign-dynamic'>
+      #
+(void)
+<b>getCellAlign</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Return right/left/center - left is assumed by default</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getCellTablename-dynamic'>
+      #
+(void)
+<b>getCellTablename</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getCellCalculation-dynamic'>
+      #
+(void)
+<b>getCellCalculation</b><span>(location)</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getCellSource-dynamic'>
+      #
+(void)
+<b>getCellSource</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getCellRecordID-dynamic'>
+      #
+(void)
+<b>getCellRecordID</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getCellFormatterName-dynamic'>
+      #
+(void)
+<b>getCellFormatterName</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='shouldAdvanceCol-dynamic'>
+      #
+(void)
+<b>shouldAdvanceCol</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getCellDataPath-dynamic'>
+      #
+(void)
+<b>getCellDataPath</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setHeaderFilterField-dynamic'>
+      #
+(void)
+<b>setHeaderFilterField</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setHeaderField-dynamic'>
+      #
+(void)
+<b>setHeaderField</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setHeaderGroupField-dynamic'>
+      #
+(void)
+<b>setHeaderGroupField</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setDataField-dynamic'>
+      #
+(void)
+<b>setDataField</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='shouldSkipCol-dynamic'>
+      #
+(void)
+<b>shouldSkipCol</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getRowType-dynamic'>
+      #
+(void)
+<b>getRowType</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Returns a state record for the current row</p><p>#|  data - Cells of data</p><p>#|  locked - Cells of header or locked content</p><p>#|  group - Starting a new group</p><p>#|  skip - Skip this row</p><p>#|  invalid - Invalid row</p><p>#|</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getCellType-dynamic'>
+      #
+(void)
+<b>getCellType</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='isHeaderCell-dynamic'>
+      #
+(void)
+<b>isHeaderCell</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='isResizable-dynamic'>
+      #
+(void)
+<b>isResizable</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='initializeSpacerCell-dynamic'>
+      #
+(void)
+<b>initializeSpacerCell</b><span>(location, spacer)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Setup the spacer cell for a location</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='updateCellClasses-dynamic'>
+      #
+(void)
+<b>updateCellClasses</b><span>(location, div)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='incrementColumn-dynamic'>
+      #
+(void)
+<b>incrementColumn</b><span>(location, showSpacer)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='updateVisibleActionRowText-dynamic'>
+      #
+(void)
+<b>updateVisibleActionRowText</b><span>(location, acol, cell)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='updateVisibleActionRow-dynamic'>
+      #
+(void)
+<b>updateVisibleActionRow</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='updateVisibleTextRow-dynamic'>
+      #
+(void)
+<b>updateVisibleTextRow</b><span>(location)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Draw a single row, returns the next rowNum.</p><p>#|</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='updateVisibleText-dynamic'>
+      #
+(void)
+<b>updateVisibleText</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='resetCachedFromScroll-dynamic'>
+      #
+(void)
+<b>resetCachedFromScroll</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='resetCachedFromSize-dynamic'>
+      #
+(void)
+<b>resetCachedFromSize</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='updateScrollbarSettings-dynamic'>
+      #
+(void)
+<b>updateScrollbarSettings</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Up the visibility and settings of the scrollbars</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='isColumnEmpty-dynamic'>
+      #
+(void)
+<b>isColumnEmpty</b><span>(col)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Return true if a column is empty</p><p>#|</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='findBestFit-dynamic'>
+      #
+(void)
+<b>findBestFit</b><span>(col)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Find the best fit for the data in a given column</p><p>#|</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setAutoFillWidth-dynamic'>
+      #
+(void)
+<b>setAutoFillWidth</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='layoutShadow-dynamic'>
+      #
+(void)
+<b>layoutShadow</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  For a standard table, adjust the width of the columns to fit the space available</p><p>#|  and if it&#39;s not a close fit, then scroll the table instead</p><p>#|</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='updateStatusText-dynamic'>
+      #
+(void)
+<b>updateStatusText</b><span>(message...)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='render-dynamic'>
+      #
+(void)
+<b>render</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='real_render-dynamic'>
+      #
+(void)
+<b>real_render</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='sortByColumn-dynamic'>
+      #
+(void)
+<b>sortByColumn</b><span>(name)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="function-to-sort-the-table-base-on-column-and-type">function to sort the table base on column and type</h1><p>#</p><h1 id="-param-string-name-name-of-the-column-to-apply-sorting-on">@param [String] name name of the column to apply sorting on</h1>
+<h1 id="-param-string-type-it-can-be-asc-desc">@param [String] type it can be ASC|DESC</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='groupBy-dynamic'>
+      #
+(void)
+<b>groupBy</b><span>(columnSource)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Add a group by condition</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='onFilterKeypress-dynamic'>
+      #
+(void)
+<b>onFilterKeypress</b><span>(e)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-move-">-----------------------------------------------------------------------------------------------ƒmove--------------</h1>
+<h1 id="intenal-event-key-press-in-a-filter-field-that-executes-during-the-filter-text-box-keypress-event">intenal event key press in a filter field, that executes during the filter text box keypress event</h1><p>#</p><h1 id="-event-onfilterkeypress">@event onFilterKeypress</h1>
+<h1 id="-param-event-e-jquery-event-keypress-object">@param [Event] e jquery event keypress object</h1>
+<h1 id="-return-boolean-">@return [Boolean]</h1><p>#</p>
 </div>
 <div class='tags'>
 </div>
@@ -1068,7 +3066,8 @@ This should be a simple <table id='something'> tag.
       <br>
     </p>
     <div class='docstring'>
-  <p>Add a row that takes the full width using colspan</p>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="add-a-row-that-takes-the-full-width-using-colspan">add a row that takes the full width using colspan</h1><p>#</p><h1 id="-param-string-message-the-message-that-should-be-displayed-in-column">@param [String] message the message that should be displayed in column</h1><p>#</p>
 </div>
 <div class='tags'>
 </div>
@@ -1082,8 +3081,8 @@ This should be a simple <table id='something'> tag.
       <br>
     </p>
     <div class='docstring'>
-  <p>clear the table using jquery .html &quot;&quot;
-    tableView.clear() will remove all the html of table</p>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="clear-the-table-using-jquery-html-">clear the table using jquery .html &quot;&quot;</h1><p>#</p>
 </div>
 <div class='tags'>
 </div>
@@ -1097,52 +3096,180 @@ This should be a simple <table id='something'> tag.
       <br>
     </p>
     <div class='docstring'>
-  <p>clear the html and also remove the associated column and rows reference
-    tableView.reset()</p>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="clear-the-html-and-also-remove-the-associated-column-and-rows-reference">clear the html and also remove the associated column and rows reference</h1><p>#</p>
 </div>
 <div class='tags'>
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='setFilterFunction-dynamic'>
+    <p class='signature' id='onAddedEvent-dynamic'>
       #
 (void)
-<b>setFilterFunction</b><span>(filterFunction)</span>
+<b>onAddedEvent</b><span>(eventName, callback)</span>
       <span class='bound note'>Bound</span>
       <br>
     </p>
     <div class='docstring'>
-  <p>add custom filter function which will be called on the key press of filter field
-@param Function callback to be called in keypress</p>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1><p>#|</p><p>#|  Called when an even has been added using the event manager</p>
 </div>
 <div class='tags'>
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='findRowFromElement-dynamic'>
+    <p class='signature' id='moveCellRight-dynamic'>
       #
 (void)
-<b>findRowFromElement</b><span>(e, stackCount)</span>
+<b>moveCellRight</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='moveCellLeft-dynamic'>
+      #
+(void)
+<b>moveCellLeft</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='moveCellUp-dynamic'>
+      #
+(void)
+<b>moveCellUp</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='moveCellDown-dynamic'>
+      #
+(void)
+<b>moveCellDown</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setFocusFirstCell-dynamic'>
+      #
+(void)
+<b>setFocusFirstCell</b><span>()</span>
       <span class='bound note'>Bound</span>
       <br>
     </p>
     <div class='docstring'>
-  <p>internal function to find the row Element from the event object</p>
+  <p>#|</p><p>#|  Auto select the first visible cell</p>
 </div>
 <div class='tags'>
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='setAutoHideColumn-dynamic'>
+    <p class='signature' id='onActionCopyCell-dynamic'>
       #
 (void)
-<b>setAutoHideColumn</b><span>(width = 32)</span>
+<b>onActionCopyCell</b><span>()</span>
       <span class='bound note'>Bound</span>
       <br>
     </p>
     <div class='docstring'>
-  <p>add responsive capabilities by adding auto hide columns having width less than passed thresold
-@param Integer width default is 32 so columns having width less than 32 will be hidden if space is not enough</p>
+  <p>#|</p><p>#|  Copy to clipboard the current cell</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setFocusCell-dynamic'>
+      #
+(void)
+<b>setFocusCell</b><span>(visibleRow, visColNum, e)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Focus on a path cell</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='findPathVisible-dynamic'>
+      #
+(void)
+<b>findPathVisible</b><span>(path)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Returns true if a path is visible</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='show-dynamic'>
+      #
+(void)
+<b>show</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='hide-dynamic'>
+      #
+(void)
+<b>hide</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='destroy-dynamic'>
+      #
+(void)
+<b>destroy</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='findColFromPath-dynamic'>
+      #
+(void)
+<b>findColFromPath</b><span>(path)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="internal-function-to-find-the-col-name-from-the-event-object">internal function to find the col name from the event object</h1><p>#</p><h1 id="-param-event-e-the-jquery-event-object">@param [Event] e the jquery Event object</h1>
+<h1 id="-param-integer-stackcount-number-of-checking-round">@param [Integer] stackCount number of checking round</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='findRowFromPath-dynamic'>
+      #
+(void)
+<b>findRowFromPath</b><span>(path)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="internal-function-to-find-the-row-element-from-the-event-object">internal function to find the row element from the event object</h1><p>#</p><h1 id="-param-event-e-the-jquery-event-object">@param [Event] e the jquery Event object</h1>
+<h1 id="-param-integer-stackcount-number-of-checking-round">@param [Integer] stackCount number of checking round</h1><p>#</p>
 </div>
 <div class='tags'>
 </div>
@@ -1154,7 +3281,7 @@ This should be a simple <table id='something'> tag.
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>
-  2.1.0
+  2.1.2
   &#10034;
   Press H to see the keyboard shortcuts
   &#10034;

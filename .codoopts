@@ -1,0 +1,8 @@
+--name       "CoffeeNinjaCommon"
+--readme     README.md
+--title      "CoffeeNinjaCommon Api Doc"
+--private
+--quiet
+--extension  coffee
+--output     ./doc
+./src

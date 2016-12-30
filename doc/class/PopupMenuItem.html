@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset='UTF-8'>
+  <title>CoffeeScript API Documentation</title>
+  <script src='../javascript/application.js'></script>
+  <script src='../javascript/search.js'></script>
+  <link rel='stylesheet' href='../stylesheets/application.css' type='text/css'>
+</head>
+  <body>
+    <div id='base' data-path='../'></div>
+<div id='header'>
+  <div id='menu'>
+    <a href='../extra/README.md.html' title='NinjaCommon'>
+      NinjaCommon
+    </a>
+    &raquo;
+    <a href='../alphabetical_index.html' title='Index'>
+      Index
+    </a>
+    &raquo;
+    <span class='title'>PopupMenuItem</span>
+  </div>
+</div>
+    <div id='content'>
+      <h1>
+        Class:
+        PopupMenuItem
+      </h1>
+      <table class='box'>
+        <tr>
+          <td>Defined in:</td>
+          <td>src\popup_menu\popup_menu.coffee</td>
+        </tr>
+      </table>
+      <h2>Overview</h2>
+      <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="popup-menu-item-class-to-manage-single-popup-menu-item">popup menu item class to manage single popup menu item</h1>
+<h1 id="-example">@example</h1>
+<h1 id="popup-new-popupmenu-title-x-y-">popup = new PopupMenu(title, x, y)</h1>
+<h1 id="popup-additem-item-text-callbackfunction-callbackdata">popup.addItem &quot;Item Text&quot;, callbackFunction, callbackData</h1>
+<h1 id="-setbadge-3-">.setBadge(3)</h1>
+<h1 id="-seticon-fa-fa-home-">.setIcon(&#39;fa fa-home&#39;)</h1>
+<h1 id="-setclass-primary-">.setClass(&#39;primary&#39;)</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+      <h2>Instance Method Summary</h2>
+      <ul class='summary'>
+  <li>
+    <span class='signature'>
+      <a href='#getRenderedElement-dynamic'>
+        #
+(void)
+<b>getRenderedElement</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- function to get the html element including badge and icon and classes
+#
+@return [JqueryElement] jquery element including badge icons and applied settings
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getLink-dynamic'>
+        #
+(void)
+<b>getLink</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- getLink function to get the link of the currently created li
+#
+@return [JqueryElement] link jquery element
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setBadge-dynamic'>
+        #
+(void)
+<b>setBadge</b><span>(badge)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- setBadge function to set the badge
+#
+@param [Integer] number to set as the badge
+@return [PopupMenuItem] this current instance
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setIcon-dynamic'>
+        #
+(void)
+<b>setIcon</b><span>(iconClass)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- setIcon function to set the icon on menu item
+#
+@param [String] iconClass to set the class name
+@return [PopupMenuItem] this current instance
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setClass-dynamic'>
+        #
+(void)
+<b>setClass</b><span>(textClass)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- setClass to set the classes on li itself
+#
+@param [String] textClass
+@return [PopupMenuItem] this current instance
+#
+
+    </span>
+  </li>
+</ul>
+      <h2>Constructor Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='constructor-dynamic'>
+      #
+(void)
+<b>constructor</b><span>(name, className, id)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="constructor-create-new-popup-menu">constructor create new popup menu</h1><p>#</p><h1 id="-param-string-name-the-name-of-the-popup-menu-to-display">@param [String] name the name of the popup menu to display</h1>
+<h1 id="-param-string-classname-the-class-to-be-applied-on-the-popup-menu-li">@param [String] className the class to be applied on the popup menu li</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+</div>
+      <h2>Instance Method Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='getRenderedElement-dynamic'>
+      #
+(void)
+<b>getRenderedElement</b><span>()</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="function-to-get-the-html-element-including-badge-and-icon-and-classes">function to get the html element including badge and icon and classes</h1><p>#</p><h1 id="-return-jqueryelement-jquery-element-including-badge-icons-and-applied-settings">@return [JqueryElement] jquery element including badge icons and applied settings</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getLink-dynamic'>
+      #
+(void)
+<b>getLink</b><span>()</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="getlink-function-to-get-the-link-of-the-currently-created-li">getLink function to get the link of the currently created li</h1><p>#</p><h1 id="-return-jqueryelement-link-jquery-element">@return [JqueryElement] link jquery element</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setBadge-dynamic'>
+      #
+(void)
+<b>setBadge</b><span>(badge)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="setbadge-function-to-set-the-badge">setBadge function to set the badge</h1><p>#</p><h1 id="-param-integer-number-to-set-as-the-badge">@param [Integer] number to set as the badge</h1>
+<h1 id="-return-popupmenuitem-this-current-instance">@return [PopupMenuItem] this current instance</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setIcon-dynamic'>
+      #
+(void)
+<b>setIcon</b><span>(iconClass)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="seticon-function-to-set-the-icon-on-menu-item">setIcon function to set the icon on menu item</h1><p>#</p><h1 id="-param-string-iconclass-to-set-the-class-name">@param [String] iconClass to set the class name</h1>
+<h1 id="-return-popupmenuitem-this-current-instance">@return [PopupMenuItem] this current instance</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setClass-dynamic'>
+      #
+(void)
+<b>setClass</b><span>(textClass)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="setclass-to-set-the-classes-on-li-itself">setClass to set the classes on li itself</h1><p>#</p><h1 id="-param-string-textclass">@param [String] textClass</h1>
+<h1 id="-return-popupmenuitem-this-current-instance">@return [PopupMenuItem] this current instance</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+</div>
+    </div>
+    <div id='footer'>
+  By
+  <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
+    Codo
+  </a>
+  2.1.2
+  &#10034;
+  Press H to see the keyboard shortcuts
+  &#10034;
+  <a href='http://twitter.com/netzpirat' target='_parent'>@netzpirat</a>
+  &#10034;
+  <a href='http://twitter.com/_inossidabile' target='_parent'>@_inossidabile</a>
+</div>
+<iframe id='search_frame'></iframe>
+<div id='fuzzySearch'>
+  <input type='text'>
+  <ol></ol>
+</div>
+<div id='help'>
+  <p>
+    Quickly fuzzy find classes, mixins, methods, file:
+  </p>
+  <ul>
+    <li>
+      <span>T</span>
+      Open fuzzy finder dialog
+    </li>
+  </ul>
+  <p>
+    Control the navigation frame:
+  </p>
+  <ul>
+    <li>
+      <span>L</span>
+      Toggle list view
+    </li>
+    <li>
+      <span>C</span>
+      Show class list
+    </li>
+    <li>
+      <span>I</span>
+      Show mixin list
+    </li>
+    <li>
+      <span>F</span>
+      Show file list
+    </li>
+    <li>
+      <span>M</span>
+      Show method list
+    </li>
+    <li>
+      <span>E</span>
+      Show extras list
+    </li>
+  </ul>
+  <p>
+    You can focus and blur the search input:
+  </p>
+  <ul>
+    <li>
+      <span>S</span>
+      Focus search input
+    </li>
+    <li>
+      <span>Esc</span>
+      Blur search input
+    </li>
+  </ul>
+</div>
+  </body>
+</html>

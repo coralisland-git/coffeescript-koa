@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset='UTF-8'>
+  <title>CoffeeScript API Documentation</title>
+  <script src='../javascript/application.js'></script>
+  <script src='../javascript/search.js'></script>
+  <link rel='stylesheet' href='../stylesheets/application.css' type='text/css'>
+</head>
+  <body>
+    <div id='base' data-path='../'></div>
+<div id='header'>
+  <div id='menu'>
+    <a href='../extra/README.md.html' title='NinjaCommon'>
+      NinjaCommon
+    </a>
+    &raquo;
+    <a href='../alphabetical_index.html' title='Index'>
+      Index
+    </a>
+    &raquo;
+    <span class='title'>DataTypeCollection</span>
+  </div>
+</div>
+    <div id='content'>
+      <h1>
+        Class:
+        DataTypeCollection
+      </h1>
+      <table class='box'>
+        <tr>
+          <td>Defined in:</td>
+          <td>src\data_formatter\data_type_collection.coffee</td>
+        </tr>
+      </table>
+      <h2>Overview</h2>
+      <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="class-for-datatypecollection">class for DataTypeCollection</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+      <h2>Instance Method Summary</h2>
+      <ul class='summary'>
+  <li>
+    <span class='signature'>
+      <a href='#getColumn-dynamic'>
+        #
+(void)
+<b>getColumn</b><span>(source)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Returns the column if defined by
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#toSave-dynamic'>
+        #
+(void)
+<b>toSave</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Convert the data type collection back to values that can be saved to a database
+#|
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#configureColumn-dynamic'>
+        #
+(void)
+<b>configureColumn</b><span>(col, skipDeduce = false)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- Given an array of column configuration structures, create new
+columns automatically based on the configuration.
+#
+@example
+dc.configureColumn
+name: &#39;Create Date&#39;
+source: &#39;create_date&#39;
+visible: true
+hideable: true
+editable: true
+type: &#39;datetime&#39;
+required: false
+#
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#verifyOrderIsUnique-dynamic'>
+        #
+(void)
+<b>verifyOrderIsUnique</b><span>()</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      #| #|  Verify that the sort order id for each column is unique
+
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#configureColumns-dynamic'>
+        #
+(void)
+<b>configureColumns</b><span>(columns, skipDeduce = false)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      ------------------------------------------------------------------------------------------------------------- function to configure more than one columns
+#
+@param [Array] columns columns to configure
+@return [Boolean]
+#
+
+    </span>
+  </li>
+</ul>
+      <h2>Constructor Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='constructor-dynamic'>
+      #
+(void)
+<b>constructor</b><span>(tableName)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="constructor">constructor</h1><p>#</p><h1 id="-param-string-tablename-to-identify-the-datatypecollection-inside-datamap">@param [String] tableName to identify the DataTypeCollection inside dataMap</h1>
+<h1 id="-param-object-cols-the-columns-to-include-in-the-tables">@param [Object] cols the columns to include in the tables</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+</div>
+      <h2>Instance Method Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='getColumn-dynamic'>
+      #
+(void)
+<b>getColumn</b><span>(source)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Returns the column if defined by</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='toSave-dynamic'>
+      #
+(void)
+<b>toSave</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Convert the data type collection back to values that can be saved to a database</p><p>#|</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='configureColumn-dynamic'>
+      #
+(void)
+<b>configureColumn</b><span>(col, skipDeduce = false)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="given-an-array-of-column-configuration-structures-create-new">Given an array of column configuration structures, create new</h1>
+<h1 id="columns-automatically-based-on-the-configuration-">columns automatically based on the configuration.</h1><p>#</p><h1 id="-example">@example</h1>
+<h1 id="dc-configurecolumn">dc.configureColumn</h1>
+<h1 id="name-create-date-">name: &#39;Create Date&#39;</h1>
+<h1 id="source-create_date-">source: &#39;create_date&#39;</h1>
+<h1 id="visible-true">visible: true</h1>
+<h1 id="hideable-true">hideable: true</h1>
+<h1 id="editable-true">editable: true</h1>
+<h1 id="type-datetime-">type: &#39;datetime&#39;</h1>
+<h1 id="required-false">required: false</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='verifyOrderIsUnique-dynamic'>
+      #
+(void)
+<b>verifyOrderIsUnique</b><span>()</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>#|</p><p>#|  Verify that the sort order id for each column is unique</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='configureColumns-dynamic'>
+      #
+(void)
+<b>configureColumns</b><span>(columns, skipDeduce = false)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h1 id="-">-------------------------------------------------------------------------------------------------------------</h1>
+<h1 id="function-to-configure-more-than-one-columns">function to configure more than one columns</h1><p>#</p><h1 id="-param-array-columns-columns-to-configure">@param [Array] columns columns to configure</h1>
+<h1 id="-return-boolean-">@return [Boolean]</h1><p>#</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+</div>
+    </div>
+    <div id='footer'>
+  By
+  <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
+    Codo
+  </a>
+  2.1.2
+  &#10034;
+  Press H to see the keyboard shortcuts
+  &#10034;
+  <a href='http://twitter.com/netzpirat' target='_parent'>@netzpirat</a>
+  &#10034;
+  <a href='http://twitter.com/_inossidabile' target='_parent'>@_inossidabile</a>
+</div>
+<iframe id='search_frame'></iframe>
+<div id='fuzzySearch'>
+  <input type='text'>
+  <ol></ol>
+</div>
+<div id='help'>
+  <p>
+    Quickly fuzzy find classes, mixins, methods, file:
+  </p>
+  <ul>
+    <li>
+      <span>T</span>
+      Open fuzzy finder dialog
+    </li>
+  </ul>
+  <p>
+    Control the navigation frame:
+  </p>
+  <ul>
+    <li>
+      <span>L</span>
+      Toggle list view
+    </li>
+    <li>
+      <span>C</span>
+      Show class list
+    </li>
+    <li>
+      <span>I</span>
+      Show mixin list
+    </li>
+    <li>
+      <span>F</span>
+      Show file list
+    </li>
+    <li>
+      <span>M</span>
+      Show method list
+    </li>
+    <li>
+      <span>E</span>
+      Show extras list
+    </li>
+  </ul>
+  <p>
+    You can focus and blur the search input:
+  </p>
+  <ul>
+    <li>
+      <span>S</span>
+      Focus search input
+    </li>
+    <li>
+      <span>Esc</span>
+      Blur search input
+    </li>
+  </ul>
+</div>
+  </body>
+</html>
