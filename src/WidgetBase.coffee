@@ -288,6 +288,12 @@ class WidgetTag
         for c in @children
             c.onResize()
 
+        if @view?
+            console.log "Resizing widget view to ", @width(), @height()
+            @view.onResize(@width(), @height())
+
+        true
+
     ##|
     ##|   Set the text value or get the text value if nothing passed in
     text: (str) =>
@@ -371,6 +377,24 @@ class WidgetTag
 
     on: (eventName, callback)=>
         @bind(eventName, callback)
+
+    ##|
+    ##|  Set the HTML to a given view name
+    ##|  Execute the callback with the view before returning if
+    ##|  a callback is specified
+    setView: (viewName, viewCallback)=>
+
+        new Promise (resolve, reject)=>
+
+            doAppendView viewName, @el
+            .then (view)=>
+                if viewCallback?
+                    viewCallback(view)
+
+                @view = view
+                @onResize()
+
+                resolve(view)
 
     ##|
     ##|  Bind helper function, does a jQuery bind but first

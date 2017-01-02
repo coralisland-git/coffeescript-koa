@@ -36,6 +36,13 @@ addHolder = (name) ->
 	$("#testCase").append($("<div id='" + name + "' style='padding-top: 20px;' />"))
 	true
 
+addHolderWidget = (name, w, h)->
+
+	@addHolder("test_#{name}")
+	div = new WidgetTag "div", "testWidget"
+	div.appendTo("#test_#{name}")
+	return div
+
 ##|
 ##|  Very simple call that takes a label (some notes for the user) and
 ##|  a javascript block to execute as the test.   The code and label are

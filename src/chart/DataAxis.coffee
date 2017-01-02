@@ -2,14 +2,21 @@ class DataAxis
 
     constructor: (options)->
 
-        @data =
-            title: "Title not set"
+        @data = {}
+            # title: "Title not set"
 
         if options?
             $.extend @data, options
 
+        @setLabelFontSize 10
+
+    ##|
+    ##|  Set a new title or unset the dummy title by sending null
     setTitle: (title)=>
-        @data.title = title
+        if !title?
+            delete @data.title
+        else
+            @data.title = title
 
     setRange: (minvalue, maxvalue)=>
         @data.minimum = minvalue
@@ -25,6 +32,11 @@ class DataAxis
         @setFormatString '#,##0.##'
         @setPrefix '$ '
 
+    setLabelFontSize: (newSize)=>
+        @data.labelFontSize = newSize
+
+    setLabelFontAngle: (newAngle)=>
+        @data.labelAngle = newAngle
 
     addStripLine: (startValue, endValue, options)=>
 

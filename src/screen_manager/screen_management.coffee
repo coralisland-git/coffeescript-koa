@@ -218,6 +218,26 @@ doShowScreen = (screenName, optionalArgs) ->
     $('input').each (idx, el) ->
         $(el).blur()
 
+    afterSlash = ""
+
+    if !window.hashHistory?
+        window.hashHistory = []
+
+    if document.location.hash? and document.location.hash.length > 1
+        if /\//.test document.location.hash
+            parts = document.location.hash.split('/', 2)
+            afterSlash = parts[1]
+        window.hashHistory.push document.location.hash.replace('#','')
+
+    if screenName.indexOf("/") != -1
+        ##|
+        ##|  allow showScreen "Screen/Args/Args",
+        parts = screenName.split("/")
+        screenName = parts.shift()
+        afterSlash = parts.join("/")
+
+    ##|
+    ##|  Check to see if the screen is loaded
     if not Screens[screenName]
 
         className = "Screen#{screenName}"
@@ -236,18 +256,6 @@ doShowScreen = (screenName, optionalArgs) ->
         Screens.history.push Screens.current
         Screens.current.onHideScreen()
         $(Screens.current.classid).hide()
-
-    if !window.hashHistory?
-        window.hashHistory = []
-
-    afterSlash = ""
-
-    if document.location.hash? and document.location.hash.length > 1
-        if /\//.test document.location.hash
-            parts = document.location.hash.split('/', 2)
-            afterSlash = parts[1]
-        window.hashHistory.push document.location.hash.replace('#','')
-
 
     if afterSlash.length > 0
         document.location.hash = "#" + screenName + "/" + afterSlash

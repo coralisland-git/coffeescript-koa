@@ -1,3 +1,9 @@
+####
+#
+# NOTE:  Nothing in here works currently, moving to new chart system
+#
+####
+
 $ ->
     ##|
     ##|  This is just for diagnostics,  you don't need to verify the data map is
