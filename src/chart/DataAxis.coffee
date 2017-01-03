@@ -8,7 +8,8 @@ class DataAxis
         if options?
             $.extend @data, options
 
-        @setLabelFontSize 10
+        @setLabelFontSize 16
+        @setLabelFontAngle 0
 
     ##|
     ##|  Set a new title or unset the dummy title by sending null

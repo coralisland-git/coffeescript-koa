@@ -13,6 +13,11 @@ class DataSeries
     setColor: (newColor)=>
         @data.color = newColor
 
+    setLegend: (newText)=>
+        @data.legendText = newText
+        @data.showInLegend = true
+        true
+
     ##|
     ##|  Add a new point and increase the value if the point already exists
     ##|  @see http://canvasjs.com/editor/?id=http://canvasjs.com/example/gallery/column/oil_reserves/

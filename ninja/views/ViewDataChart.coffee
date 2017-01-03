@@ -19,9 +19,9 @@ class ViewDataChart extends View
 
     setTitle: (title)=>
         @chartOptions.title =
-            text: title
-            fontSize: 18
-            horizontalAlign: "right"
+            text            : title
+            fontSize        : 18
+            horizontalAlign : "right"
         return @chartOptions.title
 
     ##|
