@@ -23,7 +23,6 @@ class DataSeries
     ##|  @see http://canvasjs.com/editor/?id=http://canvasjs.com/example/gallery/column/oil_reserves/
     addAggregatePoint: (value, label)=>
 
-        console.log "Adding #{value} to #{label}"
         for p in @data.dataPoints
             # if p.label == label
             if p.x.toString() == label.toString()

@@ -5,7 +5,7 @@ globalChartCounter = 0
 class ViewDataChart extends View
 
     getDependencyList: ()=>
-        return ["http://canvasjs.com/assets/script/canvasjs.min.js"]
+        return ["/vendor/canvasjs.min.js"]
 
     onSetupButtons: () =>
         console.log "ViewDataChart onSetupButtons holder=", @elHolder
