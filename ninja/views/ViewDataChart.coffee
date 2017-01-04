@@ -13,9 +13,19 @@ class ViewDataChart extends View
     onShowScreen: ()=>
         console.log "ViewDataChart onShowScreen holder=", @elHolder
         @chartOptions = {}
-        @axisX = new DataAxis()
-        @axisY = new DataAxis()
+        @axisX  = new DataAxis()
+        @axisY  = new DataAxis()
         @chartOptions.backgroundColor = "#E6F8F2"
+
+    addAxisY: ()=>
+
+        if !Array.isArray(@axisY)
+            tmp = [ @axisY, new DataAxis() ]
+            @axisY = tmp
+        else
+            @axisY.push new DataAxis()
+
+        return @axisY[@axisY.length-1]
 
     setTitle: (title)=>
         @chartOptions.title =
@@ -34,21 +44,13 @@ class ViewDataChart extends View
         return @chartOptions
 
     onResize : (w, h)=>
-        height    = $(window).height()
-        if !@elHolder? then return
+        return
 
-        if w? and h?
-            @elHolder.width(w)
-            @elHolder.height(h)
-            @elHolder.find("#chart#{@gid}").width(w).height(h);
-        else
-            pos       = @elHolder.position()
-            offset    = @elHolder.offset()
-            newHeight = height - pos.top
-            newHeight = Math.floor(newHeight)
-            @elHolder.height(newHeight)
-            @elHolder.width("100%")
-            @elHolder.find("#chart#{@gid}").width("100%").height(newHeight);
+
+    setSize: (w, h)=>
+        @elHolder.width(w)
+        @elHolder.height(h)
+        @elHolder.find("#chart#{@gid}").width(w).height(h);
 
         if @chart?
             return @onRender()
@@ -63,7 +65,13 @@ class ViewDataChart extends View
         if @chart? then return onRender()
 
         @chartOptions.axisX = @axisX.data
-        @chartOptions.axisY = @axisY.data
+
+        if Array.isArray(@axisY)
+            @chartOptions.axisY = []
+            for a in @axisY
+                @chartOptions.axisY.push a.data
+        else
+            @chartOptions.axisY = @axisY.data
 
         @gid = globalChartCounter++
         if name? then @gid = name

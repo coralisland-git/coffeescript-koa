@@ -39,6 +39,9 @@ class DataAxis
     setLabelFontAngle: (newAngle)=>
         @data.labelAngle = newAngle
 
+    setLabelFontColor: (newColor)=>
+        @data.labelFontColor = newColor
+
     addStripLine: (startValue, endValue, options)=>
 
         if !@data.stripLines
