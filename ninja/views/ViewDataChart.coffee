@@ -62,7 +62,7 @@ class ViewDataChart extends View
         true
 
     show: (name)=>
-        if @chart? then return onRender()
+        if @chart? then return @onRender()
 
         @chartOptions.axisX = @axisX.data
 
