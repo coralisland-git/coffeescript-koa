@@ -257,11 +257,6 @@ doShowScreen = (screenName, optionalArgs) ->
         Screens.current.onHideScreen()
         $(Screens.current.classid).hide()
 
-    if afterSlash.length > 0
-        document.location.hash = "#" + screenName + "/" + afterSlash
-    else
-        document.location.hash = "#" + screenName
-
     Screens.current = Screens[screenName];
     activateCurrentScreen(optionalArgs, screenName);
     return
