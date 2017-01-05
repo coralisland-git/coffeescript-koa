@@ -62,3 +62,8 @@ class DataAxis
         $.extend stripLine, options
         @data.stripLines.push stripLine
         return stripLine
+
+    addOptions: (options) =>
+        for key, value of options
+            @data[key] = value
+        return options

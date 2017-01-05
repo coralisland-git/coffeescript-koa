@@ -9,7 +9,10 @@ class DataSeries
             dataPoints:   []
             pointCount:   0
 
-        @fieldName = 'x'
+        if options?
+            $.extend @data, options
+
+        @fieldName = 'label'
 
     ##|
     ##|  Set the color for this series
@@ -80,11 +83,26 @@ class DataSeries
 
     ##|
     ##|  Add a new point of data to the chart
-    addPoint: (x, y)=>
+    addPoint: (x, y, legendText)=>
 
         point = {}
         point.y = y
         point[@fieldName] = x
+        if legendText
+            point.legendText = legendText
+        @data.dataPoints.push(point)
+        return point
+
+    ##|
+    ##| Add a new point for bubble chart
+    ##| @see http://canvasjs.com/editor/?id=http://canvasjs.com/example/gallery/bubble/emp_in_agriculture/
+    addBubblePoint: (x, y, z, name) =>
+        point = {
+            x: x,
+            y: y,
+            z: z
+        }
+        point[@fieldName] = name
         @data.dataPoints.push(point)
         return point
 
