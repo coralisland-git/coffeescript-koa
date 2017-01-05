@@ -29,7 +29,18 @@ class DataSeries
     ##|  not sure why we need to do this for some examples?
     sortTimeseries: ()=>
         @data.dataPoints = @data.dataPoints.sort (a,b)=>
-            if a.x.getTime()<b.x.getTime() then return -1
+            a1 = a.x || a.label
+            b1 = b.x || b.label
+
+            if !a1
+                console.log "Invalid point:", a
+                return -1
+
+            if !b1
+                console.log "Invalid point b:", b
+                return 1
+
+            if a1.getTime()<b1.getTime() then return -1
             return 1
 
     addRangePoint: (value, label)=>
