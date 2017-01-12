@@ -150,6 +150,7 @@ class DynamicTabs
 	## @return [Array] : array that is refreshed finally
 	##
 	refreshTagOrders: (arrayToOrder) ->
+		if arrayToOrder[0].order < 0 then arrayToOrder[0].order = 0
 		arrayToOrder.reduce (prevOrder, current) ->
 			if prevOrder.order?
 				prevOrder = prevOrder.order
