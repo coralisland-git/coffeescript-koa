@@ -36,17 +36,6 @@ $ ->
 		tab2.setBadge(2,'danger','back') ## direction of the badge it can be front (default) or back
 		return 1
 
-	addTestButton "Test Tabs with Views", "Open", (e)->
-		addHolder("renderTest1");
-		newPromise ()->
-
-			tabs = new DynamicTabs("#renderTest1")
-			yield tabs.doAddViewTab "TestView 1", "Default One"
-			yield tabs.doAddViewTab "TestView 2", "Default Two"
-		
-		.then ()->
-			console.log "TabView Added."
-
 	addTestButton "Tabs with tables", "Open", (e)->
 		addHolder("renderTest1")
 		$("#renderTest1").height(800)
