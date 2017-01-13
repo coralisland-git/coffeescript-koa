@@ -3,7 +3,7 @@ koa                 = require 'koa'
 session             = require 'koa-session'
 glob                = require('glob-all');
 stylus              = require 'stylus'
-jade                = require 'jade'
+pug                 = require 'pug'
 fs                  = require 'fs'
 zlib                = require 'zlib'
 coffeeScript        = require 'coffee-script'
@@ -86,10 +86,10 @@ compileScreen = (screenName, appName)->
         if appName? then pathList = [ "../test/#{appName}/screens/", "../ninja/screens/"]
 
         filenameStylus = yield WebServerHelper.doFindFileInPath "screen_#{screenName.toLowerCase()}.styl", pathList
-        filenameJade   = yield WebServerHelper.doFindFileInPath "screen_#{screenName.toLowerCase()}.jade", pathList
+        filenamePug   = yield WebServerHelper.doFindFileInPath "screen_#{screenName.toLowerCase()}.pug", pathList
         filenameCoffee = yield WebServerHelper.doFindFileInPath "screen_#{screenName.toLowerCase()}.coffee", pathList
 
-        html = yield WebServerHelper.doCompileJadeFile filenameJade
+        html = yield WebServerHelper.doCompilePugFile filenamePug
         html = "<div id='Screen#{screenName}' class='screen contentNoPadding overflow-hidden'>" + html + "</div>"
         js   = yield WebServerHelper.doCompileCoffeeFile filenameCoffee
 
@@ -119,11 +119,11 @@ compileView = (viewName, appName)->
         if appName? then pathList = [ "../test/#{appName}/views/", "../ninja/views/" ]
 
         filenameCss  = yield WebServerHelper.doFindFileInPath "#{viewName}.styl", pathList
-        filenameHtml = yield WebServerHelper.doFindFileInPath "#{viewName}.jade", pathList
+        filenameHtml = yield WebServerHelper.doFindFileInPath "#{viewName}.pug", pathList
         filenameJs   = yield WebServerHelper.doFindFileInPath "#{viewName}.coffee", pathList
 
         css  = yield WebServerHelper.doCompileStylusFile filenameCss
-        html = yield WebServerHelper.doCompileJadeFile filenameHtml
+        html = yield WebServerHelper.doCompilePugFile filenameHtml
         js   = yield WebServerHelper.doCompileCoffeeFile filenameJs
 
         html = escape(html)
@@ -213,9 +213,9 @@ class NinjaWebServer
         @processPath url, path, "text/css", WebServerHelper.doCompileStylusFile
         true
 
-    loadJadeFile: (url, path)=>
+    loadPugFile: (url, path)=>
 
-        @processPath url, path, "text/html", WebServerHelper.doCompileJadeFile
+        @processPath url, path, "text/html", WebServerHelper.doCompilePugFile
         true
 
     loadCoffeeFiles: (url, path)=>
@@ -328,10 +328,10 @@ class NinjaWebServer
                 # console.log "Adding stylus file:", file
                 css = yield WebServerHelper.doCompileStylusFile file
                 @ninjaStylusFiles[file] = css
-            else if /.jade/.test file
-                html = yield WebServerHelper.doCompileJadeFile file
-                # console.log "Adding jade file:", file
-                @ninjaJadeFiles[file] = html
+            else if /.pug/.test file
+                html = yield WebServerHelper.doCompilePugFile file
+                # console.log "Adding Pug file:", file
+                @ninjaPugFiles[file] = html
             else if /\.png|\.jpg/.test file
                 # console.log "Adding image file:", file
             else
@@ -364,7 +364,7 @@ class NinjaWebServer
         zlib.gzip strCss, (_, contentCss)=>
             ninjaCss = contentCss
 
-        for file, html of @ninjaJadeFiles
+        for file, html of @ninjaPugFiles
             console.log "Error: what do we do with #{file}"
 
         true
@@ -382,7 +382,7 @@ class NinjaWebServer
             @ninjaCoffeeRaw     = {}
             @ninjaCoffeeFiles   = {}
             @ninjaCoffeeMap     = {}
-            @ninjaJadeFiles     = {}
+            @ninjaPugFiles     = {}
             @ninjaStylusFiles   = {}
 
             files = glob.sync "../src/**"
@@ -417,8 +417,8 @@ class NinjaWebServer
         @findAppNameMiddleware()
 
         @loadStylusFile "/css/test.css", "../test/css/*styl"
-        @loadJadeFile "/", "../test/template/index.jade"
-        @loadJadeFile "/index.html", "../test/template/index.jade"
+        @loadPugFile "/", "../test/template/index.pug"
+        @loadPugFile "/index.html", "../test/template/index.pug"
 
         ninjaPathMiddleware @app
 

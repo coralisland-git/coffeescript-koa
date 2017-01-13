@@ -12,6 +12,6 @@ Read these documents:
 Description
 --------------------------------------------------
 Each of the pages on the left are designed to demonstrate or test specific web GUI controls
-they are added as a jade template in test/views, a javascript page in test/js/, and possibly data.
+they are added as a pug template in test/views, a javascript page in test/js/, and possibly data.
 
 

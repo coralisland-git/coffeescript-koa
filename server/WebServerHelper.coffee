@@ -2,7 +2,7 @@ mime                = require 'mime-types'
 glob                = require 'glob-all';
 stylus              = require 'stylus'
 nib                 = require 'nib'
-jade                = require 'jade'
+pug                 = require 'pug'
 fs                  = require 'fs'
 less                = require 'less'
 os                  = require 'os'
@@ -97,7 +97,7 @@ class WebServerHelper
                     resolve(null)
 
 
-    @doCompileJadeFile : (filename)->
+    @doCompilePugFile : (filename)->
 
         new Promise (resolve, reject)->
 
@@ -113,7 +113,7 @@ class WebServerHelper
                         resolve("")
                         return
 
-                    html = jade.render content,
+                    html = pug.render content,
                         filename : filename
                         pretty   : false
                         debug    : false
@@ -124,7 +124,7 @@ class WebServerHelper
 
             catch e
 
-                console.log "Unable to compile jade: ", filename
+                console.log "Unable to compile Pug: ", filename
                 resolve("")
 
     @doCompileCoffeeFile : (filename, createMap = null)->

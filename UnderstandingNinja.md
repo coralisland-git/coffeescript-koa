@@ -12,7 +12,7 @@ The overall concept used by the *Edge* system is based on:
 Notes:
 
 1. Each screen or view has 1, 2, or 3 files.  There is a .coffee file that is the code for that screen or view.  
-2. There is a .jade file that is the optional HTML5 template
+2. There is a .pug file that is the optional HTML5 template
 3. There is a .styl file that is the Stylus CSS template 
 
 When a screen or view is requested, the server will compile the screen or view into a .js file and deliver it to the browser.   The Browser will then create an instance of the View or Screen class and add it to the display.
@@ -52,6 +52,6 @@ Open a browser to
 
     http://localhost:9000/
 
-Each test case should have a title on the left side of the screen defined in [index.jade](test/template/index.jade) and a page defined in test/js/
+Each test case should have a title on the left side of the screen defined in [index.pug](test/template/index.pug) and a page defined in test/js/
 
 The file [test_common.coffee](test/js/test_common.coffee) has some general functions to make each test page similar in design and style.
