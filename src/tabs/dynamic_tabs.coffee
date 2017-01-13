@@ -137,7 +137,7 @@ class DynamicTabs
 	##
 	## @return [Array] : array of tab data sorted by "order"
 	##
-	addSortedTags: () ->
+	addSortedTags: () =>
 		sortedTags = @tabData.sort(@sorter)	
 		@refreshTagOrders sortedTags
 		for tag, index in sortedTags
@@ -149,7 +149,7 @@ class DynamicTabs
 	## @param [Array] : arrayToOrder array to be refreshed 
 	## @return [Array] : array that is refreshed finally
 	##
-	refreshTagOrders: (arrayToOrder) ->
+	refreshTagOrders: (arrayToOrder) =>
 		if arrayToOrder[0].order < 0 then arrayToOrder[0].order = 0
 		arrayToOrder.reduce (prevOrder, current) ->
 			if prevOrder.order?
@@ -247,7 +247,7 @@ class DynamicTabs
 				resolve(tab)
 
 	##|
-	##|  Add a table to a tab which is a common function so we
+	##|  Add a table to a tab which is a common function so 
 	##|  we have included management for tabs with tables globally
 	##|
 	doAddTableTab : (tableName, tabText) =>
@@ -275,7 +275,7 @@ class DynamicTabs
 	onCheckTableUpdateRowcount: (tableName, newRowCount)=>
 
 		if !@tables? then return
-		# console.log "onCheckTableUpdateRowcount table=#{tableName} new=#{newRowCount}"
+		console.log "onCheckTableUpdateRowcount table=#{tableName} new=#{newRowCount}"
 
 		if @tables[tableName]?
 			@tables[tableName].tab.badgeText.html newRowCount
