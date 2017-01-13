@@ -149,11 +149,7 @@ class DynamicTabs
 	## @param [Array] : arrayToOrder array to be refreshed 
 	## @return [Array] : array that is refreshed finally
 	##
-<<<<<<< .merge_file_a01132
 	refreshTagOrders: (arrayToOrder) =>
-=======
-	refreshTagOrders: (arrayToOrder) ->
->>>>>>> .merge_file_a04024
 		if arrayToOrder[0].order < 0 then arrayToOrder[0].order = 0
 		arrayToOrder.reduce (prevOrder, current) ->
 			if prevOrder.order?
