@@ -3,13 +3,13 @@
   "version": "0.0.1",
   "private": "true",
   "dependencies": {
+    "coffee-exception-report": "^1.0.0",
     "coffee-middleware": "^0.3.0",
     "coffee-script": "^1.10.0",
     "connect-coffee-script": "^0.2.1",
     "fluidity": "^0.2.3",
-    "glob-all": "^3.1.0",   
+    "glob-all": "^3.1.0",
     "ico": "^0.3.3",
-    "jade": "^1.11.0",
     "koa": "^1.2.4",
     "koa-session": "^3.3.1",
     "less": "^2.7.1",
@@ -18,8 +18,8 @@
     "mathjs": "^3.6.0",
     "morgan": "^1.6.1",
     "nib": "^1.1.0",
+    "pug": "^2.0.0-beta6",
     "serve-favicon": "^2.3.0",
-    "coffee-exception-report": "^1.0.0",
     "stylus": "^0.52.4"
   },
   "scripts": {
