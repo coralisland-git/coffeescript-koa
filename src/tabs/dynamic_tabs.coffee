@@ -142,7 +142,7 @@ class DynamicTabs
 		@refreshTagOrders sortedTags
 		for tag, index in sortedTags
 			@addTab tag.tabName, tag.defaultHtml 
-			console.log tag.tabName + ":" + tag.order
+		##	console.log tag.tabName + ":" + tag.order
 		return sortedTags	
 	##-----------------------------------------------------------------------------------------------------------------
 	## Refresh value of each Tag's order if there is duplicated one
@@ -155,7 +155,7 @@ class DynamicTabs
 			if prevOrder.order?
 				prevOrder = prevOrder.order
 			if current.order < 0
-				console.log current.tabName + "," + prevOrder
+			##	console.log current.tabName + "," + prevOrder
 				current.order = if prevOrder? then prevOrder + 1 else 0
 			if prevOrder == current.order
 				current.order++
