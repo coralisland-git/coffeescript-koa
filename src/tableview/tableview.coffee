@@ -1230,7 +1230,7 @@ class TableView
 		newHeight = height - pos.top
 		newHeight = Math.floor(newHeight)
 		## if newHeight is too short, table content might not be shown
-		if newHeight < 100 then newHeight = 400
+		if newHeight < 400 then newHeight = 400
 		@elTableHolder.height(newHeight)
 
 		##|
