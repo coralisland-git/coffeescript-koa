@@ -17,10 +17,10 @@
 
 ###
 
-globalKeyboardEvents = new EvEmitter()
-globalTableEvents    = new EvEmitter()
-globalTableAdmin     = true
-minHeightOfTable	 = 400
+globalKeyboardEvents    = new EvEmitter()
+globalTableEvents       = new EvEmitter()
+globalTableAdmin        = true
+minHeightOfTable        = 400
 
 $(window).on "resize", (e)=>
 	w = $(window).width()
