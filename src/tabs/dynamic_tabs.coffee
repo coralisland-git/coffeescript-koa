@@ -125,11 +125,12 @@ class DynamicTabs
 	addTabData: (tabName, defaultHtml, order) =>
 		if order == undefined
 			order = -1
-		tab = 
-			tabName: 		tabName
-			defaultHtml:	defaultHtml
-			order:			order
-		@tabData.push(tab)
+		tab = {
+			tabName,
+			defaultHtml,
+			order
+		}
+		@tabData.push tab
 		return tab
 
 	## ---------------------------------------------------------------------------------------------------------------
@@ -137,13 +138,27 @@ class DynamicTabs
 	##
 	## @return [Array] : array of tab data sorted by "order"
 	##
-	addSortedTags: () =>
+	addSortedTags: (tabType) =>
 		sortedTags = @tabData.sort(@sorter)	
 		@refreshTagOrders sortedTags
-		for tag, index in sortedTags
-			@addTab tag.tabName, tag.defaultHtml 
-		##	console.log tag.tabName + ":" + tag.order
+		if tabType is "tab"
+			for tag, index in sortedTags
+				@addTab tag.tabName, tag.defaultHtml
+				console.log tag.tabName + ":" + tag.order
+		else if tabType is "viewTab"
+			for tag, index in sortedTags
+				yield @doAddViewTab tag.viewName, tag.tabText
+				console.log tag.viewName + ":" + tag.order
+		else if tabType is "tableTab"
+			for tag, index in sortedTags
+				yield @doAddTableTab tag.tableName, tag.tabText
+				console.log tag.tableName + ":" + tag.order
+		else
+			console.log "Unsupported Tab Type"
+			return
+		
 		return sortedTags	
+
 	##-----------------------------------------------------------------------------------------------------------------
 	## Refresh value of each Tag's order if there is duplicated one
 	## @param [Array] : arrayToOrder array to be refreshed 
@@ -157,8 +172,8 @@ class DynamicTabs
 			if current.order < 0
 			##	console.log current.tabName + "," + prevOrder
 				current.order = if prevOrder? then prevOrder + 1 else 0
-			if prevOrder == current.order
-				current.order++
+			if prevOrder >= current.order
+				current.order = prevOrder + 1
 			return current.order
 		return arrayToOrder
 
@@ -225,6 +240,26 @@ class DynamicTabs
 
 		true
 
+	## -------------------------------------------------------------------------------------------------------------
+	## Add a new viewTab data to array named "tabData"
+	##
+	## @param [String] viewName: the name of the viewTab to be added
+	## @param [String] tabText: text for the tab content
+	## @param [Integer] order: (optional) order of the viewTab that should >= 0, if not specified, set it to -1
+	## @return [viewTab] the new tab Object which is created
+	##
+	doAddViewTabData : (viewName, tabText, callbackWithView, order) =>
+		
+		if order == undefined then order = -1
+		viewTab = {
+			viewName,
+			tabText,
+			callbackWithView,
+			order
+		}
+		@tabData.push viewTab
+		return viewTab
+
 	##|
 	##|  Add a view to a tab
 	##|  Return (resolves) with the tab
@@ -245,6 +280,25 @@ class DynamicTabs
 				view.elHolder = elViewHolder
 				callbackWithView(view, tabText)
 				resolve(tab)
+
+	## -------------------------------------------------------------------------------------------------------------
+	## Add a new tableTab data to array named "tabData"
+	##
+	## @param [String] tableName: the name of the tableTab to be added
+	## @param [String] tabText: text for the tab content
+	## @param [Integer] order: (optional) order of the tableTab that should >= 0, if not specified, set it to -1
+	## @return [TableTab] the new tab Object which is created
+	##
+	doAddTableTabData : (tableName, tabText, order) =>
+		
+		if order == undefined then order = -1
+		tableTab = {
+			tableName,
+			tabText,
+			order
+		}
+		@tabData.push tableTab
+		return tableTab
 
 	##|
 	##|  Add a table to a tab which is a common function so 

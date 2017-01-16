@@ -11,11 +11,11 @@ $ ->
 		addHolder("renderTest1");
 		tabs = new DynamicTabs("#renderTest1")
 		tabs.addTabData "Test 1", "Default One"
-		tabs.addTabData "Test 2", "Default Two"
+		tabs.addTabData "Test 2", "Default Two", 1
 		tabs.addTabData "Test 3", "Default Three", 0
 		tabs.addTabData "Test 4", "Default Four"
-		tabs.addTabData "Test 5", "Default Five", 1
-		tabs.addSortedTags()
+		tabs.addTabData "Test 5", "Default Five", 2
+		tabs.addSortedTags("tab").next()
 
 		return 1
 
@@ -46,8 +46,10 @@ $ ->
 			yield loadStockData()
 
 			tabs = new DynamicTabs("#renderTest1")
-			yield tabs.doAddTableTab "zipcode", "Zipcodes"
-			yield tabs.doAddTableTab "stocks", "Stock Data"
+			tabs.doAddTableTabData "zipcode", "Zipcodes", 1
+			tabs.doAddTableTabData "stocks", "Stock Data"
+			tabs.doAddTableTabData "zipcode", "Zipcodes1", 0
+			yield from tabs.addSortedTags "tableTab"
 
 		.then ()->
 			console.log "Done."
