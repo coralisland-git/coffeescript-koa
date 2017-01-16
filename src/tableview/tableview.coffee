@@ -17,9 +17,10 @@
 
 ###
 
-globalKeyboardEvents = new EvEmitter()
-globalTableEvents    = new EvEmitter()
-globalTableAdmin     = true
+globalKeyboardEvents    = new EvEmitter()
+globalTableEvents       = new EvEmitter()
+globalTableAdmin        = true
+minHeightOfTable        = 400
 
 $(window).on "resize", (e)=>
 	w = $(window).width()
@@ -1229,6 +1230,8 @@ class TableView
 
 		newHeight = height - pos.top
 		newHeight = Math.floor(newHeight)
+		## if newHeight is too short, table content might not be shown
+		if newHeight < minHeightOfTable then newHeight = minHeightOfTable
 		@elTableHolder.height(newHeight)
 
 		##|
