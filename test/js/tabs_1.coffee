@@ -19,6 +19,29 @@ $ ->
 
 		return 1
 
+	addTestButton "Test Tabs order/setTimeout", "Open", (e)->
+		addHolder("renderTest1");
+		tabs = new DynamicTabs("#renderTest1")
+		setTimeout ->
+			tabs.addTabData "Test 1", "Default One"
+		, 100
+		setTimeout ->
+			tabs.addTabData "Test 2", "Default Two", 1
+		, 200
+		setTimeout ->
+			tabs.addTabData "Test 3", "Default Three", 0
+		, 300
+		setTimeout ->
+			tabs.addTabData "Test 4", "Default Four"
+		, 400
+		setTimeout ->
+			tabs.addTabData "Test 5", "Default Five", 2
+		, 500
+		setTimeout ->
+			tabs.addSortedTags("tab").next()
+		, 1000
+		return 1
+
 	addTestButton "Test Tabs with badge", "Open", (e)->
 		addHolder("renderTest1");
 		tabs = new DynamicTabs("#renderTest1")
