@@ -56,6 +56,7 @@ class MillerColumns
 
 	## -------------------------------------------------------------------------------------------------------------
 	## filter the data for given category and whose parents are given id,
+	## when dataMap is used here it should filter the data which has categoryId and parentId as passed params
 	## once filtered items are collected it renders new column inside MillerColumn using its api
 	##
 	filterDataWithParentCategory: (categoryId, parentId) =>
