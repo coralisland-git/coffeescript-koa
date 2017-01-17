@@ -123,8 +123,7 @@ class DynamicTabs
 	## @return [Tab] the new tab Object which is created
 	##
 	addTabData: (tabName, defaultHtml, order) =>
-		if order == undefined
-			order = -1
+		if !order? then order = -1
 		tab = {
 			tabName,
 			defaultHtml,
@@ -251,7 +250,7 @@ class DynamicTabs
 	##
 	doAddViewTabData : (viewName, tabText, callbackWithView, order) =>
 		
-		if order == undefined then order = -1
+		if !order? then order = -1
 		viewTab = {
 			viewName,
 			tabText,
@@ -292,7 +291,7 @@ class DynamicTabs
 	##
 	doAddTableTabData : (tableName, tabText, order) =>
 		
-		if order == undefined then order = -1
+		if !order? then order = -1
 		tableTab = {
 			tableName,
 			tabText,
