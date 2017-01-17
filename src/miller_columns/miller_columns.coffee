@@ -3,16 +3,10 @@
  Class:  MillerColumns
  =====================================================================================
 
- This is class to render MillerColumns using given items
+ This is class to render MillerColumns using given element
 
  @example:
- new MillerColumns $("#container")
-
- Events:
- =====================================================================================
-
- "selected" : will trigger when a item is clicked in a column, for example
- @example: mc.on "selected", (item, e) =>
+ new MillerColumns $("#container"), isReadOnly
 
 ###
 
@@ -60,6 +54,10 @@ class MillerColumns
 			@filterDataWithParentCategory data.categoryId, data.itemId
 			@onSelected(e, data)
 
+	## -------------------------------------------------------------------------------------------------------------
+	## filter the data for given category and whose parents are given id,
+	## once filtered items are collected it renders new column inside MillerColumn using its api
+	##
 	filterDataWithParentCategory: (categoryId, parentId) =>
 		subItems = []
 		parentItem = false
