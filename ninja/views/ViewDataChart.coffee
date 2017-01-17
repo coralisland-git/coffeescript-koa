@@ -40,6 +40,9 @@ class ViewDataChart extends View
         if !@chartOptions.data?
             @chartOptions.data = []
 
+        if dataSeries.data.type != "doughnut"
+            dataSeries.setIndexThemeColor(@chartOptions.data.length)
+
         @chartOptions.data.push dataSeries.getData()
         return @chartOptions
 

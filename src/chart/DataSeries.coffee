@@ -1,5 +1,12 @@
 class DataSeries
 
+    @defaults :
+        indexLabelFontSize:   18
+        indexLabelPlacement:   "outside"
+        indexLabelFontColor:  "#eeeeee"
+        indexLabelFontFamily: "San Francisco Text,Verdana,sans-serif"
+        colors:                 ['#007ACC', '#DF4A00', '#8618C1', '#E07600', '#F0C807', '#DF65B4', '#6F754B', '#2B56A8', '#6C13A0']
+
     constructor: (options)->
 
         @data =
@@ -9,10 +16,56 @@ class DataSeries
             dataPoints:   []
             pointCount:   0
 
-        if options?
+        if options? and typeof options == "string"
+            @setLegend(options);
+        else if options?
             $.extend @data, options
 
         @fieldName = 'label'
+
+
+    ##|
+    ##|  The data is money so we can reformat it carefully
+    ##|  using k and mil to make it clean.
+    ##|
+    setFormatMoney: ()=>
+
+        @data.indexLabelFormatter = (e)=>
+
+            # console.log "MONEY:", e
+
+            num = e.dataPoint.y
+            if e.total? then num = e.total
+
+            if !num? then return ""
+            if typeof num != "number" then return num
+
+            if num == 0
+                return ""
+
+            if num < 10000
+                return numeral(num).format('#,###')
+
+            if num < 1000000
+                return numeral(num / 1000).format('#,###') + " k"
+
+            return numeral(num / 1000000).format('#,###.[###]') + " m"
+
+    ##|
+    ##|  For use on dashboards when you may have multiple data series
+    ##|  This will set the index label settings based on a given position
+    ##|  @param num the number of the data set (0 = first, 1 = second, 2 = third, etc)
+    setIndexThemeColor: (num)=>
+
+        num -= DataSeries.defaults.colors.length while num > DataSeries.defaults.colors.length
+
+        @data.indexLabelFontSize   = DataSeries.defaults.indexLabelFontSize
+        @data.indexLabelPlacement   = DataSeries.defaults.indexLabelPlacement
+        @data.indexLabelFontColor  = DataSeries.defaults.indexLabelFontColor
+        @data.indexLabelFontFamily = DataSeries.defaults.indexLabelFontFamily
+        @data.color                = DataSeries.defaults.colors[num]
+
+        true
 
     ##|
     ##|  Set the color for this series
