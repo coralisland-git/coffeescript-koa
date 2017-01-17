@@ -50,11 +50,26 @@ root.DataFormatter = class DataFormatter
 			if data.match /\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d/
 				return moment(data, "YYYY-MM-DD HH:mm:ss")
 
-			if data.match /\d\d\d\d.\d\d.\d\d/
+			if data.match /\d\d\d\d-\d\d-\d\d/
 				return moment(data, "YYYY-MM-DD")
+
+			if data.match /\d\d\d\d\.\d\d\.\d\d \d\d:\d\d:\d\d/
+				return moment(data, "YYYY-MM-DD HH:mm:ss")
+
+			if data.match /\d\d\d\d\.\d\d\.\d\d/
+				return moment(data, "YYYY-MM-DD")
+
+			if data.match /\d\d-\d\d-\d\d\d\d \d\d:\d\d:\d\d/
+				return moment(data, "MM-DD-YYYY HH:mm:ss")
 
 			if data.match /\d\d-\d\d-\d\d\d\d/
 				return moment(data, "MM-DD-YYYY")
+
+			if data.match /\d\d\/\d\d\/\d\d\d\d \d\d:\d\d:\d\d/
+				return moment(data, "MM/DD/YYYY HH:mm:ss")
+
+			if data.match /\d\d\/\d\d\/\d\d\d\d/
+				return moment(data, "MM/DD/YYYY")
 
 			if typeof data == "object" and data['$date']?
 				return moment(new Date(data['$date']))

@@ -1,5 +1,5 @@
 $ ->
-
+	
 	addTest "Text test", ()->
 		globalDataFormatter.formatData "text", "Text value"
 
@@ -37,22 +37,22 @@ $ ->
 			globalDataFormatter.formatData "date", "2015-10-31 14:15:32"
 
 	addTest "MySQL Date to DateTime (pretty printed date time)", () ->
-		globalDataFormatter.formatData "datetime", "2015-10-31 14:15:32"
+		globalDataFormatter.formatData "datetime", "2015.10.31 14:15:32"
 
 	addTest "MySQL Date to Age (Date with days ago)", () ->
 		globalDataFormatter.formatData "age", "2015-10-31 14:15:32"
 
 	addTest "MySQL Date to Timeago", () ->
 		globalDataFormatter.formatData "timeago", "2015-10-01 14:15:32"
-
+	
 	addTest "US Date to Date (no time, simple US output)", () ->
 			globalDataFormatter.formatData "date", "10/02/2015"
 
 	addTest "US Date to DateTime (pretty printed date time)", () ->
-		globalDataFormatter.formatData "datetime", "10/02/2015"
+		globalDataFormatter.formatData "datetime", "10/02/2015 14:15:32"
 
 	addTest "US Date to Age (Date with days ago)", () ->
-		globalDataFormatter.formatData "age", "10/02/2015"
+		globalDataFormatter.formatData "age", "10/31/2015"
 
 	addTest "Enum test, value is one of the array options", () ->
 		globalDataFormatter.formatData "enum", "Blue", ["Red","Green","Blue","Pink"]
