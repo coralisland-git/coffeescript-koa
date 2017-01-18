@@ -8,7 +8,7 @@ class DataAxis
         if options?
             $.extend @data, options
 
-        @setLabelFontSize 16
+        @setLabelFontSize 12
         @setLabelFontAngle 0
 
     ##|

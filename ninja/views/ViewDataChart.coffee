@@ -15,7 +15,7 @@ class ViewDataChart extends View
         @chartOptions = {}
         @axisX  = new DataAxis()
         @axisY  = new DataAxis()
-        @chartOptions.backgroundColor = "#E6F8F2"
+        @chartOptions.backgroundColor = "#EEEEEE"
 
     addAxisY: ()=>
 
@@ -47,8 +47,9 @@ class ViewDataChart extends View
         return @chartOptions
 
     onResize : (w, h)=>
+        if @chart?
+            return @onRender()
         return
-
 
     setSize: (w, h)=>
         @elHolder.width(w)
