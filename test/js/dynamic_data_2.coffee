@@ -56,56 +56,21 @@ $ ->
         "Distance"      :   1000,
         "IsNew"         :   true
 
+    
+    ##|
+    ##|  Load the JSON files.
+    ##|  This will insert the zipcodes, SaveZipcodeData and testData into the global data map.
+    addTest "Loading Data from files..", () ->
+        loadZipcodes()
+        loadDatafromFile "SaveZipcodeData"
+        loadDatafromFile "testData"
+        true
+
     addTest "Confirm DataMap Loaded", ()->
 
         dm = DataMap.getDataMap()
-        if !dm? then return false
-
-        zipcodes = dm.types["zipcode"]
-        #console.log zipcodes
-        if !zipcodes? then return false
-        if !zipcodes.col["code"]? then return false
-
-        true
-    ##|
-    ##|  Load the zipcodes JSON file.
-    ##|  This will insert the zipcodes into the global data map.
-    addTest "Loading Zipcodes", () ->
-
-        new Promise (resolve, reject) ->
-            ds  = new DataSet "zipcode"
-            ds.setAjaxSource "/js/test_data/zipcodes.json", "data", "code"
-            ds.doLoadData()
-            .then (dsObject)->
-                resolve(true)
-            .catch (e) ->
-                console.log "Error loading zipcode data: ", e
-                resolve(false)
-    ##|
-    ##|  Load the SaveZipcodeData JSON file.
-    ##|
-    addTest "Loading SaveZipcodeData", () ->
-
-        new Promise (resolve, reject) ->
-            ds  = new DataSet "SaveZipcodeData"
-            ds.setAjaxSource "/js/test_data/SaveZipcodeData.json", "", "id"
-            ds.doLoadData()
-            .then (dsObject)->
-                resolve(true)
-            .catch (e) ->
-                console.log "Error loading SaveZipcode data: ", e
-                resolve(false)
-
-    addTest "Loading TestData", () ->
-        new Promise (resolve, reject) ->
-            ds = new DataSet "TestData"
-            ds.setAjaxSource "/js/test_data/testData.json", "", "id"
-            ds.doLoadData()
-            .then (dsObject) ->
-                resolve(true)
-            .catch (e) ->
-                console.log "Error loading TestData"
-                resolve(false)
+        if dm?.types["zipcode"]?.col["code"]? then return true
+        return false
     
     addTestButton "Bind to Path", "Open", () =>
         addHolder "renderTest"
@@ -192,7 +157,7 @@ $ ->
         children = wdt_tr.getChildren()
         index = 0
         for field, value of testData1
-            children[index]?.bindToPath "TestData", "0011", field
+            children[index]?.bindToPath "testData", "0011", field
             index++
 
         html = "<br><table class='test_table_2'><caption>Single widget from Table TestData</caption></table><br>"

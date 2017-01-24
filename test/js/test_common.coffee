@@ -30,6 +30,16 @@ loadStockData = ()->
 
 			resolve(true)
 
+loadDatafromFile = (fileName) ->
+	new Promise (resolve, reject)->
+
+		$.get "js/test_data/#{fileName}.json", (allData)->
+			for rec in allData
+				DataMap.addDataUpdateTable "#{fileName}", rec.id, rec
+
+			resolve(true)
+
+
 addHolder = (name) ->
 
 	$("#" + name).remove()
