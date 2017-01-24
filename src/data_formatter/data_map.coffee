@@ -13,7 +13,7 @@ globalOpenEditor = (e) ->
 	data = WidgetTag.getDataFromEvent(e)
 	console.log "GlobalOpenEditor Data:", data
 	path = data.path
-	DataMap.getDataMap().editValue path, e
+	DataMap.getDataMap().editValue path, e.target
 	false
 
 root = exports ? this
@@ -403,9 +403,12 @@ class DataMap
 	@addData: (tableName, keyValue, newData) =>
 
 		path = "/#{tableName}/#{keyValue}"
-		doc = DataMap.getDataMap().engine.set path, newData
-
 		dm = DataMap.getDataMap()
+		doc = dm.engine.set path, newData
+		##|
+		##|  Remove any cached values that happen to exist
+		for varName, value of newData
+			delete dm.cachedFormat["/#{tableName}/#{keyValue}/#{varName}"]
 		dm.emitEvent "new_data", [ tableName, keyValue ]
 
 		return doc
@@ -531,7 +534,7 @@ class DataMap
 		##|
 		##|  TODO Fix Row Data
 		rowData = {}
-		if dm.types[tableName].col[fieldName]?
+		if dm.types[tableName]?.col[fieldName]?
 			currentValue = dm.types[tableName].col[fieldName].renderValue(currentValue, keyValue, rowData)
 
 		if !currentValue? or currentValue == null
