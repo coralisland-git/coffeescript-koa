@@ -5,7 +5,7 @@
 		"Current Price"	:	1021.02,
 		"Date"			: 	"2016-09-16",
 		"Distance"		:	100,
-		"Is New"		:	"false"
+		"IsNew"			:	false
 	},
 	{
 		"id": "0012",
@@ -13,7 +13,7 @@
 		"Current Price"	:	2435.00,
 		"Date"			: 	"2016-05-08",
 		"Distance"		:	150,
-		"Is New"		:	"false"
+		"IsNew"			:	false
 	},
 	{
 		"id": "0013",
@@ -21,7 +21,7 @@
 		"Current Price"	:	1500.00,
 		"Date"			: 	"2016-12-16",
 		"Distance"		:	80,
-		"Is New"		:	"true"
+		"IsNew"			:	true
 	},
 	{
 		"id": "0014",
@@ -29,7 +29,7 @@
 		"Current Price"	:	500.00,
 		"Date"			: 	"2016-04-10",
 		"Distance"		:	1000,
-		"Is New"		:	"false"
+		"IsNew"			:	false
 	},
 	{
 		"id": "0015",
@@ -37,7 +37,7 @@
 		"Current Price"	:	1155.55,
 		"Date"			: 	"2017-01-06",
 		"Distance"		:	320,
-		"Is New"		:	"true"
+		"IsNew"			:	true
 	}
 
 ]

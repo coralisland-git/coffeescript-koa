@@ -7,6 +7,9 @@ $ ->
             border : 1px solid #bbbbdd;
             color  : #309030
         }
+        .lastTable {
+            margin-bottom : 330px;
+        }
         </style>
     '''
 
@@ -14,17 +17,17 @@ $ ->
 
     zipcodeData1 =
         code   : "03105"
-        city   : "Manchester123"
-        state  : "NH"
-        county : "HILLSBOROUGH"
+        city   : "Manchester_other1"
+        state  : "NH_other1"
+        county : "HILLSBOROUGH_other1"
         lat    : "42.952124"
         lon    : "-71.653939"
 
     zipcodeData2 =
         code   : "03105"
-        city   : "Manchester456"
-        state  : "NH"
-        county : "HILLSBOROUGH"
+        city   : "Manchester_other2"
+        state  : "NH_other2"
+        county : "HILLSBOROUGH_other2"
         lat    : "42.952124"
         lon    : "-71.653939"
 
@@ -43,7 +46,7 @@ $ ->
         "Current Price" :   4999.99,
         "Date"          :   "2017-01-16",
         "Distance"      :   1000,
-        "IsNew"        :   "true"
+        "IsNew"         :   true
 
     addTest "Confirm DataMap Loaded", ()->
 
@@ -143,7 +146,7 @@ $ ->
 
         return true
 
-    addTestButton "Add data", "Open", () =>
+    addTestButton "Add data(to zipcode)", "Open", () =>
 
         r = DataMap.addData "zipcode", "03105", zipcodeData1
         if r? and r.id == "03105"
@@ -152,7 +155,7 @@ $ ->
         console.log "Invalid return from adding data"
         return false
 
-    addTestButton "Add another data", "Open", () =>
+    addTestButton "Add another data(to zipcode)", "Open", () =>
 
         r = DataMap.addData "zipcode", "03105", zipcodeData2
         if r? and r.id == "03105"
@@ -161,7 +164,7 @@ $ ->
         console.log "Invalid return from adding data"
         return false
 
-    addTestButton "Add Data with Timer", "Open", () =>
+    addTestButton "Add Data with Timer(to zipcode)", "Open", () =>
         setTimeout ->
             r = DataMap.addData "zipcode", "03105", zipcodeData2
         , 3000
@@ -191,10 +194,13 @@ $ ->
         html = "<br><table class='test_table_1'><caption>Single Widget from Table SaveZipcodeData</caption></table><br>";
         $("#testCase").append($ html)
         $(".test_table_1").last().append wdt_tr.getTag()
+        $(".lastTable").removeClass "lastTable"
+        $(".test_table_1").last().addClass "lastTable"
         return true
 
     addTestButton "Bind to Path(several Data types)", "Open", () =>
         wdt_tr = new WidgetTag("tr", null, "wdt_tr", null)
+        wdt_tr.add "td", null, "wdt_td", null
         wdt_tr.add "td", null, "wdt_td", null
         wdt_tr.add "td", null, "wdt_td", null
         wdt_tr.add "td", null, "wdt_td", null
@@ -209,6 +215,8 @@ $ ->
         html = "<br><table class='test_table_2'><caption>Single widget from Table TestData</caption></table><br>"
         $("#testCase").append($ html)
         $(".test_table_2").last().append wdt_tr.getTag()
+        $(".lastTable").removeClass "lastTable"
+        $(".test_table_2").last().addClass "lastTable"
         true
 
     addTest "Render Property", () ->
