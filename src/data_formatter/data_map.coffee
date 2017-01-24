@@ -9,9 +9,9 @@
 globalOpenEditor = (e) ->
 	##|
 	##|  Clicked on an editable field
-	console.log "GlobalOpenEditor:", e
+	#console.log "GlobalOpenEditor:", e
 	data = WidgetTag.getDataFromEvent(e)
-	console.log "GlobalOpenEditor Data:", data
+	#console.log "GlobalOpenEditor Data:", data
 	path = data.path
 	DataMap.getDataMap().editValue path, e.target
 	false
@@ -87,8 +87,8 @@ class DataMap
 		##|  Fix the options in the global formatter object
 		formatter.options = @types[tableName].col[fieldName].getOptions()
 
-		console.log "editValue path=#{path} table=#{tableName}, keyValue=#{keyValue}, field=#{fieldName}"
-		console.log "Formatter:", formatter
+		#console.log "editValue path=#{path} table=#{tableName}, keyValue=#{keyValue}, field=#{fieldName}"
+		#console.log "Formatter:", formatter
 
 		formatter.editData el, existingValue, path, @updatePathValueEvent
 		return true

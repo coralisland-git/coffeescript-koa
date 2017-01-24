@@ -417,7 +417,7 @@ class WidgetTag
         @el.bind eventName, (e)->
 
             data = WidgetTag.getDataFromEvent(e)
-            console.log "bind DataFromEvent:", data
+            #console.log "bind DataFromEvent:", data
             for varName, value of data
                 e[varName] = value
 
@@ -467,7 +467,7 @@ class WidgetTag
         dm.on( "new_data"
             , (table, id) =>
                 if table is tableName and id is idValue
-                    console.log("Event emitted by DataMap: #{table}/#{id}")
+                    #console.log("Event emitted by DataMap: #{table}/#{id}")
                     @renderField tableName, idValue, fieldName
             )
         globalKeyboardEvents.on( "change"
