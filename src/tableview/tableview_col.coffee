@@ -270,6 +270,13 @@ class TableViewCol extends TableViewColBase
 			@data.skipDeduce = true
 			return
 
+		if /^Is/i.test @data.name
+			@changeColumn "type", "boolean"
+			@changeColumn "width", 60
+			@changeColumn "align", "left"
+			@data.skipDeduce = true
+			return
+
 		if reYear.test @data.name
 			@changeColumn "type", "int"
 			@changeColumn "options", '####'
