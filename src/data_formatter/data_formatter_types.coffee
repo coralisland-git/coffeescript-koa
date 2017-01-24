@@ -160,7 +160,7 @@ class DataFormatterType
 	##|  will remove the input field if you click outside the cell.
 	onGlobalMouseDown: (e)=>
 		if e.target.className == "dynamic_edit"
-			globalKeyboardEvents.once "global_mouse_down", @onGlobalMouseDown
+			#globalKeyboardEvents.once "global_mouse_down", @onGlobalMouseDown
 			return true
 
 		@editorShowing = false
