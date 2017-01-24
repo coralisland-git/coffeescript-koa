@@ -413,10 +413,11 @@ class WidgetTag
         ##|
         ##|  For mouse events, add a reference to the callback
         ##|  so the event handled can easily find this ID
-        @el.bind eventName, (e)=>
+        @el.unbind eventName
+        @el.bind eventName, (e)->
 
             data = WidgetTag.getDataFromEvent(e)
-            # console.log "bind DataFromEvent:", data
+            console.log "bind DataFromEvent:", data
             for varName, value of data
                 e[varName] = value
 
@@ -429,7 +430,7 @@ class WidgetTag
 
         return this
     ##|    
-    ##| New function added by tkooistra for issue #9
+    ##| New function added by tkooistra
     ##| Render filed of table appointed by table/id/filed
     ##|
     renderField: (tableName, idValue, fieldName) =>
@@ -439,9 +440,8 @@ class WidgetTag
         currentValue = DataMap.getDataFieldFormatted tableName, idValue, fieldName
         if currentValue is ""
             return @el
-            
-        classes = []
-        classes.push "data"
+        ## Add class `data` as a default one for widget binded to a table field    
+        classes = ["data"]
 
         if dm.types[tableName]?.col[fieldName]?.getFormatter()?
             @bind 'click', globalOpenEditor
@@ -449,22 +449,21 @@ class WidgetTag
         @addClass className for className in classes
         @setAttribute 'data-path', path
         @html currentValue
-        console.log @el   
+        
         return @el
+
+    ##| 
+    ##| New function added by tkooistra
+    ##| Bind a path(table/id/field) to a WidgetTag
+    ##| so that the WidgetTag can know and automatically update itself
+    ##| when there is any modification in data of the field in table
+    ##|
 
     bindToPath: (tableName, idValue, fieldName) =>
         dm = DataMap.getDataMap()
         @renderField tableName, idValue, fieldName
         path = "/#{tableName}/#{idValue}/#{fieldName}"
-        ###
-        addEventListener("new_data"
-            , (e) => 
-                if e.detail?
-                    if e.detail.tablename is tableName and e.detail.id is idValue
-                        console.log("Data changed: Path: #{tableName}/#{idValue}")
-                        @renderField tableName, idValue, fieldName
-            )
-        ###
+        
         dm.on( "new_data"
             , (table, id) =>
                 if table is tableName and id is idValue
