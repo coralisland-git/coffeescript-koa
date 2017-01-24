@@ -249,6 +249,12 @@ class TableViewCol extends TableViewColBase
 			@changeColumn "align", "left"
 			@data.skipDeduce = true
 			return
+		if /Date/i.test @data.name
+			@changeColumn "type", "datetime"
+			@changeColumn "width", 110
+			@changeColumn "align", "left"
+			@data.skipDeduce = true
+			return
 
 		if / Price/i.test @data.name
 			@changeColumn "type", "money"
