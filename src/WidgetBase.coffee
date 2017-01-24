@@ -90,6 +90,12 @@ class WidgetTag
                 @el.attr attName, attValue
 
     ##|
+    ##| Returns @el of WidgetTag Instance
+    ##|
+    getTag: () =>
+        return @el
+
+    ##|
     ##|  Adds a new child tag under this one of a given type
     ##|  with a default class, id, and attributes
     ##|
@@ -100,6 +106,8 @@ class WidgetTag
         @children.push tag
         return tag
 
+    getChildren: () =>
+        return @children
     ##|
     ##|  Shortcut to add a div
     addDiv: (classes, id, attributes) =>
@@ -420,6 +428,57 @@ class WidgetTag
             return false
 
         return this
+    ##|    
+    ##| New function added by tkooistra for issue #9
+    ##| Render filed of table appointed by table/id/filed
+    ##|
+    renderField: (tableName, idValue, fieldName) =>
+        if !tableName? then return @el        
+        dm = DataMap.getDataMap()
+        path = "/#{tableName}/#{idValue}/#{fieldName}"
+        currentValue = DataMap.getDataFieldFormatted tableName, idValue, fieldName
+        if currentValue is ""
+            return @el
+            
+        classes = []
+        classes.push "data"
+
+        if dm.types[tableName]?.col[fieldName]?.getFormatter()?
+            @bind 'click', globalOpenEditor
+            classes.push "editable"
+        @addClass className for className in classes
+        @setAttribute 'data-path', path
+        @html currentValue
+        console.log @el   
+        return @el
+
+    bindToPath: (tableName, idValue, fieldName) =>
+        dm = DataMap.getDataMap()
+        @renderField tableName, idValue, fieldName
+        path = "/#{tableName}/#{idValue}/#{fieldName}"
+        ###
+        addEventListener("new_data"
+            , (e) => 
+                if e.detail?
+                    if e.detail.tablename is tableName and e.detail.id is idValue
+                        console.log("Data changed: Path: #{tableName}/#{idValue}")
+                        @renderField tableName, idValue, fieldName
+            )
+        ###
+        dm.on( "new_data"
+            , (table, id) =>
+                if table is tableName and id is idValue
+                    console.log("Event emitted by DataMap: #{table}/#{id}")
+                    @renderField tableName, idValue, fieldName
+            )
+        globalKeyboardEvents.on( "change"
+            , (pathChanged, newValue) =>
+                if pathChanged is path
+                    @renderField tableName, idValue, fieldName
+            )
+        true
+        
+        
 
     ##|  Destroy an element, remove all children and destroy them.
     ##|  Remove global variables and cleanup the DOM after.
