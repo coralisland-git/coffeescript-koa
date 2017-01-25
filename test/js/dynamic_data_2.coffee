@@ -20,24 +20,24 @@ $ ->
         city   : "Manchester_other1"
         state  : "NH_other1"
         county : "HILLSBOROUGH_other1"
-        lat    : "42.952124"
-        lon    : "-71.653939"
+        lat    : "13.512632"
+        lon    : "-18.325879"
 
     zipcodeData2 =
         code   : "03105"
         city   : "Manchester_other2"
         state  : "NH_other2"
         county : "HILLSBOROUGH_other2"
-        lat    : "42.952124"
-        lon    : "-71.653939"
+        lat    : "25.654258"
+        lon    : "-20.545310"
 
     zipcodeData3 =
         code   : "03105"
         city   : "Manchester_other3"
         state  : "NH_other3"
         county : "HILLSBOROUGH_other3"
-        lat    : "42.952124"
-        lon    : "-71.653939"
+        lat    : "32.365845"
+        lon    : "-33.225304"
 
     saveZipcodeData1 = 
         "id":"00017",
@@ -62,8 +62,8 @@ $ ->
     ##|  This will insert the zipcodes, SaveZipcodeData and testData into the global data map.
     addTest "Loading Data from files..", () ->
         loadZipcodes()
-        loadDatafromFile "SaveZipcodeData"
-        loadDatafromFile "testData"
+        loadDatafromJSONFile "SaveZipcodeData"
+        loadDatafromJSONFile "testData"
         true
 
     addTest "Confirm DataMap Loaded", ()->
@@ -194,6 +194,7 @@ $ ->
         return false
 
     addTest "Render Property", () ->
+        addHolder "renderTest"
 
         DataMap.addData "property", 1234,
             id: 1234
@@ -206,7 +207,7 @@ $ ->
         html = "<br>Three property table fields, id, address, pool <br><table id='test_tbl_fake'></table>";
 
         children = wdt_tr.getChildren()
-        $("#testCase").append($ html)
+        $("#renderTest").append($ html)
         
         children[0].renderField "property", 1234, "id"
         children[1].renderField "property", 1234, "address"

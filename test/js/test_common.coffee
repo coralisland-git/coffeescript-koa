@@ -30,7 +30,7 @@ loadStockData = ()->
 
 			resolve(true)
 
-loadDatafromFile = (fileName) ->
+loadDatafromJSONFile = (fileName) ->
 	new Promise (resolve, reject)->
 
 		$.get "js/test_data/#{fileName}.json", (allData)->
