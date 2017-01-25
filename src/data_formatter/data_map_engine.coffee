@@ -338,7 +338,7 @@ class DataMapEngine
 
         origDoc = $.extend true, {}, doc
 
-        basePointer = doc
+        basePointer = origDoc
         if path.subPath? and path.subPath.length > 0 and doc?
 
             for name in path.subPath
@@ -352,11 +352,11 @@ class DataMapEngine
         ##|
         ##|  Insert saved document
         c = @internalGetCollection path.collection
-        insertedDoc = c.upsert(doc)
+        insertedDoc = c.upsert(origDoc)
 
         ##|
         ##|  Events when data changed
-        diffs = @deepDiff origDoc, doc, "/#{path.collection}/#{path.condition.id}"
+        diffs = @deepDiff doc, origDoc, "/#{path.collection}/#{path.condition.id}"
         for d in diffs
             @emitter.emitEvent 'change', [ d ]
 
