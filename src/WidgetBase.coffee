@@ -443,7 +443,7 @@ class WidgetTag
         ## Add class `data` as a default one for widget binded to a table field    
         classes = ["data"]
 
-        if dm.types[tableName]?.col[fieldName]?.getFormatter()?
+        if dm.types[tableName]?.col[fieldName]?.getEditable() == true
             @bind 'click', globalOpenEditor
             classes.push "editable"
         @addClass className for className in classes

@@ -15,6 +15,50 @@ $ ->
 
     demoMode = 0
 
+    TableZipcode = []
+    TableZipcode.push
+        name        : 'Code'
+        source      : 'code'
+        visible     : true
+        editable    : false
+        type        : 'int'
+        required    : true
+
+    TableZipcode.push
+        name        : 'City'
+        source      : 'city'
+        visible     : true
+        editable    : true
+        type        : 'text'
+        
+    TableZipcode.push
+        name        : 'State'
+        source      : 'state'
+        visible     : true
+        editable    : false
+        type        : 'text'
+        
+    TableZipcode.push
+        name        : 'County'
+        source      : 'county'
+        visible     : true
+        editable    : false
+        type        : 'text'
+
+    TableZipcode.push
+        name        : 'Latitude'
+        source      : 'lat'
+        visible     : true
+        editable    : true
+        type        : 'float'
+
+    TableZipcode.push
+        name        : 'Longitude'
+        source      : 'lon'
+        visible     : true
+        editable    : true
+        type        : 'float'
+
     zipcodeData1 =
         code   : "03105"
         city   : "Manchester_changed_1"
@@ -39,31 +83,56 @@ $ ->
         lat    : "32.365845"
         lon    : "-33.225304"
 
-    saveZipcodeData1 = 
-        "id":"00017",
-        "Active":3,
-        "Pending":1,
-        "city":"Invalid",
-        "state":"Invalid",
-        "dateLastRently":"2016-10-06T17:57:17.988Z",
-        "dateLastSchools":"2016-09-14T17:32:52.775Z"
+    TableTestdata = []
+    TableTestdata.push
+        name        : "ID"
+        source      : "id"
+        editable    : false
+        required    : true
+    TableTestdata.push
+        name        : "InitialPrice"
+        source      : "initialPrice"
+        editable    : false
+    TableTestdata.push
+        name        : "CurrentPrice"
+        source      : "currentPrice"
+        editable    : true
+    TableTestdata.push
+        name        : "Date"
+        source      : "date"
+        editable    : true
+    TableTestdata.push
+        name        : "Distance"
+        source      : "distance"
+        editable    : true
+    TableTestdata.push
+        name        : "IsNew"
+        source      : "isNew"
+        editable    : true
 
     testData1 =
-        "id": "0011"
-        "Initial Price" :   5000.00,
-        "Current Price" :   4999.99,
-        "Date"          :   "2017-01-16",
-        "Distance"      :   1000,
-        "IsNew"         :   true
+        "id"            :   "0011"
+        "initialPrice" :   5000.00,
+        "currentPrice" :   4999.99,
+        "date"          :   "2017-01-16",
+        "distance"      :   1000,
+        "isNew"         :   true
 
     
     ##|
     ##|  Load the JSON files.
-    ##|  This will insert the zipcodes, SaveZipcodeData and testData into the global data map.
+    ##|  This will insert the zipcodes and testData into the global data map.
     addTest "Loading Data from files..", () ->
         loadZipcodes()
-        loadDatafromJSONFile "SaveZipcodeData"
+        .then ()->
+            DataMap.setDataTypes 'zipcode', TableZipcode
+            true
+
         loadDatafromJSONFile "testData"
+        .then ()->
+            DataMap.setDataTypes 'testData', TableTestdata
+            true
+
         true
 
     addTest "Confirm DataMap Loaded", ()->
@@ -100,8 +169,8 @@ $ ->
         addHolder "renderTest"
         wdt_editable = new WidgetTag("div", null, "wdt_editable")
         wdt_noeditable = new WidgetTag("div", null, "wdt_noeditable")
-        wdt_editable.bindToPath "testData", "0011", "Current Price"
-        wdt_noeditable.bindToPath "testData", "0011", "id"
+        wdt_editable.bindToPath "zipcode", "03105", "city"
+        wdt_noeditable.bindToPath "zipcode", "03105", "lon"
         $("#renderTest").append($ "<br><span>Editable Field</span>")
         $("#renderTest").append wdt_editable.getTag()
         $("#renderTest").append($ "<br><span>Non-editable Field</span>")
@@ -114,21 +183,21 @@ $ ->
         wdt_id.bindToPath "testData", "0011", "id"
 
         wdt_initPrice = new WidgetTag("td", null, "wdt_td_initPrice")
-        wdt_initPrice.bindToPath "testData", "0011", "Initial Price"
+        wdt_initPrice.bindToPath "testData", "0011", "initialPrice"
 
         wdt_curPrice = new WidgetTag("td", null, "wdt_td_curPrice")
-        wdt_curPrice.bindToPath "testData", "0011", "Current Price"
+        wdt_curPrice.bindToPath "testData", "0011", "currentPrice"
 
         wdt_date = new WidgetTag("td", null, "wdt_td_date")
-        wdt_date.bindToPath "testData", "0011", "Date"
+        wdt_date.bindToPath "testData", "0011", "date"
 
         wdt_distance = new WidgetTag("td", null, "wdt_td_distance")
-        wdt_distance.bindToPath "testData", "0011", "Distance"
+        wdt_distance.bindToPath "testData", "0011", "distance"
 
         wdt_isNew = new WidgetTag("td", null, "wdt_td_isNew")
-        wdt_isNew.bindToPath "testData", "0011", "IsNew"
+        wdt_isNew.bindToPath "testData", "0011", "isNew"
        
-        $("#renderTest").append($ "<br><table class='test_table_2'><caption>There are many data types you can bind to fields.</caption></table>")
+        $("#renderTest").append($ "<br><table class='test_table_2'><caption>There are many data types you can bind to data fields.(Here, except first 2 columns, all are editable.</caption></table>")
         $(".test_table_2").append wdt_id.getTag()
         $(".test_table_2").append wdt_initPrice.getTag()
         $(".test_table_2").append wdt_curPrice.getTag()
