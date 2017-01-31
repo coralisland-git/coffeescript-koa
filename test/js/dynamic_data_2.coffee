@@ -173,7 +173,7 @@ $ ->
         wdt_uneditable.bindToPath "zipcode", "03105", "county"
         $("#renderTest").append($ "<br><span>Editable Field</span>")
         $("#renderTest").append wdt_editable.getTag()
-        $("#renderTest").append($ "<br><span>Unditable Field</span>")
+        $("#renderTest").append($ "<br><span>Uneditable Field</span>")
         $("#renderTest").append wdt_uneditable.getTag()
         return true
 

@@ -53,6 +53,7 @@ $ ->
     		view.show()
     		view.millerColumn.onSelected = (e, data) ->
     			console.log('custom event callback from miller column', data)
+    	true
 
     ##|
     ##|  Simple miller column using this
@@ -65,6 +66,7 @@ $ ->
     		view.show()
     		view.millerColumn.onSelected = (e, data) ->
     			console.log('custom event callback from miller column', data)
+    	true
 
 	##|
     ##|  Simple miller column using this
@@ -72,13 +74,13 @@ $ ->
     addTestButton "Miller Columns tab", "Open", ()->
     	addHolder('renderTest1')
     	tabs = new DynamicTabs('#renderTest1')
-    	tabs.addTab "Test 1", '<div id="miller-container"></div>'
+    	tabs.doAddViewTab("Miller", "MillerTab", (view)->
+    		view.setData MillerData
+    		view.show()
+    		view.millerColumn.onSelected = (e, data) ->
+    			console.log('custom event callback from miller column', data)
+    	)   
     	tabs.addTab "Test 2", '<h2>Another tab</h2>'
-    	## load miller.js externally as it is loaded with view only
-    	## to use MillerColumn without view miller.js needs to be loaded externally
-    	$.getScript '/vendor/miller.min.js'
-            .then ->
-		    	millerColumn = new MillerColumns $('#miller-container'), true
-		    	millerColumn.setData MillerData
-		    	millerColumn.render()
+    	
+    	true
     go()
