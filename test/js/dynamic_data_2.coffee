@@ -165,16 +165,16 @@ $ ->
         $("#renderTest").append wdt_3.getTag()
         true
 
-    addTestButton "Bind to Path(Editable and non-Editable fields)", "Open", () =>
+    addTestButton "Bind to Path(Editable and Uneditable fields)", "Open", () =>
         addHolder "renderTest"
         wdt_editable = new WidgetTag("div", null, "wdt_editable")
-        wdt_noeditable = new WidgetTag("div", null, "wdt_noeditable")
+        wdt_uneditable = new WidgetTag("div", null, "wdt_uneditable")
         wdt_editable.bindToPath "zipcode", "03105", "city"
-        wdt_noeditable.bindToPath "zipcode", "03105", "lon"
+        wdt_uneditable.bindToPath "zipcode", "03105", "county"
         $("#renderTest").append($ "<br><span>Editable Field</span>")
         $("#renderTest").append wdt_editable.getTag()
-        $("#renderTest").append($ "<br><span>Non-editable Field</span>")
-        $("#renderTest").append wdt_noeditable.getTag()
+        $("#renderTest").append($ "<br><span>Unditable Field</span>")
+        $("#renderTest").append wdt_uneditable.getTag()
         return true
 
     addTestButton "Bind to Path(Several Data types)", "Open", () =>
