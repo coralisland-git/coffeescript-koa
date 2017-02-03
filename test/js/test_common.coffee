@@ -55,7 +55,7 @@ addHolder = (name) ->
 	###
 	$('html, body').animate {
        scrollTop: $('#' + name).offset().top
-    }, 1500
+    }, 1000
 
 	true
 
