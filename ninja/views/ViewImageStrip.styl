@@ -1,0 +1,105 @@
+.ViewImageStrip
+	background grey
+	.imageHolder
+		float:left
+		width:80%
+		margin-top 5%
+		margin-bottom 5%
+		height 100%
+
+		.image-wrapper 
+			background-color white
+			width 90%
+			
+			img
+				margin: 0 auto
+				display: block
+				max-width 90%
+				
+		#controls
+			text-align center
+			margin-top 1em
+			
+			span
+				font-size 2em
+				line-height 2.2em
+#scroll_wrapper 
+	position: relative
+	z-index: 1
+	overflow: hidden
+	height: 800px
+	width: 20%
+	padding 10px
+	
+	#scroller 
+		z-index: 1
+		-webkit-tap-highlight-color: rgba(0,0,0,0)
+		width: 100%
+		-webkit-transform: translateZ(0)
+		-moz-transform: translateZ(0)
+		-ms-transform: translateZ(0)
+		-o-transform: translateZ(0)
+		transform: translateZ(0)
+		-webkit-touch-callout: none
+		-webkit-user-select: none
+		-moz-user-select: none
+		-ms-user-select: none
+		user-select: none
+		-webkit-text-size-adjust: none
+		-moz-text-size-adjust: none
+		-ms-text-size-adjust: none
+		-o-text-size-adjust: none
+		text-size-adjust: none
+
+		ul
+			list-style: none
+			padding: 0
+			margin: 0
+
+			li
+				padding: 0 10px
+				width 100%
+				border: 1px solid #ccc
+				font-size: 14px
+				background-color white
+				margin-bottom 2%
+
+				img
+					padding: 0px
+					width 100%
+					margin: 0 auto
+					display: block
+					
+.number_body
+	position relative
+	.numberCircle
+		position absolute
+		right 0px
+		margin-right 4%
+		margin-top -2%
+		border-radius: 41px  
+		min-width 49px
+		padding: 4px    
+		background: #fff
+		border: 2px solid #666
+		color: #666
+		text-align: center
+		font: 32px Arial, sans-serif
+.numberCircle_Small
+	border-radius: 15px  
+	padding: 2px    
+	background: #fff
+	border: 1px solid #666
+	color: #666
+	text-align: center
+	font: 12px Arial, sans-serif
+	min-width 20px
+	display inline-block
+.active_scroll_element
+	background : green
+.thumbnail
+	text-align right 
+	background-size 90% 100%
+	background-position center
+	background-repeat no-repeat
+	height 110px
