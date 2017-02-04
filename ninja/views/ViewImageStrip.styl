@@ -5,25 +5,42 @@
 		width:80%
 		margin-top 5%
 		margin-bottom 5%
-		height 100%
+		height 720px
 
-		.image-wrapper 
-			background-color white
-			width 90%
-			
-			img
-				margin: 0 auto
-				display: block
-				max-width 90%
+		.image
+			height 90%
+			.image-wrapper 
+				background-color white
+				width 90%
 				
-		#controls
+				img
+					margin: 0 auto
+					display: block
+					max-width 90%
+					
+		.controls
 			text-align center
 			margin-top 1em
 			
 			span
 				font-size 2em
 				line-height 2.2em
-#scroll_wrapper 
+			.arrow_left
+				background-image url('./js/test_Data/images/arrow_left.png')
+				border-top-left-radius: 25px;
+				border-bottom-left-radius: 25px;
+				background-size 100% 100%	
+				width 60px
+				height 50px
+			.arrow_right
+				background-image url('./js/test_Data/images/arrow_right.png')
+				border-top-right-radius: 25px
+				border-bottom-right-radius: 25px
+				background-size 100% 100%	
+				width 60px
+				height 50px
+	
+.scroll_wrapper 
 	position: relative
 	z-index: 1
 	overflow: hidden
@@ -55,6 +72,7 @@
 			list-style: none
 			padding: 0
 			margin: 0
+			background-color transparent
 
 			li
 				padding: 0 10px
@@ -63,13 +81,18 @@
 				font-size: 14px
 				background-color white
 				margin-bottom 2%
+				max-width 100%
 
-				img
-					padding: 0px
-					width 100%
-					margin: 0 auto
-					display: block
+				.image-wrapper
+					height 100%
 					
+					img
+						padding: 0px
+						max-width 100%
+						height 100%
+						margin: 0 auto
+						display: block
+						
 .number_body
 	position relative
 	.numberCircle
@@ -85,16 +108,20 @@
 		color: #666
 		text-align: center
 		font: 32px Arial, sans-serif
-.numberCircle_Small
-	border-radius: 15px  
-	padding: 2px    
-	background: #fff
-	border: 1px solid #666
-	color: #666
-	text-align: center
-	font: 12px Arial, sans-serif
-	min-width 20px
-	display inline-block
+	.numberCircle_Small
+		position absolute
+		right 0px
+		margin-right 4%
+		margin-top -2%
+		border-radius: 15px  
+		padding: 2px    
+		background: #fff
+		border: 1px solid #666
+		color: #666
+		text-align: center
+		font: 12px Arial, sans-serif
+		min-width 20px
+	
 .active_scroll_element
 	background : green
 .thumbnail

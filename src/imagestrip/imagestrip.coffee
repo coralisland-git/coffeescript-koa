@@ -18,11 +18,8 @@ class ImageViewer
 			role: "numberBody"
 			id: "number_body#{@gid}"
 
-		@imgViewerBody = 
-			$ "<div />",
-			class: "container-fluid image-wrapper"
-			id: "image-wrapper#{@gid}"
-
+		@imgViewerBody = new WidgetTag "div", "container-fluid image-wrapper", "image-wrapper#{@gid}"
+	
 		true
 
 	
@@ -39,21 +36,33 @@ class ImageViewer
   		true
 
 	setData: (data) =>
-		if data.image?
+		if data.image? and @imgElement isnt data.image
 			@imgElement = data.image
-		if data.number
+			isChanged = true
+		if data.number? and @number isnt data.number
 			@number = data.number
+			isChanged = true
+		if isChanged then @render()	
 		true
 
 	setImage: (@imgElement)=>
 
 	setNumber: (@number)=>
 
+	setSize: (w, h)=>
+		@elementHolder.width w
+		@elementHolder.height h
+		if parseInt(w) < 400 or parseInt(h) < 300
+			@numberBody.find(".numberCircle").addClass "numberCircle_Small"
+			@numberBody.find(".numberCircle").removeClass "numberCircle"
+		true
 	drawImage: ()=>
 		if @imgElement?.tagName is "IMG"
-			@imgViewerBody.empty()
-			@imgViewerBody.append @imgElement
-		@elementHolder.append @imgViewerBody
+			@imgViewerBody.el.empty()
+			@imgViewerBody.add "img", "image-rendered", "image_rendered#{@gid}", {"src": @imgElement.src}
+	
+		@elementHolder.append @imgViewerBody.el
+		@imgViewerBody.show()
 		true
 	drawNumber: (number)=>
 		if number >= 0
@@ -66,6 +75,4 @@ class ImageViewer
 		if @imgElement?
 			@drawNumber(@number)
 			@drawImage()
-			console.log @number
-
 		true
