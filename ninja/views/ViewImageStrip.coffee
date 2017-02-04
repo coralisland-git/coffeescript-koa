@@ -7,6 +7,7 @@ class ViewImageStrip extends View
     ##|  Add Data
     setImgData: (@imageData)=>
         return @imageData
+
     onSetupButtons: () =>
 
     setTitle: (title)=>
@@ -27,6 +28,7 @@ class ViewImageStrip extends View
 
     setSize: (w, h)=>
         true
+
     render: ()=>
         if !@setElementsImageData()?
             return false
@@ -61,8 +63,10 @@ class ViewImageStrip extends View
         
     getSelectedImgNumber: ()=>
         @selectedImgNumber
+
     getImageCount: ()=>
         @imageData.length
+
     prevImg: ()=>
         if @selectedImgNumber == 0 then return
         @selectedImgNumber--
@@ -71,6 +75,7 @@ class ViewImageStrip extends View
             number: @selectedImgNumber
         }
         true
+
     nextImg: ()=>
         if @selectedImgNumber >= @getImageCount() - 1 then return
         @selectedImgNumber++
@@ -79,11 +84,7 @@ class ViewImageStrip extends View
             number: @selectedImgNumber
         }
         true
-    refreshImg:(index)->
-        console.log "refreshing"
-        @imageViewer.setSelectedImgNumber index
-        true
-   
+
     renderControls: ()=>
         btnLeftArrow = new WidgetTag "button", "arrow_left"
         btnRightArrow = new WidgetTag "button", "arrow_right"
@@ -105,6 +106,7 @@ class ViewImageStrip extends View
             console.log "thumb clicked : " + $(this).prevAll().length
             _this.setSelectedImgNumber $(this).prevAll().length
         )
+        
     renderThumbList: ()=>
         @scrollListBody =new WidgetTag "div", "scroll_list_body", "scroller"
         element_ul = @scrollListBody.add "ul"
