@@ -8,8 +8,27 @@ class DataAxis
         if options?
             $.extend @data, options
 
-        @setLabelFontSize 16
+        @setLabelFontSize 12
         @setLabelFontAngle 0
+
+    ##|
+    ##|  Set the axis to format for money
+    setFormatMoney: ()=>
+
+        # @setPrefix '$ '
+
+        @data.labelFormatter = (e)=>
+            num = e.value
+            if !num? then return ""
+            if typeof num != "number" then return num
+
+            if num < 10000
+                return numeral(num).format('#,###')
+
+            if num < 1000000
+                return numeral(num / 1000).format('#,###') + " k"
+
+            return numeral(num / 1000000).format('#,###.[###]') + " m"
 
     ##|
     ##|  Set a new title or unset the dummy title by sending null
@@ -29,12 +48,9 @@ class DataAxis
     setPrefix: (str)=>
         @data.prefix = str
 
-    setFormatMoney: ()=>
-        @setFormatString '#,##0.##'
-        @setPrefix '$ '
-
     setLabelFontSize: (newSize)=>
-        @data.labelFontSize = newSize
+        @data.labelFontFamily = "San Francisco Display,Arial,sans-serif"
+        @data.labelFontSize   = newSize
 
     setLabelFontAngle: (newAngle)=>
         @data.labelAngle = newAngle

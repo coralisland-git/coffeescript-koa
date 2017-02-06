@@ -143,15 +143,15 @@ class DynamicTabs
 		if tabType is "tab"
 			for tag, index in sortedTags
 				@addTab tag.tabName, tag.defaultHtml
-				console.log tag.tabName + ":" + tag.order
+				# console.log tag.tabName + ":" + tag.order
 		else if tabType is "viewTab"
 			for tag, index in sortedTags
 				yield @doAddViewTab tag.viewName, tag.tabText
-				console.log tag.viewName + ":" + tag.order
+				# console.log tag.viewName + ":" + tag.order
 		else if tabType is "tableTab"
 			for tag, index in sortedTags
 				yield @doAddTableTab tag.tableName, tag.tabText
-				console.log tag.tableName + ":" + tag.order
+				# console.log tag.tableName + ":" + tag.order
 		else
 			console.log "Unsupported Tab Type"
 			return
@@ -329,7 +329,7 @@ class DynamicTabs
 	onCheckTableUpdateRowcount: (tableName, newRowCount)=>
 
 		if !@tables? then return
-		console.log "onCheckTableUpdateRowcount table=#{tableName} new=#{newRowCount}"
+		# console.log "onCheckTableUpdateRowcount table=#{tableName} new=#{newRowCount}"
 
 		if @tables[tableName]?
 			@tables[tableName].tab.badgeText.html newRowCount

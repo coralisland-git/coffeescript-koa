@@ -15,7 +15,7 @@ class ViewDataChart extends View
         @chartOptions = {}
         @axisX  = new DataAxis()
         @axisY  = new DataAxis()
-        @chartOptions.backgroundColor = "#E6F8F2"
+        @chartOptions.backgroundColor = "#EEEEEE"
 
     addAxisY: ()=>
 
@@ -40,12 +40,16 @@ class ViewDataChart extends View
         if !@chartOptions.data?
             @chartOptions.data = []
 
+        if dataSeries.data.type != "doughnut"
+            dataSeries.setIndexThemeColor(@chartOptions.data.length)
+
         @chartOptions.data.push dataSeries.getData()
         return @chartOptions
 
     onResize : (w, h)=>
+        if @chart?
+            return @onRender()
         return
-
 
     setSize: (w, h)=>
         @elHolder.width(w)
