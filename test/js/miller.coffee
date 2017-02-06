@@ -80,7 +80,7 @@ $ ->
     		view.millerColumn.onSelected = (e, data) ->
     			console.log('custom event callback from miller column', data)
     	)   
-    	tabs.addTab "Test 2", '<h2>EmptyTab</h2>'
+    	tabs.addTab "Test 2", '<h2>Another tab</h2>'
     	
     	true
     go()
