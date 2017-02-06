@@ -44,6 +44,19 @@ addHolder = (name) ->
 
 	$("#" + name).remove()
 	$("#testCase").append($("<div id='" + name + "' style='padding-top: 20px;' />"))
+
+	##|
+	##| Added by @xgao
+	##| Automatically scroll down to where the newly added element is appears.
+	##|
+	###setTimeout ->
+		document.getElementById(name).scrollIntoView()
+	, 500
+	###
+	$('html, body').animate {
+       scrollTop: $('#' + name).offset().top
+    }, 1000
+
 	true
 
 addHolderWidget = (name, w, h)->
