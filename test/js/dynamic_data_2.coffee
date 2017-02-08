@@ -15,158 +15,196 @@ $ ->
 
     demoMode = 0
 
+    TableZipcode = []
+    TableZipcode.push
+        name        : 'Code'
+        source      : 'code'
+        visible     : true
+        editable    : false
+        type        : 'int'
+        required    : true
+
+    TableZipcode.push
+        name        : 'City'
+        source      : 'city'
+        visible     : true
+        editable    : true
+        type        : 'text'
+        
+    TableZipcode.push
+        name        : 'State'
+        source      : 'state'
+        visible     : true
+        editable    : false
+        type        : 'text'
+        
+    TableZipcode.push
+        name        : 'County'
+        source      : 'county'
+        visible     : true
+        editable    : false
+        type        : 'text'
+
+    TableZipcode.push
+        name        : 'Latitude'
+        source      : 'lat'
+        visible     : true
+        editable    : true
+        type        : 'float'
+
+    TableZipcode.push
+        name        : 'Longitude'
+        source      : 'lon'
+        visible     : true
+        editable    : true
+        type        : 'float'
+
     zipcodeData1 =
         code   : "03105"
-        city   : "Manchester_other1"
+        city   : "Manchester_changed_1"
         state  : "NH_other1"
-        county : "HILLSBOROUGH_other1"
+        county : "HILLSBOROUGH_changed_1"
         lat    : "13.512632"
         lon    : "-18.325879"
 
     zipcodeData2 =
         code   : "03105"
-        city   : "Manchester_other2"
+        city   : "Manchester_changed_2"
         state  : "NH_other2"
-        county : "HILLSBOROUGH_other2"
+        county : "HILLSBOROUGH_changed_2"
         lat    : "25.654258"
         lon    : "-20.545310"
 
     zipcodeData3 =
         code   : "03105"
-        city   : "Manchester_other3"
+        city   : "Manchester_changed_3"
         state  : "NH_other3"
-        county : "HILLSBOROUGH_other3"
+        county : "HILLSBOROUGH_changed_3"
         lat    : "32.365845"
         lon    : "-33.225304"
 
-    saveZipcodeData1 = 
-        "id":"00017",
-        "Active":3,
-        "Pending":1,
-        "city":"Invalid",
-        "state":"Invalid",
-        "dateLastRently":"2016-10-06T17:57:17.988Z",
-        "dateLastSchools":"2016-09-14T17:32:52.775Z"
+    TableTestdata = []
+    TableTestdata.push
+        name        : "ID"
+        source      : "id"
+        editable    : false
+        required    : true
+    TableTestdata.push
+        name        : "InitialPrice"
+        source      : "initialPrice"
+        editable    : false
+    TableTestdata.push
+        name        : "CurrentPrice"
+        source      : "currentPrice"
+        editable    : true
+    TableTestdata.push
+        name        : "Date"
+        source      : "date"
+        editable    : true
+    TableTestdata.push
+        name        : "Distance"
+        source      : "distance"
+        editable    : true
+    TableTestdata.push
+        name        : "IsNew"
+        source      : "isNew"
+        editable    : true
 
     testData1 =
-        "id": "0011"
-        "Initial Price" :   5000.00,
-        "Current Price" :   4999.99,
-        "Date"          :   "2017-01-16",
-        "Distance"      :   1000,
-        "IsNew"         :   true
+        "id"            :   "0011"
+        "initialPrice" :   5000.00,
+        "currentPrice" :   4999.99,
+        "date"          :   "2017-01-16",
+        "distance"      :   1000,
+        "isNew"         :   true
 
     
     ##|
     ##|  Load the JSON files.
-    ##|  This will insert the zipcodes, SaveZipcodeData and testData into the global data map.
+    ##|  This will insert the zipcodes and testData into the global data map.
     addTest "Loading Data from files..", () ->
         loadZipcodes()
-        loadDatafromJSONFile "SaveZipcodeData"
+        .then ()->
+            DataMap.setDataTypes 'zipcode', TableZipcode
+            true
+
         loadDatafromJSONFile "testData"
+        .then ()->
+            DataMap.setDataTypes 'testData', TableTestdata
+            true
+
         true
 
     addTest "Confirm DataMap Loaded", ()->
 
         dm = DataMap.getDataMap()
         if dm?.types["zipcode"]?.col["code"]? then return true
-        return false
+        
+        false
     
-    addTestButton "Bind to Path", "Open", () =>
+    addTestButton "Bind to Path(Only One Data Field)", "Open", () =>
         addHolder "renderTest"
-        wdt_tr = new WidgetTag("tr", null, "wdt_tr", null)
-        wdt_tr.add "td", null, "wdt_td", null
-        wdt_tr.add "td", null, "wdt_td", null
-        wdt_tr.add "td", null, "wdt_td", null
-        wdt_tr.add "td", null, "wdt_td", null
-        wdt_tr.add "td", null, "wdt_td", null
-        wdt_tr.add "td", null, "wdt_td", null
-        children = wdt_tr.getChildren()
-
-        index = 0
-        for field, value of zipcodeData1
-            #console.log children[index]
-            children[index]?.bindToPath "zipcode", "03105", field
-            index++
- 
-        html = "<br><table class='test_table'><caption>Single Widget</caption></table><br>";
-        $("#renderTest").append($ html)
-        $(".test_table").last().append wdt_tr.getTag()
-        return true
-
-    addTestButton "Bind to Path(Several Widgets)", "Open", () =>
-        addHolder "renderTest"
-        wdt_tr_1 = new WidgetTag("tr", null, "wdt_tr_1", null)
-        wdt_tr_2 = new WidgetTag("tr", null, "wdt_tr_2", null)
-        wdt_tr_3 = new WidgetTag("tr", null, "wdt_tr_3", null)
-        for i in [0..5]
-            wdt_tr_1.add "td", null, "wdt_td_1#{i}", null
-            wdt_tr_2.add "td", null, "wdt_td_2#{i}", null
-            wdt_tr_3.add "td", null, "wdt_td_3#{i}", null
-        children_1 = wdt_tr_1.getChildren()
-        children_2 = wdt_tr_2.getChildren()
-        children_3 = wdt_tr_3.getChildren()
-
-        index = 0
-        for field, value of zipcodeData1
-            children_1[index]?.bindToPath "zipcode", "03105", field
-            children_2[index]?.bindToPath "zipcode", "03105", field
-            children_3[index]?.bindToPath "zipcode", "03105", field
-            index++
-        html = "<p><br></p><table class='test_table_multiwidget'><caption>Here are several widgets with same path</caption></table><br>";
-        $("#renderTest").append($ html)
-        $(".test_table_multiwidget").last().append wdt_tr_1.renderField()
-        $(".test_table_multiwidget").last().append wdt_tr_2.renderField()
-        $(".test_table_multiwidget").last().append wdt_tr_3.renderField()
-
-        return true
-
-    addTestButton "Bind to Path(SaveZipcodeData)", "Open", () =>
-        addHolder "renderTest"
-        wdt_tr = new WidgetTag("tr", null, "wdt_tr", null)
-        wdt_tr.add "td", null, "wdt_td", null
-        wdt_tr.add "td", null, "wdt_td", null
-        wdt_tr.add "td", null, "wdt_td", null
-        wdt_tr.add "td", null, "wdt_td", null
-        wdt_tr.add "td", null, "wdt_td", null
-        wdt_tr.add "td", null, "wdt_td", null
-        wdt_tr.add "td", null, "wdt_td", null
-        children = wdt_tr.getChildren()
-        index = 0
-        for field, value of saveZipcodeData1
-            #console.log children[index]
-            children[index]?.bindToPath "SaveZipcodeData", "00017", field
-            index++
- 
-        html = "<br><table class='test_table_1'><caption>Single Widget from Table SaveZipcodeData</caption></table><br>";
-        $("#renderTest").append($ html)
-        $(".test_table_1").last().append wdt_tr.getTag()
-        $(".lastTable").removeClass "lastTable"
-        $(".test_table_1").last().addClass "lastTable"
-        return true
-
-    addTestButton "Bind to Path(several Data types)", "Open", () =>
-        addHolder "renderTest"
-        wdt_tr = new WidgetTag("tr", null, "wdt_tr", null)
-        wdt_tr.add "td", null, "wdt_td", null
-        wdt_tr.add "td", null, "wdt_td", null
-        wdt_tr.add "td", null, "wdt_td", null
-        wdt_tr.add "td", null, "wdt_td", null
-        wdt_tr.add "td", null, "wdt_td", null
-        wdt_tr.add "td", null, "wdt_td", null
-        children = wdt_tr.getChildren()
-        index = 0
-        for field, value of testData1
-            children[index]?.bindToPath "testData", "0011", field
-            index++
-
-        html = "<br><table class='test_table_2'><caption>Single widget from Table TestData</caption></table><br>"
-        $("#renderTest").append($ html)
-        $(".test_table_2").last().append wdt_tr.getTag()
-        $(".lastTable").removeClass "lastTable"
-        $(".test_table_2").last().addClass "lastTable"
+        wdt = new WidgetTag("div", null, "wdt_div")
+        wdt.bindToPath "zipcode", "03105", "city"
+        $("#renderTest").append($ "<br><span>Simple Data Field, you can edit it</span>")
+        $("#renderTest").append wdt.getTag()
+        
         true
 
+    addTestButton "Bind to Path(Several Widgets with same Path)", "Open", () =>
+        addHolder "renderTest"
+        wdt_1 = new WidgetTag("div", null, "wdt_1")
+        wdt_2 = new WidgetTag("div", null, "wdt_2")
+        wdt_3 = new WidgetTag("div", null, "wdt_3")
+        wdt_1.bindToPath "zipcode", "03105", "city"
+        wdt_2.bindToPath "zipcode", "03105", "city"
+        wdt_3.bindToPath "zipcode", "03105", "city"
+        $("#renderTest").append $ "<p>Three WidgetTags with same DataPath, if one changes, others are updated automatically. </p>"
+        $("#renderTest").append wdt_1.getTag()
+        $("#renderTest").append wdt_2.getTag()
+        $("#renderTest").append wdt_3.getTag()
+        true
+
+    addTestButton "Bind to Path(Editable and Uneditable fields)", "Open", () =>
+        addHolder "renderTest"
+        wdt_editable = new WidgetTag("div", null, "wdt_editable")
+        wdt_uneditable = new WidgetTag("div", null, "wdt_uneditable")
+        wdt_editable.bindToPath "zipcode", "03105", "city"
+        wdt_uneditable.bindToPath "zipcode", "03105", "county"
+        $("#renderTest").append($ "<br><span>Editable Field</span>")
+        $("#renderTest").append wdt_editable.getTag()
+        $("#renderTest").append($ "<br><span>Uneditable Field</span>")
+        $("#renderTest").append wdt_uneditable.getTag()
+        return true
+
+    addTestButton "Bind to Path(Several Data types)", "Open", () =>
+        addHolder "renderTest"
+        wdt_id = new WidgetTag("td", null, "wdt_td_id")
+        wdt_id.bindToPath "testData", "0011", "id"
+
+        wdt_initPrice = new WidgetTag("td", null, "wdt_td_initPrice")
+        wdt_initPrice.bindToPath "testData", "0011", "initialPrice"
+
+        wdt_curPrice = new WidgetTag("td", null, "wdt_td_curPrice")
+        wdt_curPrice.bindToPath "testData", "0011", "currentPrice"
+
+        wdt_date = new WidgetTag("td", null, "wdt_td_date")
+        wdt_date.bindToPath "testData", "0011", "date"
+
+        wdt_distance = new WidgetTag("td", null, "wdt_td_distance")
+        wdt_distance.bindToPath "testData", "0011", "distance"
+
+        wdt_isNew = new WidgetTag("td", null, "wdt_td_isNew")
+        wdt_isNew.bindToPath "testData", "0011", "isNew"
+       
+        $("#renderTest").append($ "<br><table class='test_table_2'><caption>There are many data types you can bind to data fields.(Here, except first 2 columns, all are editable.</caption></table>")
+        $(".test_table_2").append wdt_id.getTag()
+        $(".test_table_2").append wdt_initPrice.getTag()
+        $(".test_table_2").append wdt_curPrice.getTag()
+        $(".test_table_2").append wdt_date.getTag()
+        $(".test_table_2").append wdt_distance.getTag()
+        $(".test_table_2").append wdt_isNew.getTag()
+        true
 
     addTestButton "Add data(to zipcode)", "Open", () =>
 
@@ -193,37 +231,13 @@ $ ->
         
         return false
 
-    addTest "Render Property", () ->
-        addHolder "renderTest"
-
-        DataMap.addData "property", 1234,
-            id: 1234
-            address: "1234 Fake Street"
-            pool: "Yes"
-        wdt_tr = new WidgetTag("tr", null, "wdt_tr", null)
-        wdt_tr.add "td", null, "wdt_td", null
-        wdt_tr.add "td", null, "wdt_td", null
-        wdt_tr.add "td", null, "wdt_td", null
-        html = "<br>Three property table fields, id, address, pool <br><table id='test_tbl_fake'></table>";
-
-        children = wdt_tr.getChildren()
-        $("#renderTest").append($ html)
-        
-        children[0].renderField "property", 1234, "id"
-        children[1].renderField "property", 1234, "address"
-        children[2].renderField "property", 1234, "pool"
-        $("#test_tbl_fake").append wdt_tr.getTag()
-        true
-
-    addTestButton "Change value", "Change NH to CA", () =>
+    addTestButton "Change value", "Change Manchester to NewManchester", () =>
 
         # don't do this because it won't register the change
         # zipcodeData1.state = "CA"
 
         DataMap.addData "zipcode", "03105",
-            state: "CA"
+            city: "NewManchester"
+
 
     go()
-
-
-#
