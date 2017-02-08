@@ -66,7 +66,7 @@ $ ->
     ##|  popup window Image View
     ##|
 	addTestButton "Image Strip in popup", "Open", ()->
-		doPopupView 'ImageStrip','Image Strip', 'imagestrip_popup', 1000, 450
+		doPopupView 'ImageStrip','Image Strip', 'imagestrip_popup', 1000, 800
 		.then (view) ->
 			view.setTitle("Test Title")
 			view.init()
@@ -92,8 +92,6 @@ $ ->
 			view.addImage newImage10.src
 			view.render()
 		true
-
-	go()
 
 	##|
 	addTestButton "ImageStrip in tab", "Open", ()->
@@ -125,3 +123,5 @@ $ ->
 		)
 		tabs.addTab "EmptyTab", '<h2>Another tab</h2>'
 		true
+
+	go()
