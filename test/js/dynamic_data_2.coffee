@@ -197,7 +197,7 @@ $ ->
         wdt_isNew = new WidgetTag("td", null, "wdt_td_isNew")
         wdt_isNew.bindToPath "testData", "0011", "isNew"
        
-        $("#renderTest").append($ "<br><table class='test_table_2'><caption>There are many data types you can bind to data fields.(Here, except first 2 columns, all are editable.</caption></table>")
+        $("#renderTest").append($ "<br><table class='test_table_2'><caption>There are many data types you can bind to data fields.(Here, except first 2 columns, all are editable.)</caption></table>")
         $(".test_table_2").append wdt_id.getTag()
         $(".test_table_2").append wdt_initPrice.getTag()
         $(".test_table_2").append wdt_curPrice.getTag()
