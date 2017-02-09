@@ -31,6 +31,7 @@ $ ->
 			view.addImage newImage4
 			view.addImage newImage5
 			view.addImage newImage6
+			view.setSize 0, 800
 			view.render()
 		true
 	addTestButton "Image Strip with 20 images", "Open", ()->
@@ -59,6 +60,7 @@ $ ->
 			view.addImage newImage8.src
 			view.addImage newImage9.src
 			view.addImage newImage10.src
+			view.setSize 0, 800
 			view.render()
 		true
 
@@ -68,7 +70,6 @@ $ ->
 	addTestButton "Image Strip in popup", "Open", ()->
 		doPopupView 'ImageStrip','Image Strip', 'imagestrip_popup', 1000, 800
 		.then (view) ->
-			view.setTitle("Test Title")
 			view.init()
 			view.addImage newImage1
 			view.addImage newImage2
@@ -119,6 +120,7 @@ $ ->
 			view.addImage newImage8.src
 			view.addImage newImage9.src
 			view.addImage newImage10.src
+			view.setSize 0, 800
 			view.render()
 		)
 		tabs.addTab "EmptyTab", '<h2>Another tab</h2>'
