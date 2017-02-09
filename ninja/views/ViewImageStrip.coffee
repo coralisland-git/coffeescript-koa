@@ -3,15 +3,25 @@
 globalImageCounter = 0
 
 class ViewImageStrip extends View
-    ##|
-    ##|  Add Data
+    ## ------------------------------------------------------------------------------------------
+    ## function to set data of image sources
+    ##
     setImgData: (@imageData)=>
         return @imageData
-
+    
+    ##
+    ## default function of class View that is necessary 
+    ##
     onSetupButtons: () =>
 
+    ##
+    ## default function of class View
+    ##    
     setTitle: (title)=>
 
+    ## ------------------------------------------------------------------------------------------
+    ## function to add an image source data
+    ##    
     addImage: (image)=>
         unless image? then return
         if !@imageData? then @imageData = []
@@ -23,12 +33,27 @@ class ViewImageStrip extends View
             @imageData.push(newImg)
 
         return image
-
-    onResize : (w, h)=>
-
-    setSize: (w, h)=>
+    ##
+    ## function to change width and height of the view when it is resized
+    ##
+    onResizeViewImageStrip : (w, h)=>
+        console.log "w: #{w},   h: #{h}"
+       
         true
 
+    ##
+    ## function to set width and height of View
+    ##
+    setSize: (w, h)=>
+        if w > 0
+            @elHolder.width w
+        if h > 0
+            @elHolder.height h
+        true
+
+    ## ------------------------------------------------------------------------------------------
+    ## function to render entire ImageStrip including imageviewer, thumbnail list, control buttons
+    ##    
     render: ()=>
         if !@setElementsImageData()?
             return false
@@ -36,13 +61,20 @@ class ViewImageStrip extends View
         @renderControls()
         true
 
+    ## ------------------------------------------------------------------------------------------
+    ## function to initialize class, creates ImageViewer    
+    ##
     init: ()=>
         @elHolder.find(".imageHolder").html("<div class='image' id='image#{@gid}'/><div class='controls' id='controls#{@gid}'/>")
         @elHolder.find(".scroll_wrapper").attr("id", "scroll_wrapper#{@gid}")
         @imageViewer = new ImageViewer @elHolder.find("#image#{@gid}")
         @selectedImgNumber = 0
+        @on "resize", @onResizeViewImageStrip
         true
 
+    ## 
+    ## function to send data to imageviewer, then imageviewer renders the data
+    ##
     setElementsImageData: ()=>
         if !@imageData?
             return false
@@ -52,6 +84,9 @@ class ViewImageStrip extends View
             }
         true
 
+    ##
+    ## function to set currently selected image's number
+    ##
     setSelectedImgNumber: (number)=>
         if number? and 0 <= number and number < @getImageCount()
             @selectedImgNumber = number
@@ -60,13 +95,22 @@ class ViewImageStrip extends View
                 number: @selectedImgNumber
                 }
         true
-        
+    
+    ##
+    ## function to get currently selected image number
+    ##    
     getSelectedImgNumber: ()=>
         @selectedImgNumber
 
+    ##
+    ## function to get number(counted) of images
+    ##
     getImageCount: ()=>
         @imageData.length
 
+    ##
+    ## function to set number as current's-1
+    ##
     prevImg: ()=>
         if @selectedImgNumber == 0 then return
         @selectedImgNumber--
@@ -76,6 +120,9 @@ class ViewImageStrip extends View
         }
         true
 
+    ##
+    ## function to set number as current's+1
+    ##    
     nextImg: ()=>
         if @selectedImgNumber >= @getImageCount() - 1 then return
         @selectedImgNumber++
@@ -85,6 +132,9 @@ class ViewImageStrip extends View
         }
         true
 
+    ##
+    ## function to show right and left arrow controls
+    ##    
     renderControls: ()=>
         btnLeftArrow = new WidgetTag "button", "arrow_left"
         btnRightArrow = new WidgetTag "button", "arrow_right"
@@ -97,6 +147,9 @@ class ViewImageStrip extends View
             console.log "Right Arrow Clicked"
             @nextImg()
 
+    ##
+    ## function to finally load IScroll for thumbnail list
+    ##        
     loadScroll: ()=>
         @iScroll = new IScroll document.getElementById("scroll_wrapper#{@gid}"), { mouseWheel: true, click: true, tap: true, resizeScrollbars: true }
         #@iScroll.refresh()
@@ -106,7 +159,10 @@ class ViewImageStrip extends View
             console.log "thumb clicked : " + $(this).prevAll().length
             _this.setSelectedImgNumber $(this).prevAll().length
         )
-        
+    
+    ##
+    ## function to render thumbnail list(list of imageviewers that are smaller than main one)
+    ##
     renderThumbList: ()=>
         @scrollListBody =new WidgetTag "div", "scroll_list_body", "scroller"
         element_ul = @scrollListBody.add "ul"
@@ -115,7 +171,6 @@ class ViewImageStrip extends View
             imageviewer = new ImageViewer element_li.el, image, index
             imageviewer.render()
             imageviewer.setSize "200px", "150px"
-            
         )        
         $("#scroll_wrapper#{@gid}").append @scrollListBody.el
         @loadScroll()
