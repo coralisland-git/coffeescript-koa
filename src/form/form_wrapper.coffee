@@ -6,12 +6,21 @@ class FormWrapper
     ## -------------------------------------------------------------------------------------------------------------
     ## constructor
     ##
-    constructor: () ->
+
+    constructor: (holderElement, options) ->
+
+        if !$(holderElement).length
+            holderElement = "<form id='#{@gid}' class='form-horizontal' role='form'/>"
+
+        @elementHolder = $ holderElement
+
         # @property [Array] fields fields currently included in the formWrapper
         @fields = []
 
         # @property [String] gid unique id of the formWrapper
         @gid    = "form" + GlobalValueManager.NextGlobalID()
+
+        @isFullWidth = false
 
         # @property [String] templateFormFieldText template to use in the render of form
         @templateFormFieldText = Handlebars.compile '''
@@ -46,6 +55,25 @@ class FormWrapper
             </div>
         '''
 
+        @templateFormSubmitButton = Handlebars.compile '''
+            <div class="form-group">
+                <label for="{{fieldName}}" class='control-label col-sm-5'> {{label}} </label>
+                <div class='col-sm-7'>
+                       <button class="btn btn-sm btn-primary btn2" type="submit" data-dismiss="modal"
+                            {{#each attrs}}
+                            {{@key}}="{{this}}"
+                            {{/each}}
+                        ><i class="fa fa-check"></i> {{submit}}</button>
+                </div>
+            </div>
+        '''
+        ##
+        ##  Possibly overwrite default options
+        if typeof options == "object"
+            for name, val of options
+                this[name] = val
+
+
     ## -------------------------------------------------------------------------------------------------------------
     ## Add a text input field
     ##
@@ -55,7 +83,7 @@ class FormWrapper
     ## @param [Object] attrs object as attributes that will be included in the html
     ## @param [Function] fnValidate a validation function can be passed if it returns true value will be valid else invalid
     ##
-    addTextInput: (fieldName, label, value,attrs, fnValidate) =>
+    addTextInput: (fieldName, label, value, attrs, fnValidate) =>
         @addInput(fieldName,label,value,"text",attrs,fnValidate)
 
     ## -------------------------------------------------------------------------------------------------------------
@@ -128,6 +156,18 @@ class FormWrapper
         field = new FormField(fieldName, label,value, type, attrs)
         @fields.push(field)
         return field
+    ## -------------------------------------------------------------------------------------------------------------
+    ## Add a submit button field
+    ##
+    ## @param [String] fieldName name of the input field
+    ## @param [String] label label to be displayed infornt of text input
+    ## @param [String] value default value to be filled
+    ## @param [Object] attrs object as attributes that will be included in the html
+    ##
+    addSubmit: (fieldName, label, value, attrs = {}) =>
+        field = new FormField fieldName, label, value, "submit", attrs
+        @fields.push field
+        return field
 
     ## -------------------------------------------------------------------------------------------------------------
     ## Generate html for the formWrapper
@@ -144,10 +184,13 @@ class FormWrapper
                 field.options = field.attrs.options
                 delete field.attrs.options
                 content += @templateSelectFieldText(field)
+            else if field.type is 'submit'
+                content += @templateFormSubmitButton(field)
             else
                 content += @templateFormFieldText(field)
 
-        content += "</form>";
+        content += "</form>"
+        return content
 
     ## -------------------------------------------------------------------------------------------------------------
     ## function that will be called when a form is submitted
@@ -165,7 +208,6 @@ class FormWrapper
     ##
     onSubmitAction: (e) =>
         for field in @fields
-            console.log field.el.val(),field.fieldName
             this[field.fieldName] = field.el.val()
         @onSubmit(this)
         if e?
@@ -181,11 +223,10 @@ class FormWrapper
     ##
     onAfterShow: () =>
 
-        @elForm = $("##{@gid}")
         firstField = null
+        elForm = @elementHolder.find "##{@gid}"
         for field in @fields
-            field.el = @elForm.find("##{field.fieldName}")
-            console.log "Calling onAfterShow for field:", field
+            field.el = elForm.find("##{field.fieldName}")
             field.onAfterShow()
             if !firstField
                 firstField = field
@@ -195,5 +236,54 @@ class FormWrapper
                 console.log "field.onPressEnter:", e
                 @onSubmitAction(e)
 
-        @elForm.on "submit", @onSubmitAction
+        elForm.submit @onSubmitAction
         true
+
+    ## ----------------------------------------------------------------------------------------------------------------
+    ## Function to show rendered form elements and actions
+    ## @return [Boolean]      
+
+    show: () =>
+        @elementHolder.append @getHtml()
+
+        setTimeout ()=>
+                @onAfterShow()
+            , 10
+        true
+
+    ## ------------------------------------------------------------------------------------------------------------------
+    ## Function to give responsive effect to form elements when
+    ## width of form gets shorter than boundary value (currently 400px)
+    ## @return [Boolean]
+
+    putElementsFullWidth: ()=>
+        if @isFullWidth
+            return
+        console.log "Make Full Width"
+        inputElements = @elementHolder.find "div[class^=col-sm-]"
+        inputElements.addClass "form-input-fullwidth-custom"
+        
+        labelElements = @elementHolder.find "label"
+        labelElements.addClass "form-label-fullwidth-custom"
+
+        buttonElements = @elementHolder.find "button"
+        buttonElements.addClass "form-button-fullwidth-custom"
+        @isFullWidth = true
+
+    ## ------------------------------------------------------------------------------------------------------------------
+    ## Function to take away responsive effect from form elements
+    ## @return [Boolean]
+
+    backElementsFullWidth: ()=>
+        if !@isFullWidth
+            return
+        console.log "Take off Full Width"
+        inputElements = @elementHolder.find "div[class^=col-sm-]"
+        inputElements.removeClass "form-input-fullwidth-custom"
+        
+        labelElements = @elementHolder.find "label"
+        labelElements.removeClass "form-label-fullwidth-custom"
+
+        buttonElements = @elementHolder.find "button"
+        buttonElements.removeClass "form-button-fullwidth-custom"
+        @isFullWidth = false

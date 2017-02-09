@@ -1,41 +1,48 @@
 .ViewImageStrip
 	background grey
+	height 100%
 	.imageHolder
 		float:left
 		width:80%
-		margin-top 5%
-		margin-bottom 5%
-		height 720px
+		padding-top 5%
+		padding-bottom 5%
+		//height 720px
+		height 100%
 
 		.image
 			height 90%
 			.image-wrapper 
 				background-color white
 				width 90%
+				height 100%
 				
 				img
 					margin: 0 auto
 					display: block
 					max-width 90%
-					height 600px
+					height 100%
 					
 		.controls
 			text-align center
 			margin-top 1em
+			height 10%
 			
 			span
 				font-size 2em
 				line-height 2.2em
+			button
+				height 90%
+				margin-top 3%
 			.arrow_left
 				background-image url('./js/test_Data/images/arrow_left.png')
 				background-size 100% 100%	
-				width 60px
-				height 40px
+				width 10%
+				//height 40px
 			.arrow_right
 				background-image url('./js/test_Data/images/arrow_right.png')
 				background-size 100% 100%	
-				width 60px
-				height 40px
+				width 10%
+				//height 40px
 	
 .scroll_wrapper 
 	position: relative
@@ -82,6 +89,8 @@
 
 				.image-wrapper
 					height 100%
+					padding-left 10%
+					padding-right 10%
 					
 					img
 						padding: 0px
