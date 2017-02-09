@@ -1,9 +1,22 @@
-class ModalViewDialog extends ModalDialog
+## ----------------------------------------------------------------------------------------------
+## Class for showing modal dialog with a view
+## Here, this view can have a form 
 
+class ModalViewDialog extends ModalDialog
+	## ------------------------------------------------------------------------------------------
+	## Just same as ModalDialog except this needs to create a view
 	constructor: (options) ->
 		super(options)
 		@view = new View()
 
+	## ------------------------------------------------------------------------------------------
+	## function to show modal, override ModalDialog's
+	## add a view into content of modal's body
+	## add a form into the view above
+	##
+	## @param [Object] options: options to be used in showing modal
+	## @return [Boolean]
+	##
 	show: (options) =>
 		@content += "<div class='modal_ViewDialog' id='modal_ViewDialog#{@gid}' />"
 		@html = @template(this)
