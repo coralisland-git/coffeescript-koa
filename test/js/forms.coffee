@@ -14,7 +14,7 @@ $ ->
 			view.show()
 
 	addTestButton "Form on Popup", "Open", () ->
-		doPopupView "Form", "Form-Popup", "form-popup", 500, 300
+		doPopupView "Form", "Form-Popup", "form-popup", 399, 300
 		.then (view) ->
 			view.init()
 			view.getForm().addTextInput "input1", "Example Input 1"

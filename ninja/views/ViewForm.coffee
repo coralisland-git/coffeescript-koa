@@ -40,8 +40,9 @@ class ViewForm extends View
 	## yet meaningless
 	##		
 	setSize: (w, h)=>
-        @elHolder.width(w)
-        @elHolder.height(h)
+		@onResizeFormView w, h
+		@elHolder.width(w)
+		@elHolder.height(h)
 
     ## ---------------------------------------------------------------------
     ## Function that creates/returns reference to formwrapper
@@ -58,4 +59,5 @@ class ViewForm extends View
     ##
 	show: (name)=>
         @form.show()
+        @onResizeFormView @elHolder.width(), @elHolder.height()
         true
