@@ -160,13 +160,13 @@ class ViewImageStrip extends View
     renderThumbList: ()=>
         @scrollListBody = new WidgetTag "div", "scroll_list_body", "scroller#{@gid}"
         element_ul = @scrollListBody.add "ul"
-        _this = this
-        @imageData.forEach((image, index)->
+        #_this = this
+        @imageData.forEach((image, index)=>
             element_li = element_ul.add "li"
-            element_li.el.on('click, tap', (e)->
+            element_li.el.on('click, tap', (e)=>
                 e.preventDefault()
-                console.log "thumb clicked : " + $(this).prevAll().length
-                _this.setSelectedImgNumber $(this).prevAll().length
+                console.log "thumb clicked : " + index
+                @setSelectedImgNumber index
             )
             imageviewer = new ImageViewer element_li.el, image, index
             imageviewer.render()
