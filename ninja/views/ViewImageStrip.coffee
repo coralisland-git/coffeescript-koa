@@ -69,6 +69,7 @@ class ViewImageStrip extends View
         @elHolder.find(".scroll_wrapper").attr("id", "scroll_wrapper#{@gid}")
         @imageViewer = new ImageViewer @elHolder.find("#image#{@gid}")
         @selectedImgNumber = 0
+        @setImgData []
         @on "resize", @onResizeViewImageStrip
         true
 
@@ -152,22 +153,21 @@ class ViewImageStrip extends View
     ##        
     loadScroll: ()=>
         @iScroll = new IScroll document.getElementById("scroll_wrapper#{@gid}"), { mouseWheel: true, click: true, tap: true, resizeScrollbars: true }
-        #@iScroll.refresh()
-        _this = this
-        $("#scroller li").on('click, tap', (e)->
-            e.preventDefault()
-            console.log "thumb clicked : " + $(this).prevAll().length
-            _this.setSelectedImgNumber $(this).prevAll().length
-        )
-    
+
     ##
     ## function to render thumbnail list(list of imageviewers that are smaller than main one)
     ##
     renderThumbList: ()=>
-        @scrollListBody =new WidgetTag "div", "scroll_list_body", "scroller"
+        @scrollListBody = new WidgetTag "div", "scroll_list_body", "scroller#{@gid}"
         element_ul = @scrollListBody.add "ul"
+        _this = this
         @imageData.forEach((image, index)->
             element_li = element_ul.add "li"
+            element_li.el.on('click, tap', (e)->
+                e.preventDefault()
+                console.log "thumb clicked : " + $(this).prevAll().length
+                _this.setSelectedImgNumber $(this).prevAll().length
+            )
             imageviewer = new ImageViewer element_li.el, image, index
             imageviewer.render()
             imageviewer.setSize "200px", "150px"
