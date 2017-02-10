@@ -1669,6 +1669,97 @@ class DataFormatLink extends DataFormatterType
 
 		true
 
+class DataFormatImageList extends DataFormatterType
+
+	# @property [String] name name of the data type
+	name: "imagelist"
+
+	# @property [Array|Object] options provided options for selection
+	options: []
+
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to open multiselect editor
+	##
+	## @param [JqueryObject] elParent parent element
+	## @param [Integer] left left position offset
+	## @param [Integer] top top position offset
+	## @param [Integer] width width of the editor
+	## @param [Integer] height height of the editor
+	## @param [Object] currentValue current value of the cell
+	## @param [String] path path where the value is being edited
+	## @return null
+	##
+	openEditor: (elParent, left, top, width, height, currentValue, path) =>
+
+		w = $(window).width()
+		h = $(window).height()
+
+		if w > 1000
+			w = 1000
+		else if w > 800
+			w = 800
+		else
+			w = 600
+
+		if h > 1000
+			h = 1000
+		else if h > 800
+			h = 800
+		else if h > 600
+			h = 600
+		else
+			h = 400
+
+		if typeof currentValue is "string"
+			currentValue = currentValue.split ","
+		imgCount = currentValue.length
+		if imgCount < 1 
+			return false
+		else if imgCount == 1
+			title = "View Image"
+		else 
+			title = "View #{imgCount} Images"
+
+		doPopupView 'ImageStrip', title, 'imagestrip_popup', w, h
+		.then (view) ->
+			view.init()
+			for img in currentValue
+				view.addImage img
+			view.render()
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to format the currently passed data
+	##
+	## @param [Object] data data to be formatted
+	## @param [Object] options additonal options defined for the datatype
+	## @param [String] path path where the value is being edited
+	## @return [Object] data formatted data
+	##
+	format: (currentValue, options, path) =>
+		@options = options
+		if typeof currentValue == "string"
+			currentValue = currentValue.split ','
+
+		if Array.isArray(currentValue)
+			return currentValue.join(", ")
+
+		values = []
+		for idx, obj of currentValue
+			values.push obj
+		return values.join(", ")
+
+	## -------------------------------------------------------------------------------------------------------------
+	## funtion to unformat the currently unformatted data
+	##
+	## @param [Object] data data to be unformatted
+	## @param [String] path path where the value is being edited
+	## @return [Object] data unformatted data
+	##
+	unformat: (currentValue, path) =>
+		if typeof currentValue == "string"
+			currentValue = currentValue.split ','
+		return currentValue
+
+
 
 ## -------------------------------------------------------------------------------------------------------------
 ## register all the data type with the globalDataFormatter
@@ -1696,6 +1787,7 @@ try
 	globalDataFormatter.register(new DataFormatMemo())
 	globalDataFormatter.register(new DataFormatDuration())
 	globalDataFormatter.register(new DataFormatLink())
+	globalDataFormatter.register(new DataFormatImageList())
 
 
 catch e
