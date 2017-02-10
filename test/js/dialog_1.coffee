@@ -75,7 +75,7 @@ $ ->
 		m = new ModalDialog
 			showOnCreate: false
 			content:      "Fill out this example form"
-			position:     "center"
+			position:     "top"
 			title:        "Form Title"
 			ok:           "Go"
 
