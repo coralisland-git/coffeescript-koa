@@ -38,7 +38,6 @@ class ViewImageStrip extends View
     ##
     onResizeViewImageStrip : (w, h)=>
         console.log "w: #{w},   h: #{h}"
-       
         true
 
     ##

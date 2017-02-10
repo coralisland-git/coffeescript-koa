@@ -1,5 +1,6 @@
 .ViewImageStrip
-	background grey
+	background transparent
+	border solid 1px grey
 	height 100%
 	.imageHolder
 		float:left
@@ -32,17 +33,20 @@
 				line-height 2.2em
 			button
 				height 90%
+				max-height 6vmin
 				margin-top 3%
 			.arrow_left
 				background-image url('./js/test_Data/images/arrow_left.png')
 				background-size 100% 100%	
 				width 10%
-				//height 40px
+				max-width 10vmin
+				
 			.arrow_right
 				background-image url('./js/test_Data/images/arrow_right.png')
 				background-size 100% 100%	
 				width 10%
-				//height 40px
+				max-width 10vmin
+				
 	
 .scroll_wrapper 
 	position: relative
