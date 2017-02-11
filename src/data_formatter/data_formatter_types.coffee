@@ -1752,8 +1752,7 @@ class DataFormatImageList extends DataFormatterType
 		if typeof currentValue is "string"
 			currentValue = currentValue.split ","
 		imgCount = currentValue.length
-
-		else if imgCount == 1
+		if imgCount == 1
 			formattedValue = "View Image"
 		else 
 			formattedValue = "View #{imgCount} Images"
