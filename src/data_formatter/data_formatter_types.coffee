@@ -1736,6 +1736,7 @@ class DataFormatImageList extends DataFormatterType
 	##
 	format: (currentValue, options, path) =>
 		@options = options
+		###
 		if typeof currentValue == "string"
 			currentValue = currentValue.split ','
 
@@ -1746,6 +1747,17 @@ class DataFormatImageList extends DataFormatterType
 		for idx, obj of currentValue
 			values.push obj
 		return values.join(", ")
+		###
+		formattedValue = "No Available Image"
+		if typeof currentValue is "string"
+			currentValue = currentValue.split ","
+		imgCount = currentValue.length
+
+		else if imgCount == 1
+			formattedValue = "View Image"
+		else 
+			formattedValue = "View #{imgCount} Images"
+		return formattedValue
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to unformat the currently unformatted data
