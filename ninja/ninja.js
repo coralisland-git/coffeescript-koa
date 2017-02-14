@@ -10081,15 +10081,15 @@ DataFormatImageList = (function(superClass) {
     			values.push obj
     		return values.join(", ")
      */
-    formattedValue = "No Available Image";
+    formattedValue = "No Image";
     if (typeof currentValue === "string") {
       currentValue = currentValue.split(",");
     }
     imgCount = currentValue.length;
     if (imgCount === 1) {
-      formattedValue = "View Image";
+      formattedValue = "1 Image";
     } else {
-      formattedValue = "View " + imgCount + " Images";
+      formattedValue = imgCount + " Images";
     }
     return formattedValue;
   };
