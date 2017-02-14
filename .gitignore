@@ -29,4 +29,8 @@ node_modules
 #webstorm
 .idea
 
+#build generated folder
+ninja.js
+ninja.css
+
 bower_components
