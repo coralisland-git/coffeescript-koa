@@ -38,6 +38,14 @@ class ViewImageStrip extends View
     ##
     onResizeViewImageStrip : (w, h)=>
         console.log "w: #{w},   h: #{h}"
+        if w < 400 or h < 400
+            @setThumbSize 100, 75
+        else if w < 600 or h < 600
+            @setThumbSize 150, 100
+        else if w < 900 or h < 900
+            @setThumbSize 200, 150
+        else
+            @setThumbSize 300, 200
         true
 
     ##
@@ -125,11 +133,7 @@ class ViewImageStrip extends View
     ## function to show right and left arrow controls
     ##    
     renderControls: ()=>
-        btnLeftArrow = new WidgetTag "i", "fa fa-arrow-left fa-fw arrow-left"
-        btnRightArrow = new WidgetTag "i", "fa fa-arrow-right fa-fw arrow-right"
-
         html = "<div id='left-arrow'><i class='fa fa-arrow-left fa-3x' aria-hidden='true'></i></div><div id='right-arrow'><i class='fa fa-arrow-right fa-3x' aria-hidden='true'></i></div>"
-        #btnLeftArrow.appendTo "#controls#{@gid}"
         $("#controls#{@gid}").html html
         $("#controls#{@gid} #left-arrow").bind "click", =>
             console.log "Left Arrow Clicked"
@@ -139,6 +143,9 @@ class ViewImageStrip extends View
             console.log "Right Arrow Clicked"
             @nextImg()
 
+    ##
+    ## Function to enable/disable arrow buttons as there is any previous/next images
+    ##
     hideOrShowControls: ()=>
         if @selectedImgNumber <= 0
                 $("#controls#{@gid} #left-arrow").addClass "hidden-arrow"
@@ -148,7 +155,6 @@ class ViewImageStrip extends View
                 $("#controls#{@gid} #right-arrow").addClass "hidden-arrow"
             else
                 $("#controls#{@gid} #right-arrow").removeClass "hidden-arrow"
-
 
     ##
     ## function to finally load IScroll for thumbnail list
@@ -161,10 +167,9 @@ class ViewImageStrip extends View
     ##
     renderThumbList: ()=>
         @scrollListBody = new WidgetTag "div", "scroll_list_body", "scroller#{@gid}"
-        element_ul = @scrollListBody.add "ul"
-        #_this = this
+        @element_ul = @scrollListBody.add "ul"
         @imageData.forEach((image, index)=>
-            element_li = element_ul.add "li"
+            element_li = @element_ul.add "li"
             element_li.el.on('click, tap', (e)=>
                 e.preventDefault()
                 console.log "thumb clicked : " + index
@@ -176,3 +181,14 @@ class ViewImageStrip extends View
         )        
         $("#scroll_wrapper#{@gid}").append @scrollListBody.el
         @loadScroll()
+
+    ##
+    ## Function to set size of thumbnails in IScroll
+    ##
+    setThumbSize: (w, h) =>
+        thumbList = @element_ul.getChildren()
+        for thumb in thumbList
+            thumb.el.width w
+            thumb.el.height h
+        @iScroll.refresh()
+        true
