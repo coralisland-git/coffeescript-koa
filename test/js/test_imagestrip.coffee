@@ -123,7 +123,7 @@ $ ->
 			view.setSize 0, 800
 			view.render()
 		)
-		tabs.addTab "EmptyTab", '<h2>Another tab</h2>'
+		tabs.addTab "EmptyTab", '<p style="font-size:xx-large;">--- Another tab ---</p>'
 		true
 
 	go()
