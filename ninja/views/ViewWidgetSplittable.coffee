@@ -19,8 +19,11 @@ class ViewWidgetSplittable extends View
 			@gid = name
 		else
 			@gid = GlobalValueManager.NextGlobalID()
-		@elHolder.find(".widgetsplittable-container").html "<div id='widgetsplittable#{@gid}' />"
+		@elHolder.find(".widgetsplittable-container").html "<div id='widgetsplittable#{@gid}' class='widgetsplittable' />"
 		@wdtSplittable = new WidgetSplittable @elHolder.find("#widgetsplittable#{@gid}")
 		@wdtSplittable.render(@optionData)
 		true
+
+	getWidget: () =>
+		return @wdtSplittable
 

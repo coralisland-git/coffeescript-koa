@@ -7,6 +7,12 @@ class WidgetSplittable
 
 	constructor: (@elementHolder) ->
 		@splitData = {}
+		@element1 = new WidgetTag "div", "split", "split_1"
+		@element1.appendTo @elementHolder
+
+		@element2 = new WidgetTag "div", "split", "split_2"
+		@element2.appendTo @elementHolder
+		true
 
 	setData: (data) =>
 		if !@checkValidData data then return false
@@ -14,7 +20,7 @@ class WidgetSplittable
 			@splitData[prop] = data[prop]
 		return true
 	checkValidData: (data) =>
-		if !$.fn.Split 
+		if !window.Split 
 			console.log "Error: Plugin Split not loaded"
 			
 		if @validDirections.indexOf(data.direction) is -1
@@ -25,12 +31,14 @@ class WidgetSplittable
 	render: (data) =>
 		if !@setData(data) then return false
 		direction = @splitData.direction
-		element1 = new WidgetTag "div", "split", "split#{@gid}_1"
-		element1.appendTo @elementHolder
-
-		element2 = new WidgetTag "div", "split", "split#{@gid}_2"
-		element2.appendTo @elementHolder
-
-		Split ["##{element1.id}", "##{element2.id}"], @splitData
+		@element1.addClass "split-#{direction}"
+		@element2.addClass "split-#{direction}"
+		Split ["##{@element1.id}", "##{@element2.id}"], @splitData
 		true
+
+	getFirstChild: () =>
+		return @element1
+
+	getSecondChild: () =>
+		return @element2 
 
