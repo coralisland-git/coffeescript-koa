@@ -53,11 +53,11 @@ class ViewImageStrip extends View
     ## ------------------------------------------------------------------------------------------
     ## function to render entire ImageStrip including imageviewer, thumbnail list, control buttons
     ##    
-    render: ()=>
-        if !@setElementsImageData()?
-            return false
+    render: ()=>        
         @renderThumbList()
         @renderControls()
+        if !@setSelectedImgNumber(0)?
+            return false
         true
 
     ## ------------------------------------------------------------------------------------------
@@ -90,11 +90,10 @@ class ViewImageStrip extends View
     setSelectedImgNumber: (number)=>
         if number? and 0 <= number and number < @getImageCount()
             @selectedImgNumber = number
-            @imageViewer.setData {
-                image: @imageData[@selectedImgNumber]
-                number: @selectedImgNumber
-                }
-        true
+            @hideOrShowControls()
+            return @setElementsImageData()
+        else
+            return false
     
     ##
     ## function to get currently selected image number
@@ -112,40 +111,44 @@ class ViewImageStrip extends View
     ## function to set number as current's-1
     ##
     prevImg: ()=>
-        if @selectedImgNumber == 0 then return
-        @selectedImgNumber--
-        @imageViewer.setData {
-            image: @imageData[@selectedImgNumber]
-            number: @selectedImgNumber
-        }
+        @setSelectedImgNumber @selectedImgNumber-1
         true
 
     ##
     ## function to set number as current's+1
     ##    
     nextImg: ()=>
-        if @selectedImgNumber >= @getImageCount() - 1 then return
-        @selectedImgNumber++
-        @imageViewer.setData {
-            image: @imageData[@selectedImgNumber]
-            number: @selectedImgNumber
-        }
+        @setSelectedImgNumber @selectedImgNumber+1
         true
 
     ##
     ## function to show right and left arrow controls
     ##    
     renderControls: ()=>
-        btnLeftArrow = new WidgetTag "button", "arrow_left"
-        btnRightArrow = new WidgetTag "button", "arrow_right"
-        btnLeftArrow.appendTo "#controls#{@gid}"
-        btnRightArrow.appendTo "#controls#{@gid}"
-        btnLeftArrow.bind "click", =>
+        btnLeftArrow = new WidgetTag "i", "fa fa-arrow-left fa-fw arrow-left"
+        btnRightArrow = new WidgetTag "i", "fa fa-arrow-right fa-fw arrow-right"
+
+        html = "<div id='left-arrow'><i class='fa fa-arrow-left fa-3x' aria-hidden='true'></i></div><div id='right-arrow'><i class='fa fa-arrow-right fa-3x' aria-hidden='true'></i></div>"
+        #btnLeftArrow.appendTo "#controls#{@gid}"
+        $("#controls#{@gid}").html html
+        $("#controls#{@gid} #left-arrow").bind "click", =>
             console.log "Left Arrow Clicked"
             @prevImg()
-        btnRightArrow.bind "click", =>
+            
+        $("#controls#{@gid} #right-arrow").bind "click", =>
             console.log "Right Arrow Clicked"
             @nextImg()
+
+    hideOrShowControls: ()=>
+        if @selectedImgNumber <= 0
+                $("#controls#{@gid} #left-arrow").addClass "hidden-arrow"
+            else
+                $("#controls#{@gid} #left-arrow").removeClass "hidden-arrow"
+        if @selectedImgNumber >= @getImageCount() - 1
+                $("#controls#{@gid} #right-arrow").addClass "hidden-arrow"
+            else
+                $("#controls#{@gid} #right-arrow").removeClass "hidden-arrow"
+
 
     ##
     ## function to finally load IScroll for thumbnail list
