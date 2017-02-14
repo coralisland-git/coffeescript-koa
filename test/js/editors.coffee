@@ -105,6 +105,7 @@ $ ->
     addExample "memo"         , 'This is a test\nHaving two lines"', "Popup Editor"
     addExample "imagelist"    , "./js/test_Data/images/1.jpg, ./js/test_Data/images/2.jpg, ./js/test_Data/images/3.jpg, ./js/test_Data/images/4.jpg, ./js/test_Data/images/5.jpg, ./js/test_Data/images/6.jpg, ./js/test_Data/images/7.jpg", "Imagelist as 'string'", null
     addExample "imagelist"    , ["./js/test_Data/images/fake.jpg","./js/test_Data/images/2.jpg","./js/test_Data/images/3.jpg","./js/test_Data/images/4.jpg","./js/test_Data/images/5.jpg","./js/test_Data/images/6.jpg","./js/test_Data/images/7.jpg"], "Imagelist as 'Array'", null
+    addExample "imagelist"    , ["https://cfmedia.deadline.com/2015/05/yahoo-logo-2.jpg"], "Imagelist with 1 image", null
 
     html += "</table>"
     html += "<div id='results'>Click a cell in the Test Value column.</div>"
