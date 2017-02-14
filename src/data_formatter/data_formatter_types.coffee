@@ -1748,15 +1748,15 @@ class DataFormatImageList extends DataFormatterType
 			values.push obj
 		return values.join(", ")
 		###
-		formattedValue = "No Available Image"
+		formattedValue = "No Image"
 		if typeof currentValue is "string"
 			currentValue = currentValue.split ","
 		imgCount = currentValue.length
 
-		else if imgCount == 1
-			formattedValue = "View Image"
+		if imgCount == 1
+			formattedValue = "1 Image"
 		else 
-			formattedValue = "View #{imgCount} Images"
+			formattedValue = "#{imgCount} Images"
 		return formattedValue
 
 	## -------------------------------------------------------------------------------------------------------------
