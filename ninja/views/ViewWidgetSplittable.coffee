@@ -9,8 +9,17 @@ class ViewWidgetSplittable extends View
 	##    
 	setTitle: (title)=>
 
+	onResize : (w, h)=>
+        return
+
+    setSize: (w, h)=>
+    	if w > 0
+        	@elHolder.width(w)
+        if h > 0
+        	@elHolder.height(h)
+
 	getDependencyList: () =>
-		return ["/vendor/split.js"]
+		return ["/vendor/split.min.js"]
 
 	setData: (@optionData) =>
 
@@ -19,7 +28,8 @@ class ViewWidgetSplittable extends View
 			@gid = name
 		else
 			@gid = GlobalValueManager.NextGlobalID()
-		@elHolder.find(".widgetsplittable-container").html "<div id='widgetsplittable#{@gid}' class='widgetsplittable' />"
+	
+		@elHolder.find(".widgetsplittable-container").attr "id","widgetsplittable#{@gid}"
 		@wdtSplittable = new WidgetSplittable @elHolder.find("#widgetsplittable#{@gid}")
 		@wdtSplittable.render(@optionData)
 		true
