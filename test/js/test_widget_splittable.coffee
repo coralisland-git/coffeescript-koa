@@ -4,6 +4,7 @@ $ ->
 		direction: "vertical"
 		gutterSize: 6
 		cursor: "row-resize"
+		minSize: 20
 	}
 	SplitData_H = {
 		sizes: [30, 70]
@@ -58,7 +59,7 @@ $ ->
 			div_second_child.setView "WidgetSplittable", (view) ->
 				view.setData SplitData_V
 				view.show()
-		, 100
+		, 300
 		true
 
 	addTestButton "Popup Splittable Widget", "Open", () ->
