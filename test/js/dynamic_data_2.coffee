@@ -126,12 +126,12 @@ $ ->
         loadZipcodes()
         .then ()->
             DataMap.setDataTypes 'zipcode', TableZipcode
-            true
+            return true
 
         loadDatafromJSONFile "testData"
         .then ()->
             DataMap.setDataTypes 'testData', TableTestdata
-            true
+            return true
 
         true
 
@@ -145,10 +145,9 @@ $ ->
     addTestButton "Bind to Path(Only One Data Field)", "Open", () =>
         addHolder "renderTest"
         wdt = new WidgetTag("div", null, "wdt_div")
-        wdt.bindToPath "zipcode", "03105", "city"
         $("#renderTest").append($ "<br><span>Simple Data Field, you can edit it</span>")
         $("#renderTest").append wdt.getTag()
-        
+        wdt.bindToPath "zipcode", "03105", "city"
         true
 
     addTestButton "Bind to Path(Several Widgets with same Path)", "Open", () =>

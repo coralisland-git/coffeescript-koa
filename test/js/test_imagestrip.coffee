@@ -18,6 +18,7 @@ newImage9 = new Image()
 newImage9.src = "./js/test_Data/images/9.jpg"
 newImage10 = new Image()
 newImage10.src = "./js/test_Data/images/10.jpg"
+
 $ ->
 	addTestButton "Image Strip with few images", "Open", ()->
 		addHolder("renderTest1")
