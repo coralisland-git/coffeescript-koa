@@ -29,10 +29,8 @@ class ViewForm extends View
 	onResizeFormView : (w, h)=>
 		if w == 0 or h == 0 then return
 		if w < @boundaryValueToFullWidth
-			console.log "Form width < 400"
 			@form.putElementsFullWidth()
 		else
-			console.log "Form width > 400"
 			@form.backElementsFullWidth()
 
 	## ---------------------------------------------------------------------

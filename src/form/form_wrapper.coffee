@@ -22,6 +22,13 @@ class FormWrapper
 
         @isFullWidth = false
 
+        Handlebars.registerHelper("getNumber", (data)->
+            for key, value of data
+                if key is "number"
+                    return value
+            return null
+        )
+
         # @property [String] templateFormFieldText template to use in the render of form
         @templateFormFieldText = Handlebars.compile '''
             <div class="form-group">
@@ -64,6 +71,17 @@ class FormWrapper
                             {{@key}}="{{this}}"
                             {{/each}}
                         ><i class="fa fa-check"></i> {{submit}}</button>
+                </div>
+            </div>
+        '''
+
+        @templatePathField = Handlebars.compile '''
+            <div class="form-group">
+                <label for="{{fieldName}}" class='control-label col-sm-2 label-pathfield'> {{label}} </label>
+                <div class='col-sm-10 pathfield' id='pathfield-widget-{{getNumber attrs}}'>
+                    <!--
+                    Here, path-field input will be put on
+                    -->
                 </div>
             </div>
         '''
@@ -153,7 +171,7 @@ class FormWrapper
         if type is "checkbox" and value is 1
             attrs.checked = "checked"
         value = if type is "checkbox" then 1 else value
-        field = new FormField(fieldName, label,value, type, attrs)
+        field = new FormField(fieldName, label, value, type, attrs)
         @fields.push(field)
         return field
     ## -------------------------------------------------------------------------------------------------------------
@@ -170,14 +188,46 @@ class FormWrapper
         return field
 
     ## -------------------------------------------------------------------------------------------------------------
+    ## Add an input with path of table
+    ##
+    addPathField: (fieldName, tableName, columnName) =>
+        widget = new WidgetTag "div", "form-pathfield form-control", "form-widget-#{@fields.length}"
+        field = new FormField fieldName, columnName, "", "pathfield", {
+            "table" : tableName
+            "column" : columnName
+            "pathfield-widget" : widget
+            "number" : @fields.length
+        }
+        @fields.push field       
+        return field
+
+    ## -------------------------------------------------------------------------------------------------------------
+    ## Append element of each path-field widget tag to form
+    ##
+    appendPathFieldWidgets: () =>
+        for field in @fields
+            if field.type is "pathfield"
+                widget = field.attrs["pathfield-widget"]
+                $("#pathfield-widget-#{field.attrs['number']}").empty()
+                $("#pathfield-widget-#{field.attrs['number']}").append widget.getTag()
+
+    ## -------------------------------------------------------------------------------------------------------------
+    ## Set data path of fields in this form
+    ##
+    setPath: (tableName, idValue) =>
+        for field in @fields
+            if field.type is "pathfield"
+                widget = field.attrs["pathfield-widget"]
+                widget.bindToPath tableName, idValue, field.attrs["column"]
+        true
+            
+    ## -------------------------------------------------------------------------------------------------------------
     ## Generate html for the formWrapper
     ##
     ## @return [String] content the html content after compilation under handlebar
     ##
     getHtml: () =>
-
         content = "<form id='#{@gid}' class='form-horizontal' role='form'>"
-
         for field in @fields
             if field.type is 'select'
                 ##| parse given options and remove from attributes
@@ -186,6 +236,8 @@ class FormWrapper
                 content += @templateSelectFieldText(field)
             else if field.type is 'submit'
                 content += @templateFormSubmitButton(field)
+            else if field.type is 'pathfield'
+                content += @templatePathField(field)
             else
                 content += @templateFormFieldText(field)
 
@@ -245,7 +297,7 @@ class FormWrapper
 
     show: () =>
         @elementHolder.append @getHtml()
-
+        @appendPathFieldWidgets()
         setTimeout ()=>
                 @onAfterShow()
             , 10
