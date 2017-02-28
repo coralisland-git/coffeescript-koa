@@ -37,7 +37,6 @@ class ViewImageStrip extends View
     ## function to change width and height of the view when it is resized
     ##
     onResizeViewImageStrip : (w, h)=>
-        console.log "w: #{w},   h: #{h}"
         if w < 400 or h < 400
             @setThumbSize 100, 75
         else if w < 600 or h < 600
@@ -136,11 +135,9 @@ class ViewImageStrip extends View
         html = "<div id='left-arrow'><i class='fa fa-arrow-left fa-3x' aria-hidden='true'></i></div><div id='right-arrow'><i class='fa fa-arrow-right fa-3x' aria-hidden='true'></i></div>"
         $("#controls#{@gid}").html html
         $("#controls#{@gid} #left-arrow").bind "click", =>
-            console.log "Left Arrow Clicked"
             @prevImg()
             
         $("#controls#{@gid} #right-arrow").bind "click", =>
-            console.log "Right Arrow Clicked"
             @nextImg()
 
     ##
@@ -172,7 +169,6 @@ class ViewImageStrip extends View
             element_li = @element_ul.add "li"
             element_li.el.on('click, tap', (e)=>
                 e.preventDefault()
-                console.log "thumb clicked : " + index
                 @setSelectedImgNumber index
             )
             imageviewer = new ImageViewer element_li.el, image, index
