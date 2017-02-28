@@ -190,8 +190,14 @@ class FormWrapper
     ## -------------------------------------------------------------------------------------------------------------
     ## Add an input with path of table
     ##
-    addPathField: (fieldName, tableName, columnName) =>
+    addPathField: (fieldName, tableName, columnName, attrs = {}) =>
         widget = new WidgetTag "div", "form-pathfield form-control", "form-widget-#{@fields.length}"
+        if attrs.type is "custom"
+            widget.removeClass "form-control"
+            widget.addClass "custom"
+        else if attrs.type is "calculation"
+            widget.addClass "calculation"
+        
         field = new FormField fieldName, columnName, "", "pathfield", {
             "table" : tableName
             "column" : columnName

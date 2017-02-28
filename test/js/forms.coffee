@@ -78,6 +78,14 @@ $ ->
 		name        : "IsNew"
 		source      : "isNew"
 		editable    : true
+	TableTestdata.push
+		name 		: "SourceCode"
+		source 		: "sourcecode"
+		editable	: true
+	TableTestdata.push
+		name 		: "Memo"
+		source 		: "memo"
+		editable	: true
 
 	addTest "Loading Data from files..", () ->
         loadZipcodes()
@@ -154,11 +162,13 @@ $ ->
 		div.setView "Form", (view)->
 			view.init()
 			view.getForm().addTextInput "input1", "Text Input"
-			view.getForm().addPathField "data-initialprice", "testData", "initialPrice"
+			view.getForm().addPathField "data-initialprice", "testData", "initialPrice", {"type": "calculation"}
 			view.getForm().addPathField "data-currentprice", "testData", "currentPrice"
 			view.getForm().addPathField "data-date", "testData", "date"
 			view.getForm().addPathField "data-distance", "testData", "distance"
-			view.getForm().addPathField "data-isnew", "testData", "isNew"
+			view.getForm().addPathField "data-isnew", "testData", "isNew", {"type": "custom"}
+			view.getForm().addPathField "data-sourcecode", "testData", "sourcecode"
+			view.getForm().addPathField "data-memo", "testData", "memo"
 			view.getForm().addSubmit "submit", "Click this button to submit", "Submit"
 			view.getForm().onSubmit = (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1}"

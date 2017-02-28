@@ -308,6 +308,20 @@ class TableViewCol extends TableViewColBase
 			@changeColumn "options", '#.#####'
 			return
 
+		if /^sourcecode/i.test @data.name
+			@changeColumn "type", "sourcecode"
+			@changeColumn "width", 60
+			@changeColumn "align", "left"
+			@data.skipDeduce = true
+			return
+
+		if /^memo/i.test @data.name
+			@changeColumn "type", "memo"
+			@changeColumn "width", 60
+			@changeColumn "align", "left"
+			@data.skipDeduce = true
+			return
+
 		return
 
 	##|
