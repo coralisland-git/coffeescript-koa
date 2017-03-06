@@ -9,6 +9,8 @@ class FormWrapper
 
     constructor: (holderElement, options) ->
 
+        # @property [String] gid unique id of the formWrapper
+        @gid    = "form" + GlobalValueManager.NextGlobalID()
         if !$(holderElement).length
             holderElement = "<form id='#{@gid}' class='form-horizontal' role='form'/>"
 
@@ -16,9 +18,6 @@ class FormWrapper
 
         # @property [Array] fields fields currently included in the formWrapper
         @fields = []
-
-        # @property [String] gid unique id of the formWrapper
-        @gid    = "form" + GlobalValueManager.NextGlobalID()
 
         @isFullWidth = false
 
@@ -282,7 +281,7 @@ class FormWrapper
     onAfterShow: () =>
 
         firstField = null
-        elForm = @elementHolder.find "##{@gid}"
+        elForm = $ "##{@gid}"
         for field in @fields
             field.el = elForm.find("##{field.fieldName}")
             field.onAfterShow()
