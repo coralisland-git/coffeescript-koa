@@ -887,9 +887,10 @@ class TableView
 
 	##|
 	##|  Add a new sort rule in a given order
-	##|  sortMode = null/undefined => toggle
-	##|  sortMode = 0 / false => descending
-	##|  sortMode = 1 / true  => ascending
+	##|  sortMode = 0 / toggle
+	##|  sortMode = -1 / descending
+	##|  sortMode = 1 / ascending
+	##|  sortMode = other value / error
 	##|
 
 	addSortRule: (sourceName, sortMode)=>
@@ -907,18 +908,15 @@ class TableView
 			@sortRules = [ found ]
 
 		if sortMode? and sortMode == 0
-			found.state = 0
+			found.state = found.state * -1
+			if found.state == 0 then found.state = 1
 		else if sortMode? and sortMode == 1
 			found.state = 1
 		else if sortMode? and sortMode == -1
 			found.state = -1
-		else if found.state == -1
-			found.state = 0
-		else if found.state == 0
-			found.state = 1
 		else
-			found.state = -1
-
+			@addSortRule sourceName, 0
+		
 		@updateRowData()
 		return
 
@@ -2271,10 +2269,16 @@ class TableView
 	## function to sort the table base on column and type
 	##
 	## @param [String] name name of the column to apply sorting on
-	## @param [String] type it can be ASC|DESC
+	## @param [String] type it can be ASC|DSC
 	##
-	sortByColumn: (name) =>
-		@addSortRule name
+	sortByColumn: (name, type) =>
+		if type is "ASC"
+			sortType = 1
+		else if type is "DSC"
+			sortType = -1
+		else
+			sortType = 0
+		@addSortRule name, sortType
 		true
 
 	##|
