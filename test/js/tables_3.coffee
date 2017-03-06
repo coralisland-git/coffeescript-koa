@@ -1,6 +1,10 @@
 $ ->
-
-    addTest "Automatic Data from JSON", ()->
+    TESTRESULT = {}
+    new Promise (resolve, reject)->
+        $.get "js/test_data/test_result.json", (allData)->
+            TESTRESULT = allData.TESTRESULT
+            resolve(true)
+    addTestButton "Automatic Data from JSON", "Open", ()->
 
         Data = TESTRESULT
 
