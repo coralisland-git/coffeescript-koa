@@ -2,7 +2,13 @@ $ ->
 
 	$("body").append '''
 	    <style type="text/css">
-	
+	    .test_table {
+	    	width: 100%;
+	    }
+	    .test_table td {
+	    	border: solid 1px #bbbbdd;
+	    	color: #309030;
+	    }
 	    .lastTable {
 	        margin-bottom : 330px;
 	    }
@@ -182,6 +188,40 @@ $ ->
 			state: "NewState"
 			lon: 12.34567
 		}
+
+	addTestButton "Form and Table with Pathfield - zipcode", "Open", ()=>
+		addHolder "renderTest1"
+		div = new WidgetTag "div", "testWidget"
+		div.appendTo "#renderTest1"
+		div.setView "Form", (view)->
+			view.init()
+			view.getForm().addTextInput "input1", "Text Input"
+			view.getForm().addPathField "data-city", "zipcode", "city"
+			view.getForm().addPathField "data-state", "zipcode", "state"
+			view.getForm().addPathField "data-longitude", "zipcode", "lon"
+			view.getForm().addSubmit "submit", "Click this button to submit", "Submit"
+			view.getForm().onSubmit = (form) =>
+				alert "Form Submitted Successfully!\nTest value1 = #{form.input1}"
+			view.show()
+			view.getForm().setPath "zipcode", "03105"
+
+		addHolder "renderTest2"
+		wdt_id = new WidgetTag "td", null, "wdt_td_id"
+		wdt_city = new WidgetTag "td", null, "wdt_td_city"
+		wdt_state = new WidgetTag "td", null, "wdt_td_state"
+		wdt_lon = new WidgetTag "td", null,"wdt_td_lon"
+
+		$("#renderTest2").append($ "<br><table class='test_table'><caption>This is table of data fields same as in form above</caption></table>")
+		$(".test_table").append wdt_id.getTag()
+		$(".test_table").append wdt_city.getTag()
+		$(".test_table").append wdt_state.getTag()
+		$(".test_table").append wdt_lon.getTag()
+
+		wdt_id.bindToPath "zipcode", "03105", "id"
+		wdt_city.bindToPath "zipcode", "03105", "city"
+		wdt_state.bindToPath "zipcode", "03105", "state"
+		wdt_lon.bindToPath "zipcode", "03105", "lon"
+		true
 
 	go()
 	
