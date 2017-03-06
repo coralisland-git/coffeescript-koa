@@ -20,7 +20,7 @@ $ ->
 
 		new Promise (resolve, reject) ->
 			ds  = new DataSet "zipcode"
-			ds.setAjaxSource "/js/test_data/zipcodes.json", "data", "code"
+			ds.setAjaxSource "/js/test_Data/zipcodes.json", "data", "code"
 			ds.doLoadData()
 			.then (dsObject)->
 				resolve(true)
@@ -30,26 +30,33 @@ $ ->
 
 
 	addTestButton "context menu with sorting in header according to DataType", "Open", ()->
-		addHolder("renderTest1");
+		addHolder("renderTest1")
 		table = new TableView $("#renderTest1")
 		table.addTable "zipcode"
-		table.render()
+		table.real_render()
+		#table.updateRowData()
 		true
 
 	addTestButton "inline sorting with icon in header according to DataType", "Open", ()->
 		addHolder("renderTest1");
 		table = new TableView $("#renderTest1")
 		table.addTable "zipcode"
-		table.render()
-		$('#renderTest1').prepend "<input type='button' id='sortByCity' class='btn btn-info' style='margin-bottom:15px;' value='Sort By City DESC' />"
-		$('#sortByCity').on 'click', ()->
-			table.sortByColumn('City','DSC')
+		table.real_render()
+		$('#renderTest1').prepend "<input type='button' id='sortByCityDSC' class='btn btn-info' style='margin-bottom:15px; margin-left:30px;' value='Sort By City DSC' />"
+		$('#sortByCityDSC').on 'click', ()->
+			table.sortByColumn('city','DSC')
+		$('#renderTest1').prepend "<input type='button' id='sortByCityTOG' class='btn btn-info' style='margin-bottom:15px; margin-left:30px;' value='Sort By City Toggle' />"
+		$('#sortByCityTOG').on 'click', ()->
+			table.sortByColumn('city','Random')
+		$('#renderTest1').prepend "<input type='button' id='sortByCityASC' class='btn btn-info' style='margin-bottom:15px;' value='Sort By City ASC' />"
+		$('#sortByCityASC').on 'click', ()->
+			table.sortByColumn('city','ASC')
 		true
 
 	addTestButton "auto hide columns from left on resize", "Open", ()->
 		DataMap.setDataTypes "zipcode", [
 			name    : "Custom-1"
-			source  : "code1"
+			source  : "city"
 			visible : true
 			type    : "text"
 			width   : 300
@@ -75,15 +82,15 @@ $ ->
 		addHolder("renderTest1");
 		table = new TableView $("#renderTest1")
 		table.addTable "zipcode"
-		table.render()
+		table.real_render()
 		#width can be dynamic as parameter | default = 32
-		table.setAutoHideColumn()
+		#table.setAutoHideColumn()
 		true
 
 	addTestButton "simpleobject data type test", "Open", ()->
 		##| set the address as object in data map, to manipulate address field as simple object
-		for key,obj of DataMap.getDataMap().data.zipcode
-			obj.address = {city:obj.city,state:obj.state,country:obj.county}
+		for key,obj of DataMap.getDataMap().engine.export("zipcode")
+			obj.address = {city:obj.city,state:obj.state,county:obj.county}
 
 		DataMap.setDataTypes "zipcode", [
 			name    : "Address"
@@ -92,12 +99,12 @@ $ ->
 			type    : "simpleobject"
 			width   : 200,
 			options:
-				compile: "{{city}}, {{state}}, {{country}}"
+				compile: "{{city}}, {{state}}, {{county}}"
 		]
 		addHolder("renderTest1");
 		table = new TableView $("#renderTest1")
 		table.addTable "zipcode"
-		table.render()
+		table.real_render()
 		true
 
 	addTestButton "dynamic add/remove row test case", "Open", ()->
