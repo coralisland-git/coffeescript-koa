@@ -2083,6 +2083,9 @@ FormWrapper = (function() {
     this.onSubmitAction = bind(this.onSubmitAction, this);
     this.onSubmit = bind(this.onSubmit, this);
     this.getHtml = bind(this.getHtml, this);
+    this.setPath = bind(this.setPath, this);
+    this.appendPathFieldWidgets = bind(this.appendPathFieldWidgets, this);
+    this.addPathField = bind(this.addPathField, this);
     this.addSubmit = bind(this.addSubmit, this);
     this.addInput = bind(this.addInput, this);
     this.addMultiselect = bind(this.addMultiselect, this);
@@ -2096,9 +2099,20 @@ FormWrapper = (function() {
     this.fields = [];
     this.gid = "form" + GlobalValueManager.NextGlobalID();
     this.isFullWidth = false;
+    Handlebars.registerHelper("getNumber", function(data) {
+      var key, value;
+      for (key in data) {
+        value = data[key];
+        if (key === "number") {
+          return value;
+        }
+      }
+      return null;
+    });
     this.templateFormFieldText = Handlebars.compile('<div class="form-group">\n    <label for="{{fieldName}}" class=\'control-label col-sm-2\'> {{label}} </label>\n    <div class=\'col-sm-10\'>\n            <input class="form-control" type="{{type}}" id="{{fieldName}}" value="{{value}}" name="{{fieldName}}"\n                {{#each attrs}}\n                {{@key}}="{{this}}"\n                {{/each}}\n            />\n        <div id="{{fieldName}}error" class="text-danger"></div>\n    </div>\n</div>');
     this.templateSelectFieldText = Handlebars.compile('<div class="form-group">\n    <label for="{{fieldName}}" class=\'control-label col-sm-2\'> {{label}} </label>\n    <div class=\'col-sm-10\'>\n            <select class="form-control" id="{{fieldName}}" name="{{fieldName}}"\n                {{#each attrs}}\n                {{@key}}="{{this}}"\n                {{/each}}\n            >\n                {{#each options}}\n                    <option value="{{this}}">{{this}}</option>\n                {{/each}}\n            </select>\n        <div id="{{fieldName}}error" class="text-danger"></div>\n    </div>\n</div>');
     this.templateFormSubmitButton = Handlebars.compile('<div class="form-group">\n    <label for="{{fieldName}}" class=\'control-label col-sm-5\'> {{label}} </label>\n    <div class=\'col-sm-7\'>\n           <button class="btn btn-sm btn-primary btn2" type="submit" data-dismiss="modal"\n                {{#each attrs}}\n                {{@key}}="{{this}}"\n                {{/each}}\n            ><i class="fa fa-check"></i> {{submit}}</button>\n    </div>\n</div>');
+    this.templatePathField = Handlebars.compile('<div class="form-group">\n    <label for="{{fieldName}}" class=\'control-label col-sm-2 label-pathfield\'> {{label}} </label>\n    <div class=\'col-sm-10 pathfield\' id=\'pathfield-widget-{{getNumber attrs}}\'>\n        <!--\n        Here, path-field input will be put on\n        -->\n    </div>\n</div>');
     if (typeof options === "object") {
       for (name in options) {
         val = options[name];
@@ -2179,6 +2193,58 @@ FormWrapper = (function() {
     return field;
   };
 
+  FormWrapper.prototype.addPathField = function(fieldName, tableName, columnName, attrs) {
+    var field, widget;
+    if (attrs == null) {
+      attrs = {};
+    }
+    widget = new WidgetTag("div", "form-pathfield form-control", "form-widget-" + this.fields.length);
+    if (attrs.type === "custom") {
+      widget.removeClass("form-control");
+      widget.addClass("custom");
+    } else if (attrs.type === "calculation") {
+      widget.addClass("calculation");
+    }
+    field = new FormField(fieldName, columnName, "", "pathfield", {
+      "table": tableName,
+      "column": columnName,
+      "pathfield-widget": widget,
+      "number": this.fields.length
+    });
+    this.fields.push(field);
+    return field;
+  };
+
+  FormWrapper.prototype.appendPathFieldWidgets = function() {
+    var field, i, len, ref, results, widget;
+    ref = this.fields;
+    results = [];
+    for (i = 0, len = ref.length; i < len; i++) {
+      field = ref[i];
+      if (field.type === "pathfield") {
+        widget = field.attrs["pathfield-widget"];
+        $("#pathfield-widget-" + field.attrs['number']).empty();
+        results.push($("#pathfield-widget-" + field.attrs['number']).append(widget.getTag()));
+      } else {
+        results.push(void 0);
+      }
+    }
+    return results;
+  };
+
+  FormWrapper.prototype.setPath = function(tableName, idValue) {
+    var field, i, len, ref, widget;
+    ref = this.fields;
+    for (i = 0, len = ref.length; i < len; i++) {
+      field = ref[i];
+      if (field.type === "pathfield") {
+        widget = field.attrs["pathfield-widget"];
+        widget.bindToPath(tableName, idValue, field.attrs["column"]);
+      }
+    }
+    return true;
+  };
+
   FormWrapper.prototype.getHtml = function() {
     var content, field, i, len, ref;
     content = "<form id='" + this.gid + "' class='form-horizontal' role='form'>";
@@ -2191,6 +2257,8 @@ FormWrapper = (function() {
         content += this.templateSelectFieldText(field);
       } else if (field.type === 'submit') {
         content += this.templateFormSubmitButton(field);
+      } else if (field.type === 'pathfield') {
+        content += this.templatePathField(field);
       } else {
         content += this.templateFormFieldText(field);
       }
@@ -2244,6 +2312,7 @@ FormWrapper = (function() {
 
   FormWrapper.prototype.show = function() {
     this.elementHolder.append(this.getHtml());
+    this.appendPathFieldWidgets();
     setTimeout((function(_this) {
       return function() {
         return _this.onAfterShow();
@@ -2301,7 +2370,6 @@ ImageViewer = (function() {
     this.setNumber = bind(this.setNumber, this);
     this.setImage = bind(this.setImage, this);
     this.setData = bind(this.setData, this);
-    this.handleClick = bind(this.handleClick, this);
     if (!$(holderElement).length) {
       throw new Error("Element with selector" + holderElement + " not found for ImageStrip");
     }
@@ -2311,35 +2379,15 @@ ImageViewer = (function() {
     this.number = number;
     this.numberBody = $("<div />", {
       "class": "number_body",
-      role: "numberBody",
       id: "number_body" + this.gid
     });
     this.imgViewerBody = new WidgetTag("div", "container-fluid image-wrapper", "image-wrapper" + this.gid);
     true;
   }
 
-  ImageViewer.prototype.handleClick = function(e) {
-    var element, i, len, ref, results, the_gid;
-    the_gid = $(e.target).attr("id");
-    ref = this.imgElements;
-    results = [];
-    for (i = 0, len = ref.length; i < len; i++) {
-      element = ref[i];
-      if (element.gid === the_gid) {
-        if ((element.onClick != null) && typeof element.onClick === "function" && element.onClick(e)) {
-          e.stopPropagation();
-          e.preventDefault();
-        }
-        results.push(true);
-      } else {
-        results.push(void 0);
-      }
-    }
-    return results;
-  };
-
   ImageViewer.prototype.setData = function(data) {
     var isChanged;
+    isChanged = false;
     if ((data.image != null) && this.imgElement !== data.image) {
       this.imgElement = data.image;
       isChanged = true;
@@ -3541,11 +3589,13 @@ PopupWindow = (function() {
   };
 
   PopupWindow.prototype.resize = function(popupWidth, popupHeight) {
-    var height, width;
+    var height, scrollX, scrollY, width;
     this.popupWidth = popupWidth;
     this.popupHeight = popupHeight;
     width = $(window).width();
     height = $(window).height();
+    scrollX = window.pageXOffset || document.body.scrollLeft;
+    scrollY = window.pageYOffset || document.body.scrollTop;
     console.log("popupWindow " + this.title + ", width=" + width + " height=" + height + " : " + this.popupWidth + " x " + this.popupHeight + " (x=" + this.x + ", y=" + this.y + ")");
     if (this.x === 0 && this.y === 0) {
       this.center();
@@ -3556,13 +3606,13 @@ PopupWindow = (function() {
     if (this.y < 0) {
       this.y = 0;
     }
-    if (this.x + this.popupWidth + 10 > width) {
+    if (this.x - scrollX + this.popupWidth + 10 > width) {
       console.log("popupWindow " + this.title + ", moving because " + this.x + " + " + this.popupWidth + " + 10 > " + width);
-      this.x = width - this.popupWidth - 10;
+      this.x = width + scrollX - this.popupWidth - 10;
     }
     this.popupHeight += 24;
-    if (this.y + this.popupHeight + 10 > height) {
-      this.y = height - this.popupHeight - 10;
+    if (this.y - scrollY + this.popupHeight + 10 > height) {
+      this.y = height + scrollY - this.popupHeight - 10;
     }
     while (this.x < 10) {
       this.x++;
@@ -4496,15 +4546,17 @@ View = (function() {
   };
 
   View.prototype.showPopup = function(optionalName, w, h) {
-    var cssTag, x, y;
+    var cssTag, scrollX, scrollY, x, y;
     if (w == null) {
       w = $(window).width() - 100;
     }
     if (h == null) {
       h = $(window).height() - 100;
     }
-    x = ($(window).width() - w) / 2;
-    y = ($(window).height() - h) / 2;
+    scrollX = window.pageXOffset || document.body.scrollLeft;
+    scrollY = window.pageYOffset || document.body.scrollTop;
+    x = ($(window).width() - w) / 2 + scrollX;
+    y = ($(window).height() - h) / 2 + scrollY;
     y -= 34 / 2;
     this.popup = new PopupWindow(this.windowTitle, x, y, {
       tableName: optionalName,
@@ -8016,7 +8068,7 @@ DynamicTabs = (function() {
     } else if (tabType === "viewTab") {
       for (index = j = 0, len1 = sortedTags.length; j < len1; index = ++j) {
         tag = sortedTags[index];
-        yield this.doAddViewTab(tag.viewName, tag.tabText);
+        yield this.doAddViewTab(tag.viewName, tag.tabText, tag.callbackWithView);
       }
     } else if (tabType === "tableTab") {
       for (index = k = 0, len2 = sortedTags.length; k < len2; index = ++k) {
@@ -8504,6 +8556,76 @@ this.Watch = function(eventName, delegate) {
   $("body").on(eventName, delegate);
   return true;
 };
+var WidgetSplittable,
+  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+WidgetSplittable = (function() {
+  WidgetSplittable.prototype.validProperties = ["sizes", "minSize", "direction", "gutterSize", "snapOffset", "cursor", "elementStyle", "gutterStyle", "onDrag", "onDragStart", "onDragEnd"];
+
+  WidgetSplittable.prototype.validDirections = ["horizontal", "vertical"];
+
+  function WidgetSplittable(elementHolder) {
+    this.elementHolder = elementHolder;
+    this.getSecondChild = bind(this.getSecondChild, this);
+    this.getFirstChild = bind(this.getFirstChild, this);
+    this.render = bind(this.render, this);
+    this.checkValidData = bind(this.checkValidData, this);
+    this.setData = bind(this.setData, this);
+    this.splitData = {};
+    this.gid = GlobalValueManager.NextGlobalID();
+    true;
+  }
+
+  WidgetSplittable.prototype.setData = function(data) {
+    var i, len, prop, ref;
+    if (!this.checkValidData(data)) {
+      return false;
+    }
+    ref = this.validProperties;
+    for (i = 0, len = ref.length; i < len; i++) {
+      prop = ref[i];
+      this.splitData[prop] = data[prop];
+    }
+    this.element1 = new WidgetTag("div", "split", "split_1" + this.gid);
+    this.element1.appendTo(this.elementHolder);
+    this.element2 = new WidgetTag("div", "split", "split_2" + this.gid);
+    this.element2.appendTo(this.elementHolder);
+    return true;
+  };
+
+  WidgetSplittable.prototype.checkValidData = function(data) {
+    if (!window.Split) {
+      console.log("Error: Plugin Split not loaded");
+    }
+    if (this.validDirections.indexOf(data.direction) === -1) {
+      return false;
+    }
+    return true;
+  };
+
+  WidgetSplittable.prototype.render = function(data) {
+    var direction;
+    if (!this.setData(data)) {
+      return false;
+    }
+    direction = this.splitData.direction;
+    this.element1.addClass("split-" + direction);
+    this.element2.addClass("split-" + direction);
+    Split(["#" + this.element1.id, "#" + this.element2.id], this.splitData);
+    return true;
+  };
+
+  WidgetSplittable.prototype.getFirstChild = function() {
+    return this.element1;
+  };
+
+  WidgetSplittable.prototype.getSecondChild = function() {
+    return this.element2;
+  };
+
+  return WidgetSplittable;
+
+})();
 var PopUpFormWrapper,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
@@ -11151,6 +11273,20 @@ TableViewCol = (function(superClass) {
       this.changeColumn("visible", true);
       this.changeColumn("align", "right");
       this.changeColumn("options", '#.#####');
+      return;
+    }
+    if (/^sourcecode/i.test(this.data.name)) {
+      this.changeColumn("type", "sourcecode");
+      this.changeColumn("width", 60);
+      this.changeColumn("align", "left");
+      this.data.skipDeduce = true;
+      return;
+    }
+    if (/^memo/i.test(this.data.name)) {
+      this.changeColumn("type", "memo");
+      this.changeColumn("width", 60);
+      this.changeColumn("align", "left");
+      this.data.skipDeduce = true;
       return;
     }
   };
