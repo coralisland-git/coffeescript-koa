@@ -143,13 +143,17 @@ class ModalDialog
 	##
 	show: (options) =>
 
-		if @formWrapper?
-			@content += @formWrapper.getHtml()
+#		if @formWrapper?
+#			@content += @formWrapper.getContent()
 
 		html = @template(this)
 		$("body").append html
 
 		@modal = $("#modal#{@gid}")
+
+		@modal_body = @modal.find(".modal-body")
+		@modal_body.append @formWrapper.getContent()
+
 		@modal.modal(options)
 		@modal.on "hidden.bs.modal", () =>
 			##|
