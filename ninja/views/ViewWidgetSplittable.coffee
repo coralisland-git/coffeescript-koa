@@ -9,9 +9,6 @@ class ViewWidgetSplittable extends View
 	##    
 	setTitle: (title)=>
 
-	onResize : (w, h)=>
-        return
-
     setSize: (w, h)=>
     	if w > 0
         	@elHolder.width(w)
