@@ -213,8 +213,8 @@ class FormWrapper
         for field in @fields
             if field.type is "pathfield"
                 widget = field.attrs["pathfield-widget"]
-                $("#pathfield-widget-#{field.attrs['number']}").empty()
-                $("#pathfield-widget-#{field.attrs['number']}").append widget.getTag()
+                @elementHolder.find("#pathfield-widget-#{field.attrs['number']}").empty()
+                @elementHolder.find("#pathfield-widget-#{field.attrs['number']}").append widget.getTag()
 
     ## -------------------------------------------------------------------------------------------------------------
     ## Set data path of fields in this form
@@ -307,6 +307,11 @@ class FormWrapper
                 @onAfterShow()
             , 10
         true
+
+    getContent: () =>
+        @elementHolder.append @getHtml()
+        @appendPathFieldWidgets()
+        return @elementHolder#.html()
 
     ## ------------------------------------------------------------------------------------------------------------------
     ## Function to give responsive effect to form elements when

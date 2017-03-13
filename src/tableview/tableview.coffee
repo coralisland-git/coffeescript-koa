@@ -267,7 +267,7 @@ class TableView
 		button.source = config.source
 		@actionColList.push button
 		if config.callback?
-			@on "click_#{config.source}", config.callback
+			@on "click_#{button.getSource()}", config.callback
 
 		true
 
@@ -632,6 +632,9 @@ class TableView
 				@setFocusCell(data.vr, data.vc, e)
 			else
 				@setFocusCell(null)
+
+			if data.action?
+				@elTheTable.el.trigger "click_#{data.action}", [row, e]
 
 			if !row?
 				return false

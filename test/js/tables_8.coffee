@@ -7,43 +7,64 @@ Example / Demo using 2 tables, one in each direction
 
 $ ->
 
-    theTable = "mlsactive"
-    for id, newData of Data
-        newData.distance = Math.random() * 10
-        newData.Something1 = ""
-        newData.Another = null
+	theTable = "mlsactive"
+	for id, newData of Data
+		newData.distance = Math.random() * 10
+		newData.Something1 = ""
+		newData.Another = null
         # for varName, value of newData
         #     if !/address/i.test varName
         #         delete newData[varName]
 
-        DataMap.addDataUpdateTable theTable, id, newData
+		DataMap.addDataUpdateTable theTable, id, newData
 
-    addHolder("renderTest1");
-    $("#renderTest1").css
-        width   : 1000
-        height  : 500
-        padding : 0
-        margin  : 0
-        border  : "1px solid blue"
+	addHolder("renderTest1");
+	$("#renderTest1").css
+		width   : 1000
+		height  : 500
+		padding : 0
+		margin  : 0
+		border  : "1px solid blue"
 
-    table = new TableView $("#renderTest1")
-    table.addTable "mlsactive"
-    table.setFixedHeaderAndScrollable()
-    table.moveActionColumn "distance"
-    table.setStatusBarEnabled(true)
-    table.addSortRule("distance", 1)
+	table = new TableView $("#renderTest1")
+	table.addTable "mlsactive"
+	table.setFixedHeaderAndScrollable()
+	table.moveActionColumn "distance"
+	table.setStatusBarEnabled(true)
+	table.addSortRule("distance", 1)
+	DataMap.changeColumnAttribute "mlsactive", "Unique ID", "calculation", true
+	DataMap.changeColumnAttribute "mlsactive", "DOM", "editable", true
+	DataMap.changeColumnAttribute "mlsactive", "Listing Status", "editable", true
 
-    table.addActionColumn
-        name: "Run"
-        width: 50
-        callback: (row)=>
-            console.log "run action:", row
+	table.addActionColumn
+ 		name: "Run"
+		width: 50
+		callback: (row)=>
+			console.log "run action:", row
 
-    DataMap.changeColumnAttribute "mlsactive", "Unique ID", "calculation", true
-    DataMap.changeColumnAttribute "mlsactive", "DOM", "editable", true
-    DataMap.changeColumnAttribute "mlsactive", "Listing Status", "editable", true
+	table.addActionColumn
+		name 	: "Edit"
+		source	: "editData"
+		width 	: 50
+		callback: (row) =>
+			m = new ModalDialog
+				showOnCreate: false
+				content:      "Fill out this example form"
+				position:     "top"
+				title:        "Form Title"
+				ok:           "Go"
 
-    table.render()
+			for key, value of row
+				m.getForm().addPathField "data-#{key}", "mlsactive", key
+			m.getForm().setPath "mlsactive", row.id
+			m.getForm().onSubmit = (form) =>
+				console.log "Submitted form, test value=", form.input1
+				m.hide()
+			m.show()
+			
+			return true
+
+	table.render()
 
     # setTimeout ()->
     #     table.onRearrange()
