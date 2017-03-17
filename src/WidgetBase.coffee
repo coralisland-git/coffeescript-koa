@@ -415,8 +415,7 @@ class WidgetTag
         ##|  so the event handled can easily find this ID
         @el.unbind eventName
         @el.bind eventName, (e)->
-            if eventName is "click"
-                console.log "event is click!!!"
+
             data = WidgetTag.getDataFromEvent(e)
             #console.log "bind DataFromEvent:", data
             for varName, value of data
