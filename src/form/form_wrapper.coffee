@@ -309,8 +309,8 @@ class FormWrapper
         true
 
     getContent: () =>
-        @elementHolder.append @getHtml()
-        @appendPathFieldWidgets()
+        #@elementHolder.append @getHtml()
+        #@appendPathFieldWidgets()
         return @elementHolder#.html()
 
     ## ------------------------------------------------------------------------------------------------------------------
