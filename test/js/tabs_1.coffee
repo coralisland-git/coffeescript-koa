@@ -70,8 +70,8 @@ $ ->
 
 			tabs = new DynamicTabs("#renderTest1")
 			tabs.doAddTableTabData "zipcode", "Zipcodes", 1
-			tabs.doAddTableTabData "stocks", "Stock Data"
-			tabs.doAddTableTabData "zipcode", "Zipcodes1", 0
+			tabs.doAddTableTabData "stocks", "Stock Data", 0
+
 			yield from tabs.addSortedTags "tableTab"
 
 		.then ()->
