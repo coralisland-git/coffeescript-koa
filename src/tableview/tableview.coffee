@@ -748,7 +748,7 @@ class TableView
 				m = new ModalDialog
 					showOnCreate: false
 					content:      "Enter a new name for this column"
-					position:     "center"
+					position:     "top"
 					title:        "Name:"
 					ok:           "Save"
 
@@ -1909,14 +1909,19 @@ class TableView
 			@offsetShowingLeft = 0
 
 		if @rowDataRaw.length == 0
-			return
+			#return
 
 			if !@noDataCell?
 				@noDataCell = @elTheTable.addDiv "tableRow"
 				@noDataCell.setAbsolute()
+			else if @noDataCell.visible
+				return
 
-			@noDataCell.move(0,0, @elTableHolder.width(), @elTableHolder.height())
+			marginRight = if @virtualScrollV.visible then @virtualScrollV.displaySize else 0
+			marginTop = @headerCellHeight + @getRowHeight()
+			@noDataCell.move(0, @headerCellHeight + @getRowHeight(), @elTableHolder.width() - marginRight, @elTableHolder.height() - marginTop)
 			@noDataCell.html "No data available."
+			@noDataCell.show()
 
 			r1 = @virtualScrollV.setRange 0, 0, 0, 0
 			r2 = @virtualScrollH.setRange 0, 0, 0, 0
