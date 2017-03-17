@@ -152,7 +152,9 @@ class ModalDialog
 		@modal = $("#modal#{@gid}")
 
 		@modal_body = @modal.find(".modal-body")
-		@modal_body.append @formWrapper.getContent()
+		if @formWrapper?		
+			@modal_body.append @formWrapper.getContent()
+			@formWrapper.show()
 
 		@modal.modal(options)
 		@modal.on "hidden.bs.modal", () =>
@@ -191,9 +193,10 @@ class ModalDialog
 				'margin-top' : () =>
 					Math.max(0, ($(window).scrollTop() + ($(window).height() - @modal.height()) / 2 ))
 
-		if @formWrapper?
+###		if @formWrapper?
 			setTimeout ()=>
 				@formWrapper.onAfterShow()
 			, 10
+###
 
 
