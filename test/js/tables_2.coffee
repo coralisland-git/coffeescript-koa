@@ -148,13 +148,14 @@ $ ->
 		table.updateRowData()
 		$('#renderTest1').prepend "<input type='button' id='createNew' class='btn btn-info' style='margin-bottom:15px;' value='Create New' />"
 		$('#createNew').on 'click', ()->
-			p = new PopupForm('zipcode','code')
+			p = new PopupForm('zipcode', 'code')
 			p.onCreateNew = (tableName, data) ->
-				console.log tableName,data
+				console.log tableName, data
 				##| apply filter or sorting to update the newly create row
 				setTimeout () ->
 					table.applyFilters()
-				,1
+					table.updateRowData()
+				, 100
 				true
 
 		table.rowCallback = (data,e) ->
