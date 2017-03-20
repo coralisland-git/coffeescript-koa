@@ -112,6 +112,7 @@ $ ->
 		table = new TableView $("#renderTest1")
 		table.addTable "zipcode"
 		table.render()
+		table.updateRowData()
 		_btnText = "&lt;input type='button' id='deleteFirstRow' class='btn btn-danger' style='margin-bottom:15px;' value='Delete First Row' /&gt;"
 		_btnText = _btnText.replace('&lt;','<').replace('&gt;','>')
 		$('#renderTest1').prepend _btnText
@@ -121,18 +122,22 @@ $ ->
 		$('#addNewRow').on 'click', () ->
 			##| manipulate data
 			_randomKey = Math.floor Math.random()*90000 + 10000
-			_randomData = DataMap.getDataMap().data['zipcode']["0#{Math.floor Math.random() * (1344 - 1337 + 1) + 1337}"]
+			#_randomData = DataMap.getDataMap().data['zipcode']["0#{Math.floor Math.random() * (1344 - 1337 + 1) + 1337}"]
+			_randomData = DataMap.getDataForKey "zipcode", "0#{Math.floor Math.random() * (1344 - 1337 + 1) + 1337}"
 			if _randomData
 				_randomData['code'] = _randomKey
 			##| add data
 			DataMap.addData 'zipcode', _randomKey, _randomData
 			##| applyFilters to update new Data
 			table.applyFilters()
+			table.updateRowData()
 		$('#deleteFirstRow').on 'click', () ->
 			##| get first row key from table to pass as arg in function
-			_key = $('#renderTest1 tbody tr').first().find('.col_zipcode_code').text()
+			_key = $('#renderTest1 .table-wrapper .tableRow').first().find('.cell').first().text()
 			##| function to delete the data from dataMap and from screen
 			DataMap.deleteDataByKey 'zipcode', _key
+			console.log "First Row was deleted"
+			table.updateRowData()
 		true
 
 	addTestButton "editable popup on click", "Open", ()->
@@ -140,6 +145,7 @@ $ ->
 		table = new TableView $("#renderTest1")
 		table.addTable "zipcode"
 		table.render()
+		table.updateRowData()
 		$('#renderTest1').prepend "<input type='button' id='createNew' class='btn btn-info' style='margin-bottom:15px;' value='Create New' />"
 		$('#createNew').on 'click', ()->
 			p = new PopupForm('zipcode','code')
@@ -153,7 +159,7 @@ $ ->
 
 		table.rowCallback = (data,e) ->
 			if data.id
-				new PopupForm('zipcode','code',data.id)
+				new PopupForm('zipcode', 'code', data.id)
 		true
 
 	addTestButton "editable popup on click with custom columns", "Open", ()->
@@ -161,6 +167,7 @@ $ ->
 		table = new TableView $("#renderTest1")
 		table.addTable "zipcode"
 		table.render()
+		table.updateRowData()
 		_columns = []
 		_columns.push
 			name       : 'State'
@@ -174,7 +181,7 @@ $ ->
 			required   : true
 		table.rowCallback = (data,e) ->
 			if data.key
-				new PopupForm('zipcode','code',data.key,_columns)
+				new PopupForm('zipcode', 'code', data.key, _columns)
 		true
 
 	addTestButton "popup table", "Open", ()->

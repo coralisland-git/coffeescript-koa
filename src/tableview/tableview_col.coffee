@@ -145,12 +145,10 @@ class TableViewCol extends TableViewColBase
 		return "text"
 
 	getAlign: ()=>
-		if @data.type == "money"
-			@data.align = "right"
-
+		###	
 		if @data.align? and @data.align.length > 0
 			return @data.align
-
+		###
 		f = @getFormatter()
 		if f? and f.align? then return f.align
 
