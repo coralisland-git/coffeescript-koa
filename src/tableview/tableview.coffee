@@ -162,7 +162,7 @@ class TableView
 		# @property [int] the max number of rows that can be selected
 		@checkboxLimit = 1
 
-		@renderReqired = true
+		@renderRequired = true
 
 		# @property [Boolean] showCheckboxes if checkbox to be shown or not default false
 		if !@showCheckboxes? then @showCheckboxes = false
@@ -237,6 +237,7 @@ class TableView
 		for col in columns
 			if col.getSource() == sourceName
 				@actionColList.push col
+				#@actionColList.push Object.assign(Object.create(col), col)
 
 		return true
 
@@ -406,9 +407,11 @@ class TableView
 
 			@resetTimer = setTimeout ()=>
 				delete @resetTimer
+				## 3.27
+				@updateRowData()
+				##
 				@resetCachedFromSize()
 				@onResize()
-				@updateRowData()
 			, 50
 
 	##|
@@ -1079,6 +1082,7 @@ class TableView
 			foundInGroup = false
 			for source in @currentGroups
 				if source == col.getSource()
+					col.isGrouped = true
 					foundInGroup = true
 					break
 
@@ -1087,6 +1091,12 @@ class TableView
 			# console.log "colByNum[#{total}] = ", col.getName()
 			@colByNum[total] = col
 			total++
+
+		## added by xgao
+		for acol in @actionColList
+			if acol.constructor.name is "TableViewCol"
+				@colByNum[total] = acol
+				total++
 
 		return true
 
@@ -1115,9 +1125,13 @@ class TableView
 
 			@totalAvailableRows = @rowDataRaw.length
 			@updateColumnList()
-			if @renderReqired then @real_render();
+
 			@updateFullHeight()
+
+			if @renderRequired then @real_render()
+			@updateScrollbarSettings()
 			@resetCachedFromSize()
+
 			globalTableEvents.emitEvent "row_count", [ @primaryTableName, @totalAvailableRows ]
 			return
 
@@ -1172,9 +1186,15 @@ class TableView
 
 		@totalAvailableRows = @rowDataRaw.length
 		@updateColumnList()
-		if @renderReqired then @real_render();
+		
 		@updateFullHeight()
-		@resetCachedFromSize()
+
+		if @renderRequired then @real_render()
+		## 3.27
+		@updateScrollbarSettings()
+		##
+
+		#@resetCachedFromSize()
 		globalTableEvents.emitEvent "row_count", [ @primaryTableName, @totalAvailableRows ]
 
 		return true
@@ -1200,7 +1220,7 @@ class TableView
 	##
 	setHolderToBottom: () =>
 
-		if @renderReqired then @real_render();
+		if @renderRequired then @real_render();
 		@isFixedBottom = true
 		@updateFixedPosition()
 
@@ -1240,7 +1260,7 @@ class TableView
 		newWidth = @elTableHolder.outerWidth()
 
 		@resetCachedFromSize()
-		@updateVisibleText()
+		#@updateVisibleText()
 
 		@lastNewHeight = newHeight
 		@lastNewWidth  = newWidth
@@ -1271,10 +1291,11 @@ class TableView
 		return @totalAvailableRows
 
 	getTableTotalCols: ()=>
-		return Object.keys(@colByNum).length
+		#return Object.keys(@colByNum).length
 
 		total = 0
 		for col in @colList
+		#for index, col of @colByNum
 			if col.isGrouped? and col.isGrouped == true then continue
 			total++
 
@@ -1282,13 +1303,13 @@ class TableView
 		return total
 
 	getTableVisibleWidth: ()=>
-		if @cachedVisibleWidth? then return @cachedVisibleWidth
+		if @cachedVisibleWidth? && @cachedVisibleWidth > 0 then return @cachedVisibleWidth
 		maxWidth = @elTableHolder.width()
 		if @virtualScrollV? and @virtualScrollV.visible then maxWidth -= 20
 		@cachedVisibleWidth = maxWidth - @getTotalActionWidth()
 
 	getTableVisibleHeight: ()=>
-		if @cachedVisibleHeight? then return @cachedVisibleHeight
+		if @cachedVisibleHeight? && @cachedVisibleHeight > 0 then return @cachedVisibleHeight
 		maxHeight  = @elTableHolder.height()
 		if @virtualScrollH? and @virtualScrollH.visible then maxHeight -= 20
 		@cachedVisibleHeight = maxHeight
@@ -1342,7 +1363,7 @@ class TableView
 
 		visColCount = 0
 		x           = 0
-		colNum      = @getTableTotalCols()-1
+		colNum      = @getTableTotalCols() - 1
 		maxWidth    = @getTableVisibleWidth()
 
 		while x < maxWidth and colNum >= 0
@@ -1774,7 +1795,10 @@ class TableView
 			cell.setDataValue "vr", location.visibleRow
 			cell.setDataValue "vc", location.visibleCol
 			cell.setDataValue "action", acol.getSource()
-			cell.setDataPath "/#{@primaryTableName}/#{location.recordId}/#{acol.getSource()}"
+			if location.isHeader
+				cell.setDataPath "/#{@primaryTableName}/Header/#{acol.getSource()}"	
+			else
+				cell.setDataPath "/#{@primaryTableName}/#{location.recordId}/#{acol.getSource()}"
 
 			if location.groupNum?
 				cell.setClassOne "groupRowChart#{location.groupNum}", /^groupRowChart/
@@ -2012,7 +2036,7 @@ class TableView
 			location.visibleRow++
 
 		if refreshRequired
-			@resetCachedFromSize()
+			#@resetCachedFromSize()
 			return true
 
 		while @shadowCells[location.visibleRow]?
@@ -2020,7 +2044,7 @@ class TableView
 			@shadowCells[location.visibleRow].resetDataValues()
 			location.visibleRow++
 
-		@updateScrollbarSettings()
+		#@updateScrollbarSettings()
 		true
 
 	resetCachedFromScroll: ()=>
@@ -2028,7 +2052,7 @@ class TableView
 		@cachedTotalVisibleRows    = null
 		@cachedMaxTotalVisibleCol  = null
 		@cachedMaxTotalVisibleRows = null
-		@updateVisibleText()
+		#@updateVisibleText()
 		@onMouseOut()
 		true
 
@@ -2043,7 +2067,7 @@ class TableView
 			col.currentCol = null
 
 		@layoutShadow()
-		@updateVisibleText()
+		#@updateVisibleText()
 		@onMouseOut()
 		true
 
@@ -2082,6 +2106,7 @@ class TableView
 		r2 = @virtualScrollH.setRange 0, maxAvailableCols, currentVisibleCols, @offsetShowingLeft
 		if r1 or r2
 			@resetCachedFromSize()
+		@updateVisibleText()
 
 	##|
 	##|  Return true if a column is empty
@@ -2201,13 +2226,13 @@ class TableView
 	render: () =>
 
 		if !@widgetBase?
-			@renderReqired = true
+			@renderRequired = true
 
 		return true
 
 	real_render: () =>
 
-		@renderReqired = false
+		@renderRequired = false
 
 		if !@shadowCells?
 			@shadowCells = {}
@@ -2286,8 +2311,11 @@ class TableView
 			sortType = -1
 		else
 			sortType = 0
-		@addSortRule name, sortType
-		true
+		for key, col of @colByNum
+			if col.getSource() is name
+				@addSortRule name, sortType
+				return true
+		false
 
 	##|
 	##|  Add a group by condition
@@ -2316,6 +2344,10 @@ class TableView
 		keyValue   = parts[2]
 		columnName = parts[3]
 
+		if @getColumnType(columnName) isnt 1
+			console.log "Filter on ActionColumn : Not working"
+			return false
+		
 		if !@currentFilters[tableName]?
 			@currentFilters[tableName] = {}
 
@@ -2605,3 +2637,21 @@ class TableView
 		data["id"] = keyValue
 
 		return data
+
+	## -------------------------------------------------------------------------------------------------------------
+	## check if a column is data column or action column
+	##
+	## @param [String] col name of column to be checked
+	## @return [Integer] 1 : Data Column, 2 : Action Column, 0 : not both
+	##
+	getColumnType: (colName) =>
+
+		for index, dataCol of @colByNum
+			if dataCol.getSource() is colName
+				return 1
+
+		for actionCol in @actionColList
+			if actionCol.getSource() is colName
+				return 2
+
+		return 0
