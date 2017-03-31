@@ -19,6 +19,15 @@ newImage9.src = "./js/test_Data/images/9.jpg"
 newImage10 = new Image()
 newImage10.src = "./js/test_Data/images/10.jpg"
 $ ->
+
+	$("body").append '''
+	    <style type="text/css">
+	    .scrollcontent {
+	        height : 100% !important;
+	    }
+	    </style>
+	'''
+	
 	SplitData_V = {
 		sizes: [40, 60]
 		direction: "vertical"
