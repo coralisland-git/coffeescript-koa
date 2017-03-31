@@ -96,9 +96,10 @@ class TableViewCol extends TableViewColBase
 
 	getVisible: ()=>
 		if @getAlwaysHidden() == true then return false
-		if @isGrouped?    and @isGrouped == true then return false
+		
 		if @data.visible? and @data.visible == true then return true
 		if @data.visible? and @data.visible == false then return false
+		if @isGrouped?    and @isGrouped == true then return false
 		return true
 
 	getAlwaysHidden: ()=>

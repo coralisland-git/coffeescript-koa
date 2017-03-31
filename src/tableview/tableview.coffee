@@ -706,9 +706,9 @@ class TableView
 		for source in @currentGroups
 			popupMenu.addItem "Removing #{source}", (e, source) =>
 				console.log "Remove grouping", source
-
-				col = @findColumn(source)
-				if col? then col.isGrouped = false
+				#col = @findColumn(source)
+				#if col? then col.isGrouped = false
+				@ungroupColumn source
 
 				newList = []
 				for name in @currentGroups
@@ -2090,6 +2090,12 @@ class TableView
 		# console.log "#{@primaryTableName} updateScrollbarSettings H:(#{currentVisibleCols} vs #{maxAvailableCols}) V:(#{currentVisibleRows} vs #{maxAvailableRows})"
 
 		##|
+		##| Don't set offset as less than 0
+		if @offsetShowingTop < 0 then @offsetShowingTop = 0
+
+		if @offsetShowingLeft < 0 then @offsetShowingLeft = 0
+
+		##|
 		##|  Don't show more rows than fit on the screen
 		if @offsetShowingTop >= maxAvailableRows - currentVisibleRows - 1
 			# console.log "#{@primaryTableName} updateScrollbarSettings offsetShowingTop #{@offsetShowingTop} >= #{maxAvailableRows} - #{currentVisibleRows}"
@@ -2641,7 +2647,7 @@ class TableView
 	## -------------------------------------------------------------------------------------------------------------
 	## check if a column is data column or action column
 	##
-	## @param [String] col name of column to be checked
+	## @param [String] colName name of column to be checked
 	## @return [Integer] 1 : Data Column, 2 : Action Column, 0 : not both
 	##
 	getColumnType: (colName) =>
@@ -2655,3 +2661,21 @@ class TableView
 				return 2
 
 		return 0
+
+	##
+	## set column's isGrouped property as false
+	##
+	## @param [string] colName name of column
+	## @return [Boolean] true if action is succeeded, else, false
+	##
+	ungroupColumn: (colName) =>
+
+		columns = DataMap.getColumnsFromTable(@primaryTableName, @columnReduceFunction)
+		for col in columns
+			if col.getSource() is colName
+				#DataMap.changeColumnAttribute @primaryTableName, colName, "isGrouped", false
+				col.isGrouped = false
+				#DataMap.changeColumnAttribute @primaryTableName, colName, "visible", true
+				return true
+
+		return false
