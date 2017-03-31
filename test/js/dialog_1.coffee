@@ -98,7 +98,6 @@ $ ->
 		m.show()
 
 	addTestButton "Simple Form 2", "Open", () ->
-		DataMap.changeColumnAttribute "zipcode", "city", "editable", true
 		m = new ModalDialog
 			showOnCreate: false
 			content:      "Fill out this example form"
@@ -108,13 +107,11 @@ $ ->
 		m.getForm().addTextInput "input1", "Example Input 1"
 		m.getForm().addTextInput "input2", "Example Input 2"
 		m.getForm().addTextInput "input3", "Example Input 3"
-		m.getForm().addPathField "data-city", "zipcode", "city"
 		m.getForm().onSubmit = (form) =>
 			console.log "Submitted form, test value 1=", form.input1
 			console.log "Submitted form, test value 2=", form.input2
 			console.log "Submitted form, test value 3=", form.input3
 			m.hide()
-		m.getForm().setPath "zipcode", "03105"
 
 		m.onButton2 = (e, fields) ->
 			console.log "FIELDS=", fields

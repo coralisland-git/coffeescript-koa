@@ -128,6 +128,32 @@ $ ->
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
 			view.show()
 		true
+	
+	addTestButton "Form  on Popup with Many Fields", "Open", () ->
+		doPopupView "Form", "Form-Popup", "form-popup", 399, 300
+		.then (view) ->
+			view.init()
+			view.getForm().addTextInput "input1", "Example Input 1"
+			view.getForm().addTextInput "input2", "Example Input 2"
+			view.getForm().addTextInput "input3", "Example Input 3"
+			view.getForm().addTextInput "input4", "Example Input 4"
+			view.getForm().addTextInput "input5", "Example Input 5"
+			view.getForm().addTextInput "input6", "Example Input 6"
+			view.getForm().addTextInput "input7", "Example Input 7"
+			view.getForm().addTextInput "input8", "Example Input 8"
+			view.getForm().addTextInput "input1", "Example Input 9"
+			view.getForm().addTextInput "input2", "Example Input 10"
+			view.getForm().addTextInput "input3", "Example Input 11"
+			view.getForm().addTextInput "input4", "Example Input 12"
+			view.getForm().addTextInput "input5", "Example Input 13"
+			view.getForm().addTextInput "input6", "Example Input 14"
+			view.getForm().addTextInput "input7", "Example Input 15"
+			view.getForm().addTextInput "input8", "Example Input 16"
+			view.getForm().addSubmit "submit", "Click this button to submit", "Submit"
+			view.getForm().onSubmit = (form) =>
+				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
+			view.show()
+		true
 
 	addTestButton "Form in Tab", "Open", () ->
 		addHolder "renderTest1"
