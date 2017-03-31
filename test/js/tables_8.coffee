@@ -48,20 +48,16 @@ $ ->
 		source	: "editData"
 		width 	: 50
 		callback: (row) =>
-			m = new ModalDialog
-				showOnCreate: false
-				content:      "Fill out this example form"
-				position:     "top"
-				title:        "Form Title"
-				ok:           "Go"
-
-			for key, value of row
-				m.getForm().addPathField "data-#{key}", "mlsactive", key
-			m.getForm().setPath "mlsactive", row.id
-			m.getForm().onSubmit = (form) =>
-				console.log "Submitted form, test value=", form.input1
-				m.hide()
-			m.show()
+			doPopupView "Form", "Form-Popup", "form-popup", 500, 1000
+			.then (view) ->
+				view.init()
+				for key, value of row
+					view.getForm().addPathField "data-#{key}", "mlsactive", key
+				view.getForm().setPath "mlsactive", row.id
+				view.getForm().addSubmit "submit", "Click this button to submit", "Submit"
+				view.getForm().onSubmit = (form) =>
+					alert "Form was submitted successfully."
+				view.show()
 			
 			return true
 
