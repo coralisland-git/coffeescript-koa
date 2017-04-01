@@ -1938,6 +1938,7 @@ class TableView
 			if !@noDataCell?
 				@noDataCell = @elTheTable.addDiv "tableRow"
 				@noDataCell.setAbsolute()
+				@noDataCell.setZ(1)
 			else if @noDataCell.visible
 				return
 
