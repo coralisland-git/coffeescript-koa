@@ -2076,20 +2076,12 @@ class TableView
 	##|  Up the visibility and settings of the scrollbars
 	updateScrollbarSettings: ()=>
 
-		# currentVisibleCols = @getTableVisibleCols()
-		# currentVisibleRows = @getTableVisibleRows()
 		currentVisibleCols = @getTableMaxVisibleCols()
 		currentVisibleRows = @getTableMaxVisibleRows()
 
 		maxAvailableRows = @getTableTotalRows()
 		maxAvailableCols = @getTableTotalCols()
-
-		if @elStatusScrollTextRows?
-			@elStatusScrollTextRows.html "Rows #{@offsetShowingTop+1} - #{@offsetShowingTop+currentVisibleRows} of #{maxAvailableRows}"
-			@elStatusScrollTextCols.html "Cols #{@offsetShowingLeft+1}-#{@offsetShowingLeft+currentVisibleCols} of #{maxAvailableCols}"
-
-		# console.log "#{@primaryTableName} updateScrollbarSettings H:(#{currentVisibleCols} vs #{maxAvailableCols}) V:(#{currentVisibleRows} vs #{maxAvailableRows})"
-
+		
 		##|
 		##| Don't set offset as less than 0
 		if @offsetShowingTop < 0 then @offsetShowingTop = 0
@@ -2106,6 +2098,11 @@ class TableView
 			# console.log "#{@primaryTableName} updateScrollbarSettings offsetShowingLeft #{@offsetShowingLeft} >= #{maxAvailableCols} - #{currentVisibleCols}"
 			@offsetShowingLeft = maxAvailableCols - currentVisibleCols
 			# console.log "#{@primaryTableName} updateScrollbarSettings, reset offsetShowingLeft to ", @offsetShowingLeft
+		if @elStatusScrollTextRows?
+			@elStatusScrollTextRows.html "Rows #{@offsetShowingTop+1} - #{@offsetShowingTop+currentVisibleRows} of #{maxAvailableRows}"
+			@elStatusScrollTextCols.html "Cols #{@offsetShowingLeft+1}-#{@offsetShowingLeft+currentVisibleCols} of #{maxAvailableCols}"
+
+		# console.log "#{@primaryTableName} updateScrollbarSettings H:(#{currentVisibleCols} vs #{maxAvailableCols}) V:(#{currentVisibleRows} vs #{maxAvailableRows})"
 
 		##|
 		##|  Scrollbar settings show/hide
