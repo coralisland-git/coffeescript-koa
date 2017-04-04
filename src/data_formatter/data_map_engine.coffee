@@ -116,7 +116,7 @@ class DataMapMemoryCollection
     remove: (condition) =>
 
         allResults = @find condition
-        if !allResults? then remove
+        if !allResults? then return false
         if allResults? and allResults[0]?
             for i, obj of allResults
                 strKey = @getDocumentKey[obj]

@@ -162,7 +162,7 @@ class TableView
 		# @property [int] the max number of rows that can be selected
 		@checkboxLimit = 1
 
-		@renderReqired = true
+		@renderRequired = true
 
 		# @property [Boolean] showCheckboxes if checkbox to be shown or not default false
 		if !@showCheckboxes? then @showCheckboxes = false
@@ -237,6 +237,7 @@ class TableView
 		for col in columns
 			if col.getSource() == sourceName
 				@actionColList.push col
+				#@actionColList.push Object.assign(Object.create(col), col)
 
 		return true
 
@@ -267,7 +268,7 @@ class TableView
 		button.source = config.source
 		@actionColList.push button
 		if config.callback?
-			@on "click_#{config.source}", config.callback
+			@on "click_#{button.getSource()}", config.callback
 
 		true
 
@@ -406,9 +407,11 @@ class TableView
 
 			@resetTimer = setTimeout ()=>
 				delete @resetTimer
+				## 3.27
+				@updateRowData()
+				##
 				@resetCachedFromSize()
 				@onResize()
-				@updateRowData()
 			, 50
 
 	##|
@@ -633,6 +636,9 @@ class TableView
 			else
 				@setFocusCell(null)
 
+			if data.action?
+				@elTheTable.el.trigger "click_#{data.action}", [row, e]
+
 			if !row?
 				return false
 
@@ -700,9 +706,9 @@ class TableView
 		for source in @currentGroups
 			popupMenu.addItem "Removing #{source}", (e, source) =>
 				console.log "Remove grouping", source
-
-				col = @findColumn(source)
-				if col? then col.isGrouped = false
+				#col = @findColumn(source)
+				#if col? then col.isGrouped = false
+				@ungroupColumn source
 
 				newList = []
 				for name in @currentGroups
@@ -745,7 +751,7 @@ class TableView
 				m = new ModalDialog
 					showOnCreate: false
 					content:      "Enter a new name for this column"
-					position:     "center"
+					position:     "top"
 					title:        "Name:"
 					ok:           "Save"
 
@@ -887,9 +893,10 @@ class TableView
 
 	##|
 	##|  Add a new sort rule in a given order
-	##|  sortMode = null/undefined => toggle
-	##|  sortMode = 0 / false => descending
-	##|  sortMode = 1 / true  => ascending
+	##|  sortMode = 0 / toggle
+	##|  sortMode = -1 / descending
+	##|  sortMode = 1 / ascending
+	##|  sortMode = other value / error
 	##|
 
 	addSortRule: (sourceName, sortMode)=>
@@ -907,18 +914,15 @@ class TableView
 			@sortRules = [ found ]
 
 		if sortMode? and sortMode == 0
-			found.state = 0
+			found.state = found.state * -1
+			if found.state == 0 then found.state = 1
 		else if sortMode? and sortMode == 1
 			found.state = 1
 		else if sortMode? and sortMode == -1
 			found.state = -1
-		else if found.state == -1
-			found.state = 0
-		else if found.state == 0
-			found.state = 1
 		else
-			found.state = -1
-
+			@addSortRule sourceName, 0
+		
 		@updateRowData()
 		return
 
@@ -1078,6 +1082,7 @@ class TableView
 			foundInGroup = false
 			for source in @currentGroups
 				if source == col.getSource()
+					col.isGrouped = true
 					foundInGroup = true
 					break
 
@@ -1086,6 +1091,15 @@ class TableView
 			# console.log "colByNum[#{total}] = ", col.getName()
 			@colByNum[total] = col
 			total++
+
+		## added by xgao
+		for acol in @actionColList
+			if acol.constructor.name is "TableViewCol"
+				for sortrule in @sortRules
+					if sortrule.tableName is @primaryTableName and sortrule.source is acol.getSource()
+						acol.sort = sortrule.state
+				@colByNum[total] = acol
+				total++
 
 		return true
 
@@ -1114,9 +1128,13 @@ class TableView
 
 			@totalAvailableRows = @rowDataRaw.length
 			@updateColumnList()
-			if @renderReqired then @real_render();
+
 			@updateFullHeight()
+
+			if @renderRequired then @real_render()
+			@updateScrollbarSettings()
 			@resetCachedFromSize()
+
 			globalTableEvents.emitEvent "row_count", [ @primaryTableName, @totalAvailableRows ]
 			return
 
@@ -1171,9 +1189,15 @@ class TableView
 
 		@totalAvailableRows = @rowDataRaw.length
 		@updateColumnList()
-		if @renderReqired then @real_render();
+		
 		@updateFullHeight()
-		@resetCachedFromSize()
+
+		if @renderRequired then @real_render()
+		## 3.27
+		@updateScrollbarSettings()
+		##
+
+		#@resetCachedFromSize()
 		globalTableEvents.emitEvent "row_count", [ @primaryTableName, @totalAvailableRows ]
 
 		return true
@@ -1199,7 +1223,7 @@ class TableView
 	##
 	setHolderToBottom: () =>
 
-		if @renderReqired then @real_render();
+		if @renderRequired then @real_render();
 		@isFixedBottom = true
 		@updateFixedPosition()
 
@@ -1239,7 +1263,7 @@ class TableView
 		newWidth = @elTableHolder.outerWidth()
 
 		@resetCachedFromSize()
-		@updateVisibleText()
+		#@updateVisibleText()
 
 		@lastNewHeight = newHeight
 		@lastNewWidth  = newWidth
@@ -1270,10 +1294,11 @@ class TableView
 		return @totalAvailableRows
 
 	getTableTotalCols: ()=>
-		return Object.keys(@colByNum).length
+		#return Object.keys(@colByNum).length
 
 		total = 0
 		for col in @colList
+		#for index, col of @colByNum
 			if col.isGrouped? and col.isGrouped == true then continue
 			total++
 
@@ -1281,13 +1306,13 @@ class TableView
 		return total
 
 	getTableVisibleWidth: ()=>
-		if @cachedVisibleWidth? then return @cachedVisibleWidth
+		if @cachedVisibleWidth? && @cachedVisibleWidth > 0 then return @cachedVisibleWidth
 		maxWidth = @elTableHolder.width()
 		if @virtualScrollV? and @virtualScrollV.visible then maxWidth -= 20
 		@cachedVisibleWidth = maxWidth - @getTotalActionWidth()
 
 	getTableVisibleHeight: ()=>
-		if @cachedVisibleHeight? then return @cachedVisibleHeight
+		if @cachedVisibleHeight? && @cachedVisibleHeight > 0 then return @cachedVisibleHeight
 		maxHeight  = @elTableHolder.height()
 		if @virtualScrollH? and @virtualScrollH.visible then maxHeight -= 20
 		@cachedVisibleHeight = maxHeight
@@ -1341,7 +1366,7 @@ class TableView
 
 		visColCount = 0
 		x           = 0
-		colNum      = @getTableTotalCols()-1
+		colNum      = @getTableTotalCols() - 1
 		maxWidth    = @getTableVisibleWidth()
 
 		while x < maxWidth and colNum >= 0
@@ -1773,7 +1798,10 @@ class TableView
 			cell.setDataValue "vr", location.visibleRow
 			cell.setDataValue "vc", location.visibleCol
 			cell.setDataValue "action", acol.getSource()
-			cell.setDataPath "/#{@primaryTableName}/#{location.recordId}/#{acol.getSource()}"
+			if location.isHeader
+				cell.setDataPath "/#{@primaryTableName}/Header/#{acol.getSource()}"	
+			else
+				cell.setDataPath "/#{@primaryTableName}/#{location.recordId}/#{acol.getSource()}"
 
 			if location.groupNum?
 				cell.setClassOne "groupRowChart#{location.groupNum}", /^groupRowChart/
@@ -1908,14 +1936,20 @@ class TableView
 			@offsetShowingLeft = 0
 
 		if @rowDataRaw.length == 0
-			return
+			#return
 
 			if !@noDataCell?
 				@noDataCell = @elTheTable.addDiv "tableRow"
 				@noDataCell.setAbsolute()
+				@noDataCell.setZ(1)
+			else if @noDataCell.visible
+				return
 
-			@noDataCell.move(0,0, @elTableHolder.width(), @elTableHolder.height())
+			marginRight = if @virtualScrollV.visible then @virtualScrollV.displaySize else 0
+			marginTop = @headerCellHeight + @getRowHeight()
+			@noDataCell.move(0, @headerCellHeight + @getRowHeight(), @elTableHolder.width() - marginRight, @elTableHolder.height() - marginTop)
 			@noDataCell.html "No data available."
+			@noDataCell.show()
 
 			r1 = @virtualScrollV.setRange 0, 0, 0, 0
 			r2 = @virtualScrollH.setRange 0, 0, 0, 0
@@ -2006,7 +2040,7 @@ class TableView
 			location.visibleRow++
 
 		if refreshRequired
-			@resetCachedFromSize()
+			#@resetCachedFromSize()
 			return true
 
 		while @shadowCells[location.visibleRow]?
@@ -2014,7 +2048,7 @@ class TableView
 			@shadowCells[location.visibleRow].resetDataValues()
 			location.visibleRow++
 
-		@updateScrollbarSettings()
+		#@updateScrollbarSettings()
 		true
 
 	resetCachedFromScroll: ()=>
@@ -2022,7 +2056,7 @@ class TableView
 		@cachedTotalVisibleRows    = null
 		@cachedMaxTotalVisibleCol  = null
 		@cachedMaxTotalVisibleRows = null
-		@updateVisibleText()
+		#@updateVisibleText()
 		@onMouseOut()
 		true
 
@@ -2037,7 +2071,7 @@ class TableView
 			col.currentCol = null
 
 		@layoutShadow()
-		@updateVisibleText()
+		#@updateVisibleText()
 		@onMouseOut()
 		true
 
@@ -2045,19 +2079,17 @@ class TableView
 	##|  Up the visibility and settings of the scrollbars
 	updateScrollbarSettings: ()=>
 
-		# currentVisibleCols = @getTableVisibleCols()
-		# currentVisibleRows = @getTableVisibleRows()
 		currentVisibleCols = @getTableMaxVisibleCols()
 		currentVisibleRows = @getTableMaxVisibleRows()
 
 		maxAvailableRows = @getTableTotalRows()
 		maxAvailableCols = @getTableTotalCols()
+		
+		##|
+		##| Don't set offset as less than 0
+		if @offsetShowingTop < 0 then @offsetShowingTop = 0
 
-		if @elStatusScrollTextRows?
-			@elStatusScrollTextRows.html "Rows #{@offsetShowingTop+1} - #{@offsetShowingTop+currentVisibleRows} of #{maxAvailableRows}"
-			@elStatusScrollTextCols.html "Cols #{@offsetShowingLeft+1}-#{@offsetShowingLeft+currentVisibleCols} of #{maxAvailableCols}"
-
-		# console.log "#{@primaryTableName} updateScrollbarSettings H:(#{currentVisibleCols} vs #{maxAvailableCols}) V:(#{currentVisibleRows} vs #{maxAvailableRows})"
+		if @offsetShowingLeft < 0 then @offsetShowingLeft = 0
 
 		##|
 		##|  Don't show more rows than fit on the screen
@@ -2069,6 +2101,11 @@ class TableView
 			# console.log "#{@primaryTableName} updateScrollbarSettings offsetShowingLeft #{@offsetShowingLeft} >= #{maxAvailableCols} - #{currentVisibleCols}"
 			@offsetShowingLeft = maxAvailableCols - currentVisibleCols
 			# console.log "#{@primaryTableName} updateScrollbarSettings, reset offsetShowingLeft to ", @offsetShowingLeft
+		if @elStatusScrollTextRows?
+			@elStatusScrollTextRows.html "Rows #{@offsetShowingTop+1} - #{@offsetShowingTop+currentVisibleRows} of #{maxAvailableRows}"
+			@elStatusScrollTextCols.html "Cols #{@offsetShowingLeft+1}-#{@offsetShowingLeft+currentVisibleCols} of #{maxAvailableCols}"
+
+		# console.log "#{@primaryTableName} updateScrollbarSettings H:(#{currentVisibleCols} vs #{maxAvailableCols}) V:(#{currentVisibleRows} vs #{maxAvailableRows})"
 
 		##|
 		##|  Scrollbar settings show/hide
@@ -2076,6 +2113,7 @@ class TableView
 		r2 = @virtualScrollH.setRange 0, maxAvailableCols, currentVisibleCols, @offsetShowingLeft
 		if r1 or r2
 			@resetCachedFromSize()
+		@updateVisibleText()
 
 	##|
 	##|  Return true if a column is empty
@@ -2195,13 +2233,13 @@ class TableView
 	render: () =>
 
 		if !@widgetBase?
-			@renderReqired = true
+			@renderRequired = true
 
 		return true
 
 	real_render: () =>
 
-		@renderReqired = false
+		@renderRequired = false
 
 		if !@shadowCells?
 			@shadowCells = {}
@@ -2271,11 +2309,20 @@ class TableView
 	## function to sort the table base on column and type
 	##
 	## @param [String] name name of the column to apply sorting on
-	## @param [String] type it can be ASC|DESC
+	## @param [String] type it can be ASC|DSC
 	##
-	sortByColumn: (name) =>
-		@addSortRule name
-		true
+	sortByColumn: (name, type) =>
+		if type is "ASC"
+			sortType = 1
+		else if type is "DSC"
+			sortType = -1
+		else
+			sortType = 0
+		for key, col of @colByNum
+			if col.getSource() is name
+				@addSortRule name, sortType
+				return true
+		false
 
 	##|
 	##|  Add a group by condition
@@ -2304,6 +2351,10 @@ class TableView
 		keyValue   = parts[2]
 		columnName = parts[3]
 
+		if @getColumnType(columnName) isnt 1
+			console.log "Filter on ActionColumn : Not working"
+			return false
+		
 		if !@currentFilters[tableName]?
 			@currentFilters[tableName] = {}
 
@@ -2593,3 +2644,39 @@ class TableView
 		data["id"] = keyValue
 
 		return data
+
+	## -------------------------------------------------------------------------------------------------------------
+	## check if a column is data column or action column
+	##
+	## @param [String] colName name of column to be checked
+	## @return [Integer] 1 : Data Column, 2 : Action Column, 0 : not both
+	##
+	getColumnType: (colName) =>
+
+		for index, dataCol of @colByNum
+			if dataCol.getSource() is colName
+				return 1
+
+		for actionCol in @actionColList
+			if actionCol.getSource() is colName
+				return 2
+
+		return 0
+
+	##
+	## set column's isGrouped property as false
+	##
+	## @param [string] colName name of column
+	## @return [Boolean] true if action is succeeded, else, false
+	##
+	ungroupColumn: (colName) =>
+
+		columns = DataMap.getColumnsFromTable(@primaryTableName, @columnReduceFunction)
+		for col in columns
+			if col.getSource() is colName
+				#DataMap.changeColumnAttribute @primaryTableName, colName, "isGrouped", false
+				col.isGrouped = false
+				#DataMap.changeColumnAttribute @primaryTableName, colName, "visible", true
+				return true
+
+		return false

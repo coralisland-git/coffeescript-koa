@@ -12,13 +12,14 @@ class PopUpFormWrapper extends FormWrapper
 	## constructor
 	##
 	constructor: () ->
-
+    ###
 		# @property [Array] fields the collection of fields to show
 		@fields = []
 
 		# @property [String] gid the unique key for the current form
 		@gid = "form" + GlobalValueManager.NextGlobalID()
-
+    ###
+    super()
 		# @property [String] templateFormFieldText the template for the form field
 		@templateFormFieldText = Handlebars.compile '''
                                                     	<div class="form-group">
@@ -48,18 +49,4 @@ class PopUpFormWrapper extends FormWrapper
                                                             </div>
                                                       	</div>
                                                       '''
-
-	## -------------------------------------------------------------------------------------------------------------
-	## get the html of the current form in form of string
-	##
-	## @return [String] content the html string of the current form
-	##
-	getHtml: () =>
-		content = "<form id='#{@gid}' class='form-horizontal'>"
-
-		for field in @fields
-			content += if field.type is "select" then @templateFormFieldSelect(field) else @templateFormFieldText(field)
-
-		content += "</form>";
-
 

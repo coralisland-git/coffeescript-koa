@@ -96,9 +96,10 @@ class TableViewCol extends TableViewColBase
 
 	getVisible: ()=>
 		if @getAlwaysHidden() == true then return false
-		if @isGrouped?    and @isGrouped == true then return false
+		
 		if @data.visible? and @data.visible == true then return true
 		if @data.visible? and @data.visible == false then return false
+		if @isGrouped?    and @isGrouped == true then return false
 		return true
 
 	getAlwaysHidden: ()=>
@@ -145,12 +146,10 @@ class TableViewCol extends TableViewColBase
 		return "text"
 
 	getAlign: ()=>
-		if @data.type == "money"
-			@data.align = "right"
-
+		###	
 		if @data.align? and @data.align.length > 0
 			return @data.align
-
+		###
 		f = @getFormatter()
 		if f? and f.align? then return f.align
 
@@ -287,7 +286,7 @@ class TableViewCol extends TableViewColBase
 
 		if reDistance.test @data.name
 			@changeColumn "type", "distance"
-			@changeColumn "width", 60
+			@changeColumn "width", 66
 			@changeColumn "align", "right"
 			@data.skipDeduce = true
 			return
@@ -320,6 +319,12 @@ class TableViewCol extends TableViewColBase
 			@changeColumn "width", 60
 			@changeColumn "align", "left"
 			@data.skipDeduce = true
+			return
+
+		if /^imagelist/i.test @data.name
+			@changeColumn "type", "imagelist"
+			@changeColumn "width", 60
+			@changeColumn "align", "left"
 			return
 
 		return

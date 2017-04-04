@@ -10,6 +10,9 @@ $ ->
         .lastTable {
             margin-bottom : 330px;
         }
+        .scrollcontent {
+            height: 100%;
+        }
         </style>
     '''
 
@@ -109,6 +112,10 @@ $ ->
         name        : "IsNew"
         source      : "isNew"
         editable    : true
+    TableTestdata.push
+        name        : "ImageList"
+        source      : "imagelist"
+        editable    : true
 
     testData1 =
         "id"            :   "0011"
@@ -117,6 +124,7 @@ $ ->
         "date"          :   "2017-01-16",
         "distance"      :   1000,
         "isNew"         :   true
+        "ImageList"     :   "./js/test_Data/images/1.jpg"
 
     
     ##|
@@ -195,6 +203,9 @@ $ ->
 
         wdt_isNew = new WidgetTag("td", null, "wdt_td_isNew")
         wdt_isNew.bindToPath "testData", "0011", "isNew"
+
+        wdt_imagelist = new WidgetTag("td", null, "wdt_td_imagelist")
+        wdt_imagelist.bindToPath "testData", "0011", "imagelist"
        
         $("#renderTest").append($ "<br><table class='test_table_2'><caption>There are many data types you can bind to data fields.(Here, except first 2 columns, all are editable.)</caption></table>")
         $(".test_table_2").append wdt_id.getTag()
@@ -203,6 +214,7 @@ $ ->
         $(".test_table_2").append wdt_date.getTag()
         $(".test_table_2").append wdt_distance.getTag()
         $(".test_table_2").append wdt_isNew.getTag()
+        $(".test_table_2").append wdt_imagelist.getTag()
         true
 
     addTestButton "Add data(to zipcode)", "Open", () =>

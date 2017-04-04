@@ -111,6 +111,7 @@ class DataFormatterType
 
 		@elEditor.on "blur", (e) =>
 			if @editorShowing
+				console.log "blurred", e
 				@editorShowing = false
 				e.preventDefault()
 				e.stopPropagation()
@@ -159,9 +160,10 @@ class DataFormatterType
 	##|  Trigger when the mouse goes down on any place in the window, this
 	##|  will remove the input field if you click outside the cell.
 	onGlobalMouseDown: (e)=>
-		if e.target.className == "dynamic_edit"
+		#if e.target.className == "dynamic_edit"
+		if e.target.classList.contains("dynamic_edit")
 			## This line is disabled because it causes an infinitive loops when once called
-			#globalKeyboardEvents.once "global_mouse_down", @onGlobalMouseDown
+			## globalKeyboardEvents.once "global_mouse_down", @onGlobalMouseDown
 			return true
 
 		@editorShowing = false
@@ -187,7 +189,7 @@ class DataFormatterType
 		if !@elEditor
 			@elEditor = $ "<input />",
 				type: "text"
-				class: "dynamic_edit"
+				class: "dynamic_edit form-control"
 
 			@appendEditor()
 
@@ -223,6 +225,8 @@ class DataFormatText extends DataFormatterType
 
 	# @property [String] name name of the data type
 	name: "text"
+	# @property [String] align
+	align: "left"
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to format the currently passed data
@@ -290,6 +294,8 @@ class DataFormatMemo extends DataFormatterType
 
 	# @property [String] name name of the data type
 	name: "memo"
+	# @property [String] align
+	align: "left"
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to format the currently passed data
@@ -429,6 +435,9 @@ class DataFormatSourceCode extends DataFormatText
 
 	# @property [String] name name of the data type
 	name : "sourcecode"
+
+	# @property [String] align
+	align: "left"
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to open editor including ace code editor
@@ -747,6 +756,10 @@ class DataFormatDate extends DataFormatterType
 	# @property [Integer] width
 	width: 65
 
+	# @property [String] align
+	align: "left"
+
+
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to open editor as flatpickr
 	##
@@ -830,6 +843,9 @@ class DataFormatTags extends DataFormatterType
 	# @property [String] name name of the data type
 	name: "tags"
 
+	# @property [String] align
+	align: "left"
+
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to open editor including ace code editor
 	##
@@ -902,6 +918,9 @@ class DataFormatMultiselect extends DataFormatterType
 
 	# @property [Array|Object] options provided options for selection
 	options: []
+
+	# @property [String] align
+	align: "left"
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to open multiselect editor
@@ -977,6 +996,9 @@ class DataFormatDateTime extends DataFormatterType
 
 	# @property [String] name name of the data type
 	name: "datetime"
+
+	# @property [String] align
+	align: "left"
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to open editor including ace code editor
@@ -1171,6 +1193,9 @@ class DataFormatEnum extends DataFormatterType
 	# @property [String] name name of the data type
 	name: "enum"
 
+	# @property [String] align
+	align: "left"
+
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to open editor including ace code editor
 	##
@@ -1252,6 +1277,9 @@ class DataFormatDistance extends DataFormatterType
 	# @property [Integer] width
 	width: 100
 
+	# @property [String] align
+	align: "left"
+
 	## -------------------------------------------------------------------------------------------------------------
 	## Takes meters in, returns a formatted string
 	##
@@ -1304,6 +1332,9 @@ class DataFormatBoolean extends DataFormatterType
 	textYes: "<i class='fa fa-circle'></i> Yes"
 	textNo : "<i class='fa fa-circle-thin'></i> No"
 	textNotSet: "<i class='fa fa-fs'></i> Not Set"
+
+	# @property [String] align
+	align: "left"
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to open editor including ace code editor
@@ -1374,6 +1405,9 @@ class DataFormatTimeAgo extends DataFormatterType
 
 	# @property [Integer] width
 	width: 135
+
+	# @property [String] align
+	align: "left"
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to open editor with flatpickr
@@ -1552,6 +1586,9 @@ class DataFormatSimpleObject extends DataFormatterType
 
 	# @property [String] name name of the data type
 	name: "simpleobject"
+	
+	# @property [String] align
+	align: "left"
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to format the currently passed data
@@ -1625,6 +1662,9 @@ class DataFormatLink extends DataFormatterType
 
 	clickable: true
 
+	# @property [String] align
+	align: "left"
+
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to format the currently passed data
 	##
@@ -1690,6 +1730,7 @@ class DataFormatImageList extends DataFormatterType
 	## @return null
 	##
 	openEditor: (elParent, left, top, width, height, currentValue, path) =>
+		if !currentValue? then return false
 
 		w = $(window).width()
 		h = $(window).height()
@@ -1711,7 +1752,7 @@ class DataFormatImageList extends DataFormatterType
 			h = 400
 
 		if typeof currentValue is "string"
-			currentValue = currentValue.split ","
+			currentValue = currentValue.split "||"
 		imgCount = currentValue.length
 		if imgCount < 1 
 			return false
@@ -1750,9 +1791,12 @@ class DataFormatImageList extends DataFormatterType
 		###
 		formattedValue = "No Image"
 		if typeof currentValue is "string"
-			currentValue = currentValue.split ","
-		imgCount = currentValue.length
+			currentValue = currentValue.split "||"
+		else if !currentValue?
+			return formattedValue
 
+		imgCount = currentValue.length
+		console.log imgCount
 		if imgCount == 1
 			formattedValue = "1 Image"
 		else 

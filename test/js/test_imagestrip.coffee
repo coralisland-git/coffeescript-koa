@@ -20,6 +20,16 @@ newImage10 = new Image()
 newImage10.src = "./js/test_Data/images/10.jpg"
 
 $ ->
+
+	$("body").append '''
+	    <style type="text/css">
+	    .scrollcontent {
+	        height : 100% !important;
+	    }
+	    </style>
+	'''
+
+	
 	addTestButton "Image Strip with few images", "Open", ()->
 		addHolder("renderTest1")
 		div = new WidgetTag "div", "testWidget"

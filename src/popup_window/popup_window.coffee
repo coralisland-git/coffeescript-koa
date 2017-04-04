@@ -86,7 +86,6 @@ class PopupWindow
 			e.preventDefault()
 			e.stopPropagation()
 
-		@
 		@popupWindowHolder.hide()
 		@isVisible = false
 		false
