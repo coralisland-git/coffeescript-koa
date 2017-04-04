@@ -286,7 +286,7 @@ class TableViewCol extends TableViewColBase
 
 		if reDistance.test @data.name
 			@changeColumn "type", "distance"
-			@changeColumn "width", 60
+			@changeColumn "width", 66
 			@changeColumn "align", "right"
 			@data.skipDeduce = true
 			return

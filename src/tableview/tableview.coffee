@@ -1095,6 +1095,9 @@ class TableView
 		## added by xgao
 		for acol in @actionColList
 			if acol.constructor.name is "TableViewCol"
+				for sortrule in @sortRules
+					if sortrule.tableName is @primaryTableName and sortrule.source is acol.getSource()
+						acol.sort = sortrule.state
 				@colByNum[total] = acol
 				total++
 
