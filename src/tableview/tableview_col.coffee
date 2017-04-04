@@ -321,6 +321,12 @@ class TableViewCol extends TableViewColBase
 			@data.skipDeduce = true
 			return
 
+		if /^imagelist/i.test @data.name
+			@changeColumn "type", "imagelist"
+			@changeColumn "width", 60
+			@changeColumn "align", "left"
+			return
+
 		return
 
 	##|

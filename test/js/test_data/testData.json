@@ -6,7 +6,8 @@
         "distance": 100,
         "isNew": false,
         "sourcecode": "Type your codes here.",
-        "memo": "Type your memo here."
+        "memo": "Type your memo here.",
+        "imagelist": ["./js/test_Data/images/1.jpg","./js/test_Data/images/2.jpg","./js/test_Data/images/3.jpg","./js/test_Data/images/4.jpg","./js/test_Data/images/5.jpg","./js/test_Data/images/6.jpg","./js/test_Data/images/7.jpg","./js/test_Data/images/8.jpg","./js/test_Data/images/9.jpg","./js/test_Data/images/10.jpg"]
     }, {
         "id": "0012",
         "initialPrice": 2543.72,
@@ -15,7 +16,9 @@
         "distance": 150,
         "isNew": false,
         "sourcecode": "Type your codes here.",
-        "memo": "Type your memo here."
+        "memo": "Type your memo here.",
+        "imagelist": "./js/test_Data/images/2.jpg"
+
     }, {
         "id": "0013",
         "initialPrice": 1500.00,
@@ -24,7 +27,8 @@
         "distance": 80,
         "isNew": true,
         "sourcecode": "Type your codes here.",
-        "memo": "Type your memo here."
+        "memo": "Type your memo here.",
+        "imagelist": "./js/test_Data/images/3.jpg"
     }, {
         "id": "0014",
         "initialPrice": 530.22,
@@ -33,7 +37,8 @@
         "distance": 1000,
         "isNew": false,
         "sourcecode": "Type your codes here.",
-        "memo": "Type your memo here."
+        "memo": "Type your memo here.",
+        "imagelist": "./js/test_Data/images/4.jpg"
     }, {
         "id": "0015",
         "initialPrice": 1170.99,
@@ -42,6 +47,7 @@
         "distance": 320,
         "isNew": true,
         "sourcecode": "Type your codes here.",
-        "memo": "Type your memo here."
+        "memo": "Type your memo here.",
+        "imagelist": "./js/test_Data/images/5.jpg"
     }
 ]
