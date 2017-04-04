@@ -197,7 +197,7 @@ $ ->
 	addTestButton "Locked Column Sorting", "Open", ()->		
 		theTable = "mlsactive"
 		for id, newData of Data
-			#newData.distance = Math.random() * 10
+			newData.distance = Math.random() * 1000
 			#newData.Something1 = ""
 			#newData.Another = null
 	        # for varName, value of newData
