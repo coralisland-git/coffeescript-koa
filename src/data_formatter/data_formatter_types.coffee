@@ -1730,6 +1730,7 @@ class DataFormatImageList extends DataFormatterType
 	## @return null
 	##
 	openEditor: (elParent, left, top, width, height, currentValue, path) =>
+		if !currentValue? then return false
 
 		w = $(window).width()
 		h = $(window).height()
@@ -1751,7 +1752,7 @@ class DataFormatImageList extends DataFormatterType
 			h = 400
 
 		if typeof currentValue is "string"
-			currentValue = currentValue.split ","
+			currentValue = currentValue.split "||"
 		imgCount = currentValue.length
 		if imgCount < 1 
 			return false
@@ -1790,9 +1791,12 @@ class DataFormatImageList extends DataFormatterType
 		###
 		formattedValue = "No Image"
 		if typeof currentValue is "string"
-			currentValue = currentValue.split ","
-		imgCount = currentValue.length
+			currentValue = currentValue.split "||"
+		else if !currentValue?
+			return formattedValue
 
+		imgCount = currentValue.length
+		console.log imgCount
 		if imgCount == 1
 			formattedValue = "1 Image"
 		else 
