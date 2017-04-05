@@ -5,11 +5,12 @@ class ViewWidgetSplittable extends View
 	onSetupButtons: () =>
 
 	##
-	## dssefault function of class View
+	## default function of class View
 	##    
 	setTitle: (title)=>
+		return
 
-    setSize: (w, h)=>
+	setSize: (w, h)=>
     	if w > 0
         	@elHolder.width(w)
         if h > 0
