@@ -215,6 +215,24 @@ class DataFormatterType
 	##
 	onFocus: null
 
+	renderTooltip: (row, value, tooltipWindow)=>
+		if !value? then return false
+
+		if typeof value == "string" or typeof value == "number"
+			h = 60
+			w = 320
+			if value.length > 100 then w = 440
+			if value.length > 200 then w = 640
+			if value.length > 300 then h = 440
+
+			tooltipWindow.setSize(w, h)
+			tooltipWindow.getBodyWidget().addClass "text"
+			tooltipWindow.html value
+			return true
+
+		console.log "renderTooltip row=", row, "value=", value
+		return false	
+
 
 ## -------------------------------------------------------------------------------------------------------------
 ## class for Text datatype
