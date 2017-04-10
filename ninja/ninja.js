@@ -720,7 +720,7 @@ DataMapMemoryCollection = (function() {
     var allResults, i, obj, strKey;
     allResults = this.find(condition);
     if (allResults == null) {
-      remove;
+      return false;
     }
     if ((allResults != null) && (allResults[0] != null)) {
       for (i in allResults) {
@@ -1933,12 +1933,14 @@ ModalDialog = (function() {
 
   ModalDialog.prototype.show = function(options) {
     var html;
-    if (this.formWrapper != null) {
-      this.content += this.formWrapper.getHtml();
-    }
     html = this.template(this);
     $("body").append(html);
     this.modal = $("#modal" + this.gid);
+    this.modal_body = this.modal.find(".modal-body");
+    if (this.formWrapper != null) {
+      this.modal_body.append(this.formWrapper.getContent());
+      this.formWrapper.show();
+    }
     this.modal.modal(options);
     this.modal.on("hidden.bs.modal", (function(_this) {
       return function() {
@@ -1969,7 +1971,7 @@ ModalDialog = (function() {
       };
     })(this));
     if (this.position === "center") {
-      this.modal.css({
+      return this.modal.css({
         'margin-top': (function(_this) {
           return function() {
             return Math.max(0, $(window).scrollTop() + ($(window).height() - _this.modal.height()) / 2);
@@ -1977,18 +1979,18 @@ ModalDialog = (function() {
         })(this)
       });
     }
-    if (this.formWrapper != null) {
-      return setTimeout((function(_this) {
-        return function() {
-          return _this.formWrapper.onAfterShow();
-        };
-      })(this), 10);
-    }
   };
 
   return ModalDialog;
 
 })();
+
+
+/*		if @formWrapper?
+			setTimeout ()=>
+				@formWrapper.onAfterShow()
+			, 10
+ */
 var FormField, substringMatcher,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
@@ -2078,6 +2080,7 @@ FormWrapper = (function() {
   function FormWrapper(holderElement, options) {
     this.backElementsFullWidth = bind(this.backElementsFullWidth, this);
     this.putElementsFullWidth = bind(this.putElementsFullWidth, this);
+    this.getContent = bind(this.getContent, this);
     this.show = bind(this.show, this);
     this.onAfterShow = bind(this.onAfterShow, this);
     this.onSubmitAction = bind(this.onSubmitAction, this);
@@ -2092,12 +2095,12 @@ FormWrapper = (function() {
     this.addTagsInput = bind(this.addTagsInput, this);
     this.addTextInput = bind(this.addTextInput, this);
     var name, val;
+    this.gid = "form" + GlobalValueManager.NextGlobalID();
     if (!$(holderElement).length) {
       holderElement = "<form id='" + this.gid + "' class='form-horizontal' role='form'/>";
     }
     this.elementHolder = $(holderElement);
     this.fields = [];
-    this.gid = "form" + GlobalValueManager.NextGlobalID();
     this.isFullWidth = false;
     Handlebars.registerHelper("getNumber", function(data) {
       var key, value;
@@ -2223,8 +2226,8 @@ FormWrapper = (function() {
       field = ref[i];
       if (field.type === "pathfield") {
         widget = field.attrs["pathfield-widget"];
-        $("#pathfield-widget-" + field.attrs['number']).empty();
-        results.push($("#pathfield-widget-" + field.attrs['number']).append(widget.getTag()));
+        this.elementHolder.find("#pathfield-widget-" + field.attrs['number']).empty();
+        results.push(this.elementHolder.find("#pathfield-widget-" + field.attrs['number']).append(widget.getTag()));
       } else {
         results.push(void 0);
       }
@@ -2289,7 +2292,7 @@ FormWrapper = (function() {
   FormWrapper.prototype.onAfterShow = function() {
     var elForm, field, firstField, i, len, ref;
     firstField = null;
-    elForm = this.elementHolder.find("#" + this.gid);
+    elForm = $("#" + this.gid);
     ref = this.fields;
     for (i = 0, len = ref.length; i < len; i++) {
       field = ref[i];
@@ -2319,6 +2322,10 @@ FormWrapper = (function() {
       };
     })(this), 10);
     return true;
+  };
+
+  FormWrapper.prototype.getContent = function() {
+    return this.elementHolder;
   };
 
   FormWrapper.prototype.putElementsFullWidth = function() {
@@ -3492,7 +3499,6 @@ PopupWindow = (function() {
       e.preventDefault();
       e.stopPropagation();
     }
-    this;
     this.popupWindowHolder.hide();
     this.isVisible = false;
     return false;
@@ -4983,6 +4989,8 @@ TableView = (function() {
   function TableView(elTableHolder, showCheckboxes) {
     this.elTableHolder = elTableHolder;
     this.showCheckboxes = showCheckboxes;
+    this.ungroupColumn = bind(this.ungroupColumn, this);
+    this.getColumnType = bind(this.getColumnType, this);
     this.findRowFromPath = bind(this.findRowFromPath, this);
     this.findColFromPath = bind(this.findColFromPath, this);
     this.destroy = bind(this.destroy, this);
@@ -5123,7 +5131,7 @@ TableView = (function() {
     this.contextMenuCallbackFunction = 0;
     this.contextMenuCallSetup = 0;
     this.checkboxLimit = 1;
-    this.renderReqired = true;
+    this.renderRequired = true;
     if (this.showCheckboxes == null) {
       this.showCheckboxes = false;
     }
@@ -5206,7 +5214,7 @@ TableView = (function() {
     button.source = config.source;
     this.actionColList.push(button);
     if (config.callback != null) {
-      this.on("click_" + config.source, config.callback);
+      this.on("click_" + (button.getSource()), config.callback);
     }
     return true;
   };
@@ -5329,9 +5337,9 @@ TableView = (function() {
       return this.resetTimer = setTimeout((function(_this) {
         return function() {
           delete _this.resetTimer;
+          _this.updateRowData();
           _this.resetCachedFromSize();
-          _this.onResize();
-          return _this.updateRowData();
+          return _this.onResize();
         };
       })(this), 50);
     }
@@ -5562,6 +5570,9 @@ TableView = (function() {
         } else {
           _this.setFocusCell(null);
         }
+        if (data.action != null) {
+          _this.elTheTable.el.trigger("click_" + data.action, [row, e]);
+        }
         if (row == null) {
           return false;
         }
@@ -5621,12 +5632,9 @@ TableView = (function() {
       source = ref[j];
       popupMenu.addItem("Removing " + source, (function(_this) {
         return function(e, source) {
-          var col, k, len2, name, newList, ref1;
+          var k, len2, name, newList, ref1;
           console.log("Remove grouping", source);
-          col = _this.findColumn(source);
-          if (col != null) {
-            col.isGrouped = false;
-          }
+          _this.ungroupColumn(source);
           newList = [];
           ref1 = _this.currentGroups;
           for (k = 0, len2 = ref1.length; k < len2; k++) {
@@ -5673,7 +5681,7 @@ TableView = (function() {
         m = new ModalDialog({
           showOnCreate: false,
           content: "Enter a new name for this column",
-          position: "center",
+          position: "top",
           title: "Name:",
           ok: "Save"
         });
@@ -5862,17 +5870,16 @@ TableView = (function() {
       this.sortRules = [found];
     }
     if ((sortMode != null) && sortMode === 0) {
-      found.state = 0;
+      found.state = found.state * -1;
+      if (found.state === 0) {
+        found.state = 1;
+      }
     } else if ((sortMode != null) && sortMode === 1) {
       found.state = 1;
     } else if ((sortMode != null) && sortMode === -1) {
       found.state = -1;
-    } else if (found.state === -1) {
-      found.state = 0;
-    } else if (found.state === 0) {
-      found.state = 1;
     } else {
-      found.state = -1;
+      this.addSortRule(sourceName, 0);
     }
     this.updateRowData();
   };
@@ -5991,7 +5998,7 @@ TableView = (function() {
   };
 
   TableView.prototype.updateColumnList = function() {
-    var acol, c, col, columns, foundInActionCol, foundInGroup, j, k, l, len1, len2, len3, len4, n, ref, ref1, sortedColList, source, total;
+    var acol, c, col, columns, foundInActionCol, foundInGroup, j, k, l, len1, len2, len3, len4, len5, len6, n, o, p, ref, ref1, ref2, ref3, sortedColList, sortrule, source, total;
     this.colList = [];
     this.colByNum = {};
     if (this.showCheckboxes) {
@@ -6035,6 +6042,7 @@ TableView = (function() {
       for (n = 0, len4 = ref1.length; n < len4; n++) {
         source = ref1[n];
         if (source === col.getSource()) {
+          col.isGrouped = true;
           foundInGroup = true;
           break;
         }
@@ -6044,6 +6052,21 @@ TableView = (function() {
       }
       this.colByNum[total] = col;
       total++;
+    }
+    ref2 = this.actionColList;
+    for (o = 0, len5 = ref2.length; o < len5; o++) {
+      acol = ref2[o];
+      if (acol.constructor.name === "TableViewCol") {
+        ref3 = this.sortRules;
+        for (p = 0, len6 = ref3.length; p < len6; p++) {
+          sortrule = ref3[p];
+          if (sortrule.tableName === this.primaryTableName && sortrule.source === acol.getSource()) {
+            acol.sort = sortrule.state;
+          }
+        }
+        this.colByNum[total] = acol;
+        total++;
+      }
     }
     return true;
   };
@@ -6068,10 +6091,11 @@ TableView = (function() {
       }
       this.totalAvailableRows = this.rowDataRaw.length;
       this.updateColumnList();
-      if (this.renderReqired) {
+      this.updateFullHeight();
+      if (this.renderRequired) {
         this.real_render();
       }
-      this.updateFullHeight();
+      this.updateScrollbarSettings();
       this.resetCachedFromSize();
       globalTableEvents.emitEvent("row_count", [this.primaryTableName, this.totalAvailableRows]);
       return;
@@ -6134,11 +6158,11 @@ TableView = (function() {
     }
     this.totalAvailableRows = this.rowDataRaw.length;
     this.updateColumnList();
-    if (this.renderReqired) {
+    this.updateFullHeight();
+    if (this.renderRequired) {
       this.real_render();
     }
-    this.updateFullHeight();
-    this.resetCachedFromSize();
+    this.updateScrollbarSettings();
     globalTableEvents.emitEvent("row_count", [this.primaryTableName, this.totalAvailableRows]);
     return true;
   };
@@ -6167,7 +6191,7 @@ TableView = (function() {
   };
 
   TableView.prototype.setHolderToBottom = function() {
-    if (this.renderReqired) {
+    if (this.renderRequired) {
       this.real_render();
     }
     this.isFixedBottom = true;
@@ -6209,7 +6233,6 @@ TableView = (function() {
     this.elTableHolder.height(newHeight);
     newWidth = this.elTableHolder.outerWidth();
     this.resetCachedFromSize();
-    this.updateVisibleText();
     this.lastNewHeight = newHeight;
     this.lastNewWidth = newWidth;
     return true;
@@ -6236,7 +6259,6 @@ TableView = (function() {
 
   TableView.prototype.getTableTotalCols = function() {
     var col, j, len1, ref, total;
-    return Object.keys(this.colByNum).length;
     total = 0;
     ref = this.colList;
     for (j = 0, len1 = ref.length; j < len1; j++) {
@@ -6251,7 +6273,7 @@ TableView = (function() {
 
   TableView.prototype.getTableVisibleWidth = function() {
     var maxWidth;
-    if (this.cachedVisibleWidth != null) {
+    if ((this.cachedVisibleWidth != null) && this.cachedVisibleWidth > 0) {
       return this.cachedVisibleWidth;
     }
     maxWidth = this.elTableHolder.width();
@@ -6263,7 +6285,7 @@ TableView = (function() {
 
   TableView.prototype.getTableVisibleHeight = function() {
     var maxHeight;
-    if (this.cachedVisibleHeight != null) {
+    if ((this.cachedVisibleHeight != null) && this.cachedVisibleHeight > 0) {
       return this.cachedVisibleHeight;
     }
     maxHeight = this.elTableHolder.height();
@@ -6790,7 +6812,11 @@ TableView = (function() {
       cell.setDataValue("vr", location.visibleRow);
       cell.setDataValue("vc", location.visibleCol);
       cell.setDataValue("action", acol.getSource());
-      cell.setDataPath("/" + this.primaryTableName + "/" + location.recordId + "/" + (acol.getSource()));
+      if (location.isHeader) {
+        cell.setDataPath("/" + this.primaryTableName + "/Header/" + (acol.getSource()));
+      } else {
+        cell.setDataPath("/" + this.primaryTableName + "/" + location.recordId + "/" + (acol.getSource()));
+      }
       if (location.groupNum != null) {
         cell.setClassOne("groupRowChart" + location.groupNum, /^groupRowChart/);
       } else {
@@ -6896,7 +6922,7 @@ TableView = (function() {
   };
 
   TableView.prototype.updateVisibleText = function() {
-    var groupState, hasFinishedLockedRows, location, lockRowsRemain, maxHeight, r1, r2, refreshRequired, totalRowCount, y;
+    var groupState, hasFinishedLockedRows, location, lockRowsRemain, marginRight, marginTop, maxHeight, r1, r2, refreshRequired, totalRowCount, y;
     if (this.elTheTable == null) {
       return;
     }
@@ -6907,13 +6933,18 @@ TableView = (function() {
       this.offsetShowingLeft = 0;
     }
     if (this.rowDataRaw.length === 0) {
-      return;
       if (this.noDataCell == null) {
         this.noDataCell = this.elTheTable.addDiv("tableRow");
         this.noDataCell.setAbsolute();
+        this.noDataCell.setZ(1);
+      } else if (this.noDataCell.visible) {
+        return;
       }
-      this.noDataCell.move(0, 0, this.elTableHolder.width(), this.elTableHolder.height());
+      marginRight = this.virtualScrollV.visible ? this.virtualScrollV.displaySize : 0;
+      marginTop = this.headerCellHeight + this.getRowHeight();
+      this.noDataCell.move(0, this.headerCellHeight + this.getRowHeight(), this.elTableHolder.width() - marginRight, this.elTableHolder.height() - marginTop);
       this.noDataCell.html("No data available.");
+      this.noDataCell.show();
       r1 = this.virtualScrollV.setRange(0, 0, 0, 0);
       r2 = this.virtualScrollH.setRange(0, 0, 0, 0);
       return;
@@ -6984,7 +7015,6 @@ TableView = (function() {
       location.visibleRow++;
     }
     if (refreshRequired) {
-      this.resetCachedFromSize();
       return true;
     }
     while (this.shadowCells[location.visibleRow] != null) {
@@ -6992,7 +7022,6 @@ TableView = (function() {
       this.shadowCells[location.visibleRow].resetDataValues();
       location.visibleRow++;
     }
-    this.updateScrollbarSettings();
     return true;
   };
 
@@ -7001,7 +7030,6 @@ TableView = (function() {
     this.cachedTotalVisibleRows = null;
     this.cachedMaxTotalVisibleCol = null;
     this.cachedMaxTotalVisibleRows = null;
-    this.updateVisibleText();
     this.onMouseOut();
     return true;
   };
@@ -7019,7 +7047,6 @@ TableView = (function() {
       col.currentCol = null;
     }
     this.layoutShadow();
-    this.updateVisibleText();
     this.onMouseOut();
     return true;
   };
@@ -7030,9 +7057,11 @@ TableView = (function() {
     currentVisibleRows = this.getTableMaxVisibleRows();
     maxAvailableRows = this.getTableTotalRows();
     maxAvailableCols = this.getTableTotalCols();
-    if (this.elStatusScrollTextRows != null) {
-      this.elStatusScrollTextRows.html("Rows " + (this.offsetShowingTop + 1) + " - " + (this.offsetShowingTop + currentVisibleRows) + " of " + maxAvailableRows);
-      this.elStatusScrollTextCols.html("Cols " + (this.offsetShowingLeft + 1) + "-" + (this.offsetShowingLeft + currentVisibleCols) + " of " + maxAvailableCols);
+    if (this.offsetShowingTop < 0) {
+      this.offsetShowingTop = 0;
+    }
+    if (this.offsetShowingLeft < 0) {
+      this.offsetShowingLeft = 0;
     }
     if (this.offsetShowingTop >= maxAvailableRows - currentVisibleRows - 1) {
       this.offsetShowingTop = maxAvailableRows - currentVisibleRows;
@@ -7040,11 +7069,16 @@ TableView = (function() {
     if (this.offsetShowingLeft >= maxAvailableCols - currentVisibleCols - 1) {
       this.offsetShowingLeft = maxAvailableCols - currentVisibleCols;
     }
+    if (this.elStatusScrollTextRows != null) {
+      this.elStatusScrollTextRows.html("Rows " + (this.offsetShowingTop + 1) + " - " + (this.offsetShowingTop + currentVisibleRows) + " of " + maxAvailableRows);
+      this.elStatusScrollTextCols.html("Cols " + (this.offsetShowingLeft + 1) + "-" + (this.offsetShowingLeft + currentVisibleCols) + " of " + maxAvailableCols);
+    }
     r1 = this.virtualScrollV.setRange(0, maxAvailableRows, currentVisibleRows, this.offsetShowingTop);
     r2 = this.virtualScrollH.setRange(0, maxAvailableCols, currentVisibleCols, this.offsetShowingLeft);
     if (r1 || r2) {
-      return this.resetCachedFromSize();
+      this.resetCachedFromSize();
     }
+    return this.updateVisibleText();
   };
 
   TableView.prototype.isColumnEmpty = function(col) {
@@ -7195,14 +7229,14 @@ TableView = (function() {
 
   TableView.prototype.render = function() {
     if (this.widgetBase == null) {
-      this.renderReqired = true;
+      this.renderRequired = true;
     }
     return true;
   };
 
   TableView.prototype.real_render = function() {
     var outerContainer, tableWrapper;
-    this.renderReqired = false;
+    this.renderRequired = false;
     if (this.shadowCells == null) {
       this.shadowCells = {};
     }
@@ -7245,9 +7279,24 @@ TableView = (function() {
     return true;
   };
 
-  TableView.prototype.sortByColumn = function(name) {
-    this.addSortRule(name);
-    return true;
+  TableView.prototype.sortByColumn = function(name, type) {
+    var col, key, ref, sortType;
+    if (type === "ASC") {
+      sortType = 1;
+    } else if (type === "DSC") {
+      sortType = -1;
+    } else {
+      sortType = 0;
+    }
+    ref = this.colByNum;
+    for (key in ref) {
+      col = ref[key];
+      if (col.getSource() === name) {
+        this.addSortRule(name, sortType);
+        return true;
+      }
+    }
+    return false;
   };
 
   TableView.prototype.groupBy = function(columnSource) {
@@ -7270,6 +7319,10 @@ TableView = (function() {
     tableName = parts[1];
     keyValue = parts[2];
     columnName = parts[3];
+    if (this.getColumnType(columnName) !== 1) {
+      console.log("Filter on ActionColumn : Not working");
+      return false;
+    }
     if (this.currentFilters[tableName] == null) {
       this.currentFilters[tableName] = {};
     }
@@ -7555,6 +7608,38 @@ TableView = (function() {
     }
     data["id"] = keyValue;
     return data;
+  };
+
+  TableView.prototype.getColumnType = function(colName) {
+    var actionCol, dataCol, index, j, len1, ref, ref1;
+    ref = this.colByNum;
+    for (index in ref) {
+      dataCol = ref[index];
+      if (dataCol.getSource() === colName) {
+        return 1;
+      }
+    }
+    ref1 = this.actionColList;
+    for (j = 0, len1 = ref1.length; j < len1; j++) {
+      actionCol = ref1[j];
+      if (actionCol.getSource() === colName) {
+        return 2;
+      }
+    }
+    return 0;
+  };
+
+  TableView.prototype.ungroupColumn = function(colName) {
+    var col, columns, j, len1;
+    columns = DataMap.getColumnsFromTable(this.primaryTableName, this.columnReduceFunction);
+    for (j = 0, len1 = columns.length; j < len1; j++) {
+      col = columns[j];
+      if (col.getSource() === colName) {
+        col.isGrouped = false;
+        return true;
+      }
+    }
+    return false;
   };
 
   return TableView;
@@ -8627,7 +8712,6 @@ WidgetSplittable = (function() {
 
 })();
 var PopUpFormWrapper,
-  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
 
@@ -8635,23 +8719,20 @@ PopUpFormWrapper = (function(superClass) {
   extend(PopUpFormWrapper, superClass);
 
   function PopUpFormWrapper() {
-    this.getHtml = bind(this.getHtml, this);
-    this.fields = [];
-    this.gid = "form" + GlobalValueManager.NextGlobalID();
-    this.templateFormFieldText = Handlebars.compile('<div class="form-group">\n	<label for="{{fieldName}}" class="col-md-3 control-label"> {{label}} </label>\n	<div class="col-md-9">\n	  <input type="{{type}}" class="form-control" id="{{fieldName}}" value="{{value}}" name="{{fieldName}}"\n                                                            {{#each attrs}}\n                                                              {{@key}}="{{this}}"\n                                                            {{/each}}\n                                                            />\n                                                            <div id="{{fieldName}}error" class="text-danger help-block"></div>\n                                                          </div>\n</div>');
-    this.templateFormFieldSelect = Handlebars.compile('<div class="form-group">\n	<label for="{{fieldName}}" class="col-md-3 control-label"> {{label}} </label>\n	<div class="col-md-9">\n	  <select class="form-control" id="{{fieldName}}" name="{{fieldName}}">\n                                                                {{#each attrs.options}}\n                                                                  <option value="{{this}}" {{#if @first}} selected="selected" {{/if}}>{{this}}</option>\n                                                                {{/each}}\n                                                              </select>\n                                                              <div id="{{fieldName}}error" class="text-danger help-block"></div>\n                                                            </div>\n</div>');
+
+    /*
+    		 * @property [Array] fields the collection of fields to show
+    		@fields = []
+    
+    		 * @property [String] gid the unique key for the current form
+    		@gid = "form" + GlobalValueManager.NextGlobalID()
+     */
+    PopUpFormWrapper.__super__.constructor.call(this);
   }
 
-  PopUpFormWrapper.prototype.getHtml = function() {
-    var content, field, i, len, ref;
-    content = "<form id='" + this.gid + "' class='form-horizontal'>";
-    ref = this.fields;
-    for (i = 0, len = ref.length; i < len; i++) {
-      field = ref[i];
-      content += field.type === "select" ? this.templateFormFieldSelect(field) : this.templateFormFieldText(field);
-    }
-    return content += "</form>";
-  };
+  PopUpFormWrapper.templateFormFieldText = Handlebars.compile('<div class="form-group">\n	<label for="{{fieldName}}" class="col-md-3 control-label"> {{label}} </label>\n	<div class="col-md-9">\n	  <input type="{{type}}" class="form-control" id="{{fieldName}}" value="{{value}}" name="{{fieldName}}"\n                                                            {{#each attrs}}\n                                                              {{@key}}="{{this}}"\n                                                            {{/each}}\n                                                            />\n                                                            <div id="{{fieldName}}error" class="text-danger help-block"></div>\n                                                          </div>\n</div>');
+
+  PopUpFormWrapper.templateFormFieldSelect = Handlebars.compile('<div class="form-group">\n	<label for="{{fieldName}}" class="col-md-3 control-label"> {{label}} </label>\n	<div class="col-md-9">\n	  <select class="form-control" id="{{fieldName}}" name="{{fieldName}}">\n                                                                {{#each attrs.options}}\n                                                                  <option value="{{this}}" {{#if @first}} selected="selected" {{/if}}>{{this}}</option>\n                                                                {{/each}}\n                                                              </select>\n                                                              <div id="{{fieldName}}error" class="text-danger help-block"></div>\n                                                            </div>\n</div>');
 
   return PopUpFormWrapper;
 
@@ -8731,6 +8812,7 @@ DataFormatterType = (function() {
     this.elEditor.on("blur", (function(_this) {
       return function(e) {
         if (_this.editorShowing) {
+          console.log("blurred", e);
           _this.editorShowing = false;
           e.preventDefault();
           e.stopPropagation();
@@ -8774,7 +8856,7 @@ DataFormatterType = (function() {
   };
 
   DataFormatterType.prototype.onGlobalMouseDown = function(e) {
-    if (e.target.className === "dynamic_edit") {
+    if (e.target.classList.contains("dynamic_edit")) {
       return true;
     }
     this.editorShowing = false;
@@ -8786,7 +8868,7 @@ DataFormatterType = (function() {
     if (!this.elEditor) {
       this.elEditor = $("<input />", {
         type: "text",
-        "class": "dynamic_edit"
+        "class": "dynamic_edit form-control"
       });
       this.appendEditor();
     }
@@ -8822,6 +8904,8 @@ DataFormatText = (function(superClass) {
   }
 
   DataFormatText.prototype.name = "text";
+
+  DataFormatText.prototype.align = "left";
 
   DataFormatText.prototype.format = function(data, options, path) {
     var list, value, varName;
@@ -8897,6 +8981,8 @@ DataFormatMemo = (function(superClass) {
   }
 
   DataFormatMemo.prototype.name = "memo";
+
+  DataFormatMemo.prototype.align = "left";
 
   DataFormatMemo.prototype.format = function(data, options, path) {
     if (data == null) {
@@ -9010,6 +9096,8 @@ DataFormatSourceCode = (function(superClass) {
   }
 
   DataFormatSourceCode.prototype.name = "sourcecode";
+
+  DataFormatSourceCode.prototype.align = "left";
 
   DataFormatSourceCode.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
     var code, codeEditor, codeMode, h, navButtonCancel, navButtonSave, popup, tag, w;
@@ -9284,6 +9372,8 @@ DataFormatDate = (function(superClass) {
 
   DataFormatDate.prototype.width = 65;
 
+  DataFormatDate.prototype.align = "left";
+
   DataFormatDate.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
     if (!this.elEditor) {
       this.elEditor = $("<input />", {
@@ -9364,6 +9454,8 @@ DataFormatTags = (function(superClass) {
 
   DataFormatTags.prototype.name = "tags";
 
+  DataFormatTags.prototype.align = "left";
+
   DataFormatTags.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
     var m;
     m = new ModalDialog({
@@ -9425,6 +9517,8 @@ DataFormatMultiselect = (function(superClass) {
   DataFormatMultiselect.prototype.name = "multiselect";
 
   DataFormatMultiselect.prototype.options = [];
+
+  DataFormatMultiselect.prototype.align = "left";
 
   DataFormatMultiselect.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
     var m;
@@ -9488,6 +9582,8 @@ DataFormatDateTime = (function(superClass) {
   }
 
   DataFormatDateTime.prototype.name = "datetime";
+
+  DataFormatDateTime.prototype.align = "left";
 
   DataFormatDateTime.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
     if (!this.elEditor) {
@@ -9670,6 +9766,8 @@ DataFormatEnum = (function(superClass) {
 
   DataFormatEnum.prototype.name = "enum";
 
+  DataFormatEnum.prototype.align = "left";
+
   DataFormatEnum.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
     var i, o, p, ref;
     p = new PopupMenu("Options", left, top);
@@ -9739,6 +9837,8 @@ DataFormatDistance = (function(superClass) {
 
   DataFormatDistance.prototype.width = 100;
 
+  DataFormatDistance.prototype.align = "left";
+
   DataFormatDistance.prototype.format = function(data, options, path) {
     var feet;
     if (data === 0) {
@@ -9785,6 +9885,8 @@ DataFormatBoolean = (function(superClass) {
   DataFormatBoolean.prototype.textNo = "<i class='fa fa-circle-thin'></i> No";
 
   DataFormatBoolean.prototype.textNotSet = "<i class='fa fa-fs'></i> Not Set";
+
+  DataFormatBoolean.prototype.align = "left";
 
   DataFormatBoolean.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
     if (currentValue) {
@@ -9845,6 +9947,8 @@ DataFormatTimeAgo = (function(superClass) {
   DataFormatTimeAgo.prototype.name = "timeago";
 
   DataFormatTimeAgo.prototype.width = 135;
+
+  DataFormatTimeAgo.prototype.align = "left";
 
   DataFormatTimeAgo.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
     if (!this.elEditor) {
@@ -10016,6 +10120,8 @@ DataFormatSimpleObject = (function(superClass) {
 
   DataFormatSimpleObject.prototype.name = "simpleobject";
 
+  DataFormatSimpleObject.prototype.align = "left";
+
   DataFormatSimpleObject.prototype.format = function(data, options, path) {
     if (data == null) {
       return "Not set";
@@ -10087,6 +10193,8 @@ DataFormatLink = (function(superClass) {
 
   DataFormatLink.prototype.clickable = true;
 
+  DataFormatLink.prototype.align = "left";
+
   DataFormatLink.prototype.format = function(data, options, path) {
     if (data == null) {
       return "";
@@ -10147,6 +10255,9 @@ DataFormatImageList = (function(superClass) {
 
   DataFormatImageList.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
     var h, imgCount, title, w;
+    if (currentValue == null) {
+      return false;
+    }
     w = $(window).width();
     h = $(window).height();
     if (w > 1000) {
@@ -10166,7 +10277,7 @@ DataFormatImageList = (function(superClass) {
       h = 400;
     }
     if (typeof currentValue === "string") {
-      currentValue = currentValue.split(",");
+      currentValue = currentValue.split("||");
     }
     imgCount = currentValue.length;
     if (imgCount < 1) {
@@ -10205,9 +10316,12 @@ DataFormatImageList = (function(superClass) {
      */
     formattedValue = "No Image";
     if (typeof currentValue === "string") {
-      currentValue = currentValue.split(",");
+      currentValue = currentValue.split("||");
+    } else if (currentValue == null) {
+      return formattedValue;
     }
     imgCount = currentValue.length;
+    console.log(imgCount);
     if (imgCount === 1) {
       formattedValue = "1 Image";
     } else {
@@ -10676,9 +10790,7 @@ PopupForm = (function(superClass) {
     this.ok = this.key ? 'Save Changes' : 'Create New';
     PopupForm.__super__.constructor.call(this);
     if (!this.columns) {
-      this.columns = DataMap.getColumnsFromTable(this.tableName, function(c) {
-        return c.editable;
-      });
+      this.columns = DataMap.getColumnsFromTable(this.tableName);
     }
     this.formWrapper = new PopUpFormWrapper();
     this.createInputFields();
@@ -10690,7 +10802,7 @@ PopupForm = (function(superClass) {
     if (!this.key) {
       this.keyColumn = DataMap.getColumnsFromTable(this.tableName, (function(_this) {
         return function(c) {
-          return c.source === _this.keyElement;
+          return c.getSource() === _this.keyElement;
         };
       })(this)).pop();
       this.keyColumn.required = true;
@@ -10701,16 +10813,14 @@ PopupForm = (function(superClass) {
     results = [];
     for (i = 0, len = ref.length; i < len; i++) {
       column = ref[i];
-      if (column.source === this.keyElement) {
+      if (column.getSource() === this.keyElement) {
         this.keyColumn = column;
       }
-      value = this.key ? DataMap.getDataField(this.tableName, this.key, column.source) : null;
-      if (this.defaults && this.defaults[column.source]) {
-        value = this.defaults[column.source];
+      value = this.key ? DataMap.getDataField(this.tableName, this.key, column.getSource()) : null;
+      if (this.defaults && this.defaults[column.getSource()]) {
+        value = this.defaults[column.getSource()];
       }
-      results.push(this.formWrapper.addInput(column.source, column.name, value, (!column.element ? column.type : column.element), column.options != null ? {
-        options: column.options
-      } : void 0));
+      results.push(this.formWrapper.addInput(column.getSource(), column.getName(), value, column.getType(), column.getOptions()));
     }
     return results;
   };
@@ -10722,20 +10832,20 @@ PopupForm = (function(superClass) {
     ref = this.columns;
     for (i = 0, len = ref.length; i < len; i++) {
       column = ref[i];
-      if (column.required && (!form[column.source] || form[column.source].length === 0)) {
+      if (column.required && (!form[column.getSource()] || form[column.getSource()].length === 0)) {
         valid = false;
-        invalidColumns.push(column.name);
+        invalidColumns.push(column.getName());
       }
     }
     if (!valid) {
-      alert(invalidColumns + " are required");
+      console.log("Error:", invalidColumns + " are required");
       return false;
     } else {
       if (this.key) {
         ref1 = this.columns;
         for (j = 0, len1 = ref1.length; j < len1; j++) {
           column = ref1[j];
-          DataMap.getDataMap().updatePathValue(["", this.tableName, this.key, column.source].join("/"), form[column.source]);
+          DataMap.getDataMap().updatePathValue(["", this.tableName, this.key, column.getSource()].join("/"), form[column.getSource()]);
         }
         return this.hide();
       } else {
@@ -11048,13 +11158,13 @@ TableViewCol = (function(superClass) {
     if (this.getAlwaysHidden() === true) {
       return false;
     }
-    if ((this.isGrouped != null) && this.isGrouped === true) {
-      return false;
-    }
     if ((this.data.visible != null) && this.data.visible === true) {
       return true;
     }
     if ((this.data.visible != null) && this.data.visible === false) {
+      return false;
+    }
+    if ((this.isGrouped != null) && this.isGrouped === true) {
       return false;
     }
     return true;
@@ -11114,13 +11224,12 @@ TableViewCol = (function(superClass) {
   };
 
   TableViewCol.prototype.getAlign = function() {
+
+    /*	
+    		if @data.align? and @data.align.length > 0
+    			return @data.align
+     */
     var f;
-    if (this.data.type === "money") {
-      this.data.align = "right";
-    }
-    if ((this.data.align != null) && this.data.align.length > 0) {
-      return this.data.align;
-    }
     f = this.getFormatter();
     if ((f != null) && (f.align != null)) {
       return f.align;
@@ -11254,7 +11363,7 @@ TableViewCol = (function(superClass) {
     }
     if (reDistance.test(this.data.name)) {
       this.changeColumn("type", "distance");
-      this.changeColumn("width", 60);
+      this.changeColumn("width", 66);
       this.changeColumn("align", "right");
       this.data.skipDeduce = true;
       return;
@@ -11287,6 +11396,12 @@ TableViewCol = (function(superClass) {
       this.changeColumn("width", 60);
       this.changeColumn("align", "left");
       this.data.skipDeduce = true;
+      return;
+    }
+    if (/^imagelist/i.test(this.data.name)) {
+      this.changeColumn("type", "imagelist");
+      this.changeColumn("width", 60);
+      this.changeColumn("align", "left");
       return;
     }
   };
