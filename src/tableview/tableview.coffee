@@ -1193,7 +1193,8 @@ class TableView
 		@updateFullHeight()
 
 		if @renderRequired then @real_render()
-		## 3.27
+		##
+		@layoutShadow()
 		@updateScrollbarSettings()
 		##
 
