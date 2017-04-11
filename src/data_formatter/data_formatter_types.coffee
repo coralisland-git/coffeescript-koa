@@ -1091,7 +1091,7 @@ class DataFormatDateAge extends DataFormatterType
 	width: 135
 
 	# @property [String] align
-	align: "right"
+	align: "left"
 
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to open editor with flatpickr
