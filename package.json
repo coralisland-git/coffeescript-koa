@@ -1,10 +1,6 @@
 {
   "name": "NinjaCommon",
-<<<<<<< HEAD
-  "version": "0.0.5",
-=======
   "version": "0.0.7",
->>>>>>> origin/master
   "private": "true",
   "dependencies": {
     "coffee-exception-report": "^1.0.0",
