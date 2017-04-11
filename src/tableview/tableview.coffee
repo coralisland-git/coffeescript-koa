@@ -1193,7 +1193,8 @@ class TableView
 		@updateFullHeight()
 
 		if @renderRequired then @real_render()
-		## 3.27
+		##
+		@layoutShadow()
 		@updateScrollbarSettings()
 		##
 
@@ -2614,7 +2615,9 @@ class TableView
 		parts     = path.split '/'
 		tableName = parts[1]
 		keyValue  = parts[2]
-		colName   = parts[3]
+		colName   = parts[3] 
+		for part, i in parts when i >= 4 
+			colName = colName + '/' + part
 		return colName
 
 	## -------------------------------------------------------------------------------------------------------------

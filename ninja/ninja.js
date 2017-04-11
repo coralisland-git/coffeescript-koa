@@ -6162,6 +6162,7 @@ TableView = (function() {
     if (this.renderRequired) {
       this.real_render();
     }
+    this.layoutShadow();
     this.updateScrollbarSettings();
     globalTableEvents.emitEvent("row_count", [this.primaryTableName, this.totalAvailableRows]);
     return true;
@@ -7574,7 +7575,7 @@ TableView = (function() {
   TableView.prototype.destroy = function() {};
 
   TableView.prototype.findColFromPath = function(path) {
-    var colName, keyValue, parts, tableName;
+    var colName, i, j, keyValue, len1, part, parts, tableName;
     if (path == null) {
       return null;
     }
@@ -7582,6 +7583,12 @@ TableView = (function() {
     tableName = parts[1];
     keyValue = parts[2];
     colName = parts[3];
+    for (i = j = 0, len1 = parts.length; j < len1; i = ++j) {
+      part = parts[i];
+      if (i >= 4) {
+        colName = colName + '/' + part;
+      }
+    }
     return colName;
   };
 
@@ -8711,6 +8718,1794 @@ WidgetSplittable = (function() {
   return WidgetSplittable;
 
 })();
+var PopUpFormWrapper,
+  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+  hasProp = {}.hasOwnProperty;
+
+PopUpFormWrapper = (function(superClass) {
+  extend(PopUpFormWrapper, superClass);
+
+  function PopUpFormWrapper() {
+
+    /*
+    		 * @property [Array] fields the collection of fields to show
+    		@fields = []
+    
+    		 * @property [String] gid the unique key for the current form
+    		@gid = "form" + GlobalValueManager.NextGlobalID()
+     */
+    PopUpFormWrapper.__super__.constructor.call(this);
+  }
+
+  PopUpFormWrapper.templateFormFieldText = Handlebars.compile('<div class="form-group">\n	<label for="{{fieldName}}" class="col-md-3 control-label"> {{label}} </label>\n	<div class="col-md-9">\n	  <input type="{{type}}" class="form-control" id="{{fieldName}}" value="{{value}}" name="{{fieldName}}"\n                                                            {{#each attrs}}\n                                                              {{@key}}="{{this}}"\n                                                            {{/each}}\n                                                            />\n                                                            <div id="{{fieldName}}error" class="text-danger help-block"></div>\n                                                          </div>\n</div>');
+
+  PopUpFormWrapper.templateFormFieldSelect = Handlebars.compile('<div class="form-group">\n	<label for="{{fieldName}}" class="col-md-3 control-label"> {{label}} </label>\n	<div class="col-md-9">\n	  <select class="form-control" id="{{fieldName}}" name="{{fieldName}}">\n                                                                {{#each attrs.options}}\n                                                                  <option value="{{this}}" {{#if @first}} selected="selected" {{/if}}>{{this}}</option>\n                                                                {{/each}}\n                                                              </select>\n                                                              <div id="{{fieldName}}error" class="text-danger help-block"></div>\n                                                            </div>\n</div>');
+
+  return PopUpFormWrapper;
+
+})(FormWrapper);
+var DataFormatBoolean, DataFormatCurrency, DataFormatDate, DataFormatDateAge, DataFormatDateTime, DataFormatDistance, DataFormatDuration, DataFormatEnum, DataFormatFloat, DataFormatImageList, DataFormatInt, DataFormatLink, DataFormatMemo, DataFormatMultiselect, DataFormatNumber, DataFormatPercent, DataFormatSimpleObject, DataFormatSourceCode, DataFormatTags, DataFormatText, DataFormatTimeAgo, DataFormatterType, e, globalDataFormatter,
+  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+  hasProp = {}.hasOwnProperty;
+
+DataFormatterType = (function() {
+  function DataFormatterType() {
+    this.renderTooltip = bind(this.renderTooltip, this);
+    this.openEditor = bind(this.openEditor, this);
+    this.onGlobalMouseDown = bind(this.onGlobalMouseDown, this);
+    this.appendEditor = bind(this.appendEditor, this);
+    this.saveValue = bind(this.saveValue, this);
+    this.editData = bind(this.editData, this);
+    this.allowKey = bind(this.allowKey, this);
+    this.unformat = bind(this.unformat, this);
+    this.format = bind(this.format, this);
+  }
+
+  DataFormatterType.prototype.name = "";
+
+  DataFormatterType.prototype.width = null;
+
+  DataFormatterType.prototype.editorShowing = false;
+
+  DataFormatterType.prototype.editorPath = "";
+
+  DataFormatterType.prototype.align = null;
+
+  DataFormatterType.prototype.format = function(data, options, path) {
+    return null;
+  };
+
+  DataFormatterType.prototype.unformat = function(data, path) {
+    return null;
+  };
+
+  DataFormatterType.prototype.allowKey = function(keyCode) {
+    return true;
+  };
+
+  DataFormatterType.prototype.editData = function(parentElement, currentValue, path, onSaveCallback) {
+    var elParent, height, left, pos, top, width;
+    this.onSaveCallback = onSaveCallback;
+    left = 0;
+    top = 0;
+    width = 100;
+    height = 40;
+    elParent = null;
+    this.editorPath = path;
+    if (parentElement != null) {
+      elParent = $(parentElement);
+      pos = elParent.position();
+      left = pos.left;
+      top = pos.top;
+      width = elParent.outerWidth(false);
+      height = elParent.outerHeight(false);
+      left = elParent.offset().left;
+      top = elParent.offset().top;
+    }
+    this.editorShowing = true;
+    return this.openEditor(elParent, left, top, width, height, currentValue, path);
+  };
+
+  DataFormatterType.prototype.saveValue = function(newValue) {
+    newValue = this.unformat(newValue, this.editorPath);
+    if (this.onSaveCallback != null) {
+      this.onSaveCallback(this.editorPath, newValue);
+    }
+    return true;
+  };
+
+  DataFormatterType.prototype.appendEditor = function() {
+    $("body").append(this.elEditor);
+    this.elEditor.on("blur", (function(_this) {
+      return function(e) {
+        if (_this.editorShowing) {
+          console.log("blurred", e);
+          _this.editorShowing = false;
+          e.preventDefault();
+          e.stopPropagation();
+          _this.elEditor.hide();
+          return true;
+        }
+        return false;
+      };
+    })(this));
+    this.elEditor.on("keydown", (function(_this) {
+      return function(e) {
+        if (e.keyCode === 9) {
+          _this.saveValue(_this.elEditor.val());
+          _this.editorShowing = false;
+          _this.elEditor.hide();
+          return false;
+        }
+        if (e.keyCode === 13) {
+          _this.saveValue(_this.elEditor.val());
+          _this.editorShowing = false;
+          _this.elEditor.hide();
+          return false;
+        }
+        if (e.keyCode === 27) {
+          _this.editorShowing = false;
+          _this.elEditor.hide();
+          return false;
+        }
+        if (_this.allowKey(e.keyCode)) {
+          return true;
+        } else {
+          return false;
+        }
+      };
+    })(this));
+    return $("document").on("click", (function(_this) {
+      return function(e) {
+        return console.log("Click");
+      };
+    })(this));
+  };
+
+  DataFormatterType.prototype.onGlobalMouseDown = function(e) {
+    if (e.target.classList.contains("dynamic_edit")) {
+      return true;
+    }
+    this.editorShowing = false;
+    this.elEditor.hide();
+    return true;
+  };
+
+  DataFormatterType.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
+    if (!this.elEditor) {
+      this.elEditor = $("<input />", {
+        type: "text",
+        "class": "dynamic_edit form-control"
+      });
+      this.appendEditor();
+    }
+    this.elEditor.css({
+      position: "absolute",
+      "z-index": 5001,
+      top: top,
+      left: left,
+      width: width,
+      height: height
+    });
+    this.elEditor.val(currentValue);
+    this.elEditor.show();
+    this.elEditor.focus();
+    this.elEditor.select();
+    return globalKeyboardEvents.once("global_mouse_down", this.onGlobalMouseDown);
+  };
+
+  DataFormatterType.prototype.onFocus = null;
+
+  DataFormatterType.prototype.renderTooltip = function(row, value, tooltipWindow) {
+    var h, w;
+    if (value == null) {
+      return false;
+    }
+    if (typeof value === "string" || typeof value === "number") {
+      h = 60;
+      w = 320;
+      if (value.length > 100) {
+        w = 440;
+      }
+      if (value.length > 200) {
+        w = 640;
+      }
+      if (value.length > 300) {
+        h = 440;
+      }
+      tooltipWindow.setSize(w, h);
+      tooltipWindow.getBodyWidget().addClass("text");
+      tooltipWindow.html(value);
+      return true;
+    }
+    console.log("renderTooltip row=", row, "value=", value);
+    return false;
+  };
+
+  return DataFormatterType;
+
+})();
+
+DataFormatText = (function(superClass) {
+  extend(DataFormatText, superClass);
+
+  function DataFormatText() {
+    this.unformat = bind(this.unformat, this);
+    this.renderTooltip = bind(this.renderTooltip, this);
+    this.format = bind(this.format, this);
+    return DataFormatText.__super__.constructor.apply(this, arguments);
+  }
+
+  DataFormatText.prototype.name = "text";
+
+  DataFormatText.prototype.align = "left";
+
+  DataFormatText.prototype.format = function(data, options, path) {
+    var list, value, varName;
+    if (data == null) {
+      return "";
+    }
+    if (typeof data === "object") {
+      if (Array.isArray(data)) {
+        data = data.filter(function(a) {
+          return a != null;
+        }).join(", ");
+      } else {
+        list = [];
+        for (varName in data) {
+          value = data[varName];
+          if (value == null) {
+            continue;
+          }
+          list.push(varName + "=" + value);
+        }
+        data = list.join(", ");
+      }
+    }
+    if (data.length > 300) {
+      return data.slice(0, 301) + "...";
+    }
+    return data;
+  };
+
+  DataFormatText.prototype.renderTooltip = function(row, value, tooltipWindow) {
+    var h, w;
+    if (value == null) {
+      return false;
+    }
+    if (typeof value === "string") {
+      h = 60;
+      w = 320;
+      if (value.length > 100) {
+        w = 440;
+      }
+      if (value.length > 200) {
+        w = 640;
+      }
+      if (value.length > 300) {
+        h = 440;
+      }
+      tooltipWindow.setSize(w, h);
+      tooltipWindow.getBodyWidget().addClass("text");
+      tooltipWindow.html(value);
+      return true;
+    }
+    console.log("renderTooltip row=", row, "value=", value);
+    return false;
+  };
+
+  DataFormatText.prototype.unformat = function(data, path) {
+    return data;
+  };
+
+  return DataFormatText;
+
+})(DataFormatterType);
+
+DataFormatMemo = (function(superClass) {
+  extend(DataFormatMemo, superClass);
+
+  function DataFormatMemo() {
+    this.openEditor = bind(this.openEditor, this);
+    this.onFocus = bind(this.onFocus, this);
+    this.unformat = bind(this.unformat, this);
+    this.format = bind(this.format, this);
+    return DataFormatMemo.__super__.constructor.apply(this, arguments);
+  }
+
+  DataFormatMemo.prototype.name = "memo";
+
+  DataFormatMemo.prototype.align = "left";
+
+  DataFormatMemo.prototype.format = function(data, options, path) {
+    if (data == null) {
+      return "";
+    }
+    if (data.length === 0) {
+      return "";
+    }
+    return "<span class='memo'>" + data.slice(0, 201) + "</span><span class='fieldicon'><i class='si si-eyeglasses'></i></span>";
+  };
+
+  DataFormatMemo.prototype.unformat = function(data, path) {
+    return data;
+  };
+
+  DataFormatMemo.prototype.onFocus = function(e, col, data) {
+    var content, m, text;
+    console.log("e=", e);
+    console.log("col=", col);
+    console.log("data=", data);
+    text = data[col];
+    if ((text != null) && typeof text === "string" && text.length > 0) {
+      content = "<br><textarea style='width:100%; height: 600px; font-size: 16px; line-height: 20px; font-family: Consolas, monospaced, arial;'>" + text + "</textarea>";
+      m = new ModalDialog({
+        showOnCreate: true,
+        content: content,
+        title: "View Contents",
+        ok: "Done",
+        close: ""
+      });
+    }
+    return true;
+  };
+
+  DataFormatMemo.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
+    var code, codeEditor, codeMode, cx, cy, h, navButtonCancel, navButtonSave, popup, tag, w;
+    cx = left + (width / 2);
+    cy = top - 10;
+    w = $(window).width();
+    h = $(window).height();
+    if (w > 1000) {
+      w = 1000;
+    } else if (w > 800) {
+      w = 800;
+    } else {
+      w = 600;
+    }
+    if (h > 1000) {
+      h = 1000;
+    } else if (h > 800) {
+      h = 800;
+    } else if (h > 600) {
+      h = 600;
+    } else {
+      h = 400;
+    }
+    popup = new PopupWindow("Text Editor");
+    popup.resize(w, h);
+    popup.centerToPoint(cx, cy - (popup.popupHeight / 2));
+    navButtonSave = new NavButton("Save", "toolbar-btn navbar-btn btn-primary");
+    navButtonSave.onClick = (function(_this) {
+      return function(e) {
+        _this.saveValue(codeEditor.getContent());
+        return popup.destroy();
+      };
+    })(this);
+    navButtonCancel = new NavButton("Cancel", "toolbar-btn navbar-btn btn-danger cancel-btn");
+    navButtonCancel.onClick = (function(_this) {
+      return function(e) {
+        return popup.destroy();
+      };
+    })(this);
+    popup.addToolbar([navButtonSave, navButtonCancel]);
+    tag = $("<div />", {
+      id: "editor_" + GlobalValueManager.NextGlobalID(),
+      height: popup.windowWrapper.height()
+    });
+    popup.on("resize", (function(_this) {
+      return function(ww, hh) {
+        return tag.css("height", popup.windowWrapper.height());
+      };
+    })(this));
+    popup.windowScroll.append(tag);
+    codeMode = "markdown";
+    if (typeof this.options === "string") {
+      codeMode = this.options;
+    }
+    codeEditor = new CodeEditor(tag);
+    if (!currentValue) {
+      code = '';
+    } else if (typeof currentValue !== 'string') {
+      code = currentValue.toString();
+    } else {
+      code = currentValue;
+    }
+    codeEditor.setContent(code);
+    popup.update();
+    return true;
+  };
+
+  return DataFormatMemo;
+
+})(DataFormatterType);
+
+DataFormatSourceCode = (function(superClass) {
+  extend(DataFormatSourceCode, superClass);
+
+  function DataFormatSourceCode() {
+    this.openEditor = bind(this.openEditor, this);
+    return DataFormatSourceCode.__super__.constructor.apply(this, arguments);
+  }
+
+  DataFormatSourceCode.prototype.name = "sourcecode";
+
+  DataFormatSourceCode.prototype.align = "left";
+
+  DataFormatSourceCode.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
+    var code, codeEditor, codeMode, h, navButtonCancel, navButtonSave, popup, tag, w;
+    w = $(window).width();
+    h = $(window).height();
+    width = 800;
+    height = 600;
+    if (width > w) {
+      width = w - 10;
+    }
+    if (height > h) {
+      height = h - 10;
+    }
+    top = (h - height) / 2;
+    left = (w - width) / 2;
+    popup = new PopupWindow("Source Code");
+    popup.resize(w, h);
+    navButtonSave = new NavButton("Save", "toolbar-btn navbar-btn btn-primary");
+    navButtonSave.onClick = (function(_this) {
+      return function(e) {
+        _this.saveValue(codeEditor.getContent());
+        return popup.destroy();
+      };
+    })(this);
+    navButtonCancel = new NavButton("Cancel", "toolbar-btn navbar-btn btn-danger cancel-btn");
+    navButtonCancel.onClick = (function(_this) {
+      return function(e) {
+        return popup.destroy();
+      };
+    })(this);
+    popup.addToolbar([navButtonSave, navButtonCancel]);
+    tag = $("<div />", {
+      id: "editor_" + GlobalValueManager.NextGlobalID(),
+      height: popup.windowWrapper.height()
+    });
+    popup.windowScroll.append(tag);
+    codeMode = "javascript";
+    if (typeof this.options === "string") {
+      codeMode = this.options;
+    }
+    codeEditor = new CodeEditor(tag);
+    codeEditor.popupMode().setTheme("tomorrow_night_eighties").setMode(codeMode);
+    console.log("CURRENT=", currentValue);
+    if (!currentValue) {
+      code = '';
+    } else if (typeof currentValue !== 'string') {
+      code = currentValue.toString();
+    } else {
+      code = currentValue;
+    }
+    codeEditor.setContent(code);
+    popup.update();
+    return true;
+  };
+
+  return DataFormatSourceCode;
+
+})(DataFormatText);
+
+DataFormatInt = (function(superClass) {
+  extend(DataFormatInt, superClass);
+
+  function DataFormatInt() {
+    this.unformat = bind(this.unformat, this);
+    this.format = bind(this.format, this);
+    return DataFormatInt.__super__.constructor.apply(this, arguments);
+  }
+
+  DataFormatInt.prototype.name = "int";
+
+  DataFormatInt.prototype.align = "right";
+
+  DataFormatInt.prototype.width = 90;
+
+  DataFormatInt.prototype.format = function(data, options, path) {
+    if (data == null) {
+      return "";
+    }
+    if (data === null || (typeof data === "string" && data.length === 0)) {
+      return "";
+    }
+    if ((options != null) && options !== null) {
+      return numeral(DataFormatter.getNumber(data)).format(options);
+    }
+    return numeral(DataFormatter.getNumber(data)).format("#,###");
+  };
+
+  DataFormatInt.prototype.unformat = function(data, path) {
+    var num;
+    num = DataFormatter.getNumber(data);
+    if (isNaN(num)) {
+      return "";
+    }
+    return Math.round(num);
+  };
+
+  return DataFormatInt;
+
+})(DataFormatterType);
+
+DataFormatNumber = (function(superClass) {
+  extend(DataFormatNumber, superClass);
+
+  function DataFormatNumber() {
+    this.unformat = bind(this.unformat, this);
+    this.format = bind(this.format, this);
+    return DataFormatNumber.__super__.constructor.apply(this, arguments);
+  }
+
+  DataFormatNumber.prototype.name = "number";
+
+  DataFormatNumber.prototype.align = "right";
+
+  DataFormatNumber.prototype.format = function(data, options, path) {
+    var e, num;
+    if (data == null) {
+      return "";
+    }
+    num = DataFormatter.getNumber(data);
+    if (data === null || (typeof data === "string" && data.length === 0)) {
+      return "";
+    }
+    if (isNaN(num)) {
+      return "[" + num + "]";
+    }
+    if ((options == null) || options === "") {
+      options = "#,###.[##]";
+    }
+    try {
+      return numeral(num).format(options);
+    } catch (error) {
+      e = error;
+      console.log("Exception formatting number [" + num + "] using [" + optinos + "]");
+      return retunr("[" + num + "]");
+    }
+  };
+
+  DataFormatNumber.prototype.unformat = function(data, path) {
+    console.log("unformat number:", data);
+    return DataFormatter.getNumber(data);
+  };
+
+  return DataFormatNumber;
+
+})(DataFormatterType);
+
+DataFormatFloat = (function(superClass) {
+  extend(DataFormatFloat, superClass);
+
+  function DataFormatFloat() {
+    this.unformat = bind(this.unformat, this);
+    this.format = bind(this.format, this);
+    this.allowKey = bind(this.allowKey, this);
+    return DataFormatFloat.__super__.constructor.apply(this, arguments);
+  }
+
+  DataFormatFloat.prototype.name = "decimal";
+
+  DataFormatFloat.prototype.align = "right";
+
+  DataFormatFloat.prototype.width = 100;
+
+  DataFormatFloat.prototype.allowKey = function(keyCode) {
+    return true;
+    if (keyCode >= 48 && keyCode <= 57) {
+      return true;
+    }
+    if (keyCode >= 96 && keyCode <= 105) {
+      return true;
+    }
+    if (keyCode === 190) {
+      return true;
+    }
+    if (keyCode === 189) {
+      return true;
+    }
+    if (keyCode === 119) {
+      return true;
+    }
+    if (keyCode === 109) {
+      return true;
+    }
+    console.log("Rejecting key:", keyCode);
+    return false;
+  };
+
+  DataFormatFloat.prototype.format = function(data, options, path) {
+    if (data == null) {
+      return "";
+    }
+    if ((options != null) && /#/.test(options)) {
+      return numeral(DataFormatter.getNumber(data)).format(options);
+    } else {
+      return numeral(DataFormatter.getNumber(data)).format("#,###.##");
+    }
+  };
+
+  DataFormatFloat.prototype.unformat = function(data, path) {
+    return DataFormatter.getNumber(data);
+  };
+
+  return DataFormatFloat;
+
+})(DataFormatterType);
+
+DataFormatCurrency = (function(superClass) {
+  extend(DataFormatCurrency, superClass);
+
+  function DataFormatCurrency() {
+    this.unformat = bind(this.unformat, this);
+    this.format = bind(this.format, this);
+    return DataFormatCurrency.__super__.constructor.apply(this, arguments);
+  }
+
+  DataFormatCurrency.prototype.name = "money";
+
+  DataFormatCurrency.prototype.align = "right";
+
+  DataFormatCurrency.prototype.format = function(data, options, path) {
+    if ((data == null) || data === null || data === 0 || data === "") {
+      return "";
+    }
+    return numeral(DataFormatter.getNumber(data)).format('$ #,###.[##]');
+  };
+
+  DataFormatCurrency.prototype.unformat = function(data, path) {
+    return DataFormatter.getNumber(data);
+  };
+
+  return DataFormatCurrency;
+
+})(DataFormatterType);
+
+DataFormatPercent = (function(superClass) {
+  extend(DataFormatPercent, superClass);
+
+  function DataFormatPercent() {
+    this.unformat = bind(this.unformat, this);
+    this.format = bind(this.format, this);
+    return DataFormatPercent.__super__.constructor.apply(this, arguments);
+  }
+
+  DataFormatPercent.prototype.name = "percent";
+
+  DataFormatPercent.prototype.align = "right";
+
+  DataFormatPercent.prototype.format = function(data, options, path) {
+    return numeral(DataFormatter.getNumber(data)).format('#,###.[##] %');
+  };
+
+  DataFormatPercent.prototype.unformat = function(data, path) {
+    var num;
+    num = DataFormatter.getNumber(data);
+    return num;
+  };
+
+  return DataFormatPercent;
+
+})(DataFormatterType);
+
+DataFormatDate = (function(superClass) {
+  extend(DataFormatDate, superClass);
+
+  function DataFormatDate() {
+    this.unformat = bind(this.unformat, this);
+    this.format = bind(this.format, this);
+    this.openEditor = bind(this.openEditor, this);
+    return DataFormatDate.__super__.constructor.apply(this, arguments);
+  }
+
+  DataFormatDate.prototype.name = "date";
+
+  DataFormatDate.prototype.width = 65;
+
+  DataFormatDate.prototype.align = "left";
+
+  DataFormatDate.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
+    if (!this.elEditor) {
+      this.elEditor = $("<input />", {
+        type: "text",
+        "class": "dynamic_edit"
+      });
+      this.appendEditor();
+      this.elEditor.on('keydown', (function(_this) {
+        return function(e) {
+          if (!_this.editorShowing) {
+            return _this.datePicker.close();
+          }
+        };
+      })(this));
+    }
+    this.datePicker = new flatpickr(this.elEditor[0], {
+      allowInput: true,
+      parseDate: function(dateString) {
+        return DataFormatter.getMoment(dateString);
+      },
+      onChange: (function(_this) {
+        return function(dateObject, dateString) {
+          _this.saveValue(dateObject);
+          _this.editorShowing = false;
+          return _this.elEditor.hide();
+        };
+      })(this),
+      onOpen: (function(_this) {
+        return function(dateObj, dateStr, instance) {
+          return instance.setDate(new Date(currentValue));
+        };
+      })(this)
+    });
+    this.elEditor.css({
+      position: "absolute",
+      "z-index": 5001,
+      top: top,
+      left: left,
+      width: width,
+      height: height
+    });
+    this.elEditor.val(currentValue);
+    this.elEditor.show();
+    return this.elEditor.focus();
+  };
+
+  DataFormatDate.prototype.format = function(data, options, path) {
+    var m;
+    m = DataFormatter.getMoment(data);
+    if (m == null) {
+      return "";
+    }
+    return m.format("MM/DD/YYYY");
+  };
+
+  DataFormatDate.prototype.unformat = function(data, path) {
+    var m;
+    m = DataFormatter.getMoment(data);
+    if (m == null) {
+      return "";
+    }
+    return m.format("YYYY-MM-DD HH:mm:ss");
+  };
+
+  return DataFormatDate;
+
+})(DataFormatterType);
+
+DataFormatTags = (function(superClass) {
+  extend(DataFormatTags, superClass);
+
+  function DataFormatTags() {
+    this.unformat = bind(this.unformat, this);
+    this.format = bind(this.format, this);
+    this.openEditor = bind(this.openEditor, this);
+    return DataFormatTags.__super__.constructor.apply(this, arguments);
+  }
+
+  DataFormatTags.prototype.name = "tags";
+
+  DataFormatTags.prototype.align = "left";
+
+  DataFormatTags.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
+    var m;
+    m = new ModalDialog({
+      showOnCreate: false,
+      content: "Enter the list of items",
+      title: "Edit options",
+      ok: "Save"
+    });
+    if (typeof currentValue === "string") {
+      currentValue = currentValue.split(',');
+    }
+    m.getForm().addTagsInput("input1", "Value", currentValue.join(','));
+    m.getForm().onSubmit = (function(_this) {
+      return function(form) {
+        _this.saveValue(form.input1.split(","));
+        return m.hide();
+      };
+    })(this);
+    return m.show();
+  };
+
+  DataFormatTags.prototype.format = function(currentValue, options, path) {
+    var idx, obj, values;
+    if (typeof currentValue === "string") {
+      currentValue = currentValue.split(',');
+    }
+    if (Array.isArray(currentValue)) {
+      return currentValue.sort().join(", ");
+    }
+    values = [];
+    for (idx in currentValue) {
+      obj = currentValue[idx];
+      values.push(obj);
+    }
+    return values.sort().join(", ");
+  };
+
+  DataFormatTags.prototype.unformat = function(currentValue, path) {
+    if (typeof currentValue === "string") {
+      currentValue = currentValue.split(',');
+    }
+    return currentValue;
+  };
+
+  return DataFormatTags;
+
+})(DataFormatterType);
+
+DataFormatMultiselect = (function(superClass) {
+  extend(DataFormatMultiselect, superClass);
+
+  function DataFormatMultiselect() {
+    this.unformat = bind(this.unformat, this);
+    this.format = bind(this.format, this);
+    this.openEditor = bind(this.openEditor, this);
+    return DataFormatMultiselect.__super__.constructor.apply(this, arguments);
+  }
+
+  DataFormatMultiselect.prototype.name = "multiselect";
+
+  DataFormatMultiselect.prototype.options = [];
+
+  DataFormatMultiselect.prototype.align = "left";
+
+  DataFormatMultiselect.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
+    var m;
+    m = new ModalDialog({
+      showOnCreate: false,
+      content: "Select the list of items",
+      title: "Select options",
+      ok: "Save"
+    });
+    if (typeof currentValue === "string") {
+      currentValue = currentValue.split(',');
+    }
+    m.getForm().addMultiselect("select1", "Selection", currentValue.join(','), {
+      options: this.options
+    });
+    m.getForm().onSubmit = (function(_this) {
+      return function(form) {
+        _this.saveValue(form.select1);
+        return m.hide();
+      };
+    })(this);
+    return m.show();
+  };
+
+  DataFormatMultiselect.prototype.format = function(currentValue, options, path) {
+    var idx, obj, values;
+    this.options = options;
+    if (typeof currentValue === "string") {
+      currentValue = currentValue.split(',');
+    }
+    if (Array.isArray(currentValue)) {
+      return currentValue.join(", ");
+    }
+    values = [];
+    for (idx in currentValue) {
+      obj = currentValue[idx];
+      values.push(obj);
+    }
+    return values.join(", ");
+  };
+
+  DataFormatMultiselect.prototype.unformat = function(currentValue, path) {
+    if (typeof currentValue === "string") {
+      currentValue = currentValue.split(',');
+    }
+    return currentValue;
+  };
+
+  return DataFormatMultiselect;
+
+})(DataFormatterType);
+
+DataFormatDateTime = (function(superClass) {
+  extend(DataFormatDateTime, superClass);
+
+  function DataFormatDateTime() {
+    this.unformat = bind(this.unformat, this);
+    this.format = bind(this.format, this);
+    this.openEditor = bind(this.openEditor, this);
+    return DataFormatDateTime.__super__.constructor.apply(this, arguments);
+  }
+
+  DataFormatDateTime.prototype.name = "datetime";
+
+  DataFormatDateTime.prototype.align = "left";
+
+  DataFormatDateTime.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
+    if (!this.elEditor) {
+      this.elEditor = $("<input />", {
+        type: "text",
+        "class": "dynamic_edit"
+      });
+      this.appendEditor();
+      this.elEditor.on('keydown', (function(_this) {
+        return function(e) {
+          if (!_this.editorShowing) {
+            return _this.datePicker.close();
+          }
+        };
+      })(this));
+    }
+    this.datePicker = new flatpickr(this.elEditor[0], {
+      allowInput: true,
+      parseDate: function(dateString) {
+        return DataFormatter.getMoment(dateString);
+      },
+      onChange: (function(_this) {
+        return function(dateObject, dateString) {
+          _this.saveValue(dateObject);
+          _this.editorShowing = false;
+          return _this.elEditor.hide();
+        };
+      })(this),
+      onOpen: (function(_this) {
+        return function(dateObj, dateStr, instance) {
+          instance.setDate(new Date(currentValue));
+          return instance.setTime(DataFormatter.getMoment(new Date(currentValue)).format('HH:mm:ss'));
+        };
+      })(this),
+      enableTime: true,
+      time_24hr: true
+    });
+    this.elEditor.css({
+      position: "absolute",
+      "z-index": 5001,
+      top: top,
+      left: left,
+      width: width,
+      height: height
+    });
+    this.elEditor.val(currentValue);
+    this.elEditor.show();
+    return this.elEditor.focus();
+  };
+
+  DataFormatDateTime.prototype.format = function(data, options, path) {
+    var m;
+    m = DataFormatter.getMoment(data);
+    if (m == null) {
+      return "";
+    }
+    return m.format("ddd, MMM Do, YYYY h:mm:ss a");
+  };
+
+  DataFormatDateTime.prototype.unformat = function(data, path) {
+    var m;
+    m = DataFormatter.getMoment(data);
+    if (m == null) {
+      return "";
+    }
+    return m.format("YYYY-MM-DD HH:mm:ss");
+  };
+
+  return DataFormatDateTime;
+
+})(DataFormatterType);
+
+DataFormatDateAge = (function(superClass) {
+  extend(DataFormatDateAge, superClass);
+
+  function DataFormatDateAge() {
+    this.unformat = bind(this.unformat, this);
+    this.format = bind(this.format, this);
+    this.openEditor = bind(this.openEditor, this);
+    return DataFormatDateAge.__super__.constructor.apply(this, arguments);
+  }
+
+  DataFormatDateAge.prototype.name = "age";
+
+  DataFormatDateAge.prototype.width = 135;
+
+  DataFormatDateAge.prototype.align = "left";
+
+  DataFormatDateAge.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
+    if (!this.elEditor) {
+      this.elEditor = $("<input />", {
+        type: "text",
+        "class": "dynamic_edit"
+      });
+      this.appendEditor();
+      this.elEditor.on('keydown', (function(_this) {
+        return function(e) {
+          if (!_this.editorShowing) {
+            return _this.datePicker.close();
+          }
+        };
+      })(this));
+    }
+    this.datePicker = new flatpickr(this.elEditor[0], {
+      allowInput: true,
+      parseDate: function(dateString) {
+        return DataFormatter.getMoment(dateString);
+      },
+      onChange: (function(_this) {
+        return function(dateObject, dateString) {
+          _this.saveValue(dateObject);
+          _this.editorShowing = false;
+          return _this.elEditor.hide();
+        };
+      })(this),
+      onOpen: (function(_this) {
+        return function(dateObj, dateStr, instance) {
+          instance.setDate(new Date(currentValue));
+          return instance.setTime(DataFormatter.getMoment(new Date(currentValue)).format('HH:mm:ss'));
+        };
+      })(this),
+      enableTime: true,
+      time_24hr: true
+    });
+    this.elEditor.css({
+      position: "absolute",
+      "z-index": 5001,
+      top: top,
+      left: left,
+      width: width,
+      height: height
+    });
+    this.elEditor.val(currentValue);
+    this.elEditor.show();
+    return this.elEditor.focus();
+  };
+
+  DataFormatDateAge.prototype.format = function(data, options, path) {
+    var age, html, m;
+    m = DataFormatter.getMoment(data);
+    if (m == null) {
+      return "";
+    }
+    html = "<span class='fdate'>" + m.format("MM/DD/YYYY") + "</span>";
+    age = moment().diff(m);
+    age = age / 86400000;
+    if (age < 401) {
+      age = numeral(age).format("#") + " d";
+    } else if (age < 365 * 2) {
+      age = numeral(age / 30.5).format("#") + " mn";
+    } else {
+      age = numeral(age / 365).format("#.#") + " yrs";
+    }
+    html += "<span class='fage'>" + age + "</span>";
+    return html;
+  };
+
+  DataFormatDateAge.prototype.unformat = function(data, path) {
+    var m;
+    m = DataFormatter.getMoment(data);
+    if (m == null) {
+      return "";
+    }
+    return m.format("YYYY-MM-DD HH:mm:ss");
+  };
+
+  return DataFormatDateAge;
+
+})(DataFormatterType);
+
+DataFormatEnum = (function(superClass) {
+  extend(DataFormatEnum, superClass);
+
+  function DataFormatEnum() {
+    this.unformat = bind(this.unformat, this);
+    this.format = bind(this.format, this);
+    this.openEditor = bind(this.openEditor, this);
+    return DataFormatEnum.__super__.constructor.apply(this, arguments);
+  }
+
+  DataFormatEnum.prototype.name = "enum";
+
+  DataFormatEnum.prototype.align = "left";
+
+  DataFormatEnum.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
+    var i, o, p, ref;
+    p = new PopupMenu("Options", left, top);
+    if (typeof this.options === "string") {
+      this.options = this.options.split(",");
+    }
+    if (typeof this.options === "object" && typeof this.options.length === "number") {
+      ref = this.options;
+      for (i in ref) {
+        o = ref[i];
+        p.addItem(o, (function(_this) {
+          return function(coords, data) {
+            return _this.saveValue(data);
+          };
+        })(this), o);
+      }
+    } else {
+      console.log("Invalid options: ", this.options);
+    }
+    return true;
+  };
+
+  DataFormatEnum.prototype.format = function(data, options1, path) {
+    var i, o, ref, ref1;
+    this.options = options1;
+    if (typeof this.options === "string") {
+      this.options = this.options.split(/\s*,\s*/);
+    }
+    if (data == null) {
+      return "";
+    }
+    ref = this.options;
+    for (i in ref) {
+      o = ref[i];
+      if (data === o) {
+        return o;
+      }
+    }
+    ref1 = this.options;
+    for (i in ref1) {
+      o = ref1[i];
+      if (("" + data) === ("" + i)) {
+        return o;
+      }
+    }
+    return "[" + data + "]";
+  };
+
+  DataFormatEnum.prototype.unformat = function(data, path) {
+    return data;
+  };
+
+  return DataFormatEnum;
+
+})(DataFormatterType);
+
+DataFormatDistance = (function(superClass) {
+  extend(DataFormatDistance, superClass);
+
+  function DataFormatDistance() {
+    this.unformat = bind(this.unformat, this);
+    this.format = bind(this.format, this);
+    return DataFormatDistance.__super__.constructor.apply(this, arguments);
+  }
+
+  DataFormatDistance.prototype.name = "distance";
+
+  DataFormatDistance.prototype.width = 100;
+
+  DataFormatDistance.prototype.align = "left";
+
+  DataFormatDistance.prototype.format = function(data, options, path) {
+    var feet;
+    if (data === 0) {
+      return 0;
+    }
+    feet = 3.28084 * data;
+    if (feet < 50) {
+      return "< 50 ft";
+    }
+    if (feet < 1000) {
+      return Math.ceil(feet) + " ft";
+    }
+    data = feet / 5280;
+    return numeral(data).format('#,###.##') + " mi";
+  };
+
+  DataFormatDistance.prototype.unformat = function(data, path) {
+    var val;
+    console.log("Unformat distance doesn't work:", data);
+    val = DataFormatter.getNumber(data);
+    return val;
+  };
+
+  return DataFormatDistance;
+
+})(DataFormatterType);
+
+DataFormatBoolean = (function(superClass) {
+  extend(DataFormatBoolean, superClass);
+
+  function DataFormatBoolean() {
+    this.unformat = bind(this.unformat, this);
+    this.format = bind(this.format, this);
+    this.openEditor = bind(this.openEditor, this);
+    return DataFormatBoolean.__super__.constructor.apply(this, arguments);
+  }
+
+  DataFormatBoolean.prototype.name = "boolean";
+
+  DataFormatBoolean.prototype.width = 40;
+
+  DataFormatBoolean.prototype.textYes = "<i class='fa fa-circle'></i> Yes";
+
+  DataFormatBoolean.prototype.textNo = "<i class='fa fa-circle-thin'></i> No";
+
+  DataFormatBoolean.prototype.textNotSet = "<i class='fa fa-fs'></i> Not Set";
+
+  DataFormatBoolean.prototype.align = "left";
+
+  DataFormatBoolean.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
+    if (currentValue) {
+      currentValue = false;
+    } else {
+      currentValue = true;
+    }
+    this.saveValue(currentValue);
+    return true;
+  };
+
+  DataFormatBoolean.prototype.format = function(data, options, path) {
+    if (data == null) {
+      return this.textNotSet;
+    }
+    if (data === "") {
+      return this.textNotSet;
+    }
+    if (data === null || data === 0 || data === false) {
+      return this.textNo;
+    }
+    return this.textYes;
+  };
+
+  DataFormatBoolean.prototype.unformat = function(data, path) {
+    if (data == null) {
+      return false;
+    }
+    if (typeof data === "boolean") {
+      if (data) {
+        return true;
+      }
+      return false;
+    }
+    if (data === null || data === 0) {
+      return false;
+    }
+    if (data === "No" || data === "no" || data === "false" || data === "off") {
+      return false;
+    }
+    return true;
+  };
+
+  return DataFormatBoolean;
+
+})(DataFormatterType);
+
+DataFormatTimeAgo = (function(superClass) {
+  extend(DataFormatTimeAgo, superClass);
+
+  function DataFormatTimeAgo() {
+    this.unformat = bind(this.unformat, this);
+    this.format = bind(this.format, this);
+    this.openEditor = bind(this.openEditor, this);
+    return DataFormatTimeAgo.__super__.constructor.apply(this, arguments);
+  }
+
+  DataFormatTimeAgo.prototype.name = "timeago";
+
+  DataFormatTimeAgo.prototype.width = 135;
+
+  DataFormatTimeAgo.prototype.align = "left";
+
+  DataFormatTimeAgo.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
+    if (!this.elEditor) {
+      this.elEditor = $("<input />", {
+        type: "text",
+        "class": "dynamic_edit"
+      });
+      this.appendEditor();
+      this.elEditor.on('keydown', (function(_this) {
+        return function(e) {
+          if (!_this.editorShowing) {
+            return _this.datePicker.close();
+          }
+        };
+      })(this));
+    }
+    this.datePicker = new flatpickr(this.elEditor[0], {
+      allowInput: true,
+      parseDate: function(dateString) {
+        return DataFormatter.getMoment(dateString);
+      },
+      onChange: (function(_this) {
+        return function(dateObject, dateString) {
+          _this.saveValue(dateObject);
+          _this.editorShowing = false;
+          return _this.elEditor.hide();
+        };
+      })(this),
+      onOpen: (function(_this) {
+        return function(dateObj, dateStr, instance) {
+          instance.setDate(new Date(currentValue));
+          return instance.setTime(DataFormatter.getMoment(new Date(currentValue)).format('HH:mm:ss'));
+        };
+      })(this),
+      enableTime: true,
+      time_24hr: true
+    });
+    this.elEditor.css({
+      position: "absolute",
+      "z-index": 5001,
+      top: top,
+      left: left,
+      width: width,
+      height: height
+    });
+    this.elEditor.val(currentValue);
+    this.elEditor.show();
+    return this.elEditor.focus();
+  };
+
+  DataFormatTimeAgo.prototype.format = function(data, options, path) {
+    var age, days, daysTxt, hrs, hrsText, min, stamp, txt;
+    if (data == null) {
+      return "";
+    }
+    if (typeof data === "string") {
+      stamp = new Date(data);
+    } else if (typeof data === "number") {
+      stamp = new Date(data);
+    } else if (typeof data === "object" && (data.getTime != null)) {
+      stamp = data;
+    } else {
+      return "";
+    }
+    age = new Date().getTime() - stamp.getTime();
+    age /= 1000;
+    if (age < 60) {
+      txt = numeral(age).format("#") + " sec";
+    } else if (age < (60 * 60)) {
+      txt = numeral(age / 60).format("#") + " min";
+    } else if (age > 86400) {
+      days = Math.floor(age / 86400);
+      hrs = Math.floor((age - (days * 86400)) / (60 * 60));
+      if (days !== 1) {
+        daysTxt = "days";
+      } else {
+        daysTxt = "day";
+      }
+      if (hrs > 0 && days < 30) {
+        txt = days + " " + daysTxt + ", " + hrs + " hr";
+        if (hrs !== 1) {
+          txt += "s";
+        }
+      } else {
+        txt = days + " " + daysTxt;
+      }
+    } else {
+      hrs = Math.floor(age / (60 * 60));
+      min = (age - (hrs * 60 * 60)) / 60;
+      if (hrs > 1) {
+        hrsText = "hrs";
+      } else {
+        hrsText = "hr";
+      }
+      txt = numeral(hrs).format("#") + (" " + hrsText + ", ") + numeral(min).format("#") + " min";
+    }
+    return txt;
+  };
+
+  DataFormatTimeAgo.prototype.unformat = function(data, path) {
+    var m;
+    m = DataFormatter.getMoment(data);
+    if (m == null) {
+      return "";
+    }
+    return m.format("YYYY-MM-DD HH:mm:ss");
+  };
+
+  return DataFormatTimeAgo;
+
+})(DataFormatterType);
+
+DataFormatDuration = (function(superClass) {
+  extend(DataFormatDuration, superClass);
+
+  function DataFormatDuration() {
+    this.unformat = bind(this.unformat, this);
+    this.format = bind(this.format, this);
+    return DataFormatDuration.__super__.constructor.apply(this, arguments);
+  }
+
+  DataFormatDuration.prototype.name = "duration";
+
+  DataFormatDuration.prototype.width = 90;
+
+  DataFormatDuration.prototype.align = "right";
+
+  DataFormatDuration.prototype.format = function(data, options, path) {
+    var hrs, min, sec, txt;
+    if (data == null) {
+      return "";
+    }
+    if (typeof data === "string") {
+      data = parseFloat(options);
+    }
+    sec = data / 1000;
+    if (sec < 60) {
+      txt = numeral(sec).format("#.###") + " sec";
+    } else if (sec < (60 * 60 * 2)) {
+      min = Math.floor(sec / 60);
+      sec = sec - (min * 60);
+      txt = min + " min, " + Math.floor(sec) + " sec.";
+    } else {
+      hrs = Math.floor(sec / (60 * 60));
+      min = Math.floor(sec - (hrs * 60 * 60));
+      txt = hrs + " hrs, " + min + " min";
+    }
+    return txt;
+  };
+
+  DataFormatDuration.prototype.unformat = function(data, path) {
+    return data;
+  };
+
+  return DataFormatDuration;
+
+})(DataFormatterType);
+
+DataFormatSimpleObject = (function(superClass) {
+  extend(DataFormatSimpleObject, superClass);
+
+  function DataFormatSimpleObject() {
+    this.unformat = bind(this.unformat, this);
+    this.onFocus = bind(this.onFocus, this);
+    this.renderTooltip = bind(this.renderTooltip, this);
+    this.format = bind(this.format, this);
+    return DataFormatSimpleObject.__super__.constructor.apply(this, arguments);
+  }
+
+  DataFormatSimpleObject.prototype.name = "simpleobject";
+
+  DataFormatSimpleObject.prototype.align = "left";
+
+  DataFormatSimpleObject.prototype.format = function(data, options, path) {
+    if (data == null) {
+      return "Not set";
+    }
+    if ((data != null) && Array.isArray(data)) {
+      if (data.length === 0) {
+        return "Not set";
+      }
+      if (typeof data[0] === "string") {
+        return data.sort().filter(function(a) {
+          return a != null;
+        }).join(", ");
+      }
+    }
+    return "View";
+  };
+
+  DataFormatSimpleObject.prototype.renderTooltip = function(row, value, tooltipWindow) {
+    var height, str, val, varName;
+    if (value == null) {
+      return false;
+    }
+    height = 20;
+    str = "<table>";
+    for (varName in value) {
+      val = value[varName];
+      str += "<tr><td>";
+      str += varName;
+      str += "</td><td>";
+      str += val;
+      str += "</tr>";
+      height += 20;
+    }
+    str += "</table>";
+    tooltipWindow.html(str);
+    tooltipWindow.setSize(400, height);
+    return true;
+  };
+
+  DataFormatSimpleObject.prototype.onFocus = function(e, col, data) {
+    console.log("e=", e);
+    console.log("col=", col);
+    return console.log("data=", data);
+  };
+
+  DataFormatSimpleObject.prototype.unformat = function(data, path) {
+    console.log("unformat simple:", data);
+    return data;
+  };
+
+  return DataFormatSimpleObject;
+
+})(DataFormatterType);
+
+DataFormatLink = (function(superClass) {
+  extend(DataFormatLink, superClass);
+
+  function DataFormatLink() {
+    this.onFocus = bind(this.onFocus, this);
+    this.openEditor = bind(this.openEditor, this);
+    this.unformat = bind(this.unformat, this);
+    this.format = bind(this.format, this);
+    return DataFormatLink.__super__.constructor.apply(this, arguments);
+  }
+
+  DataFormatLink.prototype.name = "link";
+
+  DataFormatLink.prototype.width = 70;
+
+  DataFormatLink.prototype.clickable = true;
+
+  DataFormatLink.prototype.align = "left";
+
+  DataFormatLink.prototype.format = function(data, options, path) {
+    if (data == null) {
+      return "";
+    }
+    if (/www/.test(data)) {
+      return "Open Link";
+    }
+    if (/^http/.test(data)) {
+      return "Open Link";
+    }
+    if (/^ftp/.test(data)) {
+      return "Open FTP";
+    }
+    if (data.length > 0) {
+      return data;
+    }
+    return "";
+  };
+
+  DataFormatLink.prototype.unformat = function(data, path) {
+    console.log("TODO: DataFormatLink.unformat not implemented:", data);
+    return data;
+  };
+
+  DataFormatLink.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
+    console.log("TODO: openEditor not implemented for link");
+    return null;
+  };
+
+  DataFormatLink.prototype.onFocus = function(e, col, data) {
+    var url, win;
+    console.log("click, col=", col, "data=", data);
+    url = data[col];
+    if ((url != null) && url.length > 0) {
+      win = window.open(url, "_blank");
+      win.focus();
+    }
+    return true;
+  };
+
+  return DataFormatLink;
+
+})(DataFormatterType);
+
+DataFormatImageList = (function(superClass) {
+  extend(DataFormatImageList, superClass);
+
+  function DataFormatImageList() {
+    this.unformat = bind(this.unformat, this);
+    this.format = bind(this.format, this);
+    this.openEditor = bind(this.openEditor, this);
+    return DataFormatImageList.__super__.constructor.apply(this, arguments);
+  }
+
+  DataFormatImageList.prototype.name = "imagelist";
+
+  DataFormatImageList.prototype.options = [];
+
+  DataFormatImageList.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
+    var h, imgCount, title, w;
+    if (currentValue == null) {
+      return false;
+    }
+    w = $(window).width();
+    h = $(window).height();
+    if (w > 1000) {
+      w = 1000;
+    } else if (w > 800) {
+      w = 800;
+    } else {
+      w = 600;
+    }
+    if (h > 1000) {
+      h = 1000;
+    } else if (h > 800) {
+      h = 800;
+    } else if (h > 600) {
+      h = 600;
+    } else {
+      h = 400;
+    }
+    if (typeof currentValue === "string") {
+      currentValue = currentValue.split("||");
+    }
+    imgCount = currentValue.length;
+    if (imgCount < 1) {
+      return false;
+    } else if (imgCount === 1) {
+      title = "View Image";
+    } else {
+      title = "View " + imgCount + " Images";
+    }
+    return doPopupView('ImageStrip', title, 'imagestrip_popup', w, h).then(function(view) {
+      var img, j, len;
+      view.init();
+      for (j = 0, len = currentValue.length; j < len; j++) {
+        img = currentValue[j];
+        view.addImage(img);
+      }
+      return view.render();
+    });
+  };
+
+  DataFormatImageList.prototype.format = function(currentValue, options, path) {
+    var formattedValue, imgCount;
+    this.options = options;
+
+    /*
+    		if typeof currentValue == "string"
+    			currentValue = currentValue.split ','
+    
+    		if Array.isArray(currentValue)
+    			return currentValue.join(", ")
+    
+    		values = []
+    		for idx, obj of currentValue
+    			values.push obj
+    		return values.join(", ")
+     */
+    formattedValue = "No Image";
+    if (typeof currentValue === "string") {
+      currentValue = currentValue.split("||");
+    } else if (currentValue == null) {
+      return formattedValue;
+    }
+    imgCount = currentValue.length;
+    console.log(imgCount);
+    if (imgCount === 1) {
+      formattedValue = "1 Image";
+    } else {
+      formattedValue = imgCount + " Images";
+    }
+    return formattedValue;
+  };
+
+  DataFormatImageList.prototype.unformat = function(currentValue, path) {
+    if (typeof currentValue === "string") {
+      currentValue = currentValue.split(',');
+    }
+    return currentValue;
+  };
+
+  return DataFormatImageList;
+
+})(DataFormatterType);
+
+try {
+  globalDataFormatter = new DataFormatter();
+  globalDataFormatter.register(new DataFormatText());
+  globalDataFormatter.register(new DataFormatInt());
+  globalDataFormatter.register(new DataFormatNumber());
+  globalDataFormatter.register(new DataFormatFloat());
+  globalDataFormatter.register(new DataFormatCurrency());
+  globalDataFormatter.register(new DataFormatDate());
+  globalDataFormatter.register(new DataFormatDateTime());
+  globalDataFormatter.register(new DataFormatDateAge());
+  globalDataFormatter.register(new DataFormatEnum());
+  globalDataFormatter.register(new DataFormatDistance());
+  globalDataFormatter.register(new DataFormatBoolean());
+  globalDataFormatter.register(new DataFormatPercent());
+  globalDataFormatter.register(new DataFormatTimeAgo());
+  globalDataFormatter.register(new DataFormatSimpleObject());
+  globalDataFormatter.register(new DataFormatSourceCode());
+  globalDataFormatter.register(new DataFormatTags());
+  globalDataFormatter.register(new DataFormatMultiselect());
+  globalDataFormatter.register(new DataFormatMemo());
+  globalDataFormatter.register(new DataFormatDuration());
+  globalDataFormatter.register(new DataFormatLink());
+  globalDataFormatter.register(new DataFormatImageList());
+} catch (error) {
+  e = error;
+  console.log("Exception while registering global Data Formatter:", e);
+}
+var ModalMessageBox,
+  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+  hasProp = {}.hasOwnProperty;
+
+ModalMessageBox = (function(superClass) {
+  extend(ModalMessageBox, superClass);
+
+  ModalMessageBox.prototype.content = "Default content";
+
+  ModalMessageBox.prototype.title = "Default title";
+
+  ModalMessageBox.prototype.ok = "Ok";
+
+  ModalMessageBox.prototype.close = "Close";
+
+  ModalMessageBox.prototype.showFooter = true;
+
+  ModalMessageBox.prototype.showOnCreate = true;
+
+  function ModalMessageBox(message) {
+    this.showOnCreate = false;
+    ModalMessageBox.__super__.constructor.call(this);
+    this.title = "Information";
+    this.position = 'center';
+    this.ok = 'Close';
+    this.close = '';
+    this.content = message;
+    this.show();
+  }
+
+  return ModalMessageBox;
+
+})(ModalDialog);
+var ModalViewDialog,
+  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+  hasProp = {}.hasOwnProperty;
+
+ModalViewDialog = (function(superClass) {
+  extend(ModalViewDialog, superClass);
+
+  function ModalViewDialog(options) {
+    this.show = bind(this.show, this);
+    ModalViewDialog.__super__.constructor.call(this, options);
+    this.view = new View();
+  }
+
+  ModalViewDialog.prototype.show = function(options) {
+    this.content += "<div class='modal_ViewDialog' id='modal_ViewDialog" + this.gid + "' />";
+    this.html = this.template(this);
+    $("body").append(this.html);
+    this.view.AddToElement("#modal_ViewDialog" + this.gid);
+    this.view.elHolder.append(this.getForm().getHtml());
+    this.modal = $("#modal" + this.gid);
+    this.modal.modal(options);
+    this.modal.on("hidden.bs.modal", (function(_this) {
+      return function() {
+        _this.modal.remove();
+        return _this.onClose();
+      };
+    })(this));
+    this.modal.find(".btn1").bind("click", (function(_this) {
+      return function() {
+        return _this.onButton1();
+      };
+    })(this));
+    this.modal.find(".btn2").bind("click", (function(_this) {
+      return function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        options = {};
+        _this.modal.find("input,select").each(function(idx, el) {
+          var name, val;
+          name = $(el).attr("name");
+          val = $(el).val();
+          return options[name] = val;
+        });
+        if (_this.onButton2(e, options) === true) {
+          _this.onClose();
+        }
+        return true;
+      };
+    })(this));
+    if (this.position === "center") {
+      this.modal.css({
+        'margin-top': (function(_this) {
+          return function() {
+            return Math.max(0, $(window).scrollTop() + ($(window).height() - _this.modal.height()) / 2);
+          };
+        })(this)
+      });
+    }
+    if (this.formWrapper != null) {
+      return setTimeout((function(_this) {
+        return function() {
+          return _this.formWrapper.onAfterShow();
+        };
+      })(this), 10);
+    }
+  };
+
+  return ModalViewDialog;
+
+})(ModalDialog);
 var FloatingSelect,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
@@ -8824,6 +10619,185 @@ FloatingSelect = (function(superClass) {
   return FloatingSelect;
 
 })(FloatingWindow);
+var ModalSortItems,
+  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+  hasProp = {}.hasOwnProperty;
+
+ModalSortItems = (function(superClass) {
+  extend(ModalSortItems, superClass);
+
+  ModalSortItems.prototype.content = "Sort Columns";
+
+  ModalSortItems.prototype.title = "Customize Columns";
+
+  ModalSortItems.prototype.ok = "Close";
+
+  ModalSortItems.prototype.close = "";
+
+  ModalSortItems.prototype.showFooter = true;
+
+  ModalSortItems.prototype.showOnCreate = false;
+
+  ModalSortItems.prototype.imgChecked = "<img src='/images/checkbox.png' width='16' height='16' alt='Selected' />";
+
+  ModalSortItems.prototype.imgNotChecked = "<img src='/images/checkbox_no.png' width='16' height='16' alt='Selected' />";
+
+  ModalSortItems.prototype.updateColumnText = function() {
+    var col, i, len, ref;
+    ref = this.columns;
+    for (i = 0, len = ref.length; i < len; i++) {
+      col = ref[i];
+      if (col.getAlwaysHidden()) {
+        continue;
+      }
+      col.tagName.html(col.getName());
+      col.tagOrderText.html(col.getOrder() + 1);
+      if (col.getVisible()) {
+        col.tagCheck.html(this.imgChecked);
+        col.tag.removeClass("notVisible");
+      } else {
+        col.tagCheck.html(this.imgNotChecked);
+        col.tag.addClass("notVisible");
+      }
+      col.tag.setClass("calculation", col.getIsCalculation());
+    }
+    return true;
+  };
+
+  ModalSortItems.prototype.onClickVisible = function(e) {
+    var col, i, len, ref, results;
+    ref = this.columns;
+    results = [];
+    for (i = 0, len = ref.length; i < len; i++) {
+      col = ref[i];
+      if (col.getAlwaysHidden()) {
+        continue;
+      }
+      if (col.getSource() !== e.path) {
+        continue;
+      }
+      DataMap.changeColumnAttribute(this.tableName, e.path, "visible", col.getVisible() === false);
+      results.push(this.updateColumnText());
+    }
+    return results;
+  };
+
+  function ModalSortItems(tableName) {
+    var col, i, len, ref;
+    this.tableName = tableName;
+    this.onClickVisible = bind(this.onClickVisible, this);
+    this.updateColumnText = bind(this.updateColumnText, this);
+    ModalSortItems.__super__.constructor.call(this);
+    GlobalClassTools.addEventManager(this);
+    this.content = '<div id=\'tableColumnSortingList\' class=\'tableColumnSortingList\'>\n</div>';
+    this.show();
+    this.sortItemsList = new WidgetTag("ul", "sortedItemsList", "sortedItemsList");
+    $("#tableColumnSortingList").append(this.sortItemsList.el);
+    this.columns = DataMap.getColumnsFromTable(this.tableName);
+    this.columns = this.columns.sort(function(a, b) {
+      return a.getOrder() - b.getOrder();
+    });
+    ref = this.columns;
+    for (i = 0, len = ref.length; i < len; i++) {
+      col = ref[i];
+      if (col.getAlwaysHidden()) {
+        continue;
+      }
+      col.tag = this.sortItemsList.add("li", "columnItem");
+      col.gid = col.tag.gid;
+      col.tagCheck = col.tag.add("div", "colVisible");
+      col.tagName = col.tag.add("div", "colName");
+      col.tagOrderText = col.tag.add("div", "orderText");
+      col.tagCheck.setDataPath(col.getSource());
+      col.tagCheck.on("click", this.onClickVisible);
+    }
+    this.updateColumnText();
+    sortable("#sortedItemsList", {
+      forcePlaceholderSize: true,
+      placeholderClass: 'placeholder'
+    });
+    sortable('#sortedItemsList')[0].addEventListener('sortupdate', (function(_this) {
+      return function(e) {
+        var el, id, j, k, len1, len2, oldOrder, order, ref1, ref2;
+        console.log("SORT UPDATE:", e.detail);
+        order = 0;
+        ref1 = _this.sortItemsList.el.children();
+        for (j = 0, len1 = ref1.length; j < len1; j++) {
+          el = ref1[j];
+          id = $(el).data("id");
+          ref2 = _this.columns;
+          for (k = 0, len2 = ref2.length; k < len2; k++) {
+            col = ref2[k];
+            if (col.getAlwaysHidden()) {
+              continue;
+            }
+            if (col.gid !== id) {
+              continue;
+            }
+            oldOrder = col.getOrder();
+            if (oldOrder !== order) {
+              DataMap.changeColumnAttribute(_this.tableName, col.getSource(), "order", order);
+              console.log("Change " + (col.getSource()) + " order from " + oldOrder + " to " + order);
+            }
+            order++;
+          }
+        }
+        _this.updateColumnText();
+        return true;
+      };
+    })(this));
+    this.onButton1 = (function(_this) {
+      return function(e) {
+        _this.hide();
+        return true;
+      };
+    })(this);
+    this.onButton2 = (function(_this) {
+      return function() {
+        _this.hide();
+        return true;
+      };
+    })(this);
+  }
+
+  return ModalSortItems;
+
+})(ModalDialog);
+var ErrorMessageBox,
+  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+  hasProp = {}.hasOwnProperty;
+
+ErrorMessageBox = (function(superClass) {
+  extend(ErrorMessageBox, superClass);
+
+  ErrorMessageBox.prototype.content = "Default content";
+
+  ErrorMessageBox.prototype.title = "Default title";
+
+  ErrorMessageBox.prototype.ok = "Ok";
+
+  ErrorMessageBox.prototype.close = "Close";
+
+  ErrorMessageBox.prototype.showFooter = true;
+
+  ErrorMessageBox.prototype.showOnCreate = true;
+
+  function ErrorMessageBox(message) {
+    this.showOnCreate = false;
+    ErrorMessageBox.__super__.constructor.call(this);
+    console.log("MESSAGE=", message);
+    this.title = "Error";
+    this.position = 'center';
+    this.ok = 'Close';
+    this.close = '';
+    this.content = message;
+    this.show();
+  }
+
+  return ErrorMessageBox;
+
+})(ModalDialog);
 var PopupForm,
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
@@ -8920,244 +10894,181 @@ PopupForm = (function(superClass) {
   return PopupForm;
 
 })(ModalDialog);
-var TableViewDetailed,
+var TableViewColButton,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
 
-TableViewDetailed = (function(superClass) {
-  extend(TableViewDetailed, superClass);
+TableViewColButton = (function(superClass) {
+  extend(TableViewColButton, superClass);
 
-  TableViewDetailed.prototype.leftWidth = 100;
-
-  TableViewDetailed.prototype.dataWidth = 120;
-
-  function TableViewDetailed(elTableHolder, showCheckboxes) {
-    this.elTableHolder = elTableHolder;
-    this.showCheckboxes = showCheckboxes;
-    this.setDataField = bind(this.setDataField, this);
-    this.getCellType = bind(this.getCellType, this);
-    this.getCellSelected = bind(this.getCellSelected, this);
-    this.setHeaderField = bind(this.setHeaderField, this);
-    this.getRowType = bind(this.getRowType, this);
-    this.shouldAdvanceCol = bind(this.shouldAdvanceCol, this);
-    this.isHeaderCell = bind(this.isHeaderCell, this);
-    this.shouldSkipCol = bind(this.shouldSkipCol, this);
-    this.shouldSkipRow = bind(this.shouldSkipRow, this);
-    this.getCellFormatterName = bind(this.getCellFormatterName, this);
-    this.getCellRecordID = bind(this.getCellRecordID, this);
-    this.getCellSource = bind(this.getCellSource, this);
-    this.getCellTablename = bind(this.getCellTablename, this);
-    this.getCellAlign = bind(this.getCellAlign, this);
-    this.getCellEditable = bind(this.getCellEditable, this);
-    this.getCellStriped = bind(this.getCellStriped, this);
-    this.getColWidth = bind(this.getColWidth, this);
-    this.getTableVisibleCols = bind(this.getTableVisibleCols, this);
-    this.getTableTotalCols = bind(this.getTableTotalCols, this);
-    this.getTableTotalRows = bind(this.getTableTotalRows, this);
-    TableViewDetailed.__super__.constructor.call(this, this.elTableHolder, this.showCheckboxes);
-    this.showFilters = false;
-    this.fixedHeader = true;
-    this.showGroupPadding = false;
-    this.showResize = false;
+  function TableViewColButton(tableName, id) {
+    this.tableName = tableName;
+    this.id = id;
+    this.UpdateSortIcon = bind(this.UpdateSortIcon, this);
+    this.RenderHeaderHorizontal = bind(this.RenderHeaderHorizontal, this);
+    this.RenderHeader = bind(this.RenderHeader, this);
+    this.getWidth = bind(this.getWidth, this);
+    this.getEditable = bind(this.getEditable, this);
+    this.getClickable = bind(this.getClickable, this);
+    this.getAlign = bind(this.getAlign, this);
+    this.getFormatterName = bind(this.getFormatterName, this);
+    this.getSource = bind(this.getSource, this);
+    this.getOrder = bind(this.getOrder, this);
+    this.getName = bind(this.getName, this);
+    this.render = bind(this.render, this);
+    this.visible = true;
+    this.width = 60;
+    this.sort = 0;
+    this.name = this.id;
   }
 
-  TableViewDetailed.prototype.getTableTotalRows = function() {
-    var count;
-    return count = Object.keys(this.colByNum).length;
+  TableViewColButton.prototype.render = function(val) {
+    return this.id;
   };
 
-  TableViewDetailed.prototype.getTableTotalCols = function() {
-    return this.totalAvailableRows + 1;
+  TableViewColButton.prototype.getName = function() {
+    return this.name;
   };
 
-  TableViewDetailed.prototype.getTableVisibleCols = function() {
-    var colNum, location, maxWidth, totalCols, visColCount, x;
-    if (this.cachedTotalVisibleCols != null) {
-      return this.cachedTotalVisibleCols;
-    }
-    visColCount = 0;
-    x = 0;
-    colNum = this.offsetShowingLeft;
-    maxWidth = this.getTableVisibleWidth();
-    totalCols = this.getTableTotalCols();
-    while (x < maxWidth && colNum < totalCols) {
-      while ((colNum < totalCols) && this.shouldSkipCol(location)) {
-        colNum++;
-      }
-      if (colNum >= totalCols) {
-        break;
-      }
-      location = {
-        colNum: colNum,
-        visibleCol: visColCount
-      };
-      x = x + this.getColWidth(location);
-      visColCount++;
-      colNum++;
-    }
-    this.cachedTotalVisibleCols = visColCount;
-    return visColCount;
+  TableViewColButton.prototype.getOrder = function() {
+    return 99;
   };
 
-  TableViewDetailed.prototype.getColWidth = function(location) {
-    if (this.showHeaders && location.visibleCol === 0) {
-      return this.leftWidth;
+  TableViewColButton.prototype.getSource = function() {
+    if (this.source != null) {
+      return this.source;
     }
-    if (this.totalAvailableRows === location.visibleCol) {
-      return this.getTableVisibleWidth() - this.leftWidth - (this.dataWidth * (this.totalAvailableRows - 1));
-    }
-    return this.dataWidth;
+    return this.id;
   };
 
-  TableViewDetailed.prototype.getCellStriped = function(location) {
-    if (this.showHeaders && location.visibleCol === 0) {
-      return false;
-    }
-    return location.visibleRow % 2 === 1;
+  TableViewColButton.prototype.getFormatterName = function() {
+    return "table_button";
   };
 
-  TableViewDetailed.prototype.getCellEditable = function(location) {
-    if (this.colByNum[location.rowNum] == null) {
-      return null;
-    }
-    return this.colByNum[location.rowNum].getEditable();
+  TableViewColButton.prototype.getAlign = function() {
+    return "center";
   };
 
-  TableViewDetailed.prototype.getCellAlign = function(location) {
-    if (this.colByNum[location.rowNum] == null) {
-      return null;
-    }
-    if (location.visibleCol === 0) {
-      return 'right';
-    }
-    return 'left';
-  };
-
-  TableViewDetailed.prototype.getCellTablename = function(location) {
-    if (this.colByNum[location.rowNum] == null) {
-      return null;
-    }
-    return this.colByNum[location.rowNum].tableName;
-  };
-
-  TableViewDetailed.prototype.getCellSource = function(location) {
-    if (this.colByNum[location.rowNum] == null) {
-      return null;
-    }
-    return this.colByNum[location.rowNum].getSource();
-  };
-
-  TableViewDetailed.prototype.getCellRecordID = function(location) {
-    if (this.rowDataRaw[location.colNum] == null) {
-      return 0;
-    }
-    return this.rowDataRaw[location.colNum].id;
-  };
-
-  TableViewDetailed.prototype.getCellFormatterName = function(location) {
-    if (this.colByNum[location.rowNum] == null) {
-      return null;
-    }
-    return this.colByNum[location.rowNum].getFormatterName();
-  };
-
-  TableViewDetailed.prototype.shouldSkipRow = function(rowNum) {
-    if (this.colByNum[location.rowNum] == null) {
-      return true;
-    }
-    return false;
-  };
-
-  TableViewDetailed.prototype.shouldSkipCol = function(colNum) {
-    if (this.rowDataRaw[location.colNum] == null) {
-      return false;
-    }
-    if ((this.rowDataRaw[location.colNum].visible != null) && this.rowDataRaw[location.colNum].visible === false) {
-      return true;
-    }
-    return false;
-  };
-
-  TableViewDetailed.prototype.isHeaderCell = function(location) {
-    if (this.showHeaders && location.visibleCol === 0) {
-      return true;
-    }
-    return false;
-  };
-
-  TableViewDetailed.prototype.shouldAdvanceCol = function(location) {
-    if (this.showHeaders && location.visibleCol === 1) {
-      return false;
-    }
+  TableViewColButton.prototype.getClickable = function() {
     return true;
   };
 
-  TableViewDetailed.prototype.getRowType = function(location) {
-    if (this.colByNum[location.rowNum] == null) {
-      return "invalid'";
-    }
-    if (this.colByNum[location.rowNum] == null) {
-      return "invalid";
-    }
-    return "data";
-  };
-
-  TableViewDetailed.prototype.setHeaderField = function(location) {
-    location.cell.html("");
-    if (this.colByNum[location.rowNum] == null) {
-      return false;
-    }
-    this.colByNum[location.rowNum].RenderHeaderHorizontal(location.cell, location);
-    return location.cell.setDataPath("/" + location.tableName + "/Header/" + location.sourceName);
-  };
-
-  TableViewDetailed.prototype.getCellSelected = function(location) {
-    if ((this.rowDataRaw[location.colNum] != null) && this.rowDataRaw[location.colNum].row_selected) {
-      return true;
-    }
+  TableViewColButton.prototype.getEditable = function() {
     return false;
   };
 
-  TableViewDetailed.prototype.getCellType = function(location) {
-    if (this.isHeaderCell(location)) {
-      return "locked";
-    }
-    if ((location.colNum == null) || (this.rowDataRaw[location.colNum] == null)) {
-      console.log("detail return invalid 1", location.colNum);
-      return "invalid";
-    }
-    if (this.rowDataRaw[location.colNum] == null) {
-      console.log("detail return invalid 2");
-      return "invalid";
-    }
-    if (this.rowDataRaw[location.colNum].type != null) {
-      return this.rowDataRaw[location.colNum].type;
-    }
-    return "data";
+  TableViewColButton.prototype.getWidth = function() {
+    return this.width;
   };
 
-  TableViewDetailed.prototype.setDataField = function(location) {
-    var col, displayValue;
-    col = this.colByNum[location.rowNum];
-    if (col.getSource() === "row_selected") {
-      if (this.getRowSelected(this.rowDataRaw[location.colNum].id)) {
-        location.cell.html(this.imgChecked);
-      } else {
-        location.cell.html(this.imgNotChecked);
-      }
-    } else if (col.render != null) {
-      location.cell.html(col.render(this.rowDataRaw[location.colNum][col.getSource()], this.rowDataRaw[location.colNum]));
-    } else {
-      displayValue = DataMap.getDataFieldFormatted(col.tableName, this.rowDataRaw[location.colNum].id, col.getSource());
-      location.cell.html(displayValue);
-    }
+  TableViewColButton.prototype.RenderHeader = function(parent, location) {
+    parent.html(this.getName());
+    parent.addClass("text-center");
+    parent.addClass("tableHeaderField");
+    return parent;
+  };
+
+  TableViewColButton.prototype.RenderHeaderHorizontal = function(parent, location) {
+    parent.html(this.tableName);
+    parent.addClass("text-center");
+    parent.addClass("tableHeaderFieldHoriz");
+    return parent;
+  };
+
+  TableViewColButton.prototype.UpdateSortIcon = function(newSort) {
     return true;
   };
 
-  return TableViewDetailed;
+  return TableViewColButton;
 
-})(TableView);
+})(TableViewColBase);
+var TableViewColCheckbox,
+  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+  hasProp = {}.hasOwnProperty;
+
+TableViewColCheckbox = (function(superClass) {
+  extend(TableViewColCheckbox, superClass);
+
+  function TableViewColCheckbox(tableName) {
+    this.tableName = tableName;
+    this.UpdateSortIcon = bind(this.UpdateSortIcon, this);
+    this.RenderHeaderHorizontal = bind(this.RenderHeaderHorizontal, this);
+    this.RenderHeader = bind(this.RenderHeader, this);
+    this.getWidth = bind(this.getWidth, this);
+    this.getEditable = bind(this.getEditable, this);
+    this.getOrder = bind(this.getOrder, this);
+    this.getAlign = bind(this.getAlign, this);
+    this.getFormatterName = bind(this.getFormatterName, this);
+    this.getSource = bind(this.getSource, this);
+    this.getName = bind(this.getName, this);
+    this.visible = true;
+    this.width = 32;
+    this.sort = 0;
+  }
+
+  TableViewColCheckbox.prototype.getName = function() {
+    return "row_selected";
+  };
+
+  TableViewColCheckbox.prototype.getSource = function() {
+    return "row_selected";
+  };
+
+  TableViewColCheckbox.prototype.getFormatterName = function() {
+    return "boolean";
+  };
+
+  TableViewColCheckbox.prototype.getAlign = function() {
+    return "center";
+  };
+
+  TableViewColCheckbox.prototype.getOrder = function() {
+    return -99;
+  };
+
+  TableViewColCheckbox.prototype.getEditable = function() {
+    return false;
+  };
+
+  TableViewColCheckbox.prototype.getWidth = function() {
+    return this.width;
+  };
+
+  TableViewColCheckbox.prototype.RenderHeader = function(parent, location) {
+    if (this.visible === false) {
+      return;
+    }
+    parent.addClass("checkable");
+    parent.addClass("tableHeaderField");
+    parent.html("");
+    return parent;
+  };
+
+  TableViewColCheckbox.prototype.RenderHeaderHorizontal = function(parent, location) {
+    if (this.visible === false) {
+      return;
+    }
+    parent.addClass("checkable");
+    parent.addClass("tableHeaderFieldHoriz");
+    parent.html("Select Row");
+    parent.el.css({
+      "text-align": "right",
+      "padding-right": 8,
+      "border-right": "1px solid #CCCCCC",
+      "background": "linear-gradient(to right, #fff, #f2f2f2);"
+    });
+    return parent;
+  };
+
+  TableViewColCheckbox.prototype.UpdateSortIcon = function(newSort) {
+    return true;
+  };
+
+  return TableViewColCheckbox;
+
+})(TableViewColBase);
 var TableViewCol,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
@@ -9622,5383 +11533,244 @@ TableViewCol = (function(superClass) {
   return TableViewCol;
 
 })(TableViewColBase);
-var TableViewColCheckbox,
+var TableViewDetailed,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
 
-TableViewColCheckbox = (function(superClass) {
-  extend(TableViewColCheckbox, superClass);
+TableViewDetailed = (function(superClass) {
+  extend(TableViewDetailed, superClass);
 
-  function TableViewColCheckbox(tableName) {
-    this.tableName = tableName;
-    this.UpdateSortIcon = bind(this.UpdateSortIcon, this);
-    this.RenderHeaderHorizontal = bind(this.RenderHeaderHorizontal, this);
-    this.RenderHeader = bind(this.RenderHeader, this);
-    this.getWidth = bind(this.getWidth, this);
-    this.getEditable = bind(this.getEditable, this);
-    this.getOrder = bind(this.getOrder, this);
-    this.getAlign = bind(this.getAlign, this);
-    this.getFormatterName = bind(this.getFormatterName, this);
-    this.getSource = bind(this.getSource, this);
-    this.getName = bind(this.getName, this);
-    this.visible = true;
-    this.width = 32;
-    this.sort = 0;
+  TableViewDetailed.prototype.leftWidth = 100;
+
+  TableViewDetailed.prototype.dataWidth = 120;
+
+  function TableViewDetailed(elTableHolder, showCheckboxes) {
+    this.elTableHolder = elTableHolder;
+    this.showCheckboxes = showCheckboxes;
+    this.setDataField = bind(this.setDataField, this);
+    this.getCellType = bind(this.getCellType, this);
+    this.getCellSelected = bind(this.getCellSelected, this);
+    this.setHeaderField = bind(this.setHeaderField, this);
+    this.getRowType = bind(this.getRowType, this);
+    this.shouldAdvanceCol = bind(this.shouldAdvanceCol, this);
+    this.isHeaderCell = bind(this.isHeaderCell, this);
+    this.shouldSkipCol = bind(this.shouldSkipCol, this);
+    this.shouldSkipRow = bind(this.shouldSkipRow, this);
+    this.getCellFormatterName = bind(this.getCellFormatterName, this);
+    this.getCellRecordID = bind(this.getCellRecordID, this);
+    this.getCellSource = bind(this.getCellSource, this);
+    this.getCellTablename = bind(this.getCellTablename, this);
+    this.getCellAlign = bind(this.getCellAlign, this);
+    this.getCellEditable = bind(this.getCellEditable, this);
+    this.getCellStriped = bind(this.getCellStriped, this);
+    this.getColWidth = bind(this.getColWidth, this);
+    this.getTableVisibleCols = bind(this.getTableVisibleCols, this);
+    this.getTableTotalCols = bind(this.getTableTotalCols, this);
+    this.getTableTotalRows = bind(this.getTableTotalRows, this);
+    TableViewDetailed.__super__.constructor.call(this, this.elTableHolder, this.showCheckboxes);
+    this.showFilters = false;
+    this.fixedHeader = true;
+    this.showGroupPadding = false;
+    this.showResize = false;
   }
 
-  TableViewColCheckbox.prototype.getName = function() {
-    return "row_selected";
+  TableViewDetailed.prototype.getTableTotalRows = function() {
+    var count;
+    return count = Object.keys(this.colByNum).length;
   };
 
-  TableViewColCheckbox.prototype.getSource = function() {
-    return "row_selected";
+  TableViewDetailed.prototype.getTableTotalCols = function() {
+    return this.totalAvailableRows + 1;
   };
 
-  TableViewColCheckbox.prototype.getFormatterName = function() {
-    return "boolean";
-  };
-
-  TableViewColCheckbox.prototype.getAlign = function() {
-    return "center";
-  };
-
-  TableViewColCheckbox.prototype.getOrder = function() {
-    return -99;
-  };
-
-  TableViewColCheckbox.prototype.getEditable = function() {
-    return false;
-  };
-
-  TableViewColCheckbox.prototype.getWidth = function() {
-    return this.width;
-  };
-
-  TableViewColCheckbox.prototype.RenderHeader = function(parent, location) {
-    if (this.visible === false) {
-      return;
+  TableViewDetailed.prototype.getTableVisibleCols = function() {
+    var colNum, location, maxWidth, totalCols, visColCount, x;
+    if (this.cachedTotalVisibleCols != null) {
+      return this.cachedTotalVisibleCols;
     }
-    parent.addClass("checkable");
-    parent.addClass("tableHeaderField");
-    parent.html("");
-    return parent;
-  };
-
-  TableViewColCheckbox.prototype.RenderHeaderHorizontal = function(parent, location) {
-    if (this.visible === false) {
-      return;
-    }
-    parent.addClass("checkable");
-    parent.addClass("tableHeaderFieldHoriz");
-    parent.html("Select Row");
-    parent.el.css({
-      "text-align": "right",
-      "padding-right": 8,
-      "border-right": "1px solid #CCCCCC",
-      "background": "linear-gradient(to right, #fff, #f2f2f2);"
-    });
-    return parent;
-  };
-
-  TableViewColCheckbox.prototype.UpdateSortIcon = function(newSort) {
-    return true;
-  };
-
-  return TableViewColCheckbox;
-
-})(TableViewColBase);
-var TableViewColButton,
-  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  hasProp = {}.hasOwnProperty;
-
-TableViewColButton = (function(superClass) {
-  extend(TableViewColButton, superClass);
-
-  function TableViewColButton(tableName, id) {
-    this.tableName = tableName;
-    this.id = id;
-    this.UpdateSortIcon = bind(this.UpdateSortIcon, this);
-    this.RenderHeaderHorizontal = bind(this.RenderHeaderHorizontal, this);
-    this.RenderHeader = bind(this.RenderHeader, this);
-    this.getWidth = bind(this.getWidth, this);
-    this.getEditable = bind(this.getEditable, this);
-    this.getClickable = bind(this.getClickable, this);
-    this.getAlign = bind(this.getAlign, this);
-    this.getFormatterName = bind(this.getFormatterName, this);
-    this.getSource = bind(this.getSource, this);
-    this.getOrder = bind(this.getOrder, this);
-    this.getName = bind(this.getName, this);
-    this.render = bind(this.render, this);
-    this.visible = true;
-    this.width = 60;
-    this.sort = 0;
-    this.name = this.id;
-  }
-
-  TableViewColButton.prototype.render = function(val) {
-    return this.id;
-  };
-
-  TableViewColButton.prototype.getName = function() {
-    return this.name;
-  };
-
-  TableViewColButton.prototype.getOrder = function() {
-    return 99;
-  };
-
-  TableViewColButton.prototype.getSource = function() {
-    if (this.source != null) {
-      return this.source;
-    }
-    return this.id;
-  };
-
-  TableViewColButton.prototype.getFormatterName = function() {
-    return "table_button";
-  };
-
-  TableViewColButton.prototype.getAlign = function() {
-    return "center";
-  };
-
-  TableViewColButton.prototype.getClickable = function() {
-    return true;
-  };
-
-  TableViewColButton.prototype.getEditable = function() {
-    return false;
-  };
-
-  TableViewColButton.prototype.getWidth = function() {
-    return this.width;
-  };
-
-  TableViewColButton.prototype.RenderHeader = function(parent, location) {
-    parent.html(this.getName());
-    parent.addClass("text-center");
-    parent.addClass("tableHeaderField");
-    return parent;
-  };
-
-  TableViewColButton.prototype.RenderHeaderHorizontal = function(parent, location) {
-    parent.html(this.tableName);
-    parent.addClass("text-center");
-    parent.addClass("tableHeaderFieldHoriz");
-    return parent;
-  };
-
-  TableViewColButton.prototype.UpdateSortIcon = function(newSort) {
-    return true;
-  };
-
-  return TableViewColButton;
-
-})(TableViewColBase);
-var PopUpFormWrapper,
-  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  hasProp = {}.hasOwnProperty;
-
-PopUpFormWrapper = (function(superClass) {
-  extend(PopUpFormWrapper, superClass);
-
-  function PopUpFormWrapper() {
-
-    /*
-    		 * @property [Array] fields the collection of fields to show
-    		@fields = []
-    
-    		 * @property [String] gid the unique key for the current form
-    		@gid = "form" + GlobalValueManager.NextGlobalID()
-     */
-    PopUpFormWrapper.__super__.constructor.call(this);
-  }
-
-  PopUpFormWrapper.templateFormFieldText = Handlebars.compile('<div class="form-group">\n	<label for="{{fieldName}}" class="col-md-3 control-label"> {{label}} </label>\n	<div class="col-md-9">\n	  <input type="{{type}}" class="form-control" id="{{fieldName}}" value="{{value}}" name="{{fieldName}}"\n                                                            {{#each attrs}}\n                                                              {{@key}}="{{this}}"\n                                                            {{/each}}\n                                                            />\n                                                            <div id="{{fieldName}}error" class="text-danger help-block"></div>\n                                                          </div>\n</div>');
-
-  PopUpFormWrapper.templateFormFieldSelect = Handlebars.compile('<div class="form-group">\n	<label for="{{fieldName}}" class="col-md-3 control-label"> {{label}} </label>\n	<div class="col-md-9">\n	  <select class="form-control" id="{{fieldName}}" name="{{fieldName}}">\n                                                                {{#each attrs.options}}\n                                                                  <option value="{{this}}" {{#if @first}} selected="selected" {{/if}}>{{this}}</option>\n                                                                {{/each}}\n                                                              </select>\n                                                              <div id="{{fieldName}}error" class="text-danger help-block"></div>\n                                                            </div>\n</div>');
-
-  return PopUpFormWrapper;
-
-})(FormWrapper);
-var ModalSortItems,
-  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  hasProp = {}.hasOwnProperty;
-
-ModalSortItems = (function(superClass) {
-  extend(ModalSortItems, superClass);
-
-  ModalSortItems.prototype.content = "Sort Columns";
-
-  ModalSortItems.prototype.title = "Customize Columns";
-
-  ModalSortItems.prototype.ok = "Close";
-
-  ModalSortItems.prototype.close = "";
-
-  ModalSortItems.prototype.showFooter = true;
-
-  ModalSortItems.prototype.showOnCreate = false;
-
-  ModalSortItems.prototype.imgChecked = "<img src='/images/checkbox.png' width='16' height='16' alt='Selected' />";
-
-  ModalSortItems.prototype.imgNotChecked = "<img src='/images/checkbox_no.png' width='16' height='16' alt='Selected' />";
-
-  ModalSortItems.prototype.updateColumnText = function() {
-    var col, i, len, ref;
-    ref = this.columns;
-    for (i = 0, len = ref.length; i < len; i++) {
-      col = ref[i];
-      if (col.getAlwaysHidden()) {
-        continue;
+    visColCount = 0;
+    x = 0;
+    colNum = this.offsetShowingLeft;
+    maxWidth = this.getTableVisibleWidth();
+    totalCols = this.getTableTotalCols();
+    while (x < maxWidth && colNum < totalCols) {
+      while ((colNum < totalCols) && this.shouldSkipCol(location)) {
+        colNum++;
       }
-      col.tagName.html(col.getName());
-      col.tagOrderText.html(col.getOrder() + 1);
-      if (col.getVisible()) {
-        col.tagCheck.html(this.imgChecked);
-        col.tag.removeClass("notVisible");
-      } else {
-        col.tagCheck.html(this.imgNotChecked);
-        col.tag.addClass("notVisible");
+      if (colNum >= totalCols) {
+        break;
       }
-      col.tag.setClass("calculation", col.getIsCalculation());
-    }
-    return true;
-  };
-
-  ModalSortItems.prototype.onClickVisible = function(e) {
-    var col, i, len, ref, results;
-    ref = this.columns;
-    results = [];
-    for (i = 0, len = ref.length; i < len; i++) {
-      col = ref[i];
-      if (col.getAlwaysHidden()) {
-        continue;
-      }
-      if (col.getSource() !== e.path) {
-        continue;
-      }
-      DataMap.changeColumnAttribute(this.tableName, e.path, "visible", col.getVisible() === false);
-      results.push(this.updateColumnText());
-    }
-    return results;
-  };
-
-  function ModalSortItems(tableName) {
-    var col, i, len, ref;
-    this.tableName = tableName;
-    this.onClickVisible = bind(this.onClickVisible, this);
-    this.updateColumnText = bind(this.updateColumnText, this);
-    ModalSortItems.__super__.constructor.call(this);
-    GlobalClassTools.addEventManager(this);
-    this.content = '<div id=\'tableColumnSortingList\' class=\'tableColumnSortingList\'>\n</div>';
-    this.show();
-    this.sortItemsList = new WidgetTag("ul", "sortedItemsList", "sortedItemsList");
-    $("#tableColumnSortingList").append(this.sortItemsList.el);
-    this.columns = DataMap.getColumnsFromTable(this.tableName);
-    this.columns = this.columns.sort(function(a, b) {
-      return a.getOrder() - b.getOrder();
-    });
-    ref = this.columns;
-    for (i = 0, len = ref.length; i < len; i++) {
-      col = ref[i];
-      if (col.getAlwaysHidden()) {
-        continue;
-      }
-      col.tag = this.sortItemsList.add("li", "columnItem");
-      col.gid = col.tag.gid;
-      col.tagCheck = col.tag.add("div", "colVisible");
-      col.tagName = col.tag.add("div", "colName");
-      col.tagOrderText = col.tag.add("div", "orderText");
-      col.tagCheck.setDataPath(col.getSource());
-      col.tagCheck.on("click", this.onClickVisible);
-    }
-    this.updateColumnText();
-    sortable("#sortedItemsList", {
-      forcePlaceholderSize: true,
-      placeholderClass: 'placeholder'
-    });
-    sortable('#sortedItemsList')[0].addEventListener('sortupdate', (function(_this) {
-      return function(e) {
-        var el, id, j, k, len1, len2, oldOrder, order, ref1, ref2;
-        console.log("SORT UPDATE:", e.detail);
-        order = 0;
-        ref1 = _this.sortItemsList.el.children();
-        for (j = 0, len1 = ref1.length; j < len1; j++) {
-          el = ref1[j];
-          id = $(el).data("id");
-          ref2 = _this.columns;
-          for (k = 0, len2 = ref2.length; k < len2; k++) {
-            col = ref2[k];
-            if (col.getAlwaysHidden()) {
-              continue;
-            }
-            if (col.gid !== id) {
-              continue;
-            }
-            oldOrder = col.getOrder();
-            if (oldOrder !== order) {
-              DataMap.changeColumnAttribute(_this.tableName, col.getSource(), "order", order);
-              console.log("Change " + (col.getSource()) + " order from " + oldOrder + " to " + order);
-            }
-            order++;
-          }
-        }
-        _this.updateColumnText();
-        return true;
+      location = {
+        colNum: colNum,
+        visibleCol: visColCount
       };
-    })(this));
-    this.onButton1 = (function(_this) {
-      return function(e) {
-        _this.hide();
-        return true;
-      };
-    })(this);
-    this.onButton2 = (function(_this) {
-      return function() {
-        _this.hide();
-        return true;
-      };
-    })(this);
-  }
-
-  return ModalSortItems;
-
-})(ModalDialog);
-var ModalViewDialog,
-  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  hasProp = {}.hasOwnProperty;
-
-ModalViewDialog = (function(superClass) {
-  extend(ModalViewDialog, superClass);
-
-  function ModalViewDialog(options) {
-    this.show = bind(this.show, this);
-    ModalViewDialog.__super__.constructor.call(this, options);
-    this.view = new View();
-  }
-
-  ModalViewDialog.prototype.show = function(options) {
-    this.content += "<div class='modal_ViewDialog' id='modal_ViewDialog" + this.gid + "' />";
-    this.html = this.template(this);
-    $("body").append(this.html);
-    this.view.AddToElement("#modal_ViewDialog" + this.gid);
-    this.view.elHolder.append(this.getForm().getHtml());
-    this.modal = $("#modal" + this.gid);
-    this.modal.modal(options);
-    this.modal.on("hidden.bs.modal", (function(_this) {
-      return function() {
-        _this.modal.remove();
-        return _this.onClose();
-      };
-    })(this));
-    this.modal.find(".btn1").bind("click", (function(_this) {
-      return function() {
-        return _this.onButton1();
-      };
-    })(this));
-    this.modal.find(".btn2").bind("click", (function(_this) {
-      return function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        options = {};
-        _this.modal.find("input,select").each(function(idx, el) {
-          var name, val;
-          name = $(el).attr("name");
-          val = $(el).val();
-          return options[name] = val;
-        });
-        if (_this.onButton2(e, options) === true) {
-          _this.onClose();
-        }
-        return true;
-      };
-    })(this));
-    if (this.position === "center") {
-      this.modal.css({
-        'margin-top': (function(_this) {
-          return function() {
-            return Math.max(0, $(window).scrollTop() + ($(window).height() - _this.modal.height()) / 2);
-          };
-        })(this)
-      });
+      x = x + this.getColWidth(location);
+      visColCount++;
+      colNum++;
     }
-    if (this.formWrapper != null) {
-      return setTimeout((function(_this) {
-        return function() {
-          return _this.formWrapper.onAfterShow();
-        };
-      })(this), 10);
+    this.cachedTotalVisibleCols = visColCount;
+    return visColCount;
+  };
+
+  TableViewDetailed.prototype.getColWidth = function(location) {
+    if (this.showHeaders && location.visibleCol === 0) {
+      return this.leftWidth;
     }
-  };
-
-  return ModalViewDialog;
-
-})(ModalDialog);
-var ModalMessageBox,
-  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  hasProp = {}.hasOwnProperty;
-
-ModalMessageBox = (function(superClass) {
-  extend(ModalMessageBox, superClass);
-
-  ModalMessageBox.prototype.content = "Default content";
-
-  ModalMessageBox.prototype.title = "Default title";
-
-  ModalMessageBox.prototype.ok = "Ok";
-
-  ModalMessageBox.prototype.close = "Close";
-
-  ModalMessageBox.prototype.showFooter = true;
-
-  ModalMessageBox.prototype.showOnCreate = true;
-
-  function ModalMessageBox(message) {
-    this.showOnCreate = false;
-    ModalMessageBox.__super__.constructor.call(this);
-    this.title = "Information";
-    this.position = 'center';
-    this.ok = 'Close';
-    this.close = '';
-    this.content = message;
-    this.show();
-  }
-
-  return ModalMessageBox;
-
-})(ModalDialog);
-var ErrorMessageBox,
-  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  hasProp = {}.hasOwnProperty;
-
-ErrorMessageBox = (function(superClass) {
-  extend(ErrorMessageBox, superClass);
-
-  ErrorMessageBox.prototype.content = "Default content";
-
-  ErrorMessageBox.prototype.title = "Default title";
-
-  ErrorMessageBox.prototype.ok = "Ok";
-
-  ErrorMessageBox.prototype.close = "Close";
-
-  ErrorMessageBox.prototype.showFooter = true;
-
-  ErrorMessageBox.prototype.showOnCreate = true;
-
-  function ErrorMessageBox(message) {
-    this.showOnCreate = false;
-    ErrorMessageBox.__super__.constructor.call(this);
-    console.log("MESSAGE=", message);
-    this.title = "Error";
-    this.position = 'center';
-    this.ok = 'Close';
-    this.close = '';
-    this.content = message;
-    this.show();
-  }
-
-  return ErrorMessageBox;
-
-})(ModalDialog);
-var DataFormatBoolean, DataFormatCurrency, DataFormatDate, DataFormatDateAge, DataFormatDateTime, DataFormatDistance, DataFormatDuration, DataFormatEnum, DataFormatFloat, DataFormatImageList, DataFormatInt, DataFormatLink, DataFormatMemo, DataFormatMultiselect, DataFormatNumber, DataFormatPercent, DataFormatSimpleObject, DataFormatSourceCode, DataFormatTags, DataFormatText, DataFormatTimeAgo, DataFormatterType, e, globalDataFormatter,
-  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  hasProp = {}.hasOwnProperty;
-
-DataFormatterType = (function() {
-  function DataFormatterType() {
-    this.openEditor = bind(this.openEditor, this);
-    this.onGlobalMouseDown = bind(this.onGlobalMouseDown, this);
-    this.appendEditor = bind(this.appendEditor, this);
-    this.saveValue = bind(this.saveValue, this);
-    this.editData = bind(this.editData, this);
-    this.allowKey = bind(this.allowKey, this);
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-  }
-
-  DataFormatterType.prototype.name = "";
-
-  DataFormatterType.prototype.width = null;
-
-  DataFormatterType.prototype.editorShowing = false;
-
-  DataFormatterType.prototype.editorPath = "";
-
-  DataFormatterType.prototype.align = null;
-
-  DataFormatterType.prototype.format = function(data, options, path) {
-    return null;
-  };
-
-  DataFormatterType.prototype.unformat = function(data, path) {
-    return null;
-  };
-
-  DataFormatterType.prototype.allowKey = function(keyCode) {
-    return true;
-  };
-
-  DataFormatterType.prototype.editData = function(parentElement, currentValue, path, onSaveCallback) {
-    var elParent, height, left, pos, top, width;
-    this.onSaveCallback = onSaveCallback;
-    left = 0;
-    top = 0;
-    width = 100;
-    height = 40;
-    elParent = null;
-    this.editorPath = path;
-    if (parentElement != null) {
-      elParent = $(parentElement);
-      pos = elParent.position();
-      left = pos.left;
-      top = pos.top;
-      width = elParent.outerWidth(false);
-      height = elParent.outerHeight(false);
-      left = elParent.offset().left;
-      top = elParent.offset().top;
+    if (this.totalAvailableRows === location.visibleCol) {
+      return this.getTableVisibleWidth() - this.leftWidth - (this.dataWidth * (this.totalAvailableRows - 1));
     }
-    this.editorShowing = true;
-    return this.openEditor(elParent, left, top, width, height, currentValue, path);
+    return this.dataWidth;
   };
 
-  DataFormatterType.prototype.saveValue = function(newValue) {
-    newValue = this.unformat(newValue, this.editorPath);
-    if (this.onSaveCallback != null) {
-      this.onSaveCallback(this.editorPath, newValue);
-    }
-    return true;
-  };
-
-  DataFormatterType.prototype.appendEditor = function() {
-    $("body").append(this.elEditor);
-    this.elEditor.on("blur", (function(_this) {
-      return function(e) {
-        if (_this.editorShowing) {
-          console.log("blurred", e);
-          _this.editorShowing = false;
-          e.preventDefault();
-          e.stopPropagation();
-          _this.elEditor.hide();
-          return true;
-        }
-        return false;
-      };
-    })(this));
-    this.elEditor.on("keydown", (function(_this) {
-      return function(e) {
-        if (e.keyCode === 9) {
-          _this.saveValue(_this.elEditor.val());
-          _this.editorShowing = false;
-          _this.elEditor.hide();
-          return false;
-        }
-        if (e.keyCode === 13) {
-          _this.saveValue(_this.elEditor.val());
-          _this.editorShowing = false;
-          _this.elEditor.hide();
-          return false;
-        }
-        if (e.keyCode === 27) {
-          _this.editorShowing = false;
-          _this.elEditor.hide();
-          return false;
-        }
-        if (_this.allowKey(e.keyCode)) {
-          return true;
-        } else {
-          return false;
-        }
-      };
-    })(this));
-    return $("document").on("click", (function(_this) {
-      return function(e) {
-        return console.log("Click");
-      };
-    })(this));
-  };
-
-  DataFormatterType.prototype.onGlobalMouseDown = function(e) {
-    if (e.target.classList.contains("dynamic_edit")) {
-      return true;
-    }
-    this.editorShowing = false;
-    this.elEditor.hide();
-    return true;
-  };
-
-  DataFormatterType.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    if (!this.elEditor) {
-      this.elEditor = $("<input />", {
-        type: "text",
-        "class": "dynamic_edit form-control"
-      });
-      this.appendEditor();
-    }
-    this.elEditor.css({
-      position: "absolute",
-      "z-index": 5001,
-      top: top,
-      left: left,
-      width: width,
-      height: height
-    });
-    this.elEditor.val(currentValue);
-    this.elEditor.show();
-    this.elEditor.focus();
-    this.elEditor.select();
-    return globalKeyboardEvents.once("global_mouse_down", this.onGlobalMouseDown);
-  };
-
-  DataFormatterType.prototype.onFocus = null;
-
-  return DataFormatterType;
-
-})();
-
-DataFormatText = (function(superClass) {
-  extend(DataFormatText, superClass);
-
-  function DataFormatText() {
-    this.unformat = bind(this.unformat, this);
-    this.renderTooltip = bind(this.renderTooltip, this);
-    this.format = bind(this.format, this);
-    return DataFormatText.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatText.prototype.name = "text";
-
-  DataFormatText.prototype.align = "left";
-
-  DataFormatText.prototype.format = function(data, options, path) {
-    var list, value, varName;
-    if (data == null) {
-      return "";
-    }
-    if (typeof data === "object") {
-      if (Array.isArray(data)) {
-        data = data.filter(function(a) {
-          return a != null;
-        }).join(", ");
-      } else {
-        list = [];
-        for (varName in data) {
-          value = data[varName];
-          if (value == null) {
-            continue;
-          }
-          list.push(varName + "=" + value);
-        }
-        data = list.join(", ");
-      }
-    }
-    if (data.length > 300) {
-      return data.slice(0, 301) + "...";
-    }
-    return data;
-  };
-
-  DataFormatText.prototype.renderTooltip = function(row, value, tooltipWindow) {
-    var h, w;
-    if (value == null) {
+  TableViewDetailed.prototype.getCellStriped = function(location) {
+    if (this.showHeaders && location.visibleCol === 0) {
       return false;
     }
-    if (typeof value === "string") {
-      h = 60;
-      w = 320;
-      if (value.length > 100) {
-        w = 440;
-      }
-      if (value.length > 200) {
-        w = 640;
-      }
-      if (value.length > 300) {
-        h = 440;
-      }
-      tooltipWindow.setSize(w, h);
-      tooltipWindow.getBodyWidget().addClass("text");
-      tooltipWindow.html(value);
-      return true;
-    }
-    console.log("renderTooltip row=", row, "value=", value);
-    return false;
+    return location.visibleRow % 2 === 1;
   };
 
-  DataFormatText.prototype.unformat = function(data, path) {
-    return data;
+  TableViewDetailed.prototype.getCellEditable = function(location) {
+    if (this.colByNum[location.rowNum] == null) {
+      return null;
+    }
+    return this.colByNum[location.rowNum].getEditable();
   };
 
-  return DataFormatText;
-
-})(DataFormatterType);
-
-DataFormatMemo = (function(superClass) {
-  extend(DataFormatMemo, superClass);
-
-  function DataFormatMemo() {
-    this.openEditor = bind(this.openEditor, this);
-    this.onFocus = bind(this.onFocus, this);
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    return DataFormatMemo.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatMemo.prototype.name = "memo";
-
-  DataFormatMemo.prototype.align = "left";
-
-  DataFormatMemo.prototype.format = function(data, options, path) {
-    if (data == null) {
-      return "";
+  TableViewDetailed.prototype.getCellAlign = function(location) {
+    if (this.colByNum[location.rowNum] == null) {
+      return null;
     }
-    if (data.length === 0) {
-      return "";
+    if (location.visibleCol === 0) {
+      return 'right';
     }
-    return "<span class='memo'>" + data.slice(0, 201) + "</span><span class='fieldicon'><i class='si si-eyeglasses'></i></span>";
+    return 'left';
   };
 
-  DataFormatMemo.prototype.unformat = function(data, path) {
-    return data;
+  TableViewDetailed.prototype.getCellTablename = function(location) {
+    if (this.colByNum[location.rowNum] == null) {
+      return null;
+    }
+    return this.colByNum[location.rowNum].tableName;
   };
 
-  DataFormatMemo.prototype.onFocus = function(e, col, data) {
-    var content, m, text;
-    console.log("e=", e);
-    console.log("col=", col);
-    console.log("data=", data);
-    text = data[col];
-    if ((text != null) && typeof text === "string" && text.length > 0) {
-      content = "<br><textarea style='width:100%; height: 600px; font-size: 16px; line-height: 20px; font-family: Consolas, monospaced, arial;'>" + text + "</textarea>";
-      m = new ModalDialog({
-        showOnCreate: true,
-        content: content,
-        title: "View Contents",
-        ok: "Done",
-        close: ""
-      });
+  TableViewDetailed.prototype.getCellSource = function(location) {
+    if (this.colByNum[location.rowNum] == null) {
+      return null;
     }
-    return true;
+    return this.colByNum[location.rowNum].getSource();
   };
 
-  DataFormatMemo.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    var code, codeEditor, codeMode, cx, cy, h, navButtonCancel, navButtonSave, popup, tag, w;
-    cx = left + (width / 2);
-    cy = top - 10;
-    w = $(window).width();
-    h = $(window).height();
-    if (w > 1000) {
-      w = 1000;
-    } else if (w > 800) {
-      w = 800;
-    } else {
-      w = 600;
-    }
-    if (h > 1000) {
-      h = 1000;
-    } else if (h > 800) {
-      h = 800;
-    } else if (h > 600) {
-      h = 600;
-    } else {
-      h = 400;
-    }
-    popup = new PopupWindow("Text Editor");
-    popup.resize(w, h);
-    popup.centerToPoint(cx, cy - (popup.popupHeight / 2));
-    navButtonSave = new NavButton("Save", "toolbar-btn navbar-btn btn-primary");
-    navButtonSave.onClick = (function(_this) {
-      return function(e) {
-        _this.saveValue(codeEditor.getContent());
-        return popup.destroy();
-      };
-    })(this);
-    navButtonCancel = new NavButton("Cancel", "toolbar-btn navbar-btn btn-danger cancel-btn");
-    navButtonCancel.onClick = (function(_this) {
-      return function(e) {
-        return popup.destroy();
-      };
-    })(this);
-    popup.addToolbar([navButtonSave, navButtonCancel]);
-    tag = $("<div />", {
-      id: "editor_" + GlobalValueManager.NextGlobalID(),
-      height: popup.windowWrapper.height()
-    });
-    popup.on("resize", (function(_this) {
-      return function(ww, hh) {
-        return tag.css("height", popup.windowWrapper.height());
-      };
-    })(this));
-    popup.windowScroll.append(tag);
-    codeMode = "markdown";
-    if (typeof this.options === "string") {
-      codeMode = this.options;
-    }
-    codeEditor = new CodeEditor(tag);
-    if (!currentValue) {
-      code = '';
-    } else if (typeof currentValue !== 'string') {
-      code = currentValue.toString();
-    } else {
-      code = currentValue;
-    }
-    codeEditor.setContent(code);
-    popup.update();
-    return true;
-  };
-
-  return DataFormatMemo;
-
-})(DataFormatterType);
-
-DataFormatSourceCode = (function(superClass) {
-  extend(DataFormatSourceCode, superClass);
-
-  function DataFormatSourceCode() {
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatSourceCode.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatSourceCode.prototype.name = "sourcecode";
-
-  DataFormatSourceCode.prototype.align = "left";
-
-  DataFormatSourceCode.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    var code, codeEditor, codeMode, h, navButtonCancel, navButtonSave, popup, tag, w;
-    w = $(window).width();
-    h = $(window).height();
-    width = 800;
-    height = 600;
-    if (width > w) {
-      width = w - 10;
-    }
-    if (height > h) {
-      height = h - 10;
-    }
-    top = (h - height) / 2;
-    left = (w - width) / 2;
-    popup = new PopupWindow("Source Code");
-    popup.resize(w, h);
-    navButtonSave = new NavButton("Save", "toolbar-btn navbar-btn btn-primary");
-    navButtonSave.onClick = (function(_this) {
-      return function(e) {
-        _this.saveValue(codeEditor.getContent());
-        return popup.destroy();
-      };
-    })(this);
-    navButtonCancel = new NavButton("Cancel", "toolbar-btn navbar-btn btn-danger cancel-btn");
-    navButtonCancel.onClick = (function(_this) {
-      return function(e) {
-        return popup.destroy();
-      };
-    })(this);
-    popup.addToolbar([navButtonSave, navButtonCancel]);
-    tag = $("<div />", {
-      id: "editor_" + GlobalValueManager.NextGlobalID(),
-      height: popup.windowWrapper.height()
-    });
-    popup.windowScroll.append(tag);
-    codeMode = "javascript";
-    if (typeof this.options === "string") {
-      codeMode = this.options;
-    }
-    codeEditor = new CodeEditor(tag);
-    codeEditor.popupMode().setTheme("tomorrow_night_eighties").setMode(codeMode);
-    console.log("CURRENT=", currentValue);
-    if (!currentValue) {
-      code = '';
-    } else if (typeof currentValue !== 'string') {
-      code = currentValue.toString();
-    } else {
-      code = currentValue;
-    }
-    codeEditor.setContent(code);
-    popup.update();
-    return true;
-  };
-
-  return DataFormatSourceCode;
-
-})(DataFormatText);
-
-DataFormatInt = (function(superClass) {
-  extend(DataFormatInt, superClass);
-
-  function DataFormatInt() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    return DataFormatInt.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatInt.prototype.name = "int";
-
-  DataFormatInt.prototype.align = "right";
-
-  DataFormatInt.prototype.width = 90;
-
-  DataFormatInt.prototype.format = function(data, options, path) {
-    if (data == null) {
-      return "";
-    }
-    if (data === null || (typeof data === "string" && data.length === 0)) {
-      return "";
-    }
-    if ((options != null) && options !== null) {
-      return numeral(DataFormatter.getNumber(data)).format(options);
-    }
-    return numeral(DataFormatter.getNumber(data)).format("#,###");
-  };
-
-  DataFormatInt.prototype.unformat = function(data, path) {
-    var num;
-    num = DataFormatter.getNumber(data);
-    if (isNaN(num)) {
-      return "";
-    }
-    return Math.round(num);
-  };
-
-  return DataFormatInt;
-
-})(DataFormatterType);
-
-DataFormatNumber = (function(superClass) {
-  extend(DataFormatNumber, superClass);
-
-  function DataFormatNumber() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    return DataFormatNumber.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatNumber.prototype.name = "number";
-
-  DataFormatNumber.prototype.align = "right";
-
-  DataFormatNumber.prototype.format = function(data, options, path) {
-    var e, num;
-    if (data == null) {
-      return "";
-    }
-    num = DataFormatter.getNumber(data);
-    if (data === null || (typeof data === "string" && data.length === 0)) {
-      return "";
-    }
-    if (isNaN(num)) {
-      return "[" + num + "]";
-    }
-    if ((options == null) || options === "") {
-      options = "#,###.[##]";
-    }
-    try {
-      return numeral(num).format(options);
-    } catch (error) {
-      e = error;
-      console.log("Exception formatting number [" + num + "] using [" + optinos + "]");
-      return retunr("[" + num + "]");
-    }
-  };
-
-  DataFormatNumber.prototype.unformat = function(data, path) {
-    console.log("unformat number:", data);
-    return DataFormatter.getNumber(data);
-  };
-
-  return DataFormatNumber;
-
-})(DataFormatterType);
-
-DataFormatFloat = (function(superClass) {
-  extend(DataFormatFloat, superClass);
-
-  function DataFormatFloat() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.allowKey = bind(this.allowKey, this);
-    return DataFormatFloat.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatFloat.prototype.name = "decimal";
-
-  DataFormatFloat.prototype.align = "right";
-
-  DataFormatFloat.prototype.width = 100;
-
-  DataFormatFloat.prototype.allowKey = function(keyCode) {
-    return true;
-    if (keyCode >= 48 && keyCode <= 57) {
-      return true;
-    }
-    if (keyCode >= 96 && keyCode <= 105) {
-      return true;
-    }
-    if (keyCode === 190) {
-      return true;
-    }
-    if (keyCode === 189) {
-      return true;
-    }
-    if (keyCode === 119) {
-      return true;
-    }
-    if (keyCode === 109) {
-      return true;
-    }
-    console.log("Rejecting key:", keyCode);
-    return false;
-  };
-
-  DataFormatFloat.prototype.format = function(data, options, path) {
-    if (data == null) {
-      return "";
-    }
-    if ((options != null) && /#/.test(options)) {
-      return numeral(DataFormatter.getNumber(data)).format(options);
-    } else {
-      return numeral(DataFormatter.getNumber(data)).format("#,###.##");
-    }
-  };
-
-  DataFormatFloat.prototype.unformat = function(data, path) {
-    return DataFormatter.getNumber(data);
-  };
-
-  return DataFormatFloat;
-
-})(DataFormatterType);
-
-DataFormatCurrency = (function(superClass) {
-  extend(DataFormatCurrency, superClass);
-
-  function DataFormatCurrency() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    return DataFormatCurrency.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatCurrency.prototype.name = "money";
-
-  DataFormatCurrency.prototype.align = "right";
-
-  DataFormatCurrency.prototype.format = function(data, options, path) {
-    if ((data == null) || data === null || data === 0 || data === "") {
-      return "";
-    }
-    return numeral(DataFormatter.getNumber(data)).format('$ #,###.[##]');
-  };
-
-  DataFormatCurrency.prototype.unformat = function(data, path) {
-    return DataFormatter.getNumber(data);
-  };
-
-  return DataFormatCurrency;
-
-})(DataFormatterType);
-
-DataFormatPercent = (function(superClass) {
-  extend(DataFormatPercent, superClass);
-
-  function DataFormatPercent() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    return DataFormatPercent.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatPercent.prototype.name = "percent";
-
-  DataFormatPercent.prototype.align = "right";
-
-  DataFormatPercent.prototype.format = function(data, options, path) {
-    return numeral(DataFormatter.getNumber(data)).format('#,###.[##] %');
-  };
-
-  DataFormatPercent.prototype.unformat = function(data, path) {
-    var num;
-    num = DataFormatter.getNumber(data);
-    return num;
-  };
-
-  return DataFormatPercent;
-
-})(DataFormatterType);
-
-DataFormatDate = (function(superClass) {
-  extend(DataFormatDate, superClass);
-
-  function DataFormatDate() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatDate.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatDate.prototype.name = "date";
-
-  DataFormatDate.prototype.width = 65;
-
-  DataFormatDate.prototype.align = "left";
-
-  DataFormatDate.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    if (!this.elEditor) {
-      this.elEditor = $("<input />", {
-        type: "text",
-        "class": "dynamic_edit"
-      });
-      this.appendEditor();
-      this.elEditor.on('keydown', (function(_this) {
-        return function(e) {
-          if (!_this.editorShowing) {
-            return _this.datePicker.close();
-          }
-        };
-      })(this));
-    }
-    this.datePicker = new flatpickr(this.elEditor[0], {
-      allowInput: true,
-      parseDate: function(dateString) {
-        return DataFormatter.getMoment(dateString);
-      },
-      onChange: (function(_this) {
-        return function(dateObject, dateString) {
-          _this.saveValue(dateObject);
-          _this.editorShowing = false;
-          return _this.elEditor.hide();
-        };
-      })(this),
-      onOpen: (function(_this) {
-        return function(dateObj, dateStr, instance) {
-          return instance.setDate(new Date(currentValue));
-        };
-      })(this)
-    });
-    this.elEditor.css({
-      position: "absolute",
-      "z-index": 5001,
-      top: top,
-      left: left,
-      width: width,
-      height: height
-    });
-    this.elEditor.val(currentValue);
-    this.elEditor.show();
-    return this.elEditor.focus();
-  };
-
-  DataFormatDate.prototype.format = function(data, options, path) {
-    var m;
-    m = DataFormatter.getMoment(data);
-    if (m == null) {
-      return "";
-    }
-    return m.format("MM/DD/YYYY");
-  };
-
-  DataFormatDate.prototype.unformat = function(data, path) {
-    var m;
-    m = DataFormatter.getMoment(data);
-    if (m == null) {
-      return "";
-    }
-    return m.format("YYYY-MM-DD HH:mm:ss");
-  };
-
-  return DataFormatDate;
-
-})(DataFormatterType);
-
-DataFormatTags = (function(superClass) {
-  extend(DataFormatTags, superClass);
-
-  function DataFormatTags() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatTags.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatTags.prototype.name = "tags";
-
-  DataFormatTags.prototype.align = "left";
-
-  DataFormatTags.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    var m;
-    m = new ModalDialog({
-      showOnCreate: false,
-      content: "Enter the list of items",
-      title: "Edit options",
-      ok: "Save"
-    });
-    if (typeof currentValue === "string") {
-      currentValue = currentValue.split(',');
-    }
-    m.getForm().addTagsInput("input1", "Value", currentValue.join(','));
-    m.getForm().onSubmit = (function(_this) {
-      return function(form) {
-        _this.saveValue(form.input1.split(","));
-        return m.hide();
-      };
-    })(this);
-    return m.show();
-  };
-
-  DataFormatTags.prototype.format = function(currentValue, options, path) {
-    var idx, obj, values;
-    if (typeof currentValue === "string") {
-      currentValue = currentValue.split(',');
-    }
-    if (Array.isArray(currentValue)) {
-      return currentValue.sort().join(", ");
-    }
-    values = [];
-    for (idx in currentValue) {
-      obj = currentValue[idx];
-      values.push(obj);
-    }
-    return values.sort().join(", ");
-  };
-
-  DataFormatTags.prototype.unformat = function(currentValue, path) {
-    if (typeof currentValue === "string") {
-      currentValue = currentValue.split(',');
-    }
-    return currentValue;
-  };
-
-  return DataFormatTags;
-
-})(DataFormatterType);
-
-DataFormatMultiselect = (function(superClass) {
-  extend(DataFormatMultiselect, superClass);
-
-  function DataFormatMultiselect() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatMultiselect.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatMultiselect.prototype.name = "multiselect";
-
-  DataFormatMultiselect.prototype.options = [];
-
-  DataFormatMultiselect.prototype.align = "left";
-
-  DataFormatMultiselect.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    var m;
-    m = new ModalDialog({
-      showOnCreate: false,
-      content: "Select the list of items",
-      title: "Select options",
-      ok: "Save"
-    });
-    if (typeof currentValue === "string") {
-      currentValue = currentValue.split(',');
-    }
-    m.getForm().addMultiselect("select1", "Selection", currentValue.join(','), {
-      options: this.options
-    });
-    m.getForm().onSubmit = (function(_this) {
-      return function(form) {
-        _this.saveValue(form.select1);
-        return m.hide();
-      };
-    })(this);
-    return m.show();
-  };
-
-  DataFormatMultiselect.prototype.format = function(currentValue, options, path) {
-    var idx, obj, values;
-    this.options = options;
-    if (typeof currentValue === "string") {
-      currentValue = currentValue.split(',');
-    }
-    if (Array.isArray(currentValue)) {
-      return currentValue.join(", ");
-    }
-    values = [];
-    for (idx in currentValue) {
-      obj = currentValue[idx];
-      values.push(obj);
-    }
-    return values.join(", ");
-  };
-
-  DataFormatMultiselect.prototype.unformat = function(currentValue, path) {
-    if (typeof currentValue === "string") {
-      currentValue = currentValue.split(',');
-    }
-    return currentValue;
-  };
-
-  return DataFormatMultiselect;
-
-})(DataFormatterType);
-
-DataFormatDateTime = (function(superClass) {
-  extend(DataFormatDateTime, superClass);
-
-  function DataFormatDateTime() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatDateTime.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatDateTime.prototype.name = "datetime";
-
-  DataFormatDateTime.prototype.align = "left";
-
-  DataFormatDateTime.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    if (!this.elEditor) {
-      this.elEditor = $("<input />", {
-        type: "text",
-        "class": "dynamic_edit"
-      });
-      this.appendEditor();
-      this.elEditor.on('keydown', (function(_this) {
-        return function(e) {
-          if (!_this.editorShowing) {
-            return _this.datePicker.close();
-          }
-        };
-      })(this));
-    }
-    this.datePicker = new flatpickr(this.elEditor[0], {
-      allowInput: true,
-      parseDate: function(dateString) {
-        return DataFormatter.getMoment(dateString);
-      },
-      onChange: (function(_this) {
-        return function(dateObject, dateString) {
-          _this.saveValue(dateObject);
-          _this.editorShowing = false;
-          return _this.elEditor.hide();
-        };
-      })(this),
-      onOpen: (function(_this) {
-        return function(dateObj, dateStr, instance) {
-          instance.setDate(new Date(currentValue));
-          return instance.setTime(DataFormatter.getMoment(new Date(currentValue)).format('HH:mm:ss'));
-        };
-      })(this),
-      enableTime: true,
-      time_24hr: true
-    });
-    this.elEditor.css({
-      position: "absolute",
-      "z-index": 5001,
-      top: top,
-      left: left,
-      width: width,
-      height: height
-    });
-    this.elEditor.val(currentValue);
-    this.elEditor.show();
-    return this.elEditor.focus();
-  };
-
-  DataFormatDateTime.prototype.format = function(data, options, path) {
-    var m;
-    m = DataFormatter.getMoment(data);
-    if (m == null) {
-      return "";
-    }
-    return m.format("ddd, MMM Do, YYYY h:mm:ss a");
-  };
-
-  DataFormatDateTime.prototype.unformat = function(data, path) {
-    var m;
-    m = DataFormatter.getMoment(data);
-    if (m == null) {
-      return "";
-    }
-    return m.format("YYYY-MM-DD HH:mm:ss");
-  };
-
-  return DataFormatDateTime;
-
-})(DataFormatterType);
-
-DataFormatDateAge = (function(superClass) {
-  extend(DataFormatDateAge, superClass);
-
-  function DataFormatDateAge() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatDateAge.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatDateAge.prototype.name = "age";
-
-  DataFormatDateAge.prototype.width = 135;
-
-  DataFormatDateAge.prototype.align = "left";
-
-  DataFormatDateAge.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    if (!this.elEditor) {
-      this.elEditor = $("<input />", {
-        type: "text",
-        "class": "dynamic_edit"
-      });
-      this.appendEditor();
-      this.elEditor.on('keydown', (function(_this) {
-        return function(e) {
-          if (!_this.editorShowing) {
-            return _this.datePicker.close();
-          }
-        };
-      })(this));
-    }
-    this.datePicker = new flatpickr(this.elEditor[0], {
-      allowInput: true,
-      parseDate: function(dateString) {
-        return DataFormatter.getMoment(dateString);
-      },
-      onChange: (function(_this) {
-        return function(dateObject, dateString) {
-          _this.saveValue(dateObject);
-          _this.editorShowing = false;
-          return _this.elEditor.hide();
-        };
-      })(this),
-      onOpen: (function(_this) {
-        return function(dateObj, dateStr, instance) {
-          instance.setDate(new Date(currentValue));
-          return instance.setTime(DataFormatter.getMoment(new Date(currentValue)).format('HH:mm:ss'));
-        };
-      })(this),
-      enableTime: true,
-      time_24hr: true
-    });
-    this.elEditor.css({
-      position: "absolute",
-      "z-index": 5001,
-      top: top,
-      left: left,
-      width: width,
-      height: height
-    });
-    this.elEditor.val(currentValue);
-    this.elEditor.show();
-    return this.elEditor.focus();
-  };
-
-  DataFormatDateAge.prototype.format = function(data, options, path) {
-    var age, html, m;
-    m = DataFormatter.getMoment(data);
-    if (m == null) {
-      return "";
-    }
-    html = "<span class='fdate'>" + m.format("MM/DD/YYYY") + "</span>";
-    age = moment().diff(m);
-    age = age / 86400000;
-    if (age < 401) {
-      age = numeral(age).format("#") + " d";
-    } else if (age < 365 * 2) {
-      age = numeral(age / 30.5).format("#") + " mn";
-    } else {
-      age = numeral(age / 365).format("#.#") + " yrs";
-    }
-    html += "<span class='fage'>" + age + "</span>";
-    return html;
-  };
-
-  DataFormatDateAge.prototype.unformat = function(data, path) {
-    var m;
-    m = DataFormatter.getMoment(data);
-    if (m == null) {
-      return "";
-    }
-    return m.format("YYYY-MM-DD HH:mm:ss");
-  };
-
-  return DataFormatDateAge;
-
-})(DataFormatterType);
-
-DataFormatEnum = (function(superClass) {
-  extend(DataFormatEnum, superClass);
-
-  function DataFormatEnum() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatEnum.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatEnum.prototype.name = "enum";
-
-  DataFormatEnum.prototype.align = "left";
-
-  DataFormatEnum.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    var i, o, p, ref;
-    p = new PopupMenu("Options", left, top);
-    if (typeof this.options === "string") {
-      this.options = this.options.split(",");
-    }
-    if (typeof this.options === "object" && typeof this.options.length === "number") {
-      ref = this.options;
-      for (i in ref) {
-        o = ref[i];
-        p.addItem(o, (function(_this) {
-          return function(coords, data) {
-            return _this.saveValue(data);
-          };
-        })(this), o);
-      }
-    } else {
-      console.log("Invalid options: ", this.options);
-    }
-    return true;
-  };
-
-  DataFormatEnum.prototype.format = function(data, options1, path) {
-    var i, o, ref, ref1;
-    this.options = options1;
-    if (typeof this.options === "string") {
-      this.options = this.options.split(/\s*,\s*/);
-    }
-    if (data == null) {
-      return "";
-    }
-    ref = this.options;
-    for (i in ref) {
-      o = ref[i];
-      if (data === o) {
-        return o;
-      }
-    }
-    ref1 = this.options;
-    for (i in ref1) {
-      o = ref1[i];
-      if (("" + data) === ("" + i)) {
-        return o;
-      }
-    }
-    return "[" + data + "]";
-  };
-
-  DataFormatEnum.prototype.unformat = function(data, path) {
-    return data;
-  };
-
-  return DataFormatEnum;
-
-})(DataFormatterType);
-
-DataFormatDistance = (function(superClass) {
-  extend(DataFormatDistance, superClass);
-
-  function DataFormatDistance() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    return DataFormatDistance.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatDistance.prototype.name = "distance";
-
-  DataFormatDistance.prototype.width = 100;
-
-  DataFormatDistance.prototype.align = "left";
-
-  DataFormatDistance.prototype.format = function(data, options, path) {
-    var feet;
-    if (data === 0) {
+  TableViewDetailed.prototype.getCellRecordID = function(location) {
+    if (this.rowDataRaw[location.colNum] == null) {
       return 0;
     }
-    feet = 3.28084 * data;
-    if (feet < 50) {
-      return "< 50 ft";
-    }
-    if (feet < 1000) {
-      return Math.ceil(feet) + " ft";
-    }
-    data = feet / 5280;
-    return numeral(data).format('#,###.##') + " mi";
+    return this.rowDataRaw[location.colNum].id;
   };
 
-  DataFormatDistance.prototype.unformat = function(data, path) {
-    var val;
-    console.log("Unformat distance doesn't work:", data);
-    val = DataFormatter.getNumber(data);
-    return val;
+  TableViewDetailed.prototype.getCellFormatterName = function(location) {
+    if (this.colByNum[location.rowNum] == null) {
+      return null;
+    }
+    return this.colByNum[location.rowNum].getFormatterName();
   };
 
-  return DataFormatDistance;
-
-})(DataFormatterType);
-
-DataFormatBoolean = (function(superClass) {
-  extend(DataFormatBoolean, superClass);
-
-  function DataFormatBoolean() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatBoolean.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatBoolean.prototype.name = "boolean";
-
-  DataFormatBoolean.prototype.width = 40;
-
-  DataFormatBoolean.prototype.textYes = "<i class='fa fa-circle'></i> Yes";
-
-  DataFormatBoolean.prototype.textNo = "<i class='fa fa-circle-thin'></i> No";
-
-  DataFormatBoolean.prototype.textNotSet = "<i class='fa fa-fs'></i> Not Set";
-
-  DataFormatBoolean.prototype.align = "left";
-
-  DataFormatBoolean.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    if (currentValue) {
-      currentValue = false;
-    } else {
-      currentValue = true;
-    }
-    this.saveValue(currentValue);
-    return true;
-  };
-
-  DataFormatBoolean.prototype.format = function(data, options, path) {
-    if (data == null) {
-      return this.textNotSet;
-    }
-    if (data === "") {
-      return this.textNotSet;
-    }
-    if (data === null || data === 0 || data === false) {
-      return this.textNo;
-    }
-    return this.textYes;
-  };
-
-  DataFormatBoolean.prototype.unformat = function(data, path) {
-    if (data == null) {
-      return false;
-    }
-    if (typeof data === "boolean") {
-      if (data) {
-        return true;
-      }
-      return false;
-    }
-    if (data === null || data === 0) {
-      return false;
-    }
-    if (data === "No" || data === "no" || data === "false" || data === "off") {
-      return false;
-    }
-    return true;
-  };
-
-  return DataFormatBoolean;
-
-})(DataFormatterType);
-
-DataFormatTimeAgo = (function(superClass) {
-  extend(DataFormatTimeAgo, superClass);
-
-  function DataFormatTimeAgo() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatTimeAgo.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatTimeAgo.prototype.name = "timeago";
-
-  DataFormatTimeAgo.prototype.width = 135;
-
-  DataFormatTimeAgo.prototype.align = "left";
-
-  DataFormatTimeAgo.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    if (!this.elEditor) {
-      this.elEditor = $("<input />", {
-        type: "text",
-        "class": "dynamic_edit"
-      });
-      this.appendEditor();
-      this.elEditor.on('keydown', (function(_this) {
-        return function(e) {
-          if (!_this.editorShowing) {
-            return _this.datePicker.close();
-          }
-        };
-      })(this));
-    }
-    this.datePicker = new flatpickr(this.elEditor[0], {
-      allowInput: true,
-      parseDate: function(dateString) {
-        return DataFormatter.getMoment(dateString);
-      },
-      onChange: (function(_this) {
-        return function(dateObject, dateString) {
-          _this.saveValue(dateObject);
-          _this.editorShowing = false;
-          return _this.elEditor.hide();
-        };
-      })(this),
-      onOpen: (function(_this) {
-        return function(dateObj, dateStr, instance) {
-          instance.setDate(new Date(currentValue));
-          return instance.setTime(DataFormatter.getMoment(new Date(currentValue)).format('HH:mm:ss'));
-        };
-      })(this),
-      enableTime: true,
-      time_24hr: true
-    });
-    this.elEditor.css({
-      position: "absolute",
-      "z-index": 5001,
-      top: top,
-      left: left,
-      width: width,
-      height: height
-    });
-    this.elEditor.val(currentValue);
-    this.elEditor.show();
-    return this.elEditor.focus();
-  };
-
-  DataFormatTimeAgo.prototype.format = function(data, options, path) {
-    var age, days, daysTxt, hrs, hrsText, min, stamp, txt;
-    if (data == null) {
-      return "";
-    }
-    if (typeof data === "string") {
-      stamp = new Date(data);
-    } else if (typeof data === "number") {
-      stamp = new Date(data);
-    } else if (typeof data === "object" && (data.getTime != null)) {
-      stamp = data;
-    } else {
-      return "";
-    }
-    age = new Date().getTime() - stamp.getTime();
-    age /= 1000;
-    if (age < 60) {
-      txt = numeral(age).format("#") + " sec";
-    } else if (age < (60 * 60)) {
-      txt = numeral(age / 60).format("#") + " min";
-    } else if (age > 86400) {
-      days = Math.floor(age / 86400);
-      hrs = Math.floor((age - (days * 86400)) / (60 * 60));
-      if (days !== 1) {
-        daysTxt = "days";
-      } else {
-        daysTxt = "day";
-      }
-      if (hrs > 0 && days < 30) {
-        txt = days + " " + daysTxt + ", " + hrs + " hr";
-        if (hrs !== 1) {
-          txt += "s";
-        }
-      } else {
-        txt = days + " " + daysTxt;
-      }
-    } else {
-      hrs = Math.floor(age / (60 * 60));
-      min = (age - (hrs * 60 * 60)) / 60;
-      if (hrs > 1) {
-        hrsText = "hrs";
-      } else {
-        hrsText = "hr";
-      }
-      txt = numeral(hrs).format("#") + (" " + hrsText + ", ") + numeral(min).format("#") + " min";
-    }
-    return txt;
-  };
-
-  DataFormatTimeAgo.prototype.unformat = function(data, path) {
-    var m;
-    m = DataFormatter.getMoment(data);
-    if (m == null) {
-      return "";
-    }
-    return m.format("YYYY-MM-DD HH:mm:ss");
-  };
-
-  return DataFormatTimeAgo;
-
-})(DataFormatterType);
-
-DataFormatDuration = (function(superClass) {
-  extend(DataFormatDuration, superClass);
-
-  function DataFormatDuration() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    return DataFormatDuration.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatDuration.prototype.name = "duration";
-
-  DataFormatDuration.prototype.width = 90;
-
-  DataFormatDuration.prototype.align = "right";
-
-  DataFormatDuration.prototype.format = function(data, options, path) {
-    var hrs, min, sec, txt;
-    if (data == null) {
-      return "";
-    }
-    if (typeof data === "string") {
-      data = parseFloat(options);
-    }
-    sec = data / 1000;
-    if (sec < 60) {
-      txt = numeral(sec).format("#.###") + " sec";
-    } else if (sec < (60 * 60 * 2)) {
-      min = Math.floor(sec / 60);
-      sec = sec - (min * 60);
-      txt = min + " min, " + Math.floor(sec) + " sec.";
-    } else {
-      hrs = Math.floor(sec / (60 * 60));
-      min = Math.floor(sec - (hrs * 60 * 60));
-      txt = hrs + " hrs, " + min + " min";
-    }
-    return txt;
-  };
-
-  DataFormatDuration.prototype.unformat = function(data, path) {
-    return data;
-  };
-
-  return DataFormatDuration;
-
-})(DataFormatterType);
-
-DataFormatSimpleObject = (function(superClass) {
-  extend(DataFormatSimpleObject, superClass);
-
-  function DataFormatSimpleObject() {
-    this.unformat = bind(this.unformat, this);
-    this.onFocus = bind(this.onFocus, this);
-    this.renderTooltip = bind(this.renderTooltip, this);
-    this.format = bind(this.format, this);
-    return DataFormatSimpleObject.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatSimpleObject.prototype.name = "simpleobject";
-
-  DataFormatSimpleObject.prototype.align = "left";
-
-  DataFormatSimpleObject.prototype.format = function(data, options, path) {
-    if (data == null) {
-      return "Not set";
-    }
-    if ((data != null) && Array.isArray(data)) {
-      if (data.length === 0) {
-        return "Not set";
-      }
-      if (typeof data[0] === "string") {
-        return data.sort().filter(function(a) {
-          return a != null;
-        }).join(", ");
-      }
-    }
-    return "View";
-  };
-
-  DataFormatSimpleObject.prototype.renderTooltip = function(row, value, tooltipWindow) {
-    var height, str, val, varName;
-    if (value == null) {
-      return false;
-    }
-    height = 20;
-    str = "<table>";
-    for (varName in value) {
-      val = value[varName];
-      str += "<tr><td>";
-      str += varName;
-      str += "</td><td>";
-      str += val;
-      str += "</tr>";
-      height += 20;
-    }
-    str += "</table>";
-    tooltipWindow.html(str);
-    tooltipWindow.setSize(400, height);
-    return true;
-  };
-
-  DataFormatSimpleObject.prototype.onFocus = function(e, col, data) {
-    console.log("e=", e);
-    console.log("col=", col);
-    return console.log("data=", data);
-  };
-
-  DataFormatSimpleObject.prototype.unformat = function(data, path) {
-    console.log("unformat simple:", data);
-    return data;
-  };
-
-  return DataFormatSimpleObject;
-
-})(DataFormatterType);
-
-DataFormatLink = (function(superClass) {
-  extend(DataFormatLink, superClass);
-
-  function DataFormatLink() {
-    this.onFocus = bind(this.onFocus, this);
-    this.openEditor = bind(this.openEditor, this);
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    return DataFormatLink.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatLink.prototype.name = "link";
-
-  DataFormatLink.prototype.width = 70;
-
-  DataFormatLink.prototype.clickable = true;
-
-  DataFormatLink.prototype.align = "left";
-
-  DataFormatLink.prototype.format = function(data, options, path) {
-    if (data == null) {
-      return "";
-    }
-    if (/www/.test(data)) {
-      return "Open Link";
-    }
-    if (/^http/.test(data)) {
-      return "Open Link";
-    }
-    if (/^ftp/.test(data)) {
-      return "Open FTP";
-    }
-    if (data.length > 0) {
-      return data;
-    }
-    return "";
-  };
-
-  DataFormatLink.prototype.unformat = function(data, path) {
-    console.log("TODO: DataFormatLink.unformat not implemented:", data);
-    return data;
-  };
-
-  DataFormatLink.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    console.log("TODO: openEditor not implemented for link");
-    return null;
-  };
-
-  DataFormatLink.prototype.onFocus = function(e, col, data) {
-    var url, win;
-    console.log("click, col=", col, "data=", data);
-    url = data[col];
-    if ((url != null) && url.length > 0) {
-      win = window.open(url, "_blank");
-      win.focus();
-    }
-    return true;
-  };
-
-  return DataFormatLink;
-
-})(DataFormatterType);
-
-DataFormatImageList = (function(superClass) {
-  extend(DataFormatImageList, superClass);
-
-  function DataFormatImageList() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatImageList.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatImageList.prototype.name = "imagelist";
-
-  DataFormatImageList.prototype.options = [];
-
-  DataFormatImageList.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    var h, imgCount, title, w;
-    if (currentValue == null) {
-      return false;
-    }
-    w = $(window).width();
-    h = $(window).height();
-    if (w > 1000) {
-      w = 1000;
-    } else if (w > 800) {
-      w = 800;
-    } else {
-      w = 600;
-    }
-    if (h > 1000) {
-      h = 1000;
-    } else if (h > 800) {
-      h = 800;
-    } else if (h > 600) {
-      h = 600;
-    } else {
-      h = 400;
-    }
-    if (typeof currentValue === "string") {
-      currentValue = currentValue.split("||");
-    }
-    imgCount = currentValue.length;
-    if (imgCount < 1) {
-      return false;
-    } else if (imgCount === 1) {
-      title = "View Image";
-    } else {
-      title = "View " + imgCount + " Images";
-    }
-    return doPopupView('ImageStrip', title, 'imagestrip_popup', w, h).then(function(view) {
-      var img, j, len;
-      view.init();
-      for (j = 0, len = currentValue.length; j < len; j++) {
-        img = currentValue[j];
-        view.addImage(img);
-      }
-      return view.render();
-    });
-  };
-
-  DataFormatImageList.prototype.format = function(currentValue, options, path) {
-    var formattedValue, imgCount;
-    this.options = options;
-
-    /*
-    		if typeof currentValue == "string"
-    			currentValue = currentValue.split ','
-    
-    		if Array.isArray(currentValue)
-    			return currentValue.join(", ")
-    
-    		values = []
-    		for idx, obj of currentValue
-    			values.push obj
-    		return values.join(", ")
-     */
-    formattedValue = "No Image";
-    if (typeof currentValue === "string") {
-      currentValue = currentValue.split("||");
-    } else if (currentValue == null) {
-      return formattedValue;
-    }
-    imgCount = currentValue.length;
-    console.log(imgCount);
-    if (imgCount === 1) {
-      formattedValue = "1 Image";
-    } else {
-      formattedValue = imgCount + " Images";
-    }
-    return formattedValue;
-  };
-
-  DataFormatImageList.prototype.unformat = function(currentValue, path) {
-    if (typeof currentValue === "string") {
-      currentValue = currentValue.split(',');
-    }
-    return currentValue;
-  };
-
-  return DataFormatImageList;
-
-})(DataFormatterType);
-
-try {
-  globalDataFormatter = new DataFormatter();
-  globalDataFormatter.register(new DataFormatText());
-  globalDataFormatter.register(new DataFormatInt());
-  globalDataFormatter.register(new DataFormatNumber());
-  globalDataFormatter.register(new DataFormatFloat());
-  globalDataFormatter.register(new DataFormatCurrency());
-  globalDataFormatter.register(new DataFormatDate());
-  globalDataFormatter.register(new DataFormatDateTime());
-  globalDataFormatter.register(new DataFormatDateAge());
-  globalDataFormatter.register(new DataFormatEnum());
-  globalDataFormatter.register(new DataFormatDistance());
-  globalDataFormatter.register(new DataFormatBoolean());
-  globalDataFormatter.register(new DataFormatPercent());
-  globalDataFormatter.register(new DataFormatTimeAgo());
-  globalDataFormatter.register(new DataFormatSimpleObject());
-  globalDataFormatter.register(new DataFormatSourceCode());
-  globalDataFormatter.register(new DataFormatTags());
-  globalDataFormatter.register(new DataFormatMultiselect());
-  globalDataFormatter.register(new DataFormatMemo());
-  globalDataFormatter.register(new DataFormatDuration());
-  globalDataFormatter.register(new DataFormatLink());
-  globalDataFormatter.register(new DataFormatImageList());
-} catch (error) {
-  e = error;
-  console.log("Exception while registering global Data Formatter:", e);
-}
-var DataFormatBoolean, DataFormatCurrency, DataFormatDate, DataFormatDateAge, DataFormatDateTime, DataFormatDistance, DataFormatDuration, DataFormatEnum, DataFormatFloat, DataFormatImageList, DataFormatInt, DataFormatLink, DataFormatMemo, DataFormatMultiselect, DataFormatNumber, DataFormatPercent, DataFormatSimpleObject, DataFormatSourceCode, DataFormatTags, DataFormatText, DataFormatTimeAgo, DataFormatterType, e, globalDataFormatter,
-  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  hasProp = {}.hasOwnProperty;
-
-DataFormatterType = (function() {
-  function DataFormatterType() {
-    this.openEditor = bind(this.openEditor, this);
-    this.onGlobalMouseDown = bind(this.onGlobalMouseDown, this);
-    this.appendEditor = bind(this.appendEditor, this);
-    this.saveValue = bind(this.saveValue, this);
-    this.editData = bind(this.editData, this);
-    this.allowKey = bind(this.allowKey, this);
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-  }
-
-  DataFormatterType.prototype.name = "";
-
-  DataFormatterType.prototype.width = null;
-
-  DataFormatterType.prototype.editorShowing = false;
-
-  DataFormatterType.prototype.editorPath = "";
-
-  DataFormatterType.prototype.align = null;
-
-  DataFormatterType.prototype.format = function(data, options, path) {
-    return null;
-  };
-
-  DataFormatterType.prototype.unformat = function(data, path) {
-    return null;
-  };
-
-  DataFormatterType.prototype.allowKey = function(keyCode) {
-    return true;
-  };
-
-  DataFormatterType.prototype.editData = function(parentElement, currentValue, path, onSaveCallback) {
-    var elParent, height, left, pos, top, width;
-    this.onSaveCallback = onSaveCallback;
-    left = 0;
-    top = 0;
-    width = 100;
-    height = 40;
-    elParent = null;
-    this.editorPath = path;
-    if (parentElement != null) {
-      elParent = $(parentElement);
-      pos = elParent.position();
-      left = pos.left;
-      top = pos.top;
-      width = elParent.outerWidth(false);
-      height = elParent.outerHeight(false);
-      left = elParent.offset().left;
-      top = elParent.offset().top;
-    }
-    this.editorShowing = true;
-    return this.openEditor(elParent, left, top, width, height, currentValue, path);
-  };
-
-  DataFormatterType.prototype.saveValue = function(newValue) {
-    newValue = this.unformat(newValue, this.editorPath);
-    if (this.onSaveCallback != null) {
-      this.onSaveCallback(this.editorPath, newValue);
-    }
-    return true;
-  };
-
-  DataFormatterType.prototype.appendEditor = function() {
-    $("body").append(this.elEditor);
-    this.elEditor.on("blur", (function(_this) {
-      return function(e) {
-        if (_this.editorShowing) {
-          console.log("blurred", e);
-          _this.editorShowing = false;
-          e.preventDefault();
-          e.stopPropagation();
-          _this.elEditor.hide();
-          return true;
-        }
-        return false;
-      };
-    })(this));
-    this.elEditor.on("keydown", (function(_this) {
-      return function(e) {
-        if (e.keyCode === 9) {
-          _this.saveValue(_this.elEditor.val());
-          _this.editorShowing = false;
-          _this.elEditor.hide();
-          return false;
-        }
-        if (e.keyCode === 13) {
-          _this.saveValue(_this.elEditor.val());
-          _this.editorShowing = false;
-          _this.elEditor.hide();
-          return false;
-        }
-        if (e.keyCode === 27) {
-          _this.editorShowing = false;
-          _this.elEditor.hide();
-          return false;
-        }
-        if (_this.allowKey(e.keyCode)) {
-          return true;
-        } else {
-          return false;
-        }
-      };
-    })(this));
-    return $("document").on("click", (function(_this) {
-      return function(e) {
-        return console.log("Click");
-      };
-    })(this));
-  };
-
-  DataFormatterType.prototype.onGlobalMouseDown = function(e) {
-    if (e.target.classList.contains("dynamic_edit")) {
+  TableViewDetailed.prototype.shouldSkipRow = function(rowNum) {
+    if (this.colByNum[location.rowNum] == null) {
       return true;
     }
-    this.editorShowing = false;
-    this.elEditor.hide();
-    return true;
-  };
-
-  DataFormatterType.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    if (!this.elEditor) {
-      this.elEditor = $("<input />", {
-        type: "text",
-        "class": "dynamic_edit form-control"
-      });
-      this.appendEditor();
-    }
-    this.elEditor.css({
-      position: "absolute",
-      "z-index": 5001,
-      top: top,
-      left: left,
-      width: width,
-      height: height
-    });
-    this.elEditor.val(currentValue);
-    this.elEditor.show();
-    this.elEditor.focus();
-    this.elEditor.select();
-    return globalKeyboardEvents.once("global_mouse_down", this.onGlobalMouseDown);
-  };
-
-  DataFormatterType.prototype.onFocus = null;
-
-  return DataFormatterType;
-
-})();
-
-DataFormatText = (function(superClass) {
-  extend(DataFormatText, superClass);
-
-  function DataFormatText() {
-    this.unformat = bind(this.unformat, this);
-    this.renderTooltip = bind(this.renderTooltip, this);
-    this.format = bind(this.format, this);
-    return DataFormatText.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatText.prototype.name = "text";
-
-  DataFormatText.prototype.align = "left";
-
-  DataFormatText.prototype.format = function(data, options, path) {
-    var list, value, varName;
-    if (data == null) {
-      return "";
-    }
-    if (typeof data === "object") {
-      if (Array.isArray(data)) {
-        data = data.filter(function(a) {
-          return a != null;
-        }).join(", ");
-      } else {
-        list = [];
-        for (varName in data) {
-          value = data[varName];
-          if (value == null) {
-            continue;
-          }
-          list.push(varName + "=" + value);
-        }
-        data = list.join(", ");
-      }
-    }
-    if (data.length > 300) {
-      return data.slice(0, 301) + "...";
-    }
-    return data;
-  };
-
-  DataFormatText.prototype.renderTooltip = function(row, value, tooltipWindow) {
-    var h, w;
-    if (value == null) {
-      return false;
-    }
-    if (typeof value === "string") {
-      h = 60;
-      w = 320;
-      if (value.length > 100) {
-        w = 440;
-      }
-      if (value.length > 200) {
-        w = 640;
-      }
-      if (value.length > 300) {
-        h = 440;
-      }
-      tooltipWindow.setSize(w, h);
-      tooltipWindow.getBodyWidget().addClass("text");
-      tooltipWindow.html(value);
-      return true;
-    }
-    console.log("renderTooltip row=", row, "value=", value);
     return false;
   };
 
-  DataFormatText.prototype.unformat = function(data, path) {
-    return data;
-  };
-
-  return DataFormatText;
-
-})(DataFormatterType);
-
-DataFormatMemo = (function(superClass) {
-  extend(DataFormatMemo, superClass);
-
-  function DataFormatMemo() {
-    this.openEditor = bind(this.openEditor, this);
-    this.onFocus = bind(this.onFocus, this);
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    return DataFormatMemo.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatMemo.prototype.name = "memo";
-
-  DataFormatMemo.prototype.align = "left";
-
-  DataFormatMemo.prototype.format = function(data, options, path) {
-    if (data == null) {
-      return "";
+  TableViewDetailed.prototype.shouldSkipCol = function(colNum) {
+    if (this.rowDataRaw[location.colNum] == null) {
+      return false;
     }
-    if (data.length === 0) {
-      return "";
-    }
-    return "<span class='memo'>" + data.slice(0, 201) + "</span><span class='fieldicon'><i class='si si-eyeglasses'></i></span>";
-  };
-
-  DataFormatMemo.prototype.unformat = function(data, path) {
-    return data;
-  };
-
-  DataFormatMemo.prototype.onFocus = function(e, col, data) {
-    var content, m, text;
-    console.log("e=", e);
-    console.log("col=", col);
-    console.log("data=", data);
-    text = data[col];
-    if ((text != null) && typeof text === "string" && text.length > 0) {
-      content = "<br><textarea style='width:100%; height: 600px; font-size: 16px; line-height: 20px; font-family: Consolas, monospaced, arial;'>" + text + "</textarea>";
-      m = new ModalDialog({
-        showOnCreate: true,
-        content: content,
-        title: "View Contents",
-        ok: "Done",
-        close: ""
-      });
-    }
-    return true;
-  };
-
-  DataFormatMemo.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    var code, codeEditor, codeMode, cx, cy, h, navButtonCancel, navButtonSave, popup, tag, w;
-    cx = left + (width / 2);
-    cy = top - 10;
-    w = $(window).width();
-    h = $(window).height();
-    if (w > 1000) {
-      w = 1000;
-    } else if (w > 800) {
-      w = 800;
-    } else {
-      w = 600;
-    }
-    if (h > 1000) {
-      h = 1000;
-    } else if (h > 800) {
-      h = 800;
-    } else if (h > 600) {
-      h = 600;
-    } else {
-      h = 400;
-    }
-    popup = new PopupWindow("Text Editor");
-    popup.resize(w, h);
-    popup.centerToPoint(cx, cy - (popup.popupHeight / 2));
-    navButtonSave = new NavButton("Save", "toolbar-btn navbar-btn btn-primary");
-    navButtonSave.onClick = (function(_this) {
-      return function(e) {
-        _this.saveValue(codeEditor.getContent());
-        return popup.destroy();
-      };
-    })(this);
-    navButtonCancel = new NavButton("Cancel", "toolbar-btn navbar-btn btn-danger cancel-btn");
-    navButtonCancel.onClick = (function(_this) {
-      return function(e) {
-        return popup.destroy();
-      };
-    })(this);
-    popup.addToolbar([navButtonSave, navButtonCancel]);
-    tag = $("<div />", {
-      id: "editor_" + GlobalValueManager.NextGlobalID(),
-      height: popup.windowWrapper.height()
-    });
-    popup.on("resize", (function(_this) {
-      return function(ww, hh) {
-        return tag.css("height", popup.windowWrapper.height());
-      };
-    })(this));
-    popup.windowScroll.append(tag);
-    codeMode = "markdown";
-    if (typeof this.options === "string") {
-      codeMode = this.options;
-    }
-    codeEditor = new CodeEditor(tag);
-    if (!currentValue) {
-      code = '';
-    } else if (typeof currentValue !== 'string') {
-      code = currentValue.toString();
-    } else {
-      code = currentValue;
-    }
-    codeEditor.setContent(code);
-    popup.update();
-    return true;
-  };
-
-  return DataFormatMemo;
-
-})(DataFormatterType);
-
-DataFormatSourceCode = (function(superClass) {
-  extend(DataFormatSourceCode, superClass);
-
-  function DataFormatSourceCode() {
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatSourceCode.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatSourceCode.prototype.name = "sourcecode";
-
-  DataFormatSourceCode.prototype.align = "left";
-
-  DataFormatSourceCode.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    var code, codeEditor, codeMode, h, navButtonCancel, navButtonSave, popup, tag, w;
-    w = $(window).width();
-    h = $(window).height();
-    width = 800;
-    height = 600;
-    if (width > w) {
-      width = w - 10;
-    }
-    if (height > h) {
-      height = h - 10;
-    }
-    top = (h - height) / 2;
-    left = (w - width) / 2;
-    popup = new PopupWindow("Source Code");
-    popup.resize(w, h);
-    navButtonSave = new NavButton("Save", "toolbar-btn navbar-btn btn-primary");
-    navButtonSave.onClick = (function(_this) {
-      return function(e) {
-        _this.saveValue(codeEditor.getContent());
-        return popup.destroy();
-      };
-    })(this);
-    navButtonCancel = new NavButton("Cancel", "toolbar-btn navbar-btn btn-danger cancel-btn");
-    navButtonCancel.onClick = (function(_this) {
-      return function(e) {
-        return popup.destroy();
-      };
-    })(this);
-    popup.addToolbar([navButtonSave, navButtonCancel]);
-    tag = $("<div />", {
-      id: "editor_" + GlobalValueManager.NextGlobalID(),
-      height: popup.windowWrapper.height()
-    });
-    popup.windowScroll.append(tag);
-    codeMode = "javascript";
-    if (typeof this.options === "string") {
-      codeMode = this.options;
-    }
-    codeEditor = new CodeEditor(tag);
-    codeEditor.popupMode().setTheme("tomorrow_night_eighties").setMode(codeMode);
-    console.log("CURRENT=", currentValue);
-    if (!currentValue) {
-      code = '';
-    } else if (typeof currentValue !== 'string') {
-      code = currentValue.toString();
-    } else {
-      code = currentValue;
-    }
-    codeEditor.setContent(code);
-    popup.update();
-    return true;
-  };
-
-  return DataFormatSourceCode;
-
-})(DataFormatText);
-
-DataFormatInt = (function(superClass) {
-  extend(DataFormatInt, superClass);
-
-  function DataFormatInt() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    return DataFormatInt.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatInt.prototype.name = "int";
-
-  DataFormatInt.prototype.align = "right";
-
-  DataFormatInt.prototype.width = 90;
-
-  DataFormatInt.prototype.format = function(data, options, path) {
-    if (data == null) {
-      return "";
-    }
-    if (data === null || (typeof data === "string" && data.length === 0)) {
-      return "";
-    }
-    if ((options != null) && options !== null) {
-      return numeral(DataFormatter.getNumber(data)).format(options);
-    }
-    return numeral(DataFormatter.getNumber(data)).format("#,###");
-  };
-
-  DataFormatInt.prototype.unformat = function(data, path) {
-    var num;
-    num = DataFormatter.getNumber(data);
-    if (isNaN(num)) {
-      return "";
-    }
-    return Math.round(num);
-  };
-
-  return DataFormatInt;
-
-})(DataFormatterType);
-
-DataFormatNumber = (function(superClass) {
-  extend(DataFormatNumber, superClass);
-
-  function DataFormatNumber() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    return DataFormatNumber.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatNumber.prototype.name = "number";
-
-  DataFormatNumber.prototype.align = "right";
-
-  DataFormatNumber.prototype.format = function(data, options, path) {
-    var e, num;
-    if (data == null) {
-      return "";
-    }
-    num = DataFormatter.getNumber(data);
-    if (data === null || (typeof data === "string" && data.length === 0)) {
-      return "";
-    }
-    if (isNaN(num)) {
-      return "[" + num + "]";
-    }
-    if ((options == null) || options === "") {
-      options = "#,###.[##]";
-    }
-    try {
-      return numeral(num).format(options);
-    } catch (error) {
-      e = error;
-      console.log("Exception formatting number [" + num + "] using [" + optinos + "]");
-      return retunr("[" + num + "]");
-    }
-  };
-
-  DataFormatNumber.prototype.unformat = function(data, path) {
-    console.log("unformat number:", data);
-    return DataFormatter.getNumber(data);
-  };
-
-  return DataFormatNumber;
-
-})(DataFormatterType);
-
-DataFormatFloat = (function(superClass) {
-  extend(DataFormatFloat, superClass);
-
-  function DataFormatFloat() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.allowKey = bind(this.allowKey, this);
-    return DataFormatFloat.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatFloat.prototype.name = "decimal";
-
-  DataFormatFloat.prototype.align = "right";
-
-  DataFormatFloat.prototype.width = 100;
-
-  DataFormatFloat.prototype.allowKey = function(keyCode) {
-    return true;
-    if (keyCode >= 48 && keyCode <= 57) {
+    if ((this.rowDataRaw[location.colNum].visible != null) && this.rowDataRaw[location.colNum].visible === false) {
       return true;
     }
-    if (keyCode >= 96 && keyCode <= 105) {
-      return true;
-    }
-    if (keyCode === 190) {
-      return true;
-    }
-    if (keyCode === 189) {
-      return true;
-    }
-    if (keyCode === 119) {
-      return true;
-    }
-    if (keyCode === 109) {
-      return true;
-    }
-    console.log("Rejecting key:", keyCode);
     return false;
   };
 
-  DataFormatFloat.prototype.format = function(data, options, path) {
-    if (data == null) {
-      return "";
-    }
-    if ((options != null) && /#/.test(options)) {
-      return numeral(DataFormatter.getNumber(data)).format(options);
-    } else {
-      return numeral(DataFormatter.getNumber(data)).format("#,###.##");
-    }
-  };
-
-  DataFormatFloat.prototype.unformat = function(data, path) {
-    return DataFormatter.getNumber(data);
-  };
-
-  return DataFormatFloat;
-
-})(DataFormatterType);
-
-DataFormatCurrency = (function(superClass) {
-  extend(DataFormatCurrency, superClass);
-
-  function DataFormatCurrency() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    return DataFormatCurrency.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatCurrency.prototype.name = "money";
-
-  DataFormatCurrency.prototype.align = "right";
-
-  DataFormatCurrency.prototype.format = function(data, options, path) {
-    if ((data == null) || data === null || data === 0 || data === "") {
-      return "";
-    }
-    return numeral(DataFormatter.getNumber(data)).format('$ #,###.[##]');
-  };
-
-  DataFormatCurrency.prototype.unformat = function(data, path) {
-    return DataFormatter.getNumber(data);
-  };
-
-  return DataFormatCurrency;
-
-})(DataFormatterType);
-
-DataFormatPercent = (function(superClass) {
-  extend(DataFormatPercent, superClass);
-
-  function DataFormatPercent() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    return DataFormatPercent.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatPercent.prototype.name = "percent";
-
-  DataFormatPercent.prototype.align = "right";
-
-  DataFormatPercent.prototype.format = function(data, options, path) {
-    return numeral(DataFormatter.getNumber(data)).format('#,###.[##] %');
-  };
-
-  DataFormatPercent.prototype.unformat = function(data, path) {
-    var num;
-    num = DataFormatter.getNumber(data);
-    return num;
-  };
-
-  return DataFormatPercent;
-
-})(DataFormatterType);
-
-DataFormatDate = (function(superClass) {
-  extend(DataFormatDate, superClass);
-
-  function DataFormatDate() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatDate.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatDate.prototype.name = "date";
-
-  DataFormatDate.prototype.width = 65;
-
-  DataFormatDate.prototype.align = "left";
-
-  DataFormatDate.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    if (!this.elEditor) {
-      this.elEditor = $("<input />", {
-        type: "text",
-        "class": "dynamic_edit"
-      });
-      this.appendEditor();
-      this.elEditor.on('keydown', (function(_this) {
-        return function(e) {
-          if (!_this.editorShowing) {
-            return _this.datePicker.close();
-          }
-        };
-      })(this));
-    }
-    this.datePicker = new flatpickr(this.elEditor[0], {
-      allowInput: true,
-      parseDate: function(dateString) {
-        return DataFormatter.getMoment(dateString);
-      },
-      onChange: (function(_this) {
-        return function(dateObject, dateString) {
-          _this.saveValue(dateObject);
-          _this.editorShowing = false;
-          return _this.elEditor.hide();
-        };
-      })(this),
-      onOpen: (function(_this) {
-        return function(dateObj, dateStr, instance) {
-          return instance.setDate(new Date(currentValue));
-        };
-      })(this)
-    });
-    this.elEditor.css({
-      position: "absolute",
-      "z-index": 5001,
-      top: top,
-      left: left,
-      width: width,
-      height: height
-    });
-    this.elEditor.val(currentValue);
-    this.elEditor.show();
-    return this.elEditor.focus();
-  };
-
-  DataFormatDate.prototype.format = function(data, options, path) {
-    var m;
-    m = DataFormatter.getMoment(data);
-    if (m == null) {
-      return "";
-    }
-    return m.format("MM/DD/YYYY");
-  };
-
-  DataFormatDate.prototype.unformat = function(data, path) {
-    var m;
-    m = DataFormatter.getMoment(data);
-    if (m == null) {
-      return "";
-    }
-    return m.format("YYYY-MM-DD HH:mm:ss");
-  };
-
-  return DataFormatDate;
-
-})(DataFormatterType);
-
-DataFormatTags = (function(superClass) {
-  extend(DataFormatTags, superClass);
-
-  function DataFormatTags() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatTags.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatTags.prototype.name = "tags";
-
-  DataFormatTags.prototype.align = "left";
-
-  DataFormatTags.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    var m;
-    m = new ModalDialog({
-      showOnCreate: false,
-      content: "Enter the list of items",
-      title: "Edit options",
-      ok: "Save"
-    });
-    if (typeof currentValue === "string") {
-      currentValue = currentValue.split(',');
-    }
-    m.getForm().addTagsInput("input1", "Value", currentValue.join(','));
-    m.getForm().onSubmit = (function(_this) {
-      return function(form) {
-        _this.saveValue(form.input1.split(","));
-        return m.hide();
-      };
-    })(this);
-    return m.show();
-  };
-
-  DataFormatTags.prototype.format = function(currentValue, options, path) {
-    var idx, obj, values;
-    if (typeof currentValue === "string") {
-      currentValue = currentValue.split(',');
-    }
-    if (Array.isArray(currentValue)) {
-      return currentValue.sort().join(", ");
-    }
-    values = [];
-    for (idx in currentValue) {
-      obj = currentValue[idx];
-      values.push(obj);
-    }
-    return values.sort().join(", ");
-  };
-
-  DataFormatTags.prototype.unformat = function(currentValue, path) {
-    if (typeof currentValue === "string") {
-      currentValue = currentValue.split(',');
-    }
-    return currentValue;
-  };
-
-  return DataFormatTags;
-
-})(DataFormatterType);
-
-DataFormatMultiselect = (function(superClass) {
-  extend(DataFormatMultiselect, superClass);
-
-  function DataFormatMultiselect() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatMultiselect.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatMultiselect.prototype.name = "multiselect";
-
-  DataFormatMultiselect.prototype.options = [];
-
-  DataFormatMultiselect.prototype.align = "left";
-
-  DataFormatMultiselect.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    var m;
-    m = new ModalDialog({
-      showOnCreate: false,
-      content: "Select the list of items",
-      title: "Select options",
-      ok: "Save"
-    });
-    if (typeof currentValue === "string") {
-      currentValue = currentValue.split(',');
-    }
-    m.getForm().addMultiselect("select1", "Selection", currentValue.join(','), {
-      options: this.options
-    });
-    m.getForm().onSubmit = (function(_this) {
-      return function(form) {
-        _this.saveValue(form.select1);
-        return m.hide();
-      };
-    })(this);
-    return m.show();
-  };
-
-  DataFormatMultiselect.prototype.format = function(currentValue, options, path) {
-    var idx, obj, values;
-    this.options = options;
-    if (typeof currentValue === "string") {
-      currentValue = currentValue.split(',');
-    }
-    if (Array.isArray(currentValue)) {
-      return currentValue.join(", ");
-    }
-    values = [];
-    for (idx in currentValue) {
-      obj = currentValue[idx];
-      values.push(obj);
-    }
-    return values.join(", ");
-  };
-
-  DataFormatMultiselect.prototype.unformat = function(currentValue, path) {
-    if (typeof currentValue === "string") {
-      currentValue = currentValue.split(',');
-    }
-    return currentValue;
-  };
-
-  return DataFormatMultiselect;
-
-})(DataFormatterType);
-
-DataFormatDateTime = (function(superClass) {
-  extend(DataFormatDateTime, superClass);
-
-  function DataFormatDateTime() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatDateTime.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatDateTime.prototype.name = "datetime";
-
-  DataFormatDateTime.prototype.align = "left";
-
-  DataFormatDateTime.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    if (!this.elEditor) {
-      this.elEditor = $("<input />", {
-        type: "text",
-        "class": "dynamic_edit"
-      });
-      this.appendEditor();
-      this.elEditor.on('keydown', (function(_this) {
-        return function(e) {
-          if (!_this.editorShowing) {
-            return _this.datePicker.close();
-          }
-        };
-      })(this));
-    }
-    this.datePicker = new flatpickr(this.elEditor[0], {
-      allowInput: true,
-      parseDate: function(dateString) {
-        return DataFormatter.getMoment(dateString);
-      },
-      onChange: (function(_this) {
-        return function(dateObject, dateString) {
-          _this.saveValue(dateObject);
-          _this.editorShowing = false;
-          return _this.elEditor.hide();
-        };
-      })(this),
-      onOpen: (function(_this) {
-        return function(dateObj, dateStr, instance) {
-          instance.setDate(new Date(currentValue));
-          return instance.setTime(DataFormatter.getMoment(new Date(currentValue)).format('HH:mm:ss'));
-        };
-      })(this),
-      enableTime: true,
-      time_24hr: true
-    });
-    this.elEditor.css({
-      position: "absolute",
-      "z-index": 5001,
-      top: top,
-      left: left,
-      width: width,
-      height: height
-    });
-    this.elEditor.val(currentValue);
-    this.elEditor.show();
-    return this.elEditor.focus();
-  };
-
-  DataFormatDateTime.prototype.format = function(data, options, path) {
-    var m;
-    m = DataFormatter.getMoment(data);
-    if (m == null) {
-      return "";
-    }
-    return m.format("ddd, MMM Do, YYYY h:mm:ss a");
-  };
-
-  DataFormatDateTime.prototype.unformat = function(data, path) {
-    var m;
-    m = DataFormatter.getMoment(data);
-    if (m == null) {
-      return "";
-    }
-    return m.format("YYYY-MM-DD HH:mm:ss");
-  };
-
-  return DataFormatDateTime;
-
-})(DataFormatterType);
-
-DataFormatDateAge = (function(superClass) {
-  extend(DataFormatDateAge, superClass);
-
-  function DataFormatDateAge() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatDateAge.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatDateAge.prototype.name = "age";
-
-  DataFormatDateAge.prototype.width = 135;
-
-  DataFormatDateAge.prototype.align = "left";
-
-  DataFormatDateAge.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    if (!this.elEditor) {
-      this.elEditor = $("<input />", {
-        type: "text",
-        "class": "dynamic_edit"
-      });
-      this.appendEditor();
-      this.elEditor.on('keydown', (function(_this) {
-        return function(e) {
-          if (!_this.editorShowing) {
-            return _this.datePicker.close();
-          }
-        };
-      })(this));
-    }
-    this.datePicker = new flatpickr(this.elEditor[0], {
-      allowInput: true,
-      parseDate: function(dateString) {
-        return DataFormatter.getMoment(dateString);
-      },
-      onChange: (function(_this) {
-        return function(dateObject, dateString) {
-          _this.saveValue(dateObject);
-          _this.editorShowing = false;
-          return _this.elEditor.hide();
-        };
-      })(this),
-      onOpen: (function(_this) {
-        return function(dateObj, dateStr, instance) {
-          instance.setDate(new Date(currentValue));
-          return instance.setTime(DataFormatter.getMoment(new Date(currentValue)).format('HH:mm:ss'));
-        };
-      })(this),
-      enableTime: true,
-      time_24hr: true
-    });
-    this.elEditor.css({
-      position: "absolute",
-      "z-index": 5001,
-      top: top,
-      left: left,
-      width: width,
-      height: height
-    });
-    this.elEditor.val(currentValue);
-    this.elEditor.show();
-    return this.elEditor.focus();
-  };
-
-  DataFormatDateAge.prototype.format = function(data, options, path) {
-    var age, html, m;
-    m = DataFormatter.getMoment(data);
-    if (m == null) {
-      return "";
-    }
-    html = "<span class='fdate'>" + m.format("MM/DD/YYYY") + "</span>";
-    age = moment().diff(m);
-    age = age / 86400000;
-    if (age < 401) {
-      age = numeral(age).format("#") + " d";
-    } else if (age < 365 * 2) {
-      age = numeral(age / 30.5).format("#") + " mn";
-    } else {
-      age = numeral(age / 365).format("#.#") + " yrs";
-    }
-    html += "<span class='fage'>" + age + "</span>";
-    return html;
-  };
-
-  DataFormatDateAge.prototype.unformat = function(data, path) {
-    var m;
-    m = DataFormatter.getMoment(data);
-    if (m == null) {
-      return "";
-    }
-    return m.format("YYYY-MM-DD HH:mm:ss");
-  };
-
-  return DataFormatDateAge;
-
-})(DataFormatterType);
-
-DataFormatEnum = (function(superClass) {
-  extend(DataFormatEnum, superClass);
-
-  function DataFormatEnum() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatEnum.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatEnum.prototype.name = "enum";
-
-  DataFormatEnum.prototype.align = "left";
-
-  DataFormatEnum.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    var i, o, p, ref;
-    p = new PopupMenu("Options", left, top);
-    if (typeof this.options === "string") {
-      this.options = this.options.split(",");
-    }
-    if (typeof this.options === "object" && typeof this.options.length === "number") {
-      ref = this.options;
-      for (i in ref) {
-        o = ref[i];
-        p.addItem(o, (function(_this) {
-          return function(coords, data) {
-            return _this.saveValue(data);
-          };
-        })(this), o);
-      }
-    } else {
-      console.log("Invalid options: ", this.options);
-    }
-    return true;
-  };
-
-  DataFormatEnum.prototype.format = function(data, options1, path) {
-    var i, o, ref, ref1;
-    this.options = options1;
-    if (typeof this.options === "string") {
-      this.options = this.options.split(/\s*,\s*/);
-    }
-    if (data == null) {
-      return "";
-    }
-    ref = this.options;
-    for (i in ref) {
-      o = ref[i];
-      if (data === o) {
-        return o;
-      }
-    }
-    ref1 = this.options;
-    for (i in ref1) {
-      o = ref1[i];
-      if (("" + data) === ("" + i)) {
-        return o;
-      }
-    }
-    return "[" + data + "]";
-  };
-
-  DataFormatEnum.prototype.unformat = function(data, path) {
-    return data;
-  };
-
-  return DataFormatEnum;
-
-})(DataFormatterType);
-
-DataFormatDistance = (function(superClass) {
-  extend(DataFormatDistance, superClass);
-
-  function DataFormatDistance() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    return DataFormatDistance.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatDistance.prototype.name = "distance";
-
-  DataFormatDistance.prototype.width = 100;
-
-  DataFormatDistance.prototype.align = "left";
-
-  DataFormatDistance.prototype.format = function(data, options, path) {
-    var feet;
-    if (data === 0) {
-      return 0;
-    }
-    feet = 3.28084 * data;
-    if (feet < 50) {
-      return "< 50 ft";
-    }
-    if (feet < 1000) {
-      return Math.ceil(feet) + " ft";
-    }
-    data = feet / 5280;
-    return numeral(data).format('#,###.##') + " mi";
-  };
-
-  DataFormatDistance.prototype.unformat = function(data, path) {
-    var val;
-    console.log("Unformat distance doesn't work:", data);
-    val = DataFormatter.getNumber(data);
-    return val;
-  };
-
-  return DataFormatDistance;
-
-})(DataFormatterType);
-
-DataFormatBoolean = (function(superClass) {
-  extend(DataFormatBoolean, superClass);
-
-  function DataFormatBoolean() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatBoolean.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatBoolean.prototype.name = "boolean";
-
-  DataFormatBoolean.prototype.width = 40;
-
-  DataFormatBoolean.prototype.textYes = "<i class='fa fa-circle'></i> Yes";
-
-  DataFormatBoolean.prototype.textNo = "<i class='fa fa-circle-thin'></i> No";
-
-  DataFormatBoolean.prototype.textNotSet = "<i class='fa fa-fs'></i> Not Set";
-
-  DataFormatBoolean.prototype.align = "left";
-
-  DataFormatBoolean.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    if (currentValue) {
-      currentValue = false;
-    } else {
-      currentValue = true;
-    }
-    this.saveValue(currentValue);
-    return true;
-  };
-
-  DataFormatBoolean.prototype.format = function(data, options, path) {
-    if (data == null) {
-      return this.textNotSet;
-    }
-    if (data === "") {
-      return this.textNotSet;
-    }
-    if (data === null || data === 0 || data === false) {
-      return this.textNo;
-    }
-    return this.textYes;
-  };
-
-  DataFormatBoolean.prototype.unformat = function(data, path) {
-    if (data == null) {
-      return false;
-    }
-    if (typeof data === "boolean") {
-      if (data) {
-        return true;
-      }
-      return false;
-    }
-    if (data === null || data === 0) {
-      return false;
-    }
-    if (data === "No" || data === "no" || data === "false" || data === "off") {
-      return false;
-    }
-    return true;
-  };
-
-  return DataFormatBoolean;
-
-})(DataFormatterType);
-
-DataFormatTimeAgo = (function(superClass) {
-  extend(DataFormatTimeAgo, superClass);
-
-  function DataFormatTimeAgo() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatTimeAgo.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatTimeAgo.prototype.name = "timeago";
-
-  DataFormatTimeAgo.prototype.width = 135;
-
-  DataFormatTimeAgo.prototype.align = "left";
-
-  DataFormatTimeAgo.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    if (!this.elEditor) {
-      this.elEditor = $("<input />", {
-        type: "text",
-        "class": "dynamic_edit"
-      });
-      this.appendEditor();
-      this.elEditor.on('keydown', (function(_this) {
-        return function(e) {
-          if (!_this.editorShowing) {
-            return _this.datePicker.close();
-          }
-        };
-      })(this));
-    }
-    this.datePicker = new flatpickr(this.elEditor[0], {
-      allowInput: true,
-      parseDate: function(dateString) {
-        return DataFormatter.getMoment(dateString);
-      },
-      onChange: (function(_this) {
-        return function(dateObject, dateString) {
-          _this.saveValue(dateObject);
-          _this.editorShowing = false;
-          return _this.elEditor.hide();
-        };
-      })(this),
-      onOpen: (function(_this) {
-        return function(dateObj, dateStr, instance) {
-          instance.setDate(new Date(currentValue));
-          return instance.setTime(DataFormatter.getMoment(new Date(currentValue)).format('HH:mm:ss'));
-        };
-      })(this),
-      enableTime: true,
-      time_24hr: true
-    });
-    this.elEditor.css({
-      position: "absolute",
-      "z-index": 5001,
-      top: top,
-      left: left,
-      width: width,
-      height: height
-    });
-    this.elEditor.val(currentValue);
-    this.elEditor.show();
-    return this.elEditor.focus();
-  };
-
-  DataFormatTimeAgo.prototype.format = function(data, options, path) {
-    var age, days, daysTxt, hrs, hrsText, min, stamp, txt;
-    if (data == null) {
-      return "";
-    }
-    if (typeof data === "string") {
-      stamp = new Date(data);
-    } else if (typeof data === "number") {
-      stamp = new Date(data);
-    } else if (typeof data === "object" && (data.getTime != null)) {
-      stamp = data;
-    } else {
-      return "";
-    }
-    age = new Date().getTime() - stamp.getTime();
-    age /= 1000;
-    if (age < 60) {
-      txt = numeral(age).format("#") + " sec";
-    } else if (age < (60 * 60)) {
-      txt = numeral(age / 60).format("#") + " min";
-    } else if (age > 86400) {
-      days = Math.floor(age / 86400);
-      hrs = Math.floor((age - (days * 86400)) / (60 * 60));
-      if (days !== 1) {
-        daysTxt = "days";
-      } else {
-        daysTxt = "day";
-      }
-      if (hrs > 0 && days < 30) {
-        txt = days + " " + daysTxt + ", " + hrs + " hr";
-        if (hrs !== 1) {
-          txt += "s";
-        }
-      } else {
-        txt = days + " " + daysTxt;
-      }
-    } else {
-      hrs = Math.floor(age / (60 * 60));
-      min = (age - (hrs * 60 * 60)) / 60;
-      if (hrs > 1) {
-        hrsText = "hrs";
-      } else {
-        hrsText = "hr";
-      }
-      txt = numeral(hrs).format("#") + (" " + hrsText + ", ") + numeral(min).format("#") + " min";
-    }
-    return txt;
-  };
-
-  DataFormatTimeAgo.prototype.unformat = function(data, path) {
-    var m;
-    m = DataFormatter.getMoment(data);
-    if (m == null) {
-      return "";
-    }
-    return m.format("YYYY-MM-DD HH:mm:ss");
-  };
-
-  return DataFormatTimeAgo;
-
-})(DataFormatterType);
-
-DataFormatDuration = (function(superClass) {
-  extend(DataFormatDuration, superClass);
-
-  function DataFormatDuration() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    return DataFormatDuration.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatDuration.prototype.name = "duration";
-
-  DataFormatDuration.prototype.width = 90;
-
-  DataFormatDuration.prototype.align = "right";
-
-  DataFormatDuration.prototype.format = function(data, options, path) {
-    var hrs, min, sec, txt;
-    if (data == null) {
-      return "";
-    }
-    if (typeof data === "string") {
-      data = parseFloat(options);
-    }
-    sec = data / 1000;
-    if (sec < 60) {
-      txt = numeral(sec).format("#.###") + " sec";
-    } else if (sec < (60 * 60 * 2)) {
-      min = Math.floor(sec / 60);
-      sec = sec - (min * 60);
-      txt = min + " min, " + Math.floor(sec) + " sec.";
-    } else {
-      hrs = Math.floor(sec / (60 * 60));
-      min = Math.floor(sec - (hrs * 60 * 60));
-      txt = hrs + " hrs, " + min + " min";
-    }
-    return txt;
-  };
-
-  DataFormatDuration.prototype.unformat = function(data, path) {
-    return data;
-  };
-
-  return DataFormatDuration;
-
-})(DataFormatterType);
-
-DataFormatSimpleObject = (function(superClass) {
-  extend(DataFormatSimpleObject, superClass);
-
-  function DataFormatSimpleObject() {
-    this.unformat = bind(this.unformat, this);
-    this.onFocus = bind(this.onFocus, this);
-    this.renderTooltip = bind(this.renderTooltip, this);
-    this.format = bind(this.format, this);
-    return DataFormatSimpleObject.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatSimpleObject.prototype.name = "simpleobject";
-
-  DataFormatSimpleObject.prototype.align = "left";
-
-  DataFormatSimpleObject.prototype.format = function(data, options, path) {
-    if (data == null) {
-      return "Not set";
-    }
-    if ((data != null) && Array.isArray(data)) {
-      if (data.length === 0) {
-        return "Not set";
-      }
-      if (typeof data[0] === "string") {
-        return data.sort().filter(function(a) {
-          return a != null;
-        }).join(", ");
-      }
-    }
-    return "View";
-  };
-
-  DataFormatSimpleObject.prototype.renderTooltip = function(row, value, tooltipWindow) {
-    var height, str, val, varName;
-    if (value == null) {
-      return false;
-    }
-    height = 20;
-    str = "<table>";
-    for (varName in value) {
-      val = value[varName];
-      str += "<tr><td>";
-      str += varName;
-      str += "</td><td>";
-      str += val;
-      str += "</tr>";
-      height += 20;
-    }
-    str += "</table>";
-    tooltipWindow.html(str);
-    tooltipWindow.setSize(400, height);
-    return true;
-  };
-
-  DataFormatSimpleObject.prototype.onFocus = function(e, col, data) {
-    console.log("e=", e);
-    console.log("col=", col);
-    return console.log("data=", data);
-  };
-
-  DataFormatSimpleObject.prototype.unformat = function(data, path) {
-    console.log("unformat simple:", data);
-    return data;
-  };
-
-  return DataFormatSimpleObject;
-
-})(DataFormatterType);
-
-DataFormatLink = (function(superClass) {
-  extend(DataFormatLink, superClass);
-
-  function DataFormatLink() {
-    this.onFocus = bind(this.onFocus, this);
-    this.openEditor = bind(this.openEditor, this);
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    return DataFormatLink.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatLink.prototype.name = "link";
-
-  DataFormatLink.prototype.width = 70;
-
-  DataFormatLink.prototype.clickable = true;
-
-  DataFormatLink.prototype.align = "left";
-
-  DataFormatLink.prototype.format = function(data, options, path) {
-    if (data == null) {
-      return "";
-    }
-    if (/www/.test(data)) {
-      return "Open Link";
-    }
-    if (/^http/.test(data)) {
-      return "Open Link";
-    }
-    if (/^ftp/.test(data)) {
-      return "Open FTP";
-    }
-    if (data.length > 0) {
-      return data;
-    }
-    return "";
-  };
-
-  DataFormatLink.prototype.unformat = function(data, path) {
-    console.log("TODO: DataFormatLink.unformat not implemented:", data);
-    return data;
-  };
-
-  DataFormatLink.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    console.log("TODO: openEditor not implemented for link");
-    return null;
-  };
-
-  DataFormatLink.prototype.onFocus = function(e, col, data) {
-    var url, win;
-    console.log("click, col=", col, "data=", data);
-    url = data[col];
-    if ((url != null) && url.length > 0) {
-      win = window.open(url, "_blank");
-      win.focus();
-    }
-    return true;
-  };
-
-  return DataFormatLink;
-
-})(DataFormatterType);
-
-DataFormatImageList = (function(superClass) {
-  extend(DataFormatImageList, superClass);
-
-  function DataFormatImageList() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatImageList.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatImageList.prototype.name = "imagelist";
-
-  DataFormatImageList.prototype.options = [];
-
-  DataFormatImageList.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    var h, imgCount, title, w;
-    if (currentValue == null) {
-      return false;
-    }
-    w = $(window).width();
-    h = $(window).height();
-    if (w > 1000) {
-      w = 1000;
-    } else if (w > 800) {
-      w = 800;
-    } else {
-      w = 600;
-    }
-    if (h > 1000) {
-      h = 1000;
-    } else if (h > 800) {
-      h = 800;
-    } else if (h > 600) {
-      h = 600;
-    } else {
-      h = 400;
-    }
-    if (typeof currentValue === "string") {
-      currentValue = currentValue.split("||");
-    }
-    imgCount = currentValue.length;
-    if (imgCount < 1) {
-      return false;
-    } else if (imgCount === 1) {
-      title = "View Image";
-    } else {
-      title = "View " + imgCount + " Images";
-    }
-    return doPopupView('ImageStrip', title, 'imagestrip_popup', w, h).then(function(view) {
-      var img, j, len;
-      view.init();
-      for (j = 0, len = currentValue.length; j < len; j++) {
-        img = currentValue[j];
-        view.addImage(img);
-      }
-      return view.render();
-    });
-  };
-
-  DataFormatImageList.prototype.format = function(currentValue, options, path) {
-    var formattedValue, imgCount;
-    this.options = options;
-
-    /*
-    		if typeof currentValue == "string"
-    			currentValue = currentValue.split ','
-    
-    		if Array.isArray(currentValue)
-    			return currentValue.join(", ")
-    
-    		values = []
-    		for idx, obj of currentValue
-    			values.push obj
-    		return values.join(", ")
-     */
-    formattedValue = "No Image";
-    if (typeof currentValue === "string") {
-      currentValue = currentValue.split("||");
-    } else if (currentValue == null) {
-      return formattedValue;
-    }
-    imgCount = currentValue.length;
-    console.log(imgCount);
-    if (imgCount === 1) {
-      formattedValue = "1 Image";
-    } else {
-      formattedValue = imgCount + " Images";
-    }
-    return formattedValue;
-  };
-
-  DataFormatImageList.prototype.unformat = function(currentValue, path) {
-    if (typeof currentValue === "string") {
-      currentValue = currentValue.split(',');
-    }
-    return currentValue;
-  };
-
-  return DataFormatImageList;
-
-})(DataFormatterType);
-
-try {
-  globalDataFormatter = new DataFormatter();
-  globalDataFormatter.register(new DataFormatText());
-  globalDataFormatter.register(new DataFormatInt());
-  globalDataFormatter.register(new DataFormatNumber());
-  globalDataFormatter.register(new DataFormatFloat());
-  globalDataFormatter.register(new DataFormatCurrency());
-  globalDataFormatter.register(new DataFormatDate());
-  globalDataFormatter.register(new DataFormatDateTime());
-  globalDataFormatter.register(new DataFormatDateAge());
-  globalDataFormatter.register(new DataFormatEnum());
-  globalDataFormatter.register(new DataFormatDistance());
-  globalDataFormatter.register(new DataFormatBoolean());
-  globalDataFormatter.register(new DataFormatPercent());
-  globalDataFormatter.register(new DataFormatTimeAgo());
-  globalDataFormatter.register(new DataFormatSimpleObject());
-  globalDataFormatter.register(new DataFormatSourceCode());
-  globalDataFormatter.register(new DataFormatTags());
-  globalDataFormatter.register(new DataFormatMultiselect());
-  globalDataFormatter.register(new DataFormatMemo());
-  globalDataFormatter.register(new DataFormatDuration());
-  globalDataFormatter.register(new DataFormatLink());
-  globalDataFormatter.register(new DataFormatImageList());
-} catch (error) {
-  e = error;
-  console.log("Exception while registering global Data Formatter:", e);
-}
-var DataFormatBoolean, DataFormatCurrency, DataFormatDate, DataFormatDateAge, DataFormatDateTime, DataFormatDistance, DataFormatDuration, DataFormatEnum, DataFormatFloat, DataFormatImageList, DataFormatInt, DataFormatLink, DataFormatMemo, DataFormatMultiselect, DataFormatNumber, DataFormatPercent, DataFormatSimpleObject, DataFormatSourceCode, DataFormatTags, DataFormatText, DataFormatTimeAgo, DataFormatterType, e, globalDataFormatter,
-  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  hasProp = {}.hasOwnProperty;
-
-DataFormatterType = (function() {
-  function DataFormatterType() {
-    this.openEditor = bind(this.openEditor, this);
-    this.onGlobalMouseDown = bind(this.onGlobalMouseDown, this);
-    this.appendEditor = bind(this.appendEditor, this);
-    this.saveValue = bind(this.saveValue, this);
-    this.editData = bind(this.editData, this);
-    this.allowKey = bind(this.allowKey, this);
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-  }
-
-  DataFormatterType.prototype.name = "";
-
-  DataFormatterType.prototype.width = null;
-
-  DataFormatterType.prototype.editorShowing = false;
-
-  DataFormatterType.prototype.editorPath = "";
-
-  DataFormatterType.prototype.align = null;
-
-  DataFormatterType.prototype.format = function(data, options, path) {
-    return null;
-  };
-
-  DataFormatterType.prototype.unformat = function(data, path) {
-    return null;
-  };
-
-  DataFormatterType.prototype.allowKey = function(keyCode) {
-    return true;
-  };
-
-  DataFormatterType.prototype.editData = function(parentElement, currentValue, path, onSaveCallback) {
-    var elParent, height, left, pos, top, width;
-    this.onSaveCallback = onSaveCallback;
-    left = 0;
-    top = 0;
-    width = 100;
-    height = 40;
-    elParent = null;
-    this.editorPath = path;
-    if (parentElement != null) {
-      elParent = $(parentElement);
-      pos = elParent.position();
-      left = pos.left;
-      top = pos.top;
-      width = elParent.outerWidth(false);
-      height = elParent.outerHeight(false);
-      left = elParent.offset().left;
-      top = elParent.offset().top;
-    }
-    this.editorShowing = true;
-    return this.openEditor(elParent, left, top, width, height, currentValue, path);
-  };
-
-  DataFormatterType.prototype.saveValue = function(newValue) {
-    newValue = this.unformat(newValue, this.editorPath);
-    if (this.onSaveCallback != null) {
-      this.onSaveCallback(this.editorPath, newValue);
-    }
-    return true;
-  };
-
-  DataFormatterType.prototype.appendEditor = function() {
-    $("body").append(this.elEditor);
-    this.elEditor.on("blur", (function(_this) {
-      return function(e) {
-        if (_this.editorShowing) {
-          console.log("blurred", e);
-          _this.editorShowing = false;
-          e.preventDefault();
-          e.stopPropagation();
-          _this.elEditor.hide();
-          return true;
-        }
-        return false;
-      };
-    })(this));
-    this.elEditor.on("keydown", (function(_this) {
-      return function(e) {
-        if (e.keyCode === 9) {
-          _this.saveValue(_this.elEditor.val());
-          _this.editorShowing = false;
-          _this.elEditor.hide();
-          return false;
-        }
-        if (e.keyCode === 13) {
-          _this.saveValue(_this.elEditor.val());
-          _this.editorShowing = false;
-          _this.elEditor.hide();
-          return false;
-        }
-        if (e.keyCode === 27) {
-          _this.editorShowing = false;
-          _this.elEditor.hide();
-          return false;
-        }
-        if (_this.allowKey(e.keyCode)) {
-          return true;
-        } else {
-          return false;
-        }
-      };
-    })(this));
-    return $("document").on("click", (function(_this) {
-      return function(e) {
-        return console.log("Click");
-      };
-    })(this));
-  };
-
-  DataFormatterType.prototype.onGlobalMouseDown = function(e) {
-    if (e.target.classList.contains("dynamic_edit")) {
+  TableViewDetailed.prototype.isHeaderCell = function(location) {
+    if (this.showHeaders && location.visibleCol === 0) {
       return true;
     }
-    this.editorShowing = false;
-    this.elEditor.hide();
-    return true;
-  };
-
-  DataFormatterType.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    if (!this.elEditor) {
-      this.elEditor = $("<input />", {
-        type: "text",
-        "class": "dynamic_edit form-control"
-      });
-      this.appendEditor();
-    }
-    this.elEditor.css({
-      position: "absolute",
-      "z-index": 5001,
-      top: top,
-      left: left,
-      width: width,
-      height: height
-    });
-    this.elEditor.val(currentValue);
-    this.elEditor.show();
-    this.elEditor.focus();
-    this.elEditor.select();
-    return globalKeyboardEvents.once("global_mouse_down", this.onGlobalMouseDown);
-  };
-
-  DataFormatterType.prototype.onFocus = null;
-
-  return DataFormatterType;
-
-})();
-
-DataFormatText = (function(superClass) {
-  extend(DataFormatText, superClass);
-
-  function DataFormatText() {
-    this.unformat = bind(this.unformat, this);
-    this.renderTooltip = bind(this.renderTooltip, this);
-    this.format = bind(this.format, this);
-    return DataFormatText.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatText.prototype.name = "text";
-
-  DataFormatText.prototype.align = "left";
-
-  DataFormatText.prototype.format = function(data, options, path) {
-    var list, value, varName;
-    if (data == null) {
-      return "";
-    }
-    if (typeof data === "object") {
-      if (Array.isArray(data)) {
-        data = data.filter(function(a) {
-          return a != null;
-        }).join(", ");
-      } else {
-        list = [];
-        for (varName in data) {
-          value = data[varName];
-          if (value == null) {
-            continue;
-          }
-          list.push(varName + "=" + value);
-        }
-        data = list.join(", ");
-      }
-    }
-    if (data.length > 300) {
-      return data.slice(0, 301) + "...";
-    }
-    return data;
-  };
-
-  DataFormatText.prototype.renderTooltip = function(row, value, tooltipWindow) {
-    var h, w;
-    if (value == null) {
-      return false;
-    }
-    if (typeof value === "string") {
-      h = 60;
-      w = 320;
-      if (value.length > 100) {
-        w = 440;
-      }
-      if (value.length > 200) {
-        w = 640;
-      }
-      if (value.length > 300) {
-        h = 440;
-      }
-      tooltipWindow.setSize(w, h);
-      tooltipWindow.getBodyWidget().addClass("text");
-      tooltipWindow.html(value);
-      return true;
-    }
-    console.log("renderTooltip row=", row, "value=", value);
     return false;
   };
 
-  DataFormatText.prototype.unformat = function(data, path) {
-    return data;
-  };
-
-  return DataFormatText;
-
-})(DataFormatterType);
-
-DataFormatMemo = (function(superClass) {
-  extend(DataFormatMemo, superClass);
-
-  function DataFormatMemo() {
-    this.openEditor = bind(this.openEditor, this);
-    this.onFocus = bind(this.onFocus, this);
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    return DataFormatMemo.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatMemo.prototype.name = "memo";
-
-  DataFormatMemo.prototype.align = "left";
-
-  DataFormatMemo.prototype.format = function(data, options, path) {
-    if (data == null) {
-      return "";
-    }
-    if (data.length === 0) {
-      return "";
-    }
-    return "<span class='memo'>" + data.slice(0, 201) + "</span><span class='fieldicon'><i class='si si-eyeglasses'></i></span>";
-  };
-
-  DataFormatMemo.prototype.unformat = function(data, path) {
-    return data;
-  };
-
-  DataFormatMemo.prototype.onFocus = function(e, col, data) {
-    var content, m, text;
-    console.log("e=", e);
-    console.log("col=", col);
-    console.log("data=", data);
-    text = data[col];
-    if ((text != null) && typeof text === "string" && text.length > 0) {
-      content = "<br><textarea style='width:100%; height: 600px; font-size: 16px; line-height: 20px; font-family: Consolas, monospaced, arial;'>" + text + "</textarea>";
-      m = new ModalDialog({
-        showOnCreate: true,
-        content: content,
-        title: "View Contents",
-        ok: "Done",
-        close: ""
-      });
+  TableViewDetailed.prototype.shouldAdvanceCol = function(location) {
+    if (this.showHeaders && location.visibleCol === 1) {
+      return false;
     }
     return true;
   };
 
-  DataFormatMemo.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    var code, codeEditor, codeMode, cx, cy, h, navButtonCancel, navButtonSave, popup, tag, w;
-    cx = left + (width / 2);
-    cy = top - 10;
-    w = $(window).width();
-    h = $(window).height();
-    if (w > 1000) {
-      w = 1000;
-    } else if (w > 800) {
-      w = 800;
-    } else {
-      w = 600;
+  TableViewDetailed.prototype.getRowType = function(location) {
+    if (this.colByNum[location.rowNum] == null) {
+      return "invalid'";
     }
-    if (h > 1000) {
-      h = 1000;
-    } else if (h > 800) {
-      h = 800;
-    } else if (h > 600) {
-      h = 600;
-    } else {
-      h = 400;
+    if (this.colByNum[location.rowNum] == null) {
+      return "invalid";
     }
-    popup = new PopupWindow("Text Editor");
-    popup.resize(w, h);
-    popup.centerToPoint(cx, cy - (popup.popupHeight / 2));
-    navButtonSave = new NavButton("Save", "toolbar-btn navbar-btn btn-primary");
-    navButtonSave.onClick = (function(_this) {
-      return function(e) {
-        _this.saveValue(codeEditor.getContent());
-        return popup.destroy();
-      };
-    })(this);
-    navButtonCancel = new NavButton("Cancel", "toolbar-btn navbar-btn btn-danger cancel-btn");
-    navButtonCancel.onClick = (function(_this) {
-      return function(e) {
-        return popup.destroy();
-      };
-    })(this);
-    popup.addToolbar([navButtonSave, navButtonCancel]);
-    tag = $("<div />", {
-      id: "editor_" + GlobalValueManager.NextGlobalID(),
-      height: popup.windowWrapper.height()
-    });
-    popup.on("resize", (function(_this) {
-      return function(ww, hh) {
-        return tag.css("height", popup.windowWrapper.height());
-      };
-    })(this));
-    popup.windowScroll.append(tag);
-    codeMode = "markdown";
-    if (typeof this.options === "string") {
-      codeMode = this.options;
-    }
-    codeEditor = new CodeEditor(tag);
-    if (!currentValue) {
-      code = '';
-    } else if (typeof currentValue !== 'string') {
-      code = currentValue.toString();
-    } else {
-      code = currentValue;
-    }
-    codeEditor.setContent(code);
-    popup.update();
-    return true;
+    return "data";
   };
 
-  return DataFormatMemo;
-
-})(DataFormatterType);
-
-DataFormatSourceCode = (function(superClass) {
-  extend(DataFormatSourceCode, superClass);
-
-  function DataFormatSourceCode() {
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatSourceCode.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatSourceCode.prototype.name = "sourcecode";
-
-  DataFormatSourceCode.prototype.align = "left";
-
-  DataFormatSourceCode.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    var code, codeEditor, codeMode, h, navButtonCancel, navButtonSave, popup, tag, w;
-    w = $(window).width();
-    h = $(window).height();
-    width = 800;
-    height = 600;
-    if (width > w) {
-      width = w - 10;
+  TableViewDetailed.prototype.setHeaderField = function(location) {
+    location.cell.html("");
+    if (this.colByNum[location.rowNum] == null) {
+      return false;
     }
-    if (height > h) {
-      height = h - 10;
-    }
-    top = (h - height) / 2;
-    left = (w - width) / 2;
-    popup = new PopupWindow("Source Code");
-    popup.resize(w, h);
-    navButtonSave = new NavButton("Save", "toolbar-btn navbar-btn btn-primary");
-    navButtonSave.onClick = (function(_this) {
-      return function(e) {
-        _this.saveValue(codeEditor.getContent());
-        return popup.destroy();
-      };
-    })(this);
-    navButtonCancel = new NavButton("Cancel", "toolbar-btn navbar-btn btn-danger cancel-btn");
-    navButtonCancel.onClick = (function(_this) {
-      return function(e) {
-        return popup.destroy();
-      };
-    })(this);
-    popup.addToolbar([navButtonSave, navButtonCancel]);
-    tag = $("<div />", {
-      id: "editor_" + GlobalValueManager.NextGlobalID(),
-      height: popup.windowWrapper.height()
-    });
-    popup.windowScroll.append(tag);
-    codeMode = "javascript";
-    if (typeof this.options === "string") {
-      codeMode = this.options;
-    }
-    codeEditor = new CodeEditor(tag);
-    codeEditor.popupMode().setTheme("tomorrow_night_eighties").setMode(codeMode);
-    console.log("CURRENT=", currentValue);
-    if (!currentValue) {
-      code = '';
-    } else if (typeof currentValue !== 'string') {
-      code = currentValue.toString();
-    } else {
-      code = currentValue;
-    }
-    codeEditor.setContent(code);
-    popup.update();
-    return true;
+    this.colByNum[location.rowNum].RenderHeaderHorizontal(location.cell, location);
+    return location.cell.setDataPath("/" + location.tableName + "/Header/" + location.sourceName);
   };
 
-  return DataFormatSourceCode;
-
-})(DataFormatText);
-
-DataFormatInt = (function(superClass) {
-  extend(DataFormatInt, superClass);
-
-  function DataFormatInt() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    return DataFormatInt.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatInt.prototype.name = "int";
-
-  DataFormatInt.prototype.align = "right";
-
-  DataFormatInt.prototype.width = 90;
-
-  DataFormatInt.prototype.format = function(data, options, path) {
-    if (data == null) {
-      return "";
-    }
-    if (data === null || (typeof data === "string" && data.length === 0)) {
-      return "";
-    }
-    if ((options != null) && options !== null) {
-      return numeral(DataFormatter.getNumber(data)).format(options);
-    }
-    return numeral(DataFormatter.getNumber(data)).format("#,###");
-  };
-
-  DataFormatInt.prototype.unformat = function(data, path) {
-    var num;
-    num = DataFormatter.getNumber(data);
-    if (isNaN(num)) {
-      return "";
-    }
-    return Math.round(num);
-  };
-
-  return DataFormatInt;
-
-})(DataFormatterType);
-
-DataFormatNumber = (function(superClass) {
-  extend(DataFormatNumber, superClass);
-
-  function DataFormatNumber() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    return DataFormatNumber.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatNumber.prototype.name = "number";
-
-  DataFormatNumber.prototype.align = "right";
-
-  DataFormatNumber.prototype.format = function(data, options, path) {
-    var e, num;
-    if (data == null) {
-      return "";
-    }
-    num = DataFormatter.getNumber(data);
-    if (data === null || (typeof data === "string" && data.length === 0)) {
-      return "";
-    }
-    if (isNaN(num)) {
-      return "[" + num + "]";
-    }
-    if ((options == null) || options === "") {
-      options = "#,###.[##]";
-    }
-    try {
-      return numeral(num).format(options);
-    } catch (error) {
-      e = error;
-      console.log("Exception formatting number [" + num + "] using [" + optinos + "]");
-      return retunr("[" + num + "]");
-    }
-  };
-
-  DataFormatNumber.prototype.unformat = function(data, path) {
-    console.log("unformat number:", data);
-    return DataFormatter.getNumber(data);
-  };
-
-  return DataFormatNumber;
-
-})(DataFormatterType);
-
-DataFormatFloat = (function(superClass) {
-  extend(DataFormatFloat, superClass);
-
-  function DataFormatFloat() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.allowKey = bind(this.allowKey, this);
-    return DataFormatFloat.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatFloat.prototype.name = "decimal";
-
-  DataFormatFloat.prototype.align = "right";
-
-  DataFormatFloat.prototype.width = 100;
-
-  DataFormatFloat.prototype.allowKey = function(keyCode) {
-    return true;
-    if (keyCode >= 48 && keyCode <= 57) {
+  TableViewDetailed.prototype.getCellSelected = function(location) {
+    if ((this.rowDataRaw[location.colNum] != null) && this.rowDataRaw[location.colNum].row_selected) {
       return true;
     }
-    if (keyCode >= 96 && keyCode <= 105) {
-      return true;
-    }
-    if (keyCode === 190) {
-      return true;
-    }
-    if (keyCode === 189) {
-      return true;
-    }
-    if (keyCode === 119) {
-      return true;
-    }
-    if (keyCode === 109) {
-      return true;
-    }
-    console.log("Rejecting key:", keyCode);
     return false;
   };
 
-  DataFormatFloat.prototype.format = function(data, options, path) {
-    if (data == null) {
-      return "";
+  TableViewDetailed.prototype.getCellType = function(location) {
+    if (this.isHeaderCell(location)) {
+      return "locked";
     }
-    if ((options != null) && /#/.test(options)) {
-      return numeral(DataFormatter.getNumber(data)).format(options);
-    } else {
-      return numeral(DataFormatter.getNumber(data)).format("#,###.##");
+    if ((location.colNum == null) || (this.rowDataRaw[location.colNum] == null)) {
+      console.log("detail return invalid 1", location.colNum);
+      return "invalid";
     }
+    if (this.rowDataRaw[location.colNum] == null) {
+      console.log("detail return invalid 2");
+      return "invalid";
+    }
+    if (this.rowDataRaw[location.colNum].type != null) {
+      return this.rowDataRaw[location.colNum].type;
+    }
+    return "data";
   };
 
-  DataFormatFloat.prototype.unformat = function(data, path) {
-    return DataFormatter.getNumber(data);
-  };
-
-  return DataFormatFloat;
-
-})(DataFormatterType);
-
-DataFormatCurrency = (function(superClass) {
-  extend(DataFormatCurrency, superClass);
-
-  function DataFormatCurrency() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    return DataFormatCurrency.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatCurrency.prototype.name = "money";
-
-  DataFormatCurrency.prototype.align = "right";
-
-  DataFormatCurrency.prototype.format = function(data, options, path) {
-    if ((data == null) || data === null || data === 0 || data === "") {
-      return "";
-    }
-    return numeral(DataFormatter.getNumber(data)).format('$ #,###.[##]');
-  };
-
-  DataFormatCurrency.prototype.unformat = function(data, path) {
-    return DataFormatter.getNumber(data);
-  };
-
-  return DataFormatCurrency;
-
-})(DataFormatterType);
-
-DataFormatPercent = (function(superClass) {
-  extend(DataFormatPercent, superClass);
-
-  function DataFormatPercent() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    return DataFormatPercent.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatPercent.prototype.name = "percent";
-
-  DataFormatPercent.prototype.align = "right";
-
-  DataFormatPercent.prototype.format = function(data, options, path) {
-    return numeral(DataFormatter.getNumber(data)).format('#,###.[##] %');
-  };
-
-  DataFormatPercent.prototype.unformat = function(data, path) {
-    var num;
-    num = DataFormatter.getNumber(data);
-    return num;
-  };
-
-  return DataFormatPercent;
-
-})(DataFormatterType);
-
-DataFormatDate = (function(superClass) {
-  extend(DataFormatDate, superClass);
-
-  function DataFormatDate() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatDate.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatDate.prototype.name = "date";
-
-  DataFormatDate.prototype.width = 65;
-
-  DataFormatDate.prototype.align = "left";
-
-  DataFormatDate.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    if (!this.elEditor) {
-      this.elEditor = $("<input />", {
-        type: "text",
-        "class": "dynamic_edit"
-      });
-      this.appendEditor();
-      this.elEditor.on('keydown', (function(_this) {
-        return function(e) {
-          if (!_this.editorShowing) {
-            return _this.datePicker.close();
-          }
-        };
-      })(this));
-    }
-    this.datePicker = new flatpickr(this.elEditor[0], {
-      allowInput: true,
-      parseDate: function(dateString) {
-        return DataFormatter.getMoment(dateString);
-      },
-      onChange: (function(_this) {
-        return function(dateObject, dateString) {
-          _this.saveValue(dateObject);
-          _this.editorShowing = false;
-          return _this.elEditor.hide();
-        };
-      })(this),
-      onOpen: (function(_this) {
-        return function(dateObj, dateStr, instance) {
-          return instance.setDate(new Date(currentValue));
-        };
-      })(this)
-    });
-    this.elEditor.css({
-      position: "absolute",
-      "z-index": 5001,
-      top: top,
-      left: left,
-      width: width,
-      height: height
-    });
-    this.elEditor.val(currentValue);
-    this.elEditor.show();
-    return this.elEditor.focus();
-  };
-
-  DataFormatDate.prototype.format = function(data, options, path) {
-    var m;
-    m = DataFormatter.getMoment(data);
-    if (m == null) {
-      return "";
-    }
-    return m.format("MM/DD/YYYY");
-  };
-
-  DataFormatDate.prototype.unformat = function(data, path) {
-    var m;
-    m = DataFormatter.getMoment(data);
-    if (m == null) {
-      return "";
-    }
-    return m.format("YYYY-MM-DD HH:mm:ss");
-  };
-
-  return DataFormatDate;
-
-})(DataFormatterType);
-
-DataFormatTags = (function(superClass) {
-  extend(DataFormatTags, superClass);
-
-  function DataFormatTags() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatTags.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatTags.prototype.name = "tags";
-
-  DataFormatTags.prototype.align = "left";
-
-  DataFormatTags.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    var m;
-    m = new ModalDialog({
-      showOnCreate: false,
-      content: "Enter the list of items",
-      title: "Edit options",
-      ok: "Save"
-    });
-    if (typeof currentValue === "string") {
-      currentValue = currentValue.split(',');
-    }
-    m.getForm().addTagsInput("input1", "Value", currentValue.join(','));
-    m.getForm().onSubmit = (function(_this) {
-      return function(form) {
-        _this.saveValue(form.input1.split(","));
-        return m.hide();
-      };
-    })(this);
-    return m.show();
-  };
-
-  DataFormatTags.prototype.format = function(currentValue, options, path) {
-    var idx, obj, values;
-    if (typeof currentValue === "string") {
-      currentValue = currentValue.split(',');
-    }
-    if (Array.isArray(currentValue)) {
-      return currentValue.sort().join(", ");
-    }
-    values = [];
-    for (idx in currentValue) {
-      obj = currentValue[idx];
-      values.push(obj);
-    }
-    return values.sort().join(", ");
-  };
-
-  DataFormatTags.prototype.unformat = function(currentValue, path) {
-    if (typeof currentValue === "string") {
-      currentValue = currentValue.split(',');
-    }
-    return currentValue;
-  };
-
-  return DataFormatTags;
-
-})(DataFormatterType);
-
-DataFormatMultiselect = (function(superClass) {
-  extend(DataFormatMultiselect, superClass);
-
-  function DataFormatMultiselect() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatMultiselect.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatMultiselect.prototype.name = "multiselect";
-
-  DataFormatMultiselect.prototype.options = [];
-
-  DataFormatMultiselect.prototype.align = "left";
-
-  DataFormatMultiselect.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    var m;
-    m = new ModalDialog({
-      showOnCreate: false,
-      content: "Select the list of items",
-      title: "Select options",
-      ok: "Save"
-    });
-    if (typeof currentValue === "string") {
-      currentValue = currentValue.split(',');
-    }
-    m.getForm().addMultiselect("select1", "Selection", currentValue.join(','), {
-      options: this.options
-    });
-    m.getForm().onSubmit = (function(_this) {
-      return function(form) {
-        _this.saveValue(form.select1);
-        return m.hide();
-      };
-    })(this);
-    return m.show();
-  };
-
-  DataFormatMultiselect.prototype.format = function(currentValue, options, path) {
-    var idx, obj, values;
-    this.options = options;
-    if (typeof currentValue === "string") {
-      currentValue = currentValue.split(',');
-    }
-    if (Array.isArray(currentValue)) {
-      return currentValue.join(", ");
-    }
-    values = [];
-    for (idx in currentValue) {
-      obj = currentValue[idx];
-      values.push(obj);
-    }
-    return values.join(", ");
-  };
-
-  DataFormatMultiselect.prototype.unformat = function(currentValue, path) {
-    if (typeof currentValue === "string") {
-      currentValue = currentValue.split(',');
-    }
-    return currentValue;
-  };
-
-  return DataFormatMultiselect;
-
-})(DataFormatterType);
-
-DataFormatDateTime = (function(superClass) {
-  extend(DataFormatDateTime, superClass);
-
-  function DataFormatDateTime() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatDateTime.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatDateTime.prototype.name = "datetime";
-
-  DataFormatDateTime.prototype.align = "left";
-
-  DataFormatDateTime.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    if (!this.elEditor) {
-      this.elEditor = $("<input />", {
-        type: "text",
-        "class": "dynamic_edit"
-      });
-      this.appendEditor();
-      this.elEditor.on('keydown', (function(_this) {
-        return function(e) {
-          if (!_this.editorShowing) {
-            return _this.datePicker.close();
-          }
-        };
-      })(this));
-    }
-    this.datePicker = new flatpickr(this.elEditor[0], {
-      allowInput: true,
-      parseDate: function(dateString) {
-        return DataFormatter.getMoment(dateString);
-      },
-      onChange: (function(_this) {
-        return function(dateObject, dateString) {
-          _this.saveValue(dateObject);
-          _this.editorShowing = false;
-          return _this.elEditor.hide();
-        };
-      })(this),
-      onOpen: (function(_this) {
-        return function(dateObj, dateStr, instance) {
-          instance.setDate(new Date(currentValue));
-          return instance.setTime(DataFormatter.getMoment(new Date(currentValue)).format('HH:mm:ss'));
-        };
-      })(this),
-      enableTime: true,
-      time_24hr: true
-    });
-    this.elEditor.css({
-      position: "absolute",
-      "z-index": 5001,
-      top: top,
-      left: left,
-      width: width,
-      height: height
-    });
-    this.elEditor.val(currentValue);
-    this.elEditor.show();
-    return this.elEditor.focus();
-  };
-
-  DataFormatDateTime.prototype.format = function(data, options, path) {
-    var m;
-    m = DataFormatter.getMoment(data);
-    if (m == null) {
-      return "";
-    }
-    return m.format("ddd, MMM Do, YYYY h:mm:ss a");
-  };
-
-  DataFormatDateTime.prototype.unformat = function(data, path) {
-    var m;
-    m = DataFormatter.getMoment(data);
-    if (m == null) {
-      return "";
-    }
-    return m.format("YYYY-MM-DD HH:mm:ss");
-  };
-
-  return DataFormatDateTime;
-
-})(DataFormatterType);
-
-DataFormatDateAge = (function(superClass) {
-  extend(DataFormatDateAge, superClass);
-
-  function DataFormatDateAge() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatDateAge.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatDateAge.prototype.name = "age";
-
-  DataFormatDateAge.prototype.width = 135;
-
-  DataFormatDateAge.prototype.align = "left";
-
-  DataFormatDateAge.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    if (!this.elEditor) {
-      this.elEditor = $("<input />", {
-        type: "text",
-        "class": "dynamic_edit"
-      });
-      this.appendEditor();
-      this.elEditor.on('keydown', (function(_this) {
-        return function(e) {
-          if (!_this.editorShowing) {
-            return _this.datePicker.close();
-          }
-        };
-      })(this));
-    }
-    this.datePicker = new flatpickr(this.elEditor[0], {
-      allowInput: true,
-      parseDate: function(dateString) {
-        return DataFormatter.getMoment(dateString);
-      },
-      onChange: (function(_this) {
-        return function(dateObject, dateString) {
-          _this.saveValue(dateObject);
-          _this.editorShowing = false;
-          return _this.elEditor.hide();
-        };
-      })(this),
-      onOpen: (function(_this) {
-        return function(dateObj, dateStr, instance) {
-          instance.setDate(new Date(currentValue));
-          return instance.setTime(DataFormatter.getMoment(new Date(currentValue)).format('HH:mm:ss'));
-        };
-      })(this),
-      enableTime: true,
-      time_24hr: true
-    });
-    this.elEditor.css({
-      position: "absolute",
-      "z-index": 5001,
-      top: top,
-      left: left,
-      width: width,
-      height: height
-    });
-    this.elEditor.val(currentValue);
-    this.elEditor.show();
-    return this.elEditor.focus();
-  };
-
-  DataFormatDateAge.prototype.format = function(data, options, path) {
-    var age, html, m;
-    m = DataFormatter.getMoment(data);
-    if (m == null) {
-      return "";
-    }
-    html = "<span class='fdate'>" + m.format("MM/DD/YYYY") + "</span>";
-    age = moment().diff(m);
-    age = age / 86400000;
-    if (age < 401) {
-      age = numeral(age).format("#") + " d";
-    } else if (age < 365 * 2) {
-      age = numeral(age / 30.5).format("#") + " mn";
-    } else {
-      age = numeral(age / 365).format("#.#") + " yrs";
-    }
-    html += "<span class='fage'>" + age + "</span>";
-    return html;
-  };
-
-  DataFormatDateAge.prototype.unformat = function(data, path) {
-    var m;
-    m = DataFormatter.getMoment(data);
-    if (m == null) {
-      return "";
-    }
-    return m.format("YYYY-MM-DD HH:mm:ss");
-  };
-
-  return DataFormatDateAge;
-
-})(DataFormatterType);
-
-DataFormatEnum = (function(superClass) {
-  extend(DataFormatEnum, superClass);
-
-  function DataFormatEnum() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatEnum.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatEnum.prototype.name = "enum";
-
-  DataFormatEnum.prototype.align = "left";
-
-  DataFormatEnum.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    var i, o, p, ref;
-    p = new PopupMenu("Options", left, top);
-    if (typeof this.options === "string") {
-      this.options = this.options.split(",");
-    }
-    if (typeof this.options === "object" && typeof this.options.length === "number") {
-      ref = this.options;
-      for (i in ref) {
-        o = ref[i];
-        p.addItem(o, (function(_this) {
-          return function(coords, data) {
-            return _this.saveValue(data);
-          };
-        })(this), o);
-      }
-    } else {
-      console.log("Invalid options: ", this.options);
-    }
-    return true;
-  };
-
-  DataFormatEnum.prototype.format = function(data, options1, path) {
-    var i, o, ref, ref1;
-    this.options = options1;
-    if (typeof this.options === "string") {
-      this.options = this.options.split(/\s*,\s*/);
-    }
-    if (data == null) {
-      return "";
-    }
-    ref = this.options;
-    for (i in ref) {
-      o = ref[i];
-      if (data === o) {
-        return o;
-      }
-    }
-    ref1 = this.options;
-    for (i in ref1) {
-      o = ref1[i];
-      if (("" + data) === ("" + i)) {
-        return o;
-      }
-    }
-    return "[" + data + "]";
-  };
-
-  DataFormatEnum.prototype.unformat = function(data, path) {
-    return data;
-  };
-
-  return DataFormatEnum;
-
-})(DataFormatterType);
-
-DataFormatDistance = (function(superClass) {
-  extend(DataFormatDistance, superClass);
-
-  function DataFormatDistance() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    return DataFormatDistance.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatDistance.prototype.name = "distance";
-
-  DataFormatDistance.prototype.width = 100;
-
-  DataFormatDistance.prototype.align = "left";
-
-  DataFormatDistance.prototype.format = function(data, options, path) {
-    var feet;
-    if (data === 0) {
-      return 0;
-    }
-    feet = 3.28084 * data;
-    if (feet < 50) {
-      return "< 50 ft";
-    }
-    if (feet < 1000) {
-      return Math.ceil(feet) + " ft";
-    }
-    data = feet / 5280;
-    return numeral(data).format('#,###.##') + " mi";
-  };
-
-  DataFormatDistance.prototype.unformat = function(data, path) {
-    var val;
-    console.log("Unformat distance doesn't work:", data);
-    val = DataFormatter.getNumber(data);
-    return val;
-  };
-
-  return DataFormatDistance;
-
-})(DataFormatterType);
-
-DataFormatBoolean = (function(superClass) {
-  extend(DataFormatBoolean, superClass);
-
-  function DataFormatBoolean() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatBoolean.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatBoolean.prototype.name = "boolean";
-
-  DataFormatBoolean.prototype.width = 40;
-
-  DataFormatBoolean.prototype.textYes = "<i class='fa fa-circle'></i> Yes";
-
-  DataFormatBoolean.prototype.textNo = "<i class='fa fa-circle-thin'></i> No";
-
-  DataFormatBoolean.prototype.textNotSet = "<i class='fa fa-fs'></i> Not Set";
-
-  DataFormatBoolean.prototype.align = "left";
-
-  DataFormatBoolean.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    if (currentValue) {
-      currentValue = false;
-    } else {
-      currentValue = true;
-    }
-    this.saveValue(currentValue);
-    return true;
-  };
-
-  DataFormatBoolean.prototype.format = function(data, options, path) {
-    if (data == null) {
-      return this.textNotSet;
-    }
-    if (data === "") {
-      return this.textNotSet;
-    }
-    if (data === null || data === 0 || data === false) {
-      return this.textNo;
-    }
-    return this.textYes;
-  };
-
-  DataFormatBoolean.prototype.unformat = function(data, path) {
-    if (data == null) {
-      return false;
-    }
-    if (typeof data === "boolean") {
-      if (data) {
-        return true;
-      }
-      return false;
-    }
-    if (data === null || data === 0) {
-      return false;
-    }
-    if (data === "No" || data === "no" || data === "false" || data === "off") {
-      return false;
-    }
-    return true;
-  };
-
-  return DataFormatBoolean;
-
-})(DataFormatterType);
-
-DataFormatTimeAgo = (function(superClass) {
-  extend(DataFormatTimeAgo, superClass);
-
-  function DataFormatTimeAgo() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatTimeAgo.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatTimeAgo.prototype.name = "timeago";
-
-  DataFormatTimeAgo.prototype.width = 135;
-
-  DataFormatTimeAgo.prototype.align = "left";
-
-  DataFormatTimeAgo.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    if (!this.elEditor) {
-      this.elEditor = $("<input />", {
-        type: "text",
-        "class": "dynamic_edit"
-      });
-      this.appendEditor();
-      this.elEditor.on('keydown', (function(_this) {
-        return function(e) {
-          if (!_this.editorShowing) {
-            return _this.datePicker.close();
-          }
-        };
-      })(this));
-    }
-    this.datePicker = new flatpickr(this.elEditor[0], {
-      allowInput: true,
-      parseDate: function(dateString) {
-        return DataFormatter.getMoment(dateString);
-      },
-      onChange: (function(_this) {
-        return function(dateObject, dateString) {
-          _this.saveValue(dateObject);
-          _this.editorShowing = false;
-          return _this.elEditor.hide();
-        };
-      })(this),
-      onOpen: (function(_this) {
-        return function(dateObj, dateStr, instance) {
-          instance.setDate(new Date(currentValue));
-          return instance.setTime(DataFormatter.getMoment(new Date(currentValue)).format('HH:mm:ss'));
-        };
-      })(this),
-      enableTime: true,
-      time_24hr: true
-    });
-    this.elEditor.css({
-      position: "absolute",
-      "z-index": 5001,
-      top: top,
-      left: left,
-      width: width,
-      height: height
-    });
-    this.elEditor.val(currentValue);
-    this.elEditor.show();
-    return this.elEditor.focus();
-  };
-
-  DataFormatTimeAgo.prototype.format = function(data, options, path) {
-    var age, days, daysTxt, hrs, hrsText, min, stamp, txt;
-    if (data == null) {
-      return "";
-    }
-    if (typeof data === "string") {
-      stamp = new Date(data);
-    } else if (typeof data === "number") {
-      stamp = new Date(data);
-    } else if (typeof data === "object" && (data.getTime != null)) {
-      stamp = data;
-    } else {
-      return "";
-    }
-    age = new Date().getTime() - stamp.getTime();
-    age /= 1000;
-    if (age < 60) {
-      txt = numeral(age).format("#") + " sec";
-    } else if (age < (60 * 60)) {
-      txt = numeral(age / 60).format("#") + " min";
-    } else if (age > 86400) {
-      days = Math.floor(age / 86400);
-      hrs = Math.floor((age - (days * 86400)) / (60 * 60));
-      if (days !== 1) {
-        daysTxt = "days";
+  TableViewDetailed.prototype.setDataField = function(location) {
+    var col, displayValue;
+    col = this.colByNum[location.rowNum];
+    if (col.getSource() === "row_selected") {
+      if (this.getRowSelected(this.rowDataRaw[location.colNum].id)) {
+        location.cell.html(this.imgChecked);
       } else {
-        daysTxt = "day";
+        location.cell.html(this.imgNotChecked);
       }
-      if (hrs > 0 && days < 30) {
-        txt = days + " " + daysTxt + ", " + hrs + " hr";
-        if (hrs !== 1) {
-          txt += "s";
-        }
-      } else {
-        txt = days + " " + daysTxt;
-      }
+    } else if (col.render != null) {
+      location.cell.html(col.render(this.rowDataRaw[location.colNum][col.getSource()], this.rowDataRaw[location.colNum]));
     } else {
-      hrs = Math.floor(age / (60 * 60));
-      min = (age - (hrs * 60 * 60)) / 60;
-      if (hrs > 1) {
-        hrsText = "hrs";
-      } else {
-        hrsText = "hr";
-      }
-      txt = numeral(hrs).format("#") + (" " + hrsText + ", ") + numeral(min).format("#") + " min";
-    }
-    return txt;
-  };
-
-  DataFormatTimeAgo.prototype.unformat = function(data, path) {
-    var m;
-    m = DataFormatter.getMoment(data);
-    if (m == null) {
-      return "";
-    }
-    return m.format("YYYY-MM-DD HH:mm:ss");
-  };
-
-  return DataFormatTimeAgo;
-
-})(DataFormatterType);
-
-DataFormatDuration = (function(superClass) {
-  extend(DataFormatDuration, superClass);
-
-  function DataFormatDuration() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    return DataFormatDuration.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatDuration.prototype.name = "duration";
-
-  DataFormatDuration.prototype.width = 90;
-
-  DataFormatDuration.prototype.align = "right";
-
-  DataFormatDuration.prototype.format = function(data, options, path) {
-    var hrs, min, sec, txt;
-    if (data == null) {
-      return "";
-    }
-    if (typeof data === "string") {
-      data = parseFloat(options);
-    }
-    sec = data / 1000;
-    if (sec < 60) {
-      txt = numeral(sec).format("#.###") + " sec";
-    } else if (sec < (60 * 60 * 2)) {
-      min = Math.floor(sec / 60);
-      sec = sec - (min * 60);
-      txt = min + " min, " + Math.floor(sec) + " sec.";
-    } else {
-      hrs = Math.floor(sec / (60 * 60));
-      min = Math.floor(sec - (hrs * 60 * 60));
-      txt = hrs + " hrs, " + min + " min";
-    }
-    return txt;
-  };
-
-  DataFormatDuration.prototype.unformat = function(data, path) {
-    return data;
-  };
-
-  return DataFormatDuration;
-
-})(DataFormatterType);
-
-DataFormatSimpleObject = (function(superClass) {
-  extend(DataFormatSimpleObject, superClass);
-
-  function DataFormatSimpleObject() {
-    this.unformat = bind(this.unformat, this);
-    this.onFocus = bind(this.onFocus, this);
-    this.renderTooltip = bind(this.renderTooltip, this);
-    this.format = bind(this.format, this);
-    return DataFormatSimpleObject.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatSimpleObject.prototype.name = "simpleobject";
-
-  DataFormatSimpleObject.prototype.align = "left";
-
-  DataFormatSimpleObject.prototype.format = function(data, options, path) {
-    if (data == null) {
-      return "Not set";
-    }
-    if ((data != null) && Array.isArray(data)) {
-      if (data.length === 0) {
-        return "Not set";
-      }
-      if (typeof data[0] === "string") {
-        return data.sort().filter(function(a) {
-          return a != null;
-        }).join(", ");
-      }
-    }
-    return "View";
-  };
-
-  DataFormatSimpleObject.prototype.renderTooltip = function(row, value, tooltipWindow) {
-    var height, str, val, varName;
-    if (value == null) {
-      return false;
-    }
-    height = 20;
-    str = "<table>";
-    for (varName in value) {
-      val = value[varName];
-      str += "<tr><td>";
-      str += varName;
-      str += "</td><td>";
-      str += val;
-      str += "</tr>";
-      height += 20;
-    }
-    str += "</table>";
-    tooltipWindow.html(str);
-    tooltipWindow.setSize(400, height);
-    return true;
-  };
-
-  DataFormatSimpleObject.prototype.onFocus = function(e, col, data) {
-    console.log("e=", e);
-    console.log("col=", col);
-    return console.log("data=", data);
-  };
-
-  DataFormatSimpleObject.prototype.unformat = function(data, path) {
-    console.log("unformat simple:", data);
-    return data;
-  };
-
-  return DataFormatSimpleObject;
-
-})(DataFormatterType);
-
-DataFormatLink = (function(superClass) {
-  extend(DataFormatLink, superClass);
-
-  function DataFormatLink() {
-    this.onFocus = bind(this.onFocus, this);
-    this.openEditor = bind(this.openEditor, this);
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    return DataFormatLink.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatLink.prototype.name = "link";
-
-  DataFormatLink.prototype.width = 70;
-
-  DataFormatLink.prototype.clickable = true;
-
-  DataFormatLink.prototype.align = "left";
-
-  DataFormatLink.prototype.format = function(data, options, path) {
-    if (data == null) {
-      return "";
-    }
-    if (/www/.test(data)) {
-      return "Open Link";
-    }
-    if (/^http/.test(data)) {
-      return "Open Link";
-    }
-    if (/^ftp/.test(data)) {
-      return "Open FTP";
-    }
-    if (data.length > 0) {
-      return data;
-    }
-    return "";
-  };
-
-  DataFormatLink.prototype.unformat = function(data, path) {
-    console.log("TODO: DataFormatLink.unformat not implemented:", data);
-    return data;
-  };
-
-  DataFormatLink.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    console.log("TODO: openEditor not implemented for link");
-    return null;
-  };
-
-  DataFormatLink.prototype.onFocus = function(e, col, data) {
-    var url, win;
-    console.log("click, col=", col, "data=", data);
-    url = data[col];
-    if ((url != null) && url.length > 0) {
-      win = window.open(url, "_blank");
-      win.focus();
+      displayValue = DataMap.getDataFieldFormatted(col.tableName, this.rowDataRaw[location.colNum].id, col.getSource());
+      location.cell.html(displayValue);
     }
     return true;
   };
 
-  return DataFormatLink;
+  return TableViewDetailed;
 
-})(DataFormatterType);
-
-DataFormatImageList = (function(superClass) {
-  extend(DataFormatImageList, superClass);
-
-  function DataFormatImageList() {
-    this.unformat = bind(this.unformat, this);
-    this.format = bind(this.format, this);
-    this.openEditor = bind(this.openEditor, this);
-    return DataFormatImageList.__super__.constructor.apply(this, arguments);
-  }
-
-  DataFormatImageList.prototype.name = "imagelist";
-
-  DataFormatImageList.prototype.options = [];
-
-  DataFormatImageList.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-    var h, imgCount, title, w;
-    if (currentValue == null) {
-      return false;
-    }
-    w = $(window).width();
-    h = $(window).height();
-    if (w > 1000) {
-      w = 1000;
-    } else if (w > 800) {
-      w = 800;
-    } else {
-      w = 600;
-    }
-    if (h > 1000) {
-      h = 1000;
-    } else if (h > 800) {
-      h = 800;
-    } else if (h > 600) {
-      h = 600;
-    } else {
-      h = 400;
-    }
-    if (typeof currentValue === "string") {
-      currentValue = currentValue.split("||");
-    }
-    imgCount = currentValue.length;
-    if (imgCount < 1) {
-      return false;
-    } else if (imgCount === 1) {
-      title = "View Image";
-    } else {
-      title = "View " + imgCount + " Images";
-    }
-    return doPopupView('ImageStrip', title, 'imagestrip_popup', w, h).then(function(view) {
-      var img, j, len;
-      view.init();
-      for (j = 0, len = currentValue.length; j < len; j++) {
-        img = currentValue[j];
-        view.addImage(img);
-      }
-      return view.render();
-    });
-  };
-
-  DataFormatImageList.prototype.format = function(currentValue, options, path) {
-    var formattedValue, imgCount;
-    this.options = options;
-
-    /*
-    		if typeof currentValue == "string"
-    			currentValue = currentValue.split ','
-    
-    		if Array.isArray(currentValue)
-    			return currentValue.join(", ")
-    
-    		values = []
-    		for idx, obj of currentValue
-    			values.push obj
-    		return values.join(", ")
-     */
-    formattedValue = "No Image";
-    if (typeof currentValue === "string") {
-      currentValue = currentValue.split("||");
-    } else if (currentValue == null) {
-      return formattedValue;
-    }
-    imgCount = currentValue.length;
-    console.log(imgCount);
-    if (imgCount === 1) {
-      formattedValue = "1 Image";
-    } else {
-      formattedValue = imgCount + " Images";
-    }
-    return formattedValue;
-  };
-
-  DataFormatImageList.prototype.unformat = function(currentValue, path) {
-    if (typeof currentValue === "string") {
-      currentValue = currentValue.split(',');
-    }
-    return currentValue;
-  };
-
-  return DataFormatImageList;
-
-})(DataFormatterType);
-
-try {
-  globalDataFormatter = new DataFormatter();
-  globalDataFormatter.register(new DataFormatText());
-  globalDataFormatter.register(new DataFormatInt());
-  globalDataFormatter.register(new DataFormatNumber());
-  globalDataFormatter.register(new DataFormatFloat());
-  globalDataFormatter.register(new DataFormatCurrency());
-  globalDataFormatter.register(new DataFormatDate());
-  globalDataFormatter.register(new DataFormatDateTime());
-  globalDataFormatter.register(new DataFormatDateAge());
-  globalDataFormatter.register(new DataFormatEnum());
-  globalDataFormatter.register(new DataFormatDistance());
-  globalDataFormatter.register(new DataFormatBoolean());
-  globalDataFormatter.register(new DataFormatPercent());
-  globalDataFormatter.register(new DataFormatTimeAgo());
-  globalDataFormatter.register(new DataFormatSimpleObject());
-  globalDataFormatter.register(new DataFormatSourceCode());
-  globalDataFormatter.register(new DataFormatTags());
-  globalDataFormatter.register(new DataFormatMultiselect());
-  globalDataFormatter.register(new DataFormatMemo());
-  globalDataFormatter.register(new DataFormatDuration());
-  globalDataFormatter.register(new DataFormatLink());
-  globalDataFormatter.register(new DataFormatImageList());
-} catch (error) {
-  e = error;
-  console.log("Exception while registering global Data Formatter:", e);
-}
+})(TableView);
 var WidgetBase, WidgetTag, globalTagData, globalTagID, globalTagPath,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
