@@ -792,7 +792,7 @@ class TableView
 		console.log "Context on header:", source
 		popupMenu = null
 
-		for col in @colList
+		for index, col of @colByNum
 			if col.getSource() == source
 
 				popupMenu = new PopupMenu "#{col.getName()}", coords.x-150, coords.y
@@ -827,7 +827,8 @@ class TableView
 
 					if globalTableAdmin
 						popupMenu.addItem "Open table editor", (e, source)=>
-							for col in @colList
+							#for col in @colList
+							for index, col of @colByNum
 								if col.getSource() == source
 									console.log "Emitting open_editor"
 									# globalTableEvents.emitEvent "open_editor", [ col.tableName ]
@@ -940,13 +941,13 @@ class TableView
 	##
 	applySorting: (rowData) =>
 
+		if !@sortRules?
+			@sortRules = []
+
 		@numLockedRows = Object.keys(@lockList).length
 		if @sortRules.length == 0 and @numLockedRows == 0 then return rowData
 
 		# console.log "applySorting", @sortRules, rowData
-
-		if !@sortRules?
-			@sortRules = []
 
 		sorted = rowData.sort (a, b)=>
 
@@ -1093,6 +1094,7 @@ class TableView
 			total++
 
 		## added by xgao
+		## to show sorting arrow on ActionColumn header
 		for acol in @actionColList
 			if acol.constructor.name is "TableViewCol"
 				for sortrule in @sortRules
