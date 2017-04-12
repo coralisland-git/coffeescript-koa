@@ -5732,12 +5732,12 @@ TableView = (function() {
   };
 
   TableView.prototype.onContextMenuHeader = function(source, coords) {
-    var col, j, k, len1, len2, popupMenu, ref, ref1;
+    var col, index, j, len1, popupMenu, ref, ref1;
     console.log("Context on header:", source);
     popupMenu = null;
-    ref = this.colList;
-    for (j = 0, len1 = ref.length; j < len1; j++) {
-      col = ref[j];
+    ref = this.colByNum;
+    for (index in ref) {
+      col = ref[index];
       if (col.getSource() === source) {
         popupMenu = new PopupMenu("" + (col.getName()), coords.x - 150, coords.y);
         popupMenu.addItem("Hide column", (function(_this) {
@@ -5773,11 +5773,11 @@ TableView = (function() {
           if (globalTableAdmin) {
             popupMenu.addItem("Open table editor", (function(_this) {
               return function(e, source) {
-                var k, len2, ref1, results;
-                ref1 = _this.colList;
+                var ref1, results;
+                ref1 = _this.colByNum;
                 results = [];
-                for (k = 0, len2 = ref1.length; k < len2; k++) {
-                  col = ref1[k];
+                for (index in ref1) {
+                  col = ref1[index];
                   if (col.getSource() === source) {
                     console.log("Emitting open_editor");
                     results.push(doPopupView("ShowTableEditor", "Editing table: " + _this.primaryTableName, null, 1300, 800).then(function(view) {
@@ -5798,8 +5798,8 @@ TableView = (function() {
       popupMenu = new PopupMenu("Unknown " + source, coords.x - 150, coords.y);
     }
     ref1 = this.colList;
-    for (k = 0, len2 = ref1.length; k < len2; k++) {
-      col = ref1[k];
+    for (j = 0, len1 = ref1.length; j < len1; j++) {
+      col = ref1[j];
       if ((col.visible != null) && col.visible === false) {
         popupMenu.addItem("Show " + (col.getName()), (function(_this) {
           return function(e, list) {
@@ -5891,12 +5891,12 @@ TableView = (function() {
 
   TableView.prototype.applySorting = function(rowData) {
     var finalList, j, k, len1, len2, rec, sorted;
+    if (this.sortRules == null) {
+      this.sortRules = [];
+    }
     this.numLockedRows = Object.keys(this.lockList).length;
     if (this.sortRules.length === 0 && this.numLockedRows === 0) {
       return rowData;
-    }
-    if (this.sortRules == null) {
-      this.sortRules = [];
     }
     sorted = rowData.sort((function(_this) {
       return function(a, b) {
