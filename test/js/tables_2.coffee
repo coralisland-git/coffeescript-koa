@@ -177,13 +177,12 @@ $ ->
 			##| manipulate data
 			_randomKey = Math.floor Math.random()*90000 + 10000
 			#_randomData = DataMap.getDataMap().data['zipcode']["0#{Math.floor Math.random() * (1344 - 1337 + 1) + 1337}"]
-			_randomData = DataMap.getDataForKey "zipcode", "0#{Math.floor Math.random() * (1344 - 1337 + 1) + 1337}"
+			_randomData = Object.assign({}, DataMap.getDataForKey("zipcode", "0#{Math.floor Math.random() * (1344 - 1337 + 1) + 1337}"))
 			if _randomData
 				_randomData['code'] = _randomKey
+				_randomData['id'] = _randomKey
 			##| add data
 			DataMap.addData 'zipcode', _randomKey, _randomData
-			##| applyFilters to update new Data
-			table.applyFilters()
 			table.updateRowData()
 		$('#deleteFirstRow').on 'click', () ->
 			##| get first row key from table to pass as arg in function

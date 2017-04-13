@@ -7058,17 +7058,17 @@ TableView = (function() {
     currentVisibleRows = this.getTableMaxVisibleRows();
     maxAvailableRows = this.getTableTotalRows();
     maxAvailableCols = this.getTableTotalCols();
+    if (this.offsetShowingTop >= maxAvailableRows - currentVisibleRows) {
+      this.offsetShowingTop = maxAvailableRows - currentVisibleRows;
+    }
+    if (this.offsetShowingLeft >= maxAvailableCols - currentVisibleCols) {
+      this.offsetShowingLeft = maxAvailableCols - currentVisibleCols;
+    }
     if (this.offsetShowingTop < 0) {
       this.offsetShowingTop = 0;
     }
     if (this.offsetShowingLeft < 0) {
       this.offsetShowingLeft = 0;
-    }
-    if (this.offsetShowingTop >= maxAvailableRows - currentVisibleRows - 1) {
-      this.offsetShowingTop = maxAvailableRows - currentVisibleRows;
-    }
-    if (this.offsetShowingLeft >= maxAvailableCols - currentVisibleCols - 1) {
-      this.offsetShowingLeft = maxAvailableCols - currentVisibleCols;
     }
     if (this.elStatusScrollTextRows != null) {
       this.elStatusScrollTextRows.html("Rows " + (this.offsetShowingTop + 1) + " - " + (this.offsetShowingTop + currentVisibleRows) + " of " + maxAvailableRows);
