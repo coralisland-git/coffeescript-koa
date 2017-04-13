@@ -2089,21 +2089,22 @@ class TableView
 		maxAvailableCols = @getTableTotalCols()
 		
 		##|
+		##|  Don't show more rows than fit on the screen
+		if @offsetShowingTop >= maxAvailableRows - currentVisibleRows
+			# console.log "#{@primaryTableName} updateScrollbarSettings offsetShowingTop #{@offsetShowingTop} >= #{maxAvailableRows} - #{currentVisibleRows}"
+			@offsetShowingTop = maxAvailableRows - currentVisibleRows
+
+		if @offsetShowingLeft >= maxAvailableCols - currentVisibleCols
+			# console.log "#{@primaryTableName} updateScrollbarSettings offsetShowingLeft #{@offsetShowingLeft} >= #{maxAvailableCols} - #{currentVisibleCols}"
+			@offsetShowingLeft = maxAvailableCols - currentVisibleCols
+			# console.log "#{@primaryTableName} updateScrollbarSettings, reset offsetShowingLeft to ", @offsetShowingLeft
+
+		##|
 		##| Don't set offset as less than 0
 		if @offsetShowingTop < 0 then @offsetShowingTop = 0
 
 		if @offsetShowingLeft < 0 then @offsetShowingLeft = 0
 
-		##|
-		##|  Don't show more rows than fit on the screen
-		if @offsetShowingTop >= maxAvailableRows - currentVisibleRows - 1
-			# console.log "#{@primaryTableName} updateScrollbarSettings offsetShowingTop #{@offsetShowingTop} >= #{maxAvailableRows} - #{currentVisibleRows}"
-			@offsetShowingTop = maxAvailableRows - currentVisibleRows
-
-		if @offsetShowingLeft >= maxAvailableCols - currentVisibleCols - 1
-			# console.log "#{@primaryTableName} updateScrollbarSettings offsetShowingLeft #{@offsetShowingLeft} >= #{maxAvailableCols} - #{currentVisibleCols}"
-			@offsetShowingLeft = maxAvailableCols - currentVisibleCols
-			# console.log "#{@primaryTableName} updateScrollbarSettings, reset offsetShowingLeft to ", @offsetShowingLeft
 		if @elStatusScrollTextRows?
 			@elStatusScrollTextRows.html "Rows #{@offsetShowingTop+1} - #{@offsetShowingTop+currentVisibleRows} of #{maxAvailableRows}"
 			@elStatusScrollTextCols.html "Cols #{@offsetShowingLeft+1}-#{@offsetShowingLeft+currentVisibleCols} of #{maxAvailableCols}"

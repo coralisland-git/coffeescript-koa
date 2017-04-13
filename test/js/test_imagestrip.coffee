@@ -18,6 +18,8 @@ newImage9 = new Image()
 newImage9.src = "./js/test_Data/images/9.jpg"
 newImage10 = new Image()
 newImage10.src = "./js/test_Data/images/10.jpg"
+newImage11 = new Image()
+newImage11.src = "https://www.e-architect.co.uk/images/jpgs/concept/large-span-translucent-buildings-s010313.jpg"
 
 $ ->
 
@@ -42,6 +44,7 @@ $ ->
 			view.addImage newImage4
 			view.addImage newImage5
 			view.addImage newImage6
+			view.addImage newImage11
 			view.setSize 0, 800
 			view.render()
 		true
