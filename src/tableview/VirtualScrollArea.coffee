@@ -208,8 +208,10 @@ class VirtualScrollArea
 
             scrollX = Math.ceil(Math.abs(deltaX)/60)
             scrollY = Math.ceil(Math.abs(deltaY)/60)
-            console.log "deltaX == ", deltaX
             if scrollY > 3 then scrollX = 0
+
+            if Math.abs(deltaX) < 5 then scrollX = 0
+            if Math.abs(deltaY) < 6 then scrollY = 0
 
             e.preventDefault()
             e.stopPropagation()
@@ -218,9 +220,9 @@ class VirtualScrollArea
                     @emitEvent "scroll_to", [ @current+scrollY ]
                 else 
                     @emitEvent "scroll_to", [ @current-scrollY ]
-            if not @isVert and scrollX != 0
-                if e.originalEvent.wheelDelta < 0
-                    @emitEvent "scroll_to", [ @current+scrollX ]
+            else if not @isVert and scrollX != 0
+                if e.originalEvent.deltaX < 0
+                    @emitEvent "scroll_to", [ @current-scrollX ]
                 else
                     @emitEvent "scroll_to", [ @current+scrollX ]
 
