@@ -7857,7 +7857,6 @@ VirtualScrollArea = (function() {
     var num, percent;
     percent = pos / (maxLoc - this.thumbHeight);
     num = this.min + (percent * (this.max - this.min));
-    console.log("num ==== ", num);
     this.emitEvent("scroll_to", [Math.floor(num)]);
     return true;
   };
@@ -7937,9 +7936,11 @@ VirtualScrollArea = (function() {
         }
         scrollX = Math.ceil(Math.abs(deltaX) / 60);
         scrollY = Math.ceil(Math.abs(deltaY) / 60);
-        console.log("deltaX == ", deltaX);
-        if (scrollY > 3) {
+        if (Math.abs(deltaX) < 4) {
           scrollX = 0;
+        }
+        if (Math.abs(deltaY) < 5) {
+          scrollY = 0;
         }
         e.preventDefault();
         e.stopPropagation();
@@ -7949,10 +7950,9 @@ VirtualScrollArea = (function() {
           } else {
             _this.emitEvent("scroll_to", [_this.current - scrollY]);
           }
-        }
-        if (!_this.isVert && scrollX !== 0) {
-          if (e.originalEvent.wheelDelta < 0) {
-            _this.emitEvent("scroll_to", [_this.current + scrollX]);
+        } else if (!_this.isVert && scrollX !== 0) {
+          if (e.originalEvent.deltaX < 0) {
+            _this.emitEvent("scroll_to", [_this.current - scrollX]);
           } else {
             _this.emitEvent("scroll_to", [_this.current + scrollX]);
           }

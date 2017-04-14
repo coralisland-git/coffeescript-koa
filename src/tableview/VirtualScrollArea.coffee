@@ -131,7 +131,6 @@ class VirtualScrollArea
     OnMarkerSet: (pos, maxLoc)=>
         percent = pos / (maxLoc - @thumbHeight)
         num = @min + (percent * (@max - @min))
-        console.log "num ==== ", num
         @emitEvent "scroll_to", [ Math.floor(num) ]
         true
 
@@ -206,12 +205,11 @@ class VirtualScrollArea
                 deltaX = e.originalEvent.deltaX * -1
                 deltaY = e.originalEvent.deltaY * -1
 
-            scrollX = Math.ceil(Math.abs(deltaX)/60)
-            scrollY = Math.ceil(Math.abs(deltaY)/60)
-            if scrollY > 3 then scrollX = 0
+            scrollX = Math.ceil(Math.abs(deltaX)/48)
+            scrollY = Math.ceil(Math.abs(deltaY)/48)
 
             if Math.abs(deltaX) < 5 then scrollX = 0
-            if Math.abs(deltaY) < 6 then scrollY = 0
+            if Math.abs(deltaY) < 5 then scrollY = 0
 
             e.preventDefault()
             e.stopPropagation()
