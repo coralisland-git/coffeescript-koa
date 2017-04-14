@@ -6095,6 +6095,7 @@ TableView = (function() {
       if (this.renderRequired) {
         this.real_render();
       }
+      this.layoutShadow();
       this.updateScrollbarSettings();
       this.resetCachedFromSize();
       globalTableEvents.emitEvent("row_count", [this.primaryTableName, this.totalAvailableRows]);
