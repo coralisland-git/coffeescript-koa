@@ -52,7 +52,7 @@ $ ->
 
         table.addTable "zipcode", noAreaCode, filter
         table.render()
-
+        table.updateRowData()
         true
 
     addTestButton "Configure Columns", "Open", ()->
@@ -61,8 +61,7 @@ $ ->
         table = new TableView $("#renderTest1")
         table.addTable "zipcode"
         table.allowCustomize()
-        table.render()
-
+        table.real_render()
         true
 
     addTestButton "Custom Column", "Open", ()->
@@ -80,8 +79,7 @@ $ ->
         addHolder("renderTest1");
         table = new TableView $("#renderTest1")
         table.addTable "zipcode"
-        table.render()
-
+        table.real_render()
         true
 
     addTestButton "Grouping Columns", "Open", () ->
@@ -115,10 +113,8 @@ $ ->
         addHolder("renderTest1");
         table = new TableView $("#renderTest1")
         table.addTable "zipcode"
-        table.addJoinTable "county", null, "county"
-
-        table.render()
-
+        #table.addJoinTable "county", null, "county"
+        table.real_render()
         true
 
     addTestButton "Checkboxes", "Open", ()->
@@ -126,7 +122,7 @@ $ ->
         addHolder("renderTest1");
         table = new TableView $("#renderTest1"), true
         table.addTable "zipcode"
-        table.render()
-
+        table.real_render()
         true
+
     go()
