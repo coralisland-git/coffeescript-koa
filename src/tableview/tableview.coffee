@@ -1096,6 +1096,7 @@ class TableView
 		## added by xgao
 		## to show sorting arrow on ActionColumn header
 		for acol in @actionColList
+			acol.sort = 0
 			if acol.constructor.name is "TableViewCol"
 				for sortrule in @sortRules
 					if sortrule.tableName is @primaryTableName and sortrule.source is acol.getSource()

@@ -6056,6 +6056,7 @@ TableView = (function() {
     ref2 = this.actionColList;
     for (o = 0, len5 = ref2.length; o < len5; o++) {
       acol = ref2[o];
+      acol.sort = 0;
       if (acol.constructor.name === "TableViewCol") {
         ref3 = this.sortRules;
         for (p = 0, len6 = ref3.length; p < len6; p++) {
@@ -7934,9 +7935,9 @@ VirtualScrollArea = (function() {
           deltaX = e.originalEvent.deltaX * -1;
           deltaY = e.originalEvent.deltaY * -1;
         }
-        scrollX = Math.ceil(Math.abs(deltaX) / 60);
-        scrollY = Math.ceil(Math.abs(deltaY) / 60);
-        if (Math.abs(deltaX) < 4) {
+        scrollX = Math.ceil(Math.abs(deltaX) / 48);
+        scrollY = Math.ceil(Math.abs(deltaY) / 48);
+        if (Math.abs(deltaX) < 5) {
           scrollX = 0;
         }
         if (Math.abs(deltaY) < 5) {
@@ -11426,7 +11427,7 @@ TableViewCol = (function(superClass) {
       this.changeColumn("width", 60);
       this.changeColumn("visible", true);
       this.changeColumn("align", "right");
-      this.changeColumn("options", '#.#####');
+      this.changeColumn("options", '#.######');
       return;
     }
     if (/^sourcecode/i.test(this.data.name)) {
@@ -12260,9 +12261,6 @@ WidgetTag = (function() {
     dm = DataMap.getDataMap();
     path = "/" + tableName + "/" + idValue + "/" + fieldName;
     currentValue = DataMap.getDataFieldFormatted(tableName, idValue, fieldName);
-    if (currentValue === "") {
-      return this.el;
-    }
     classes = ["data"];
     if (((ref = dm.types[tableName]) != null ? (ref1 = ref.col[fieldName]) != null ? ref1.getEditable() : void 0 : void 0) === true) {
       this.bind('click', globalOpenEditor);
