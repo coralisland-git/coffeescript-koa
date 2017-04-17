@@ -7934,18 +7934,28 @@ VirtualScrollArea = (function() {
           deltaX = e.originalEvent.deltaX * -1;
           deltaY = e.originalEvent.deltaY * -1;
         }
-        scrollX = Math.ceil(deltaX / 60);
-        scrollY = Math.ceil(deltaY / 60);
-        if (scrollY > 3) {
+        scrollX = Math.ceil(Math.abs(deltaX) / 60);
+        scrollY = Math.ceil(Math.abs(deltaY) / 60);
+        if (Math.abs(deltaX) < 4) {
           scrollX = 0;
+        }
+        if (Math.abs(deltaY) < 5) {
+          scrollY = 0;
         }
         e.preventDefault();
         e.stopPropagation();
         if (_this.isVert && scrollY !== 0) {
-          _this.emitEvent("scroll_to", [_this.current + scrollY]);
-        }
-        if (!_this.isVert && scrollX !== 0) {
-          _this.emitEvent("scroll_to", [_this.current + scrollX]);
+          if (e.originalEvent.wheelDelta < 0) {
+            _this.emitEvent("scroll_to", [_this.current + scrollY]);
+          } else {
+            _this.emitEvent("scroll_to", [_this.current - scrollY]);
+          }
+        } else if (!_this.isVert && scrollX !== 0) {
+          if (e.originalEvent.deltaX < 0) {
+            _this.emitEvent("scroll_to", [_this.current - scrollX]);
+          } else {
+            _this.emitEvent("scroll_to", [_this.current + scrollX]);
+          }
         }
         return true;
       };
