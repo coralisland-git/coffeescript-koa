@@ -304,7 +304,7 @@ class TableViewCol extends TableViewColBase
 			@changeColumn "width", 60
 			@changeColumn "visible", true
 			@changeColumn "align", "right"
-			@changeColumn "options", '#.#####'
+			@changeColumn "options", '#.######'
 			return
 
 		if /^sourcecode/i.test @data.name
