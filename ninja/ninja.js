@@ -6352,7 +6352,7 @@ TableView = (function() {
   };
 
   TableView.prototype.getTableMaxVisibleCols = function() {
-    var col, colNum, location, maxWidth, visColCount, x;
+    var cn, col, colNum, location, maxWidth, visColCount, x;
     if (this.cachedMaxTotalVisibleCol != null) {
       return this.cachedMaxTotalVisibleCol;
     }
@@ -6360,22 +6360,23 @@ TableView = (function() {
     x = 0;
     colNum = this.getTableTotalCols() - 1;
     maxWidth = this.getTableVisibleWidth();
-    while (x < maxWidth && colNum >= 0) {
-      col = this.colByNum[colNum];
+    cn = 0;
+    while (x < maxWidth && cn <= colNum) {
+      col = this.colByNum[cn];
       location = {
-        colNum: colNum,
+        colNum: cn,
         tableName: col.tableName,
         sourceName: col.getSource(),
-        visibleCol: colNum
+        visibleCol: cn
       };
-      if ((colNum > 0) && this.shouldSkipCol(location)) {
-        colNum--;
+      if ((cn <= colNum) && this.shouldSkipCol(location)) {
+        cn++;
         continue;
       }
       col.currentWidth = this.getColWidth(location);
       x = x + col.currentWidth;
       visColCount++;
-      colNum--;
+      cn++;
     }
     if (visColCount > 0) {
       this.cachedMaxTotalVisibleCol = visColCount;

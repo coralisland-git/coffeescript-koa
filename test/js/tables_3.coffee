@@ -21,6 +21,7 @@ $ ->
         table.setColumnFilterAsPopup "T026_VEL_ID"
         table.setColumnFilterAsPopup "T231_ITM_STS_CD"
         table.render()
+        table.updateRowData()
 
         console.log "Done"
 
