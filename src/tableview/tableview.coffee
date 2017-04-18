@@ -745,7 +745,8 @@ class TableView
 	##|  Dialog to rename a column
 	onRenameField: (source) =>
 
-		for col in @colList
+		#for col in @colList
+		for index, col of @colByNum
 			if col.getSource() == source
 
 				m = new ModalDialog
@@ -770,7 +771,8 @@ class TableView
 			popupMenu.addItem name, (e, opt)=>
 				console.log "Change type of #{source} to #{opt}"
 
-				for col in @colList
+				#for col in @colList
+				for index, col of @colByNum
 					if col.getSource() == source
 						DataMap.changeColumnAttribute col.tableName, source, "type", opt
 						# @updateRowData()
