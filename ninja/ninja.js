@@ -5672,11 +5672,11 @@ TableView = (function() {
   };
 
   TableView.prototype.onRenameField = function(source) {
-    var col, j, len1, m, ref, results;
-    ref = this.colList;
+    var col, index, m, ref, results;
+    ref = this.colByNum;
     results = [];
-    for (j = 0, len1 = ref.length; j < len1; j++) {
-      col = ref[j];
+    for (index in ref) {
+      col = ref[index];
       if (col.getSource() === source) {
         m = new ModalDialog({
           showOnCreate: false,
@@ -5709,11 +5709,11 @@ TableView = (function() {
       name = ref[j];
       popupMenu.addItem(name, (function(_this) {
         return function(e, opt) {
-          var col, k, len2, ref1;
+          var col, index, ref1;
           console.log("Change type of " + source + " to " + opt);
-          ref1 = _this.colList;
-          for (k = 0, len2 = ref1.length; k < len2; k++) {
-            col = ref1[k];
+          ref1 = _this.colByNum;
+          for (index in ref1) {
+            col = ref1[index];
             if (col.getSource() === source) {
               DataMap.changeColumnAttribute(col.tableName, source, "type", opt);
               return;
