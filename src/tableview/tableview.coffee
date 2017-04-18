@@ -1376,23 +1376,24 @@ class TableView
 		colNum      = @getTableTotalCols() - 1
 		maxWidth    = @getTableVisibleWidth()
 
-		while x < maxWidth and colNum >= 0
-
-			col = @colByNum[colNum]
+		#while x < maxWidth and colNum >= 0
+		cn = 0
+		while x < maxWidth and cn <= colNum
+			col = @colByNum[cn]
 			location =
-				colNum     : colNum
+				colNum 	   : cn
 				tableName  : col.tableName
 				sourceName : col.getSource()
-				visibleCol : colNum
+				visibleCol : cn
 
-			if (colNum > 0) and @shouldSkipCol(location)
-				colNum--
+			if (cn <= colNum) and @shouldSkipCol(location)
+				cn++
 				continue
 
 			col.currentWidth = @getColWidth(location)
 			x = x + col.currentWidth
 			visColCount++
-			colNum--
+			cn++
 
 		if visColCount > 0 then @cachedMaxTotalVisibleCol = visColCount
 		return visColCount
