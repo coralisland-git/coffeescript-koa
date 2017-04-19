@@ -7174,11 +7174,6 @@ TableView = (function() {
 
   TableView.prototype.layoutShadow = function() {
     var autoAdjustableColumns, col, colNum, diffAmount, i, j, k, l, len1, len2, len3, location, maxWidth, ref, ref1, totalWidth, w;
-    maxWidth = this.getTableVisibleWidth();
-    if ((this.cachedLayoutShadowWidth != null) && this.cachedLayoutShadowWidth === maxWidth) {
-      return;
-    }
-    this.cachedLayoutShadowWidth = maxWidth;
     autoAdjustableColumns = [];
     ref = this.colList;
     for (j = 0, len1 = ref.length; j < len1; j++) {
@@ -7217,6 +7212,11 @@ TableView = (function() {
       col = autoAdjustableColumns[l];
       col.actualWidth += diffAmount;
     }
+    maxWidth = this.getTableVisibleWidth();
+    if ((this.cachedLayoutShadowWidth != null) && this.cachedLayoutShadowWidth === maxWidth) {
+      return;
+    }
+    this.cachedLayoutShadowWidth = maxWidth;
     return true;
   };
 
@@ -7936,12 +7936,12 @@ VirtualScrollArea = (function() {
           deltaX = e.originalEvent.deltaX * -1;
           deltaY = e.originalEvent.deltaY * -1;
         }
-        scrollX = Math.ceil(Math.abs(deltaX) / 48);
-        scrollY = Math.ceil(Math.abs(deltaY) / 48);
-        if (Math.abs(deltaX) < 5) {
+        scrollX = Math.ceil(Math.abs(deltaX) / 40);
+        scrollY = Math.ceil(Math.abs(deltaY) / 40);
+        if (Math.abs(deltaX) < 10) {
           scrollX = 0;
         }
-        if (Math.abs(deltaY) < 5) {
+        if (Math.abs(deltaY) < 10) {
           scrollY = 0;
         }
         e.preventDefault();

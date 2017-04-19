@@ -2184,10 +2184,6 @@ class TableView
 	##|
 	layoutShadow: ()=>
 
-		maxWidth   = @getTableVisibleWidth()
-		if @cachedLayoutShadowWidth? and @cachedLayoutShadowWidth == maxWidth then return
-		@cachedLayoutShadowWidth = maxWidth
-
 		autoAdjustableColumns = []
 		for i in @colList
 			if i.getAutoSize()
@@ -2224,6 +2220,11 @@ class TableView
 
 		# console.log "layoutShadow maxWidth=#{maxWidth} totalWidth=#{totalWidth}", autoAdjustableColumns
 		# console.log "diffAmount=#{diffAmount}"
+
+		maxWidth   = @getTableVisibleWidth()
+		if @cachedLayoutShadowWidth? and @cachedLayoutShadowWidth == maxWidth then return
+		@cachedLayoutShadowWidth = maxWidth
+
 		true
 
 	updateStatusText: (message...)=>
