@@ -205,11 +205,11 @@ class VirtualScrollArea
                 deltaX = e.originalEvent.deltaX * -1
                 deltaY = e.originalEvent.deltaY * -1
 
-            scrollX = Math.ceil(Math.abs(deltaX)/48)
-            scrollY = Math.ceil(Math.abs(deltaY)/48)
+            scrollX = Math.ceil(Math.abs(deltaX)/40)
+            scrollY = Math.ceil(Math.abs(deltaY)/40)
 
-            if Math.abs(deltaX) < 5 then scrollX = 0
-            if Math.abs(deltaY) < 5 then scrollY = 0
+            if Math.abs(deltaX) < 10 then scrollX = 0
+            if Math.abs(deltaY) < 10 then scrollY = 0
 
             e.preventDefault()
             e.stopPropagation()
