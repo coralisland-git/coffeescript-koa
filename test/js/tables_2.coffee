@@ -90,6 +90,28 @@ $ ->
 		table.real_render()
 		#table.updateRowData()
 		true
+	
+	addTestButton "Tabs in Tabs with Table", "Open", ()->
+		addHolder "renderTest1"
+		$("#renderTest1").height 800
+		tabs = new DynamicTabs "#renderTest1"
+		tab1 = tabs.addTab "Parent Tab1", '<div id="parentTab1"></div>'
+		tab2 = tabs.addTab "Parent Tab2", '<div id="parentTab2"></div>'
+		newPromise ()->
+			yield loadZipcodes()
+			yield loadStockData()
+			yield loadDatafromJSONFile("testData")
+			yield loadDatafromJSONFile("SaveZipcodeData")
+			DataMap.changeColumnAttribute "testData", "imagelist", "editable", true
+			tabs1 = new DynamicTabs "#parentTab1"
+			tabs1.doAddTableTab "zipcode", "Zipcodes"
+			tabs1.doAddTableTab "stocks", "Stocks"
+
+			tabs2 = new DynamicTabs "#parentTab2"
+			
+			tabs2.doAddTableTab "SaveZipcodeData", "SaveZipcodeData"	
+			tabs2.doAddTableTab "testData", "TestData"
+		return
 
 	addTestButton "inline sorting with icon in header according to DataType", "Open", ()->
 		addHolder("renderTest1");
