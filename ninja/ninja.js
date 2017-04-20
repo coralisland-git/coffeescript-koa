@@ -7174,11 +7174,6 @@ TableView = (function() {
 
   TableView.prototype.layoutShadow = function() {
     var autoAdjustableColumns, col, colNum, diffAmount, i, j, k, l, len1, len2, len3, location, maxWidth, ref, ref1, totalWidth, w;
-    maxWidth = this.getTableVisibleWidth();
-    if ((this.cachedLayoutShadowWidth != null) && this.cachedLayoutShadowWidth === maxWidth) {
-      return;
-    }
-    this.cachedLayoutShadowWidth = maxWidth;
     autoAdjustableColumns = [];
     ref = this.colList;
     for (j = 0, len1 = ref.length; j < len1; j++) {
@@ -7217,6 +7212,11 @@ TableView = (function() {
       col = autoAdjustableColumns[l];
       col.actualWidth += diffAmount;
     }
+    maxWidth = this.getTableVisibleWidth();
+    if ((this.cachedLayoutShadowWidth != null) && this.cachedLayoutShadowWidth === maxWidth) {
+      return;
+    }
+    this.cachedLayoutShadowWidth = maxWidth;
     return true;
   };
 
