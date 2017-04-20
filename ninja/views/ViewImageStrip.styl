@@ -17,12 +17,13 @@
 				width 90%
 				height 100%
 				border solid 1px grey
-				
+				padding 0
 				img
 					margin: 0 auto
 					display: block
-					max-width 90%
+					max-width 100%
 					height 100%
+					object-fit	contain
 					
 		.controls
 			text-align center
@@ -32,18 +33,32 @@
 			span
 				font-size 2em
 				line-height 2.2em
-			button
+			i
+				height 90%
+				max-height 6vmin
+				margin-top 3%
+				background-size 100% 100%	
 				width 10%
 				max-width 10vmin
-				height 100%
-				max-height 8vmin
-				margin-top 2%
-			.arrow_left
-				background-image url('./js/test_Data/images/arrow_left.png')
-				background-size 100% 100%	
-			.arrow_right
-				background-image url('./js/test_Data/images/arrow_right.png')
-				background-size 100% 100%				
+			#left-arrow
+				width: 50%
+				text-align: right
+				float: left
+				padding-right: 15px
+
+			#right-arrow
+				width: 50%
+				text-align: left
+				float: right
+				padding-left: 15px
+			.hidden-arrow
+				color grey
+				.fa:hover
+					color grey
+					text-shadow none
+.fa:hover
+	text-shadow: 0 0 6px rgba(0, 0, 0, 1)
+	color black
 	
 .scroll_wrapper 
 	position: relative
@@ -80,7 +95,7 @@
 			background-color transparent
 
 			li
-				padding: 0 10px
+				padding: 0
 				width 100%
 				border: 1px solid #ccc
 				font-size: 14px
@@ -90,15 +105,17 @@
 
 				.image-wrapper
 					height 100%
-					padding-left 10%
-					padding-right 10%
+					padding 0
+/*					padding-left 10%
+					padding-right 10%*/
 					
 					img
 						padding: 0px
-						max-width 100%
+						width 100%
 						height 100%
 						margin: 0 auto
 						display: block
+						object-fit	contain
 						
 .number_body
 	position relative
@@ -139,4 +156,4 @@
 	height 110px
 	
 .scrollcontent
-	height 100%
+	//height 100%

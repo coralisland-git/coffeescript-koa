@@ -1,4 +1,15 @@
 $ ->
+	addTest "Loading Zipcodes", () ->
+
+        new Promise (resolve, reject) ->
+            ds  = new DataSet "zipcode"
+            ds.setAjaxSource "/js/test_data/zipcodes.json", "data", "code"
+            ds.doLoadData()
+            .then (dsObject)->
+                resolve(true)
+            .catch (e) ->
+                console.log "Error loading zipcode data: ", e
+                resolve(false)
 
 	addTestButton "Simple Message Box", "Open", ()->
 
@@ -87,7 +98,6 @@ $ ->
 		m.show()
 
 	addTestButton "Simple Form 2", "Open", () ->
-
 		m = new ModalDialog
 			showOnCreate: false
 			content:      "Fill out this example form"
@@ -97,7 +107,6 @@ $ ->
 		m.getForm().addTextInput "input1", "Example Input 1"
 		m.getForm().addTextInput "input2", "Example Input 2"
 		m.getForm().addTextInput "input3", "Example Input 3"
-
 		m.getForm().onSubmit = (form) =>
 			console.log "Submitted form, test value 1=", form.input1
 			console.log "Submitted form, test value 2=", form.input2

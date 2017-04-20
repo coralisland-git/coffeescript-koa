@@ -110,8 +110,14 @@ class View
 
         if !w? then w = $(window).width() - 100
         if !h? then h = $(window).height() - 100
-        x = ($(window).width()-w)  / 2
-        y = ($(window).height()-h) / 2
+
+        ##
+        ## Calculate scrolled position
+        scrollX = window.pageXOffset || document.body.scrollLeft
+        scrollY = window.pageYOffset || document.body.scrollTop
+        
+        x = ($(window).width() - w)  / 2 + scrollX
+        y = ($(window).height() - h) / 2 + scrollY
 
         ##|
         ##|  Remove space that title bar takes up

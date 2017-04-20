@@ -18,7 +18,20 @@ newImage9 = new Image()
 newImage9.src = "./js/test_Data/images/9.jpg"
 newImage10 = new Image()
 newImage10.src = "./js/test_Data/images/10.jpg"
+newImage11 = new Image()
+newImage11.src = "https://www.e-architect.co.uk/images/jpgs/concept/large-span-translucent-buildings-s010313.jpg"
+
 $ ->
+
+	$("body").append '''
+	    <style type="text/css">
+	    .scrollcontent {
+	        height : 100% !important;
+	    }
+	    </style>
+	'''
+
+	
 	addTestButton "Image Strip with few images", "Open", ()->
 		addHolder("renderTest1")
 		div = new WidgetTag "div", "testWidget"
@@ -31,6 +44,7 @@ $ ->
 			view.addImage newImage4
 			view.addImage newImage5
 			view.addImage newImage6
+			view.addImage newImage11
 			view.setSize 0, 800
 			view.render()
 		true
@@ -123,7 +137,7 @@ $ ->
 			view.setSize 0, 800
 			view.render()
 		)
-		tabs.addTab "EmptyTab", '<h2>Another tab</h2>'
+		tabs.addTab "EmptyTab", '<p style="font-size:xx-large;">--- Another tab ---</p>'
 		true
 
 	go()

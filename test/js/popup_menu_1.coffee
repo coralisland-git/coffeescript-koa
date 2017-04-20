@@ -46,7 +46,6 @@ $ ->
             menu = new PopupMenuCalendar "Calendar", e
             menu.onChange = (dateObject, dateString) ->
                 console.log "DATE STRING=", dateString, "DATE OBJECT=", dateObject
-                menu.destroy() # to destroy calendar
 
     addTest "Popup Calendar with default value", ()->
 
@@ -57,7 +56,6 @@ $ ->
             menu = new PopupMenuCalendar "2014-05-20", e
             menu.onChange = (dateObject, dateString) ->
                 console.log "DATE STRING=", dateString, "DATE OBJECT=", dateObject
-                menu.destroy() # to destroy calendar
 
     addTest "Popup menu with badge and icon", ()->
 

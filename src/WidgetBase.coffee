@@ -438,8 +438,7 @@ class WidgetTag
         dm = DataMap.getDataMap()
         path = "/#{tableName}/#{idValue}/#{fieldName}"
         currentValue = DataMap.getDataFieldFormatted tableName, idValue, fieldName
-        if currentValue is ""
-            return @el
+
         ## Add class `data` as a default one for widget binded to a table field    
         classes = ["data"]
 

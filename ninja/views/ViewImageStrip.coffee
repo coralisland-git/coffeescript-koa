@@ -37,7 +37,14 @@ class ViewImageStrip extends View
     ## function to change width and height of the view when it is resized
     ##
     onResizeViewImageStrip : (w, h)=>
-        console.log "w: #{w},   h: #{h}"
+        if w < 400 or h < 400
+            @setThumbSize 100, 75
+        else if w < 600 or h < 600
+            @setThumbSize 150, 100
+        else if w < 900 or h < 900
+            @setThumbSize 200, 150
+        else
+            @setThumbSize 300, 200
         true
 
     ##
@@ -53,11 +60,11 @@ class ViewImageStrip extends View
     ## ------------------------------------------------------------------------------------------
     ## function to render entire ImageStrip including imageviewer, thumbnail list, control buttons
     ##    
-    render: ()=>
-        if !@setElementsImageData()?
-            return false
+    render: ()=>        
         @renderThumbList()
         @renderControls()
+        if !@setSelectedImgNumber(0)?
+            return false
         true
 
     ## ------------------------------------------------------------------------------------------
@@ -90,11 +97,10 @@ class ViewImageStrip extends View
     setSelectedImgNumber: (number)=>
         if number? and 0 <= number and number < @getImageCount()
             @selectedImgNumber = number
-            @imageViewer.setData {
-                image: @imageData[@selectedImgNumber]
-                number: @selectedImgNumber
-                }
-        true
+            @hideOrShowControls()
+            return @setElementsImageData()
+        else
+            return false
     
     ##
     ## function to get currently selected image number
@@ -112,40 +118,40 @@ class ViewImageStrip extends View
     ## function to set number as current's-1
     ##
     prevImg: ()=>
-        if @selectedImgNumber == 0 then return
-        @selectedImgNumber--
-        @imageViewer.setData {
-            image: @imageData[@selectedImgNumber]
-            number: @selectedImgNumber
-        }
+        @setSelectedImgNumber @selectedImgNumber-1
         true
 
     ##
     ## function to set number as current's+1
     ##    
     nextImg: ()=>
-        if @selectedImgNumber >= @getImageCount() - 1 then return
-        @selectedImgNumber++
-        @imageViewer.setData {
-            image: @imageData[@selectedImgNumber]
-            number: @selectedImgNumber
-        }
+        @setSelectedImgNumber @selectedImgNumber+1
         true
 
     ##
     ## function to show right and left arrow controls
     ##    
     renderControls: ()=>
-        btnLeftArrow = new WidgetTag "button", "arrow_left"
-        btnRightArrow = new WidgetTag "button", "arrow_right"
-        btnLeftArrow.appendTo "#controls#{@gid}"
-        btnRightArrow.appendTo "#controls#{@gid}"
-        btnLeftArrow.bind "click", =>
-            console.log "Left Arrow Clicked"
+        html = "<div id='left-arrow'><i class='fa fa-arrow-left fa-3x' aria-hidden='true'></i></div><div id='right-arrow'><i class='fa fa-arrow-right fa-3x' aria-hidden='true'></i></div>"
+        $("#controls#{@gid}").html html
+        $("#controls#{@gid} #left-arrow").bind "click", =>
             @prevImg()
-        btnRightArrow.bind "click", =>
-            console.log "Right Arrow Clicked"
+            
+        $("#controls#{@gid} #right-arrow").bind "click", =>
             @nextImg()
+
+    ##
+    ## Function to enable/disable arrow buttons as there is any previous/next images
+    ##
+    hideOrShowControls: ()=>
+        if @selectedImgNumber <= 0
+                $("#controls#{@gid} #left-arrow").addClass "hidden-arrow"
+            else
+                $("#controls#{@gid} #left-arrow").removeClass "hidden-arrow"
+        if @selectedImgNumber >= @getImageCount() - 1
+                $("#controls#{@gid} #right-arrow").addClass "hidden-arrow"
+            else
+                $("#controls#{@gid} #right-arrow").removeClass "hidden-arrow"
 
     ##
     ## function to finally load IScroll for thumbnail list
@@ -158,13 +164,11 @@ class ViewImageStrip extends View
     ##
     renderThumbList: ()=>
         @scrollListBody = new WidgetTag "div", "scroll_list_body", "scroller#{@gid}"
-        element_ul = @scrollListBody.add "ul"
-        #_this = this
+        @element_ul = @scrollListBody.add "ul"
         @imageData.forEach((image, index)=>
-            element_li = element_ul.add "li"
+            element_li = @element_ul.add "li"
             element_li.el.on('click, tap', (e)=>
                 e.preventDefault()
-                console.log "thumb clicked : " + index
                 @setSelectedImgNumber index
             )
             imageviewer = new ImageViewer element_li.el, image, index
@@ -173,3 +177,14 @@ class ViewImageStrip extends View
         )        
         $("#scroll_wrapper#{@gid}").append @scrollListBody.el
         @loadScroll()
+
+    ##
+    ## Function to set size of thumbnails in IScroll
+    ##
+    setThumbSize: (w, h) =>
+        thumbList = @element_ul.getChildren()
+        for thumb in thumbList
+            thumb.el.width w
+            thumb.el.height h
+        @iScroll.refresh()
+        true

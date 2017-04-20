@@ -86,7 +86,6 @@ class PopupWindow
 			e.preventDefault()
 			e.stopPropagation()
 
-		@
 		@popupWindowHolder.hide()
 		@isVisible = false
 		false
@@ -192,6 +191,11 @@ class PopupWindow
 		width  = $(window).width()
 		height = $(window).height()
 
+		##
+        ## Calculate scrolled position
+		scrollX = window.pageXOffset || document.body.scrollLeft
+		scrollY = window.pageYOffset || document.body.scrollTop
+
 		console.log "popupWindow #{@title}, width=#{width} height=#{height} : #{@popupWidth} x #{@popupHeight} (x=#{@x}, y=#{@y})"
 		if @x == 0 and @y == 0
 			@center()
@@ -202,15 +206,19 @@ class PopupWindow
 		if @y < 0
 			@y = 0
 
-		if @x + @popupWidth + 10> width
+		## 
+		## Calculate scroll position
+		if @x - scrollX + @popupWidth + 10> width
 			console.log "popupWindow #{@title}, moving because #{@x} + #{@popupWidth} + 10 > #{width}"
-			@x = width - @popupWidth - 10
+			@x = width + scrollX - @popupWidth - 10
 
 		## adjustment of 24px for the resize handle so resize handle doesn't overlap
 		@popupHeight += 24
 
-		if @y + @popupHeight + 10 > height
-			@y = height - @popupHeight - 10
+		##
+		## Calculate scroll position
+		if @y - scrollY + @popupHeight + 10 > height
+			@y = height + scrollY - @popupHeight - 10
 
 		while @x < 10
 			@x++

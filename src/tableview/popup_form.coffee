@@ -32,8 +32,8 @@ class PopupForm extends ModalDialog
         super()
 
         if !@columns
-            @columns = DataMap.getColumnsFromTable @tableName, (c) ->
-                c.editable
+            @columns = DataMap.getColumnsFromTable @tableName#, (c) ->
+                #c.getEditable()
         ##| get formWrapper object
         @formWrapper = new PopUpFormWrapper()
 
@@ -50,19 +50,20 @@ class PopupForm extends ModalDialog
         ##| if in create mode insert key column and make it required
         if !@key
             @keyColumn = DataMap.getColumnsFromTable @tableName, (c) =>
-                c.source is @keyElement
+                c.getSource() == @keyElement
             .pop()
             ##| make key column required
             @keyColumn.required = true
             @columns.unshift @keyColumn
-        @columns = $.unique(@columns);
+        @columns = $.unique(@columns)
         for column in @columns
-            if column.source is @keyElement
+            if column.getSource() is @keyElement
                 @keyColumn = column
-            value = if @key then DataMap.getDataField(@tableName, @key, column.source) else null
-            if @defaults and @defaults[column.source]
-                value = @defaults[column.source]
-            @formWrapper.addInput column.source, column.name, value, (if !column.element then column.type else column.element), if column.options? then {options: column.options}
+            value = if @key then DataMap.getDataField(@tableName, @key, column.getSource()) else null
+            if @defaults and @defaults[column.getSource()]
+                value = @defaults[column.getSource()]
+            #@formWrapper.addInput column.getSource(), column.getName(), value, (if !column.element then column.getType() else column.element), if column.getOptions()? then {options: column.getOptions()}
+            @formWrapper.addInput column.getSource(), column.getName(), value, column.getType(), column.getOptions()
 
     ## -------------------------------------------------------------------------------------------------------------
     ## function to be executed on the click of button2
@@ -75,19 +76,19 @@ class PopupForm extends ModalDialog
         valid = true
         invalidColumns = [];
         for column in @columns
-            if column.required && ( !form[column.source] || form[column.source].length == 0 )
+            if column.required && ( !form[column.getSource()] || form[column.getSource()].length == 0 )
                 valid = false
-                invalidColumns.push column.name
+                invalidColumns.push column.getName()
         ##| required fields are not supplied
         if !valid
-            alert("#{invalidColumns} are required")
+            console.log "Error:", "#{invalidColumns} are required"
             false
         else
             ##| update data
             if @key
                 for column in @columns
                     DataMap.getDataMap().updatePathValue ["", @tableName, @key,
-                        column.source].join("/"), form[column.source]
+                        column.getSource()].join("/"), form[column.getSource()]
                 @hide()
             ##| create new data
             else

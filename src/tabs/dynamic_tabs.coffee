@@ -146,7 +146,7 @@ class DynamicTabs
 				# console.log tag.tabName + ":" + tag.order
 		else if tabType is "viewTab"
 			for tag, index in sortedTags
-				yield @doAddViewTab tag.viewName, tag.tabText
+				yield @doAddViewTab tag.viewName, tag.tabText, tag.callbackWithView
 				# console.log tag.viewName + ":" + tag.order
 		else if tabType is "tableTab"
 			for tag, index in sortedTags

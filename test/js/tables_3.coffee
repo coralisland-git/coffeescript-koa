@@ -1,6 +1,10 @@
 $ ->
-
-    addTest "Automatic Data from JSON", ()->
+    TESTRESULT = {}
+    new Promise (resolve, reject)->
+        $.get "js/test_data/test_result.json", (allData)->
+            TESTRESULT = allData.TESTRESULT
+            resolve(true)
+    addTestButton "Automatic Data from JSON", "Open", ()->
 
         Data = TESTRESULT
 
@@ -17,6 +21,7 @@ $ ->
         table.setColumnFilterAsPopup "T026_VEL_ID"
         table.setColumnFilterAsPopup "T231_ITM_STS_CD"
         table.render()
+        table.updateRowData()
 
         console.log "Done"
 

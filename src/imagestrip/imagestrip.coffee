@@ -7,7 +7,7 @@ class ImageViewer
 	constructor: (holderElement, image, number) ->
 		if !$(holderElement).length
 			throw new Error "Element with selector#{holderElement} not found for ImageStrip"
-		#if typeof holderElement is 'string'
+		
 		@elementHolder = $ holderElement
 
 		@gid = GlobalValueManager.NextGlobalID()
@@ -19,30 +19,18 @@ class ImageViewer
 		@numberBody = 
 			$ "<div />",
 			class: "number_body"
-			role: "numberBody"
 			id: "number_body#{@gid}"
 		# @property [jQuery] jQuery element showing image viewer
 		@imgViewerBody = new WidgetTag "div", "container-fluid image-wrapper", "image-wrapper#{@gid}"
 	
 		true
 
-	
-	##|
-	##|  click on one of the buttons
-	handleClick : (e) =>
-		the_gid = $(e.target).attr("id")
-		for element in @imgElements
-			if element.gid == the_gid
-				if element.onClick? and typeof element.onClick == "function" and element.onClick(e)
-					e.stopPropagation()
-					e.preventDefault()
-  		true
-  	
   	## ------------------------------------------------------------------------------------------
   	## function to set image source and its number
   	## @param [Object] data: includes image source and number
   	## @return [Boolean] isChanged: true if data is new
 	setData: (data) =>
+		isChanged = false
 		if data.image? and @imgElement isnt data.image
 			@imgElement = data.image
 			isChanged = true
@@ -78,7 +66,9 @@ class ImageViewer
 	drawImage: ()=>
 		if @imgElement?.tagName is "IMG"
 			@imgViewerBody.el.empty()
-			@imgViewerBody.add "img", "image-rendered", "image_rendered#{@gid}", {"src": @imgElement.src}
+			@imgViewerBody.add "img", "image-rendered", "image_rendered#{@gid}", {
+				"src": @imgElement.src
+			}
 	
 		@elementHolder.append @imgViewerBody.el
 		@imgViewerBody.show()

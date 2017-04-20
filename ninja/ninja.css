@@ -3,6 +3,7 @@
   font-size: 14px !important;
 }
 .data {
+  cursor: default;
   padding: 4px;
   font-family: arial;
   font-weight: 300;
@@ -21,7 +22,7 @@
   font-weight: 500;
 }
 .editable {
-  cursor: ibeam;
+  cursor: text !important;
 }
 .editable:hover {
   border: 1px solid #0b0;
@@ -110,6 +111,33 @@
   width: 100%;
   float: none;
   padding-bottom: 10px;
+}
+.form-pathfield {
+  padding: 6px 12px;
+}
+.label-pathfield {
+  text-transform: capitalize;
+}
+.data {
+  height: auto;
+  min-height: 34px;
+  max-height: 170px;
+  overflow: auto;
+}
+.data.editable {
+  background-color: rgba(209,252,222,0.4);
+}
+.custom {
+  border: none;
+  background-color: transparent !important;
+  cursor: pointer !important;
+  width: auto;
+}
+.custom:hover {
+  border: none !important;
+}
+.calculation {
+  background-color: rgba(209,238,242,0.4);
 }
 .material-icons {
   font: normal normal normal 14px/1 FontAwesome;
@@ -677,6 +705,7 @@ padding-top: 0px,
   z-index: 5000;
   cursor: arrow;
   opacity: 1;
+  min-width: 300px;
 }
 .PopupWindow .title {
   background-color: #2980b9;
@@ -713,6 +742,7 @@ padding-top: 0px,
   overflow: hidden;
   width: 100%;
   right: 0px;
+  min-width: 300px;
 }
 .scrollable .resizeHandle {
   background: url("/images/resize-handle.png") 100% 100% no-repeat;
@@ -1422,7 +1452,8 @@ span.fage {
   border-radius: 50%;
   border: 1px solid #ddd;
   background-color: #eee;
-  width: 20px;
+  width: auto;
+  min-width: 20px;
   height: 20px;
   padding-top: 4px;
   text-align: center;
@@ -1441,4 +1472,49 @@ span.fage {
   padding: 0;
   margin: 0;
   background-color: #fff;
+}
+.ViewWidgetSplittable {
+  background: transparent;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  border: none !important;
+}
+.widgetsplittable-container {
+  width: 100%;
+  height: 100%;
+  background-color: #f6f6f6;
+  box-sizing: border-box;
+}
+.widgetsplittable-container .widgetsplittable {
+  height: 100%;
+  width: 100%;
+}
+.split {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: auto;
+  border: 1px solid #c0c0c0;
+  background-color: #fff;
+}
+.split.split-horizontal {
+  height: 100%;
+  float: left;
+}
+.gutter {
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: 50%;
+}
+.gutter.gutter-horizontal {
+  cursor: col-resize;
+  background-image: url("/images/grips_horizontal.png");
+  height: 100%;
+  float: left;
+}
+.gutter.gutter-vertical {
+  cursor: row-resize;
+  background-image: url("images/grips_vertical.png");
 }
