@@ -110,7 +110,8 @@ $ ->
 			tabs2 = new DynamicTabs "#parentTab2"
 			
 			tabs2.doAddTableTab "SaveZipcodeData", "SaveZipcodeData"	
-			tabs2.doAddTableTab "testData", "TestData"
+			tab = yield tabs2.doAddTableTab "testData", "TestData"
+			tab.table.moveActionColumn "distance"
 		return
 
 	addTestButton "inline sorting with icon in header according to DataType", "Open", ()->
