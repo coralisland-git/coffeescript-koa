@@ -1640,7 +1640,16 @@ class DataFormatSimpleObject extends DataFormatterType
 			str += "<tr><td>"
 			str += varName
 			str += "</td><td>"
-			str += val
+
+			temp = ''
+			if Array.isArray val 
+				temp = val.length + ' Records'
+			else if typeof val == 'object'
+				temp = Object.keys(val).length + ' Properties'
+			else
+				temp = val
+
+			str += temp
 			str += "</tr>"
 			height += 20
 

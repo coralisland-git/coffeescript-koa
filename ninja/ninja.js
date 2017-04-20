@@ -10187,7 +10187,7 @@ DataFormatSimpleObject = (function(superClass) {
   };
 
   DataFormatSimpleObject.prototype.renderTooltip = function(row, value, tooltipWindow) {
-    var height, str, val, varName;
+    var height, str, temp, val, varName;
     if (value == null) {
       return false;
     }
@@ -10198,7 +10198,15 @@ DataFormatSimpleObject = (function(superClass) {
       str += "<tr><td>";
       str += varName;
       str += "</td><td>";
-      str += val;
+      temp = '';
+      if (Array.isArray(val)) {
+        temp = val.length + ' Records';
+      } else if (typeof val === 'object') {
+        temp = Object.keys(val).length + ' Properties';
+      } else {
+        temp = val;
+      }
+      str += temp;
       str += "</tr>";
       height += 20;
     }
