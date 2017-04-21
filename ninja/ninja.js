@@ -8317,6 +8317,7 @@ DynamicTabs = (function() {
           table = view.loadTable(tableName);
           table.showCheckboxes = true;
           table.setStatusBarEnabled();
+          table.updateRowData();
           _this.tables[tableName] = table;
           _this.tables[tableName].tab = _this.tabs[tabText];
           return _this.tabs[tabText].table = table;
