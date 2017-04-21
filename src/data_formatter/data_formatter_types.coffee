@@ -1660,10 +1660,8 @@ class DataFormatSimpleObject extends DataFormatterType
 		return true
 
 	onFocus: (e, col, data) =>
-		console.log "e=", e
-		console.log "col=", col
-		console.log "data=", data
-
+		doPopupTableView data , "Show #{col}", "showTableClasses", 800, 400
+		.then (view) ->
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to unformat the currently formatted data
 	##
