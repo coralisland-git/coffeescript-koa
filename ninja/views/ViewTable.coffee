@@ -10,6 +10,7 @@ class ViewTable extends View
         @infoPanel.hide()
 
         @table = new TableView @elHolder.find(".viewTableHolder")
+
         @table.addTable @tableName
         @table.setFixedHeaderAndScrollable()
         @table.setStatusBarEnabled()

@@ -318,15 +318,28 @@ $ ->
 				new PopupForm('zipcode', 'code', data.key, _columns)
 		true
 
-	addTestButton "popup table", "Open", ()->
-		addHolder('renderTest1')
-		zipCodeTable = new TableView $("#renderTest1")
-		zipCodeTable.addTable "zipcode"
-		zipCodeTable.on "click_city", (row, e) =>
-			console.log "You clicked on something in City:", row
+	addTestButton "popup table with array data", "Open", ()->
+		arrayData = [{ "code": "00501", "city": "Holtsville", "state": "NY", "county": "SUFFOLK", "area_code": "", "lat": "40.922326", "lon": "-72.637078" },
+	        		{"code": "00544", "city": "Holtsville", "state": "NY", "county": "SUFFOLK", "area_code": "", "lat": "40.922326", "lon": "-72.637078" },
+	        		{"code": "01001", "city": "Agawam", "state": "MA", "county": "HAMPDEN", "area_code": "", "lat": "42.140549", "lon": "-72.788661" },
+			        {"code": "01002", "city": "Amherst", "state": "MA", "county": "HAMPSHIRE", "area_code": "", "lat": "42.367092", "lon": "-72.464571" },
+	        		{"code": "01003", "city": "Amherst", "state": "MA", "county": "HAMPSHIRE", "area_code": "", "lat": "42.369562", "lon": "-72.63599" },
+	        		{"code": "01004", "city": "Amherst", "state": "MA", "county": "HAMPSHIRE", "area_code": "", "lat": "42.384494", "lon": "-72.513183"}]
 
-		popup = new PopupTable zipCodeTable, 'zipCodeDemoTable'
-		$('#renderTest1').remove()
+		doPopupTableView arrayData , "Show Table With Array", "showTableClasses", 800, 400
+		.then (view) ->
+
+		true
+
+	addTestButton "popup table with object data", "Open", ()->
+		objectData = {
+					1:{ "code": "00501", "city": "Holtsville", "state": "NY", "county": "SUFFOLK", "area_code": "", "lat": "40.922326", "lon": "-72.637078" },
+					2:{"code": "00544", "city": "Holtsville", "state": "NY", "county": "SUFFOLK", "area_code": "", "lat": "40.922326", "lon": "-72.637078" }
+					};
+
+		doPopupTableView objectData , "Show Table With Object", "showTableClasses", 800, 400
+		.then (view) ->
+
 		true
 
 	addTestButton "table with fixed header and scrollable", "Open", ()->

@@ -4110,7 +4110,7 @@ TypeaheadInput = (function() {
   return TypeaheadInput;
 
 })();
-var Screens, Scripts, StyleManager, Views, activateCurrentScreen, doAppendView, doLoadDependencies, doLoadScreen, doLoadView, doPopupView, doReplaceScreenContent, doShowScreen, globalWindowManager, registerStyleSheet, showScreen, showViewAsScreen;
+var Screens, Scripts, StyleManager, Views, activateCurrentScreen, doAppendView, doLoadDependencies, doLoadScreen, doLoadView, doPopupTableView, doPopupView, doReplaceScreenContent, doShowScreen, globalWindowManager, registerStyleSheet, showScreen, showViewAsScreen;
 
 Screens = {};
 
@@ -4251,6 +4251,34 @@ doPopupView = function(viewName, title, settingsName, w, h) {
         view.onSetupButtons();
         return resolve(view);
       });
+    });
+  });
+};
+
+doPopupTableView = function(data, title, settingsName, w, h) {
+  return new Promise(function(resolve, reject) {
+    var table_name, vertical;
+    vertical = false;
+    table_name = title.split(' ').join('_');
+    if (Array.isArray(data)) {
+      vertical = false;
+    } else if (typeof data === 'object') {
+      vertical = true;
+    }
+    return doPopupView('PopupTable', title, settingsName, w, h).then(function(view) {
+      var id, rec;
+      if (vertical === true) {
+        DataMap.removeTableData(table_name);
+        DataMap.importDataFromObjects(table_name, data);
+        view.loadTable(table_name, vertical);
+      } else {
+        for (id in data) {
+          rec = data[id];
+          DataMap.addDataUpdateTable(table_name, id, rec);
+        }
+        view.loadTable(table_name, vertical);
+      }
+      return resolve(view);
     });
   });
 };
