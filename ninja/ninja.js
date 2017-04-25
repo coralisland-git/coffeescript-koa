@@ -7179,7 +7179,7 @@ TableView = (function() {
     for (j = 0, len1 = ref.length; j < len1; j++) {
       i = ref[j];
       if (i.getAutoSize()) {
-        if (i.actualWidth == null) {
+        if ((i.actualWidth == null) || isNaN(i.actualWidth)) {
           i.actualWidth = this.findBestFit(i);
         }
         autoAdjustableColumns.push(i);
@@ -7206,13 +7206,13 @@ TableView = (function() {
       totalWidth += w;
       colNum++;
     }
+    maxWidth = this.getTableVisibleWidth();
     diffAmount = (maxWidth - totalWidth) / autoAdjustableColumns.length;
     diffAmount = Math.floor(diffAmount);
     for (l = 0, len3 = autoAdjustableColumns.length; l < len3; l++) {
       col = autoAdjustableColumns[l];
       col.actualWidth += diffAmount;
     }
-    maxWidth = this.getTableVisibleWidth();
     if ((this.cachedLayoutShadowWidth != null) && this.cachedLayoutShadowWidth === maxWidth) {
       return;
     }
@@ -8317,6 +8317,7 @@ DynamicTabs = (function() {
           table = view.loadTable(tableName);
           table.showCheckboxes = true;
           table.setStatusBarEnabled();
+          table.updateRowData();
           _this.tables[tableName] = table;
           _this.tables[tableName].tab = _this.tabs[tabText];
           return _this.tabs[tabText].table = table;

@@ -314,6 +314,7 @@ class DynamicTabs
 				table = view.loadTable tableName
 				table.showCheckboxes = true
 				table.setStatusBarEnabled()
+				table.updateRowData()
 				@tables[tableName] = table
 				@tables[tableName].tab = @tabs[tabText]
 
