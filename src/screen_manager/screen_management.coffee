@@ -149,6 +149,32 @@ doPopupView = (viewName, title, settingsName, w, h) ->
                 view.onSetupButtons()
                 resolve(view)
 
+doPopupTableView = (data, title, settingsName, w, h) ->
+
+    new Promise (resolve, reject) ->
+        vertical = false
+        table_name = title.split(' ').join('_')
+
+        if Array.isArray data
+            vertical = false
+        else if typeof data == 'object'
+            vertical = true
+            
+
+        doPopupView 'PopupTable', title, settingsName, w, h
+        .then (view) ->
+            if vertical == true
+                DataMap.removeTableData table_name
+                DataMap.importDataFromObjects table_name, data    
+                view.loadTable table_name, vertical
+            else
+                for id, rec of data
+                    DataMap.addDataUpdateTable table_name, id, rec
+                view.loadTable table_name, vertical
+
+            resolve view
+
+
 doLoadScreen = (screenName, optionalArgs) ->
 
     new Promise (resolve, reject) ->
