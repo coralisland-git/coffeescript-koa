@@ -2187,7 +2187,7 @@ class TableView
 		autoAdjustableColumns = []
 		for i in @colList
 			if i.getAutoSize()
-				if !i.actualWidth?
+				if !i.actualWidth? or isNaN(i.actualWidth)
 					i.actualWidth = @findBestFit(i)
 				autoAdjustableColumns.push(i)
 
@@ -2209,7 +2209,8 @@ class TableView
 			w = @getColWidth(location)
 			totalWidth += w
 			colNum++
-
+		
+		maxWidth   = @getTableVisibleWidth()
 		diffAmount = (maxWidth - totalWidth) / autoAdjustableColumns.length
 		# console.log "diffAmount=#{diffAmount}", (maxWidth - totalWidth)
 
@@ -2220,8 +2221,7 @@ class TableView
 
 		# console.log "layoutShadow maxWidth=#{maxWidth} totalWidth=#{totalWidth}", autoAdjustableColumns
 		# console.log "diffAmount=#{diffAmount}"
-
-		maxWidth   = @getTableVisibleWidth()
+		
 		if @cachedLayoutShadowWidth? and @cachedLayoutShadowWidth == maxWidth then return
 		@cachedLayoutShadowWidth = maxWidth
 
