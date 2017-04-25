@@ -6,6 +6,7 @@
     "coffee-exception-report": "^1.0.0",
     "coffee-middleware": "^0.3.0",
     "coffee-script": "^1.10.0",
+    "coffeeify": "^2.1.0",
     "connect-coffee-script": "^0.2.1",
     "edgecommondatasetconfig": "git+ssh://git@gitlab.protovate.com:Edge/EdgeCommonDataSetConfig.git",
     "fluidity": "^0.2.3",

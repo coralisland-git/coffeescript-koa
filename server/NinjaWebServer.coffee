@@ -11,6 +11,15 @@ coffeeScript        = require 'coffee-script'
 mime                = require 'mime-types'
 co                  = require 'co'
 WebServerHelper     = require './WebServerHelper'
+browserify = require 'browserify'
+coffeeify = require 'coffeeify'
+
+bundle = browserify
+  extensions: ['.coffee']
+
+bundle.transform coffeeify,
+  bare: true
+  header: true
 
 WebPath         = "../ninja/"
 server          = null
@@ -342,6 +351,7 @@ class NinjaWebServer
         str = ""
         for name in @ninjaCoffeeNormal
             str += @ninjaCoffeeFiles[name]
+            bundle.add name
 
         @ninjaCoffeeExtends = @ninjaCoffeeExtends.sort (a, b)->
             return a.name < b.name
@@ -349,7 +359,17 @@ class NinjaWebServer
         for info in @ninjaCoffeeExtends
             console.log "Extends:", info
             str += @ninjaCoffeeFiles[info.name]
+            bundle.add info.name
 
+        ##
+        ##--xg
+        bundle.bundle (error, result) ->
+            throw error if error?
+            zlib.gzip result, (_, contentJs)=>
+                ninjaJavascript = contentJs
+                
+            fs.writeFile "../ninja/ninja_bundled.js", result
+        
         fs.writeFile "../ninja/ninja.js", str
         console.log "Writing ../ninja/ninja.js"
 
@@ -358,8 +378,7 @@ class NinjaWebServer
         fs.writeFile "../ninja/ninja.css", strCss
         console.log "Writing ../ninja/ninja.css"
 
-        zlib.gzip str, (_, contentJs)=>
-            ninjaJavascript = contentJs
+        
 
         zlib.gzip strCss, (_, contentCss)=>
             ninjaCss = contentCss

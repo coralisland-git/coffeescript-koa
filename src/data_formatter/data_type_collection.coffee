@@ -1,6 +1,8 @@
 ## -------------------------------------------------------------------------------------------------------------
 ## class for DataTypeCollection
 ##
+DateSetConfig = require 'edgecommondatasetconfig'
+
 class DataTypeCollection
 
     ## -------------------------------------------------------------------------------------------------------------
@@ -64,7 +66,7 @@ class DataTypeCollection
             return
 
         if !@col[col.source]?
-            @col[col.source] = new TableViewCol(@tableName)
+            @col[col.source] = new DataSetConfig.Column(@tableName)
 
         if !col.order? then col.order = Object.keys(@col).length
 
