@@ -1640,7 +1640,16 @@ class DataFormatSimpleObject extends DataFormatterType
 			str += "<tr><td>"
 			str += varName
 			str += "</td><td>"
-			str += val
+
+			temp = ''
+			if Array.isArray val 
+				temp = val.length + ' Records'
+			else if typeof val == 'object'
+				temp = Object.keys(val).length + ' Properties'
+			else
+				temp = val
+
+			str += temp
 			str += "</tr>"
 			height += 20
 
@@ -1651,10 +1660,8 @@ class DataFormatSimpleObject extends DataFormatterType
 		return true
 
 	onFocus: (e, col, data) =>
-		console.log "e=", e
-		console.log "col=", col
-		console.log "data=", data
-
+		doPopupTableView data , "Show #{col}", "showTableClasses", 800, 400
+		.then (view) ->
 	## -------------------------------------------------------------------------------------------------------------
 	## funtion to unformat the currently formatted data
 	##
