@@ -312,6 +312,10 @@ class NinjaWebServer
             if m1 then return { class: m1[1], extends: m1[2], name: name }
             return null
 
+        getRequireInfo = (name)=>
+            m1 = @ninjaCoffeeRaw[name].match /require (.*)/
+            if m1 then return { class: m1[1], useRequire: true, name: name }
+            return null
 
         co ()=>
 
@@ -324,7 +328,10 @@ class NinjaWebServer
                 @ninjaCoffeeMap[file]   = output.v3SourceMap
 
                 info = getClassInfo(file)
-                if info? and info.extends?
+                useRequire = getRequireInfo(file)
+                if useRequire? and useRequire.useRequire == false
+                    bundle.add file
+                else if info? and info.extends?
                     for name in @ninjaCoffeeExtends
                         if name == file then return true
                     @ninjaCoffeeExtends.push info
@@ -332,6 +339,7 @@ class NinjaWebServer
                     for name in @ninjaCoffeeNormal
                         if name == file then return true
                     @ninjaCoffeeNormal.push file
+                
 
             else if /.styl/.test file
                 # console.log "Adding stylus file:", file
@@ -351,7 +359,8 @@ class NinjaWebServer
         str = ""
         for name in @ninjaCoffeeNormal
             str += @ninjaCoffeeFiles[name]
-            bundle.add name
+        bundle.require 'edgecommondatasetconfig', {basedir: '../node_modules/'}
+        bundle.require 'assert'
 
         @ninjaCoffeeExtends = @ninjaCoffeeExtends.sort (a, b)->
             return a.name < b.name
@@ -359,13 +368,13 @@ class NinjaWebServer
         for info in @ninjaCoffeeExtends
             console.log "Extends:", info
             str += @ninjaCoffeeFiles[info.name]
-            bundle.add info.name
+            #bundle.add info.name
 
         ##
         ##--xg
         bundle.bundle (error, result) ->
             throw error if error?
-            zlib.gzip result, (_, contentJs)=>
+            zlib.gzip result + str, (_, contentJs)=>
                 ninjaJavascript = contentJs
                 
             fs.writeFile "../ninja/ninja_bundled.js", result

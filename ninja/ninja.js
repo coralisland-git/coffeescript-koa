@@ -1454,10 +1454,10 @@ DataMap = (function() {
   return DataMap;
 
 })();
-var DataTypeCollection, DateSetConfig,
+var DataSetConfig, DataTypeCollection,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-DateSetConfig = require('edgecommondatasetconfig');
+DataSetConfig = require('edgecommondatasetconfig');
 
 DataTypeCollection = (function() {
   function DataTypeCollection(tableName) {
