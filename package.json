@@ -3,6 +3,7 @@
   "version": "0.0.15",
   "private": "true",
   "dependencies": {
+    "browserify": "^14.3.0",
     "coffee-exception-report": "^1.0.0",
     "coffee-middleware": "^0.3.0",
     "coffee-script": "^1.10.0",
