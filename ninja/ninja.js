@@ -10240,9 +10240,6 @@ DataFormatSimpleObject = (function(superClass) {
   };
 
   DataFormatSimpleObject.prototype.onFocus = function(e, col, data) {
-    console.log("e=", e);
-    console.log("col=", col);
-    console.log("data=", data);
     return doPopupTableView(data, "Show " + col, "showTableClasses", 800, 400).then(function(view) {});
   };
 
