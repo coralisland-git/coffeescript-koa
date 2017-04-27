@@ -182,7 +182,7 @@ class DataMap
 
 			if sourceName == "_lastModified" then continue
 			if typeof obj != "object" then continue
-			dm.types[tableName].configureColumns([ obj ], true)
+			dm.types[tableName].unserialize([ obj ], true)
 
 		# console.log  "importDataTypes table=#{tableName}:", dm.types[tableName]
 
@@ -202,7 +202,7 @@ class DataMap
 		if !dm.types[tableName]?
 		   dm.types[tableName] = new DataSetConfig.Table(tableName)
 
-		dm.types[tableName].configureColumns columns
+		dm.types[tableName].unserialize columns
 
 		# console.log "ADDING:", tableName, columns
 		# console.log dm.types[tableName]
@@ -256,7 +256,7 @@ class DataMap
 		##|
 		##|  Save this new column entirely
 		##|
-		saveText = dm.types[tableName].toSave()
+		saveText = dm.types[tableName].serialize()
 		dm.emitEvent "table_change", [tableName, saveText]
 		return dm.types[tableName].col[config.source]
 
