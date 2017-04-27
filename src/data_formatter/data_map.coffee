@@ -4,7 +4,7 @@
 ## @param [Element] e the element in which the editor to create
 ## @return [Boolean]
 ##
-
+DataSetConfig = require 'edgecommondatasetconfig'
 
 globalOpenEditor = (e) ->
 	##|
@@ -176,7 +176,7 @@ class DataMap
 	@importDataTypes: (tableName, savedConfig) =>
 
 		dm = DataMap.getDataMap()
-		dm.types[tableName] = new DataTypeCollection(tableName)
+		dm.types[tableName] = new DataSetConfig.Table(tableName)
 
 		for sourceName, obj of savedConfig
 
@@ -200,7 +200,7 @@ class DataMap
 		dm = DataMap.getDataMap()
 
 		if !dm.types[tableName]?
-		   dm.types[tableName] = new DataTypeCollection(tableName)
+		   dm.types[tableName] = new DataSetConfig.Table(tableName)
 
 		dm.types[tableName].configureColumns columns
 
@@ -269,7 +269,7 @@ class DataMap
 	@setDataTypesFromObject: (tableName, objects) =>
 
 		dm = DataMap.getDataMap()
-		dm.types[tableName] = new DataTypeCollection(tableName)
+		dm.types[tableName] = new DataSetConfig.Table(tableName)
 
 		updated = false
 		for i, o of objects
@@ -282,7 +282,7 @@ class DataMap
 	setDataTypesFromSingleObject: (tableName, newData)=>
 
 		if !@types[tableName]?
-			@types[tableName] = new DataTypeCollection(tableName)
+			@types[tableName] = new DataSetConfig.Table(tableName)
 
 		##|
 		##|  Returns updated = true if the data type(s) found in this table
@@ -458,7 +458,7 @@ class DataMap
 
 		dm = DataMap.getDataMap()
 		if !dm.types[tableName]?
-			dm.types[tableName] = new DataTypeCollection(tableName)
+			dm.types[tableName] = new DataSetConfig.Table(tableName)
 
 		updated = dm.setDataTypesFromSingleObject(tableName, newData)
 

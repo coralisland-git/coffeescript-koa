@@ -1099,7 +1099,7 @@ class TableView
 		## to show sorting arrow on ActionColumn header
 		for acol in @actionColList
 			acol.sort = 0
-			if acol.constructor.name is "TableViewCol"
+			if acol.constructor.name is "Column"
 				for sortrule in @sortRules
 					if sortrule.tableName is @primaryTableName and sortrule.source is acol.getSource()
 						acol.sort = sortrule.state

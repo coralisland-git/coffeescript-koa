@@ -3,7 +3,8 @@
 ## global functions required to use tables. the cell id is a counter
 ## used to create elements with a new unique ID
 ##
-class TableViewColCheckbox extends TableViewColBase
+DataSetConfig = require 'edgecommondatasetconfig'
+class TableViewColCheckbox extends DataSetConfig.ColumnBase
 
     ## -------------------------------------------------------------------------------------------------------------
     ## constructor create new column object
