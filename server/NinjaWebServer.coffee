@@ -360,7 +360,6 @@ class NinjaWebServer
         for name in @ninjaCoffeeNormal
             str += @ninjaCoffeeFiles[name]
         bundle.require 'edgecommondatasetconfig', {basedir: '../node_modules/'}
-        bundle.require 'assert'
 
         @ninjaCoffeeExtends = @ninjaCoffeeExtends.sort (a, b)->
             return a.name < b.name
@@ -368,7 +367,6 @@ class NinjaWebServer
         for info in @ninjaCoffeeExtends
             console.log "Extends:", info
             str += @ninjaCoffeeFiles[info.name]
-            #bundle.add info.name
 
         ##
         ##--xg
@@ -376,10 +374,9 @@ class NinjaWebServer
             throw error if error?
             zlib.gzip result + str, (_, contentJs)=>
                 ninjaJavascript = contentJs
-                
-            fs.writeFile "../ninja/ninja_bundled.js", result
-        
-        fs.writeFile "../ninja/ninja.js", str
+                fs.writeFile "../ninja/ninja.js", [result, str]
+
+        #fs.writeFile "../ninja/ninja.js", str
         console.log "Writing ../ninja/ninja.js"
 
         strCss = ""
