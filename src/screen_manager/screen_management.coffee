@@ -9,7 +9,7 @@ Screens.popupVisible = 0
 Views        = {}
 Scripts      = {}
 StyleManager = {}
-
+PopupViews   = {}
 
 ##|
 ##|  An instance of the Window Manager anchored in the area that screens will swap
@@ -145,6 +145,24 @@ doPopupView = (viewName, title, settingsName, w, h) ->
         .then (view)->
             view.windowTitle = title
             view.showPopup settingsName, w, h
+            view.once "view_ready", ()->
+                view.onSetupButtons()
+                resolve(view)
+
+## - xg
+## - Popup a view with DynamicTabls, only once
+doPopupViewOnce = (viewName, title, settingsName, w, h, tabName) ->
+    if PopupViews[title]
+        return PopupViews[title]
+
+    new Promise (resolve, reject) ->
+
+        doLoadView('')
+        .then (view)->
+            view.windowTitle = title
+            view.showPopup settingsName, w, h
+            tabs = new DynamicTabs view.elHolder
+            tabs.doAddViewTab viewName, tabName
             view.once "view_ready", ()->
                 view.onSetupButtons()
                 resolve(view)

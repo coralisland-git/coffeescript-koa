@@ -74,4 +74,8 @@ $ ->
 			w: 600
 			h: 200
 		popup.windowScroll.append $ "<div> Hello World </div>"
+
+	addTestButton "PopupViewOnce", "Open", (e) ->
+		doPopupViewOnce "Table", "Test1", "", 900, 600, "Tab1"
+
 	go()

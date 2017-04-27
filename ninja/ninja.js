@@ -4110,7 +4110,7 @@ TypeaheadInput = (function() {
   return TypeaheadInput;
 
 })();
-var Screens, Scripts, StyleManager, Views, activateCurrentScreen, doAppendView, doLoadDependencies, doLoadScreen, doLoadView, doPopupView, doReplaceScreenContent, doShowScreen, globalWindowManager, registerStyleSheet, showScreen, showViewAsScreen;
+var PopupViews, Screens, Scripts, StyleManager, Views, activateCurrentScreen, doAppendView, doLoadDependencies, doLoadScreen, doLoadView, doPopupView, doPopupViewOnce, doReplaceScreenContent, doShowScreen, globalWindowManager, registerStyleSheet, showScreen, showViewAsScreen;
 
 Screens = {};
 
@@ -4125,6 +4125,8 @@ Views = {};
 Scripts = {};
 
 StyleManager = {};
+
+PopupViews = {};
 
 globalWindowManager = null;
 
@@ -4247,6 +4249,25 @@ doPopupView = function(viewName, title, settingsName, w, h) {
     return doLoadView(viewName).then(function(view) {
       view.windowTitle = title;
       view.showPopup(settingsName, w, h);
+      return view.once("view_ready", function() {
+        view.onSetupButtons();
+        return resolve(view);
+      });
+    });
+  });
+};
+
+doPopupViewOnce = function(viewName, title, settingsName, w, h, tabName) {
+  if (PopupViews[title]) {
+    return PopupViews[title];
+  }
+  return new Promise(function(resolve, reject) {
+    return doLoadView('').then(function(view) {
+      var tabs;
+      view.windowTitle = title;
+      view.showPopup(settingsName, w, h);
+      tabs = new DynamicTabs(view.elHolder);
+      tabs.doAddViewTab(viewName, tabName);
       return view.once("view_ready", function() {
         view.onSetupButtons();
         return resolve(view);
