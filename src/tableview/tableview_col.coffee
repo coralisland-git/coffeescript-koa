@@ -1,4 +1,5 @@
-class TableViewCol extends TableViewColBase
+DataSetConfig = require 'edgecommondatasetconfig'
+class TableViewCol extends DataSetConfig.ColumnBase
 
 	## -------------------------------------------------------------------------------------------------------------
 	## constructor create new column object
