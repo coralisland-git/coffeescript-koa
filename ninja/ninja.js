@@ -4257,22 +4257,40 @@ doPopupView = function(viewName, title, settingsName, w, h) {
   });
 };
 
-doPopupViewOnce = function(viewName, title, settingsName, w, h, tabName) {
-  if (PopupViews[title]) {
-    return PopupViews[title];
-  }
-  return new Promise(function(resolve, reject) {
-    return doLoadView('').then(function(view) {
-      var tabs;
+doPopupViewOnce = function(viewName, title, settingsName, w, h, tabName, callbackWithView) {
+  if (PopupViews[title] == null) {
+    PopupViews[title] = new Promise(function(resolve, reject) {
+      var tabs, view;
+      view = new View();
       view.windowTitle = title;
       view.showPopup(settingsName, w, h);
       tabs = new DynamicTabs(view.elHolder);
-      tabs.doAddViewTab(viewName, tabName);
       return view.once("view_ready", function() {
-        view.onSetupButtons();
-        return resolve(view);
+        return resolve({
+          view: view,
+          tabs: tabs
+        });
       });
     });
+    PopupViews[title].tabNames = [];
+  }
+  return PopupViews[title].then(function(arg) {
+    var tabs, view;
+    view = arg.view, tabs = arg.tabs;
+    if (view.popup == null) {
+      view.showPopup(settingsName, w, h);
+      tabs = new DynamicTabs(view.elHolder);
+    }
+    if (!view.popup.isVisible) {
+      view.popup.open();
+    }
+    if (PopupViews[title].tabNames.includes(tabName)) {
+      return tabs.show("tab" + (PopupViews[title].tabNames.indexOf(tabName)));
+    } else {
+      tabs.doAddViewTab(viewName, tabName, callbackWithView);
+      PopupViews[title].tabNames.push(tabName);
+      return tabs.show("tab" + (PopupViews[title].tabNames.indexOf(tabName)));
+    }
   });
 };
 

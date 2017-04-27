@@ -151,21 +151,32 @@ doPopupView = (viewName, title, settingsName, w, h) ->
 
 ## - xg
 ## - Popup a view with DynamicTabls, only once
-doPopupViewOnce = (viewName, title, settingsName, w, h, tabName) ->
-    if PopupViews[title]
-        return PopupViews[title]
+doPopupViewOnce = (viewName, title, settingsName, w, h, tabName, callbackWithView) ->
 
-    new Promise (resolve, reject) ->
-
-        doLoadView('')
-        .then (view)->
+    if !PopupViews[title]?
+        PopupViews[title] = new Promise (resolve, reject) ->
+            view = new View()
             view.windowTitle = title
             view.showPopup settingsName, w, h
             tabs = new DynamicTabs view.elHolder
-            tabs.doAddViewTab viewName, tabName
             view.once "view_ready", ()->
-                view.onSetupButtons()
-                resolve(view)
+                #view.onSetupButtons()
+                resolve({view, tabs})
+        PopupViews[title].tabNames = []
+
+    PopupViews[title].then ({view, tabs}) ->
+        if !view.popup?
+            view.showPopup settingsName, w, h
+            tabs = new DynamicTabs view.elHolder
+
+        if !view.popup.isVisible
+            view.popup.open()
+        if PopupViews[title].tabNames.includes(tabName)
+            tabs.show "tab#{PopupViews[title].tabNames.indexOf(tabName)}"
+        else
+            tabs.doAddViewTab viewName, tabName, callbackWithView
+            PopupViews[title].tabNames.push tabName
+            tabs.show "tab#{PopupViews[title].tabNames.indexOf(tabName)}"    
 
 doLoadScreen = (screenName, optionalArgs) ->
 
