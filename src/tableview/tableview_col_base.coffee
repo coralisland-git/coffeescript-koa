@@ -8,6 +8,8 @@ reDate1   = /^[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]T00.00.00.000Z/
 reDate2   = /^[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]T[0-9][0-9].[0-9][0-9].[0-9][0-9].[0-9][0-9][0-9]Z/
 reNumber  = /^[\-1-9][0-9]{1,10}$/
 reDecimal = /^[\-1-9\.][0-9\.]{1,11}\.[0-9]+$/
+DataSetConfig   = require 'edgecommondatasetconfig'
+dataFormatter   = new DataSetConfig.DataFormatter()
 
 class TableViewColBase
 
@@ -52,7 +54,7 @@ class TableViewColBase
 
     getFormatter: ()=>
         if @formatter then return @formatter
-        @formatter = globalDataFormatter.getFormatter @getType()
+        @formatter = dataFormatter.getFormatter @getType()
 
     getFormatterName: ()=>
         f = @getFormatter()
