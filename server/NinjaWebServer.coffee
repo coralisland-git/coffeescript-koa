@@ -11,8 +11,8 @@ coffeeScript        = require 'coffee-script'
 mime                = require 'mime-types'
 co                  = require 'co'
 WebServerHelper     = require './WebServerHelper'
-browserify = require 'browserify'
-coffeeify = require 'coffeeify'
+browserify          = require 'browserify'
+coffeeify           = require 'coffeeify'
 
 bundle = browserify
   extensions: ['.coffee']
