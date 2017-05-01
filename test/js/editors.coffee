@@ -55,6 +55,9 @@ $ ->
         padding-top: 20px;
         font-size: 14px;
     }
+    .scrollcontent {
+        height: 100%;
+    }
     </style>
     '''
 
