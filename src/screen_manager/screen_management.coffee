@@ -157,7 +157,8 @@ doPopupViewOnce = (viewName, title, settingsName, w, h, tabName, callbackWithVie
         PopupViews[title] = new Promise (resolve, reject) ->
             view = new View()
             view.windowTitle = title
-            view.showPopup settingsName, w, h
+            view.showPopupwithConfig settingsName, w, h, 
+                keyValue: title
             tabs = new DynamicTabs view.elHolder
             view.once "view_ready", ()->
                 #view.onSetupButtons()
@@ -165,8 +166,9 @@ doPopupViewOnce = (viewName, title, settingsName, w, h, tabName, callbackWithVie
         PopupViews[title].tabNames = []
 
     PopupViews[title].then ({view, tabs}) ->
-        if !view.popup?
-            view.showPopup settingsName, w, h
+        if !view.popup.popupWindowHolder?
+            view.showPopupwithConfig settingsName, w, h, 
+                keyValue: title
             tabs = new DynamicTabs view.elHolder
 
         if !view.popup.isVisible

@@ -4263,7 +4263,9 @@ doPopupViewOnce = function(viewName, title, settingsName, w, h, tabName, callbac
       var tabs, view;
       view = new View();
       view.windowTitle = title;
-      view.showPopup(settingsName, w, h);
+      view.showPopupwithConfig(settingsName, w, h, {
+        keyValue: title
+      });
       tabs = new DynamicTabs(view.elHolder);
       return view.once("view_ready", function() {
         return resolve({
@@ -4277,8 +4279,10 @@ doPopupViewOnce = function(viewName, title, settingsName, w, h, tabName, callbac
   return PopupViews[title].then(function(arg) {
     var tabs, view;
     view = arg.view, tabs = arg.tabs;
-    if (view.popup == null) {
-      view.showPopup(settingsName, w, h);
+    if (view.popup.popupWindowHolder == null) {
+      view.showPopupwithConfig(settingsName, w, h, {
+        keyValue: title
+      });
       tabs = new DynamicTabs(view.elHolder);
     }
     if (!view.popup.isVisible) {
@@ -4518,6 +4522,7 @@ View = (function() {
     this.onHideScreen = bind(this.onHideScreen, this);
     this.onShowScreen = bind(this.onShowScreen, this);
     this.internalFindElements = bind(this.internalFindElements, this);
+    this.showPopupwithConfig = bind(this.showPopupwithConfig, this);
     this.showPopup = bind(this.showPopup, this);
     this.showInDiv = bind(this.showInDiv, this);
     this.closePopup = bind(this.closePopup, this);
@@ -4608,6 +4613,45 @@ View = (function() {
       w: w,
       h: h
     });
+    this.gid = "View" + GlobalValueManager.NextGlobalID();
+    this.elHolder = $("<div />", {
+      id: this.gid,
+      "class": "popupView " + this.constructor.name
+    });
+    $(document).ready((function(_this) {
+      return function() {
+        _this.internalFindElements(_this.elHolder);
+        _this.onShowScreen();
+        return _this.emitEvent("view_ready", []);
+      };
+    })(this));
+    this.elHolder.html(this.template);
+    this.popup.windowScroll.append(this.elHolder);
+    cssTag = $("<style>" + this.css + "</style>");
+    $("head").append(cssTag);
+    return true;
+  };
+
+  View.prototype.showPopupwithConfig = function(optionalName, w, h, config) {
+    var cssTag, scrollX, scrollY, x, y;
+    if (w == null) {
+      w = $(window).width() - 100;
+    }
+    if (h == null) {
+      h = $(window).height() - 100;
+    }
+    scrollX = window.pageXOffset || document.body.scrollLeft;
+    scrollY = window.pageYOffset || document.body.scrollTop;
+    x = ($(window).width() - w) / 2 + scrollX;
+    y = ($(window).height() - h) / 2 + scrollY;
+    y -= 34 / 2;
+    if (!config) {
+      config = {};
+    }
+    config.tableName = optionalName;
+    config.w = w;
+    config.h = h;
+    this.popup = new PopupWindow(this.windowTitle, x, y, config);
     this.gid = "View" + GlobalValueManager.NextGlobalID();
     this.elHolder = $("<div />", {
       id: this.gid,
