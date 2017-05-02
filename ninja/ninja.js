@@ -3809,12 +3809,6 @@ PopupWindow = (function() {
         return false;
       };
     })(this));
-    this.dragabilly.on("dragStart", (function(_this) {
-      return function(e) {
-        _this.popupWindowHolder.css("opacity", "0.5");
-        return false;
-      };
-    })(this));
     this.dragabilly.on("dragEnd", (function(_this) {
       return function(e) {
         _this.popupWindowHolder.css("opacity", "1.0");
@@ -7257,14 +7251,16 @@ TableView = (function() {
 
   TableView.prototype.layoutShadow = function() {
     var autoAdjustableColumns, col, colNum, diffAmount, i, j, k, l, len1, len2, len3, location, maxWidth, ref, ref1, totalWidth, w;
+    maxWidth = this.getTableVisibleWidth();
+    if (!((this.cachedLayoutShadowWidth != null) && this.cachedLayoutShadowWidth === maxWidth)) {
+      this.cachedLayoutShadowWidth = maxWidth;
+    }
     autoAdjustableColumns = [];
     ref = this.colList;
     for (j = 0, len1 = ref.length; j < len1; j++) {
       i = ref[j];
       if (i.getAutoSize()) {
-        if ((i.actualWidth == null) || isNaN(i.actualWidth)) {
-          i.actualWidth = this.findBestFit(i);
-        }
+        i.actualWidth = this.findBestFit(i);
         autoAdjustableColumns.push(i);
       }
     }
@@ -7289,17 +7285,12 @@ TableView = (function() {
       totalWidth += w;
       colNum++;
     }
-    maxWidth = this.getTableVisibleWidth();
     diffAmount = (maxWidth - totalWidth) / autoAdjustableColumns.length;
     diffAmount = Math.floor(diffAmount);
     for (l = 0, len3 = autoAdjustableColumns.length; l < len3; l++) {
       col = autoAdjustableColumns[l];
       col.actualWidth += diffAmount;
     }
-    if ((this.cachedLayoutShadowWidth != null) && this.cachedLayoutShadowWidth === maxWidth) {
-      return;
-    }
-    this.cachedLayoutShadowWidth = maxWidth;
     return true;
   };
 
