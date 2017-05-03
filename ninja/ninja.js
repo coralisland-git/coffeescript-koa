@@ -8372,6 +8372,9 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
 
     DataFormatImageList.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
       var h, imgCount, title, w;
+      if (currentValue == null) {
+        return false;
+      }
       w = $(window).width();
       h = $(window).height();
       if (w > 1000) {
@@ -8391,7 +8394,7 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
         h = 400;
       }
       if (typeof currentValue === "string") {
-        currentValue = currentValue.split(",");
+        currentValue = currentValue.split("||");
       }
       imgCount = currentValue.length;
       if (imgCount < 1) {
@@ -8413,23 +8416,26 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
     };
 
     DataFormatImageList.prototype.format = function(currentValue, options, path) {
-      var formattedValue, idx, imgCount, obj, values;
+      var formattedValue, imgCount;
       this.options = options;
-      if (typeof currentValue === "string") {
-        currentValue = currentValue.split(',');
-      }
-      if (Array.isArray(currentValue)) {
-        return currentValue.join(", ");
-      }
-      values = [];
-      for (idx in currentValue) {
-        obj = currentValue[idx];
-        values.push(obj);
-      }
-      return values.join(", ");
+
+      /*
+      if typeof currentValue == "string"
+          currentValue = currentValue.split ','
+      
+      if Array.isArray(currentValue)
+          return currentValue.join(", ")
+      
+      values = []
+      for idx, obj of currentValue
+          values.push obj
+      return values.join(", ")
+       */
       formattedValue = "No Image";
       if (typeof currentValue === "string") {
-        currentValue = currentValue.split(",");
+        currentValue = currentValue.split("||");
+      } else if (currentValue == null) {
+        return formattedValue;
       }
       imgCount = currentValue.length;
       if (imgCount === 1) {

@@ -1,3 +1,6 @@
+DataSetConfig           = require 'edgecommondatasetconfig'
+dataFormatter           = new DataSetConfig.DataFormatter()
+
 class ViewShowTableEditor extends View
 
     getDependencyList: ()=>
@@ -226,7 +229,7 @@ class ViewShowTableEditor extends View
                 required : true
                 width    : 90,
                 element  : "select",
-                options  : Object.keys globalDataFormatter.formats
+                options  : Object.keys dataFormatter.formats
             ,
                 name     : "Width"
                 source   : "width"
