@@ -6124,13 +6124,15 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
     };
 
     Column.prototype.getAlign = function() {
+
+      /*
+      if @data.type == "money"
+          @data.align = "right"
+      
+      if @data.align? and @data.align.length > 0
+          return @data.align
+       */
       var f;
-      if (this.data.type === "money") {
-        this.data.align = "right";
-      }
-      if ((this.data.align != null) && this.data.align.length > 0) {
-        return this.data.align;
-      }
       f = this.getFormatter();
       if ((f != null) && (f.align != null)) {
         return f.align;
@@ -6307,7 +6309,7 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
         return this.excelStatementRender(this.data.render.substr(1), this.scope);
       }
       template = 'try {  // toStringWrapper\nXXCODEXX\n} catch (e) { console.log("Render error:",e); console.log("val=",val,"tableName=",tableName,"fieldName=",fieldName,"id=",id); return "Error"; }';
-      this.renderFunctionCache = new Function("val", "tableName", "fieldName", "id", "row", template.replace("XXCODEXX", this.data.render));
+      this.renderFunctionCache = new Function("val", "tableName", "fieldName", "id", "row", this.data.render.toString().match(/function[^{]+\{([\s\S]*)\}$/)[1]);
       return this.renderFunctionCache;
     };
 
@@ -6403,6 +6405,12 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
         this.changeColumn("width", 60);
         this.changeColumn("align", "left");
         this.data.skipDeduce = true;
+        return;
+      }
+      if (/^imagelist/i.test(this.data.name)) {
+        this.changeColumn("type", "imagelist");
+        this.changeColumn("width", 60);
+        this.changeColumn("align", "left");
         return;
       }
     };
@@ -8644,9 +8652,9 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
     };
 
     Table.prototype.unserialize = function(settingsObject) {
-      var col, key;
-      for (key in settingsObject) {
-        col = settingsObject[key];
+      var col, i, len;
+      for (i = 0, len = settingsObject.length; i < len; i++) {
+        col = settingsObject[i];
         this.configureColumn(col, false);
       }
       return true;
@@ -68385,203 +68393,6 @@ WindowManager = (function() {
   return WindowManager;
 
 })();
-var DataSetConfig, TableViewColBase, dataFormatter, reDate1, reDate2, reDecimal, reNumber,
-  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-
-reDate1 = /^[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]T00.00.00.000Z/;
-
-reDate2 = /^[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]T[0-9][0-9].[0-9][0-9].[0-9][0-9].[0-9][0-9][0-9]Z/;
-
-reNumber = /^[\-1-9][0-9]{1,10}$/;
-
-reDecimal = /^[\-1-9\.][0-9\.]{1,11}\.[0-9]+$/;
-
-DataSetConfig = require('edgecommondatasetconfig');
-
-dataFormatter = new DataSetConfig.DataFormatter();
-
-TableViewColBase = (function() {
-  function TableViewColBase() {
-    this.deserialize = bind(this.deserialize, this);
-    this.serialize = bind(this.serialize, this);
-    this.deduceInitialColumnType = bind(this.deduceInitialColumnType, this);
-    this.deduceColumnType = bind(this.deduceColumnType, this);
-    this.renderTooltip = bind(this.renderTooltip, this);
-    this.getRenderFunction = bind(this.getRenderFunction, this);
-    this.changeColumn = bind(this.changeColumn, this);
-    this.renderValue = bind(this.renderValue, this);
-    this.getIsCalculation = bind(this.getIsCalculation, this);
-    this.getAutoSize = bind(this.getAutoSize, this);
-    this.getSystemColumn = bind(this.getSystemColumn, this);
-    this.getAlwaysHidden = bind(this.getAlwaysHidden, this);
-    this.getRequired = bind(this.getRequired, this);
-    this.onFocus = bind(this.onFocus, this);
-    this.getFormatterName = bind(this.getFormatterName, this);
-    this.getFormatter = bind(this.getFormatter, this);
-    this.getType = bind(this.getType, this);
-    this.RenderHeaderHorizontal = bind(this.RenderHeaderHorizontal, this);
-    this.RenderHeader = bind(this.RenderHeader, this);
-    this.getWidth = bind(this.getWidth, this);
-  }
-
-  TableViewColBase.prototype.getName = function() {
-    return "No name";
-  };
-
-  TableViewColBase.prototype.getSource = function() {
-    return "";
-  };
-
-  TableViewColBase.prototype.getOrder = function() {
-    return 999;
-  };
-
-  TableViewColBase.prototype.getOptions = function() {
-    return null;
-  };
-
-  TableViewColBase.prototype.getClickable = function() {
-    return false;
-  };
-
-  TableViewColBase.prototype.getEditable = function() {
-    return false;
-  };
-
-  TableViewColBase.prototype.getAlign = function() {
-    return null;
-  };
-
-  TableViewColBase.prototype.getWidth = function() {
-    return 0;
-  };
-
-  TableViewColBase.prototype.RenderHeader = function(parent, location) {
-    return parent.html("No RenderHeader");
-  };
-
-  TableViewColBase.prototype.RenderHeaderHorizontal = function(parent, location) {
-    return parent.html("No RenderHeaderHorizontal");
-  };
-
-  TableViewColBase.prototype.UpdateSortIcon = function(newSort) {
-    return null;
-  };
-
-  TableViewColBase.prototype.getVisible = function() {
-    return true;
-  };
-
-  TableViewColBase.prototype.getType = function() {
-    return "text";
-  };
-
-  TableViewColBase.prototype.getFormatter = function() {
-    if (this.formatter) {
-      return this.formatter;
-    }
-    return this.formatter = dataFormatter.getFormatter(this.getType());
-  };
-
-  TableViewColBase.prototype.getFormatterName = function() {
-    var f;
-    f = this.getFormatter();
-    if (f != null) {
-      return f.name;
-    }
-    return null;
-  };
-
-  TableViewColBase.prototype.onFocus = function(e, col, data) {
-    var f;
-    f = this.getFormatter();
-    if ((f != null) && (f.onFocus != null)) {
-      f.onFocus(e, col, data);
-    }
-    return true;
-  };
-
-  TableViewColBase.prototype.getRequired = function() {
-    return false;
-  };
-
-  TableViewColBase.prototype.getAlwaysHidden = function() {
-    return false;
-  };
-
-  TableViewColBase.prototype.getSystemColumn = function() {
-    return false;
-  };
-
-  TableViewColBase.prototype.getAutoSize = function() {
-    return false;
-  };
-
-  TableViewColBase.prototype.getIsCalculation = function() {
-    return false;
-  };
-
-  TableViewColBase.prototype.renderValue = function(value, keyValue, row) {
-    return value;
-  };
-
-  TableViewColBase.prototype.changeColumn = function(varName, value) {
-    return true;
-  };
-
-  TableViewColBase.prototype.getRenderFunction = function() {
-    return null;
-  };
-
-  TableViewColBase.prototype.renderTooltip = function(row, value, tooltipWindow) {
-    return false;
-  };
-
-  TableViewColBase.prototype.deduceColumnType = function(newData) {
-    return null;
-  };
-
-  TableViewColBase.prototype.deduceInitialColumnType = function() {
-    return null;
-  };
-
-  TableViewColBase.prototype.serialize = function() {
-    var obj;
-    obj = {};
-    obj.name = this.getName();
-    obj.type = this.getType();
-    obj.width = this.getWidth();
-    obj.options = this.getOptions();
-    obj.editable = this.getEditable();
-    obj.visible = this.getVisible();
-    obj.clickable = this.getClickable();
-    obj.align = this.getAlign();
-    obj.source = this.getSource();
-    obj.required = this.getRequired();
-    obj.hideable = this.getAlwaysHidden();
-    obj.system = this.getSystemColumn();
-    obj.autosize = this.getAutoSize();
-    obj.order = this.getOrder();
-    obj.render = this.getRenderFunction();
-    obj.calculate = this.getIsCalculation();
-    if ((this.data.render != null) && typeof this.data.render === "string" && this.data.render.charAt(0) === '=') {
-      obj.render = this.data.render;
-    }
-    return obj;
-  };
-
-  TableViewColBase.prototype.deserialize = function(obj) {
-    var value, varName;
-    for (varName in obj) {
-      value = obj[varName];
-      this.changeColumn(varName, value);
-    }
-    return true;
-  };
-
-  return TableViewColBase;
-
-})();
 
 /*
 
@@ -72430,102 +72241,24 @@ WidgetSplittable = (function() {
   return WidgetSplittable;
 
 })();
-var PopupForm,
+var PopUpFormWrapper,
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
 
-PopupForm = (function(superClass) {
-  extend(PopupForm, superClass);
+PopUpFormWrapper = (function(superClass) {
+  extend(PopUpFormWrapper, superClass);
 
-  PopupForm.prototype.showOnCreate = false;
-
-  PopupForm.prototype.content = "";
-
-  PopupForm.prototype.close = "Cancel";
-
-  function PopupForm(tableName, keyElement, key, columns, defaults) {
-    this.tableName = tableName;
-    this.keyElement = keyElement;
-    this.key = key;
-    this.columns = columns;
-    this.defaults = defaults;
-    if (!this.keyElement) {
-      throw new Error("Key name is not supplied in the PopupForm");
-    }
-    this.title = this.key ? 'Edit ' : 'Create ';
-    this.ok = this.key ? 'Save Changes' : 'Create New';
-    PopupForm.__super__.constructor.call(this);
-    if (!this.columns) {
-      this.columns = DataMap.getColumnsFromTable(this.tableName);
-    }
-    this.formWrapper = new PopUpFormWrapper();
-    this.createInputFields();
-    this.show();
+  function PopUpFormWrapper() {
+    PopUpFormWrapper.__super__.constructor.call(this);
   }
 
-  PopupForm.prototype.createInputFields = function() {
-    var column, i, len, ref, results, value;
-    if (!this.key) {
-      this.keyColumn = DataMap.getColumnsFromTable(this.tableName, (function(_this) {
-        return function(c) {
-          return c.getSource() === _this.keyElement;
-        };
-      })(this)).pop();
-      this.keyColumn.required = true;
-      this.columns.unshift(this.keyColumn);
-    }
-    this.columns = $.unique(this.columns);
-    ref = this.columns;
-    results = [];
-    for (i = 0, len = ref.length; i < len; i++) {
-      column = ref[i];
-      if (column.getSource() === this.keyElement) {
-        this.keyColumn = column;
-      }
-      value = this.key ? DataMap.getDataField(this.tableName, this.key, column.getSource()) : null;
-      if (this.defaults && this.defaults[column.getSource()]) {
-        value = this.defaults[column.getSource()];
-      }
-      results.push(this.formWrapper.addInput(column.getSource(), column.getName(), value, column.getType(), column.getOptions()));
-    }
-    return results;
-  };
+  PopUpFormWrapper.templateFormFieldText = Handlebars.compile('<div class="form-group">\n	<label for="{{fieldName}}" class="col-md-3 control-label"> {{label}} </label>\n	<div class="col-md-9">\n	  <input type="{{type}}" class="form-control" id="{{fieldName}}" value="{{value}}" name="{{fieldName}}"\n                                                            {{#each attrs}}\n                                                              {{@key}}="{{this}}"\n                                                            {{/each}}\n                                                            />\n                                                            <div id="{{fieldName}}error" class="text-danger help-block"></div>\n                                                          </div>\n</div>');
 
-  PopupForm.prototype.onButton2 = function(e, form) {
-    var column, i, invalidColumns, j, len, len1, ref, ref1, valid;
-    valid = true;
-    invalidColumns = [];
-    ref = this.columns;
-    for (i = 0, len = ref.length; i < len; i++) {
-      column = ref[i];
-      if (column.required && (!form[column.getSource()] || form[column.getSource()].length === 0)) {
-        valid = false;
-        invalidColumns.push(column.getName());
-      }
-    }
-    if (!valid) {
-      console.log("Error:", invalidColumns + " are required");
-      return false;
-    } else {
-      if (this.key) {
-        ref1 = this.columns;
-        for (j = 0, len1 = ref1.length; j < len1; j++) {
-          column = ref1[j];
-          DataMap.getDataMap().updatePathValue(["", this.tableName, this.key, column.getSource()].join("/"), form[column.getSource()]);
-        }
-        return this.hide();
-      } else {
-        if (this.onCreateNew(this.tableName, form)) {
-          DataMap.addData(this.tableName, form[this.keyElement], form);
-          return this.hide();
-        }
-      }
-    }
-  };
+  PopUpFormWrapper.templateFormFieldSelect = Handlebars.compile('<div class="form-group">\n	<label for="{{fieldName}}" class="col-md-3 control-label"> {{label}} </label>\n	<div class="col-md-9">\n	  <select class="form-control" id="{{fieldName}}" name="{{fieldName}}">\n                                                                {{#each attrs.options}}\n                                                                  <option value="{{this}}" {{#if @first}} selected="selected" {{/if}}>{{this}}</option>\n                                                                {{/each}}\n                                                              </select>\n                                                              <div id="{{fieldName}}error" class="text-danger help-block"></div>\n                                                            </div>\n</div>');
 
-  return PopupForm;
+  return PopUpFormWrapper;
 
-})(ModalDialog);
+})(FormWrapper);
 var ErrorMessageBox,
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
@@ -72889,24 +72622,6 @@ ModalSortItems = (function(superClass) {
   return ModalSortItems;
 
 })(ModalDialog);
-var PopUpFormWrapper,
-  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  hasProp = {}.hasOwnProperty;
-
-PopUpFormWrapper = (function(superClass) {
-  extend(PopUpFormWrapper, superClass);
-
-  function PopUpFormWrapper() {
-    PopUpFormWrapper.__super__.constructor.call(this);
-  }
-
-  PopUpFormWrapper.templateFormFieldText = Handlebars.compile('<div class="form-group">\n	<label for="{{fieldName}}" class="col-md-3 control-label"> {{label}} </label>\n	<div class="col-md-9">\n	  <input type="{{type}}" class="form-control" id="{{fieldName}}" value="{{value}}" name="{{fieldName}}"\n                                                            {{#each attrs}}\n                                                              {{@key}}="{{this}}"\n                                                            {{/each}}\n                                                            />\n                                                            <div id="{{fieldName}}error" class="text-danger help-block"></div>\n                                                          </div>\n</div>');
-
-  PopUpFormWrapper.templateFormFieldSelect = Handlebars.compile('<div class="form-group">\n	<label for="{{fieldName}}" class="col-md-3 control-label"> {{label}} </label>\n	<div class="col-md-9">\n	  <select class="form-control" id="{{fieldName}}" name="{{fieldName}}">\n                                                                {{#each attrs.options}}\n                                                                  <option value="{{this}}" {{#if @first}} selected="selected" {{/if}}>{{this}}</option>\n                                                                {{/each}}\n                                                              </select>\n                                                              <div id="{{fieldName}}error" class="text-danger help-block"></div>\n                                                            </div>\n</div>');
-
-  return PopUpFormWrapper;
-
-})(FormWrapper);
 var ModalMessageBox,
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
@@ -72938,6 +72653,102 @@ ModalMessageBox = (function(superClass) {
   }
 
   return ModalMessageBox;
+
+})(ModalDialog);
+var PopupForm,
+  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+  hasProp = {}.hasOwnProperty;
+
+PopupForm = (function(superClass) {
+  extend(PopupForm, superClass);
+
+  PopupForm.prototype.showOnCreate = false;
+
+  PopupForm.prototype.content = "";
+
+  PopupForm.prototype.close = "Cancel";
+
+  function PopupForm(tableName, keyElement, key, columns, defaults) {
+    this.tableName = tableName;
+    this.keyElement = keyElement;
+    this.key = key;
+    this.columns = columns;
+    this.defaults = defaults;
+    if (!this.keyElement) {
+      throw new Error("Key name is not supplied in the PopupForm");
+    }
+    this.title = this.key ? 'Edit ' : 'Create ';
+    this.ok = this.key ? 'Save Changes' : 'Create New';
+    PopupForm.__super__.constructor.call(this);
+    if (!this.columns) {
+      this.columns = DataMap.getColumnsFromTable(this.tableName);
+    }
+    this.formWrapper = new PopUpFormWrapper();
+    this.createInputFields();
+    this.show();
+  }
+
+  PopupForm.prototype.createInputFields = function() {
+    var column, i, len, ref, results, value;
+    if (!this.key) {
+      this.keyColumn = DataMap.getColumnsFromTable(this.tableName, (function(_this) {
+        return function(c) {
+          return c.getSource() === _this.keyElement;
+        };
+      })(this)).pop();
+      this.keyColumn.required = true;
+      this.columns.unshift(this.keyColumn);
+    }
+    this.columns = $.unique(this.columns);
+    ref = this.columns;
+    results = [];
+    for (i = 0, len = ref.length; i < len; i++) {
+      column = ref[i];
+      if (column.getSource() === this.keyElement) {
+        this.keyColumn = column;
+      }
+      value = this.key ? DataMap.getDataField(this.tableName, this.key, column.getSource()) : null;
+      if (this.defaults && this.defaults[column.getSource()]) {
+        value = this.defaults[column.getSource()];
+      }
+      results.push(this.formWrapper.addInput(column.getSource(), column.getName(), value, column.getType(), column.getOptions()));
+    }
+    return results;
+  };
+
+  PopupForm.prototype.onButton2 = function(e, form) {
+    var column, i, invalidColumns, j, len, len1, ref, ref1, valid;
+    valid = true;
+    invalidColumns = [];
+    ref = this.columns;
+    for (i = 0, len = ref.length; i < len; i++) {
+      column = ref[i];
+      if (column.required && (!form[column.getSource()] || form[column.getSource()].length === 0)) {
+        valid = false;
+        invalidColumns.push(column.getName());
+      }
+    }
+    if (!valid) {
+      console.log("Error:", invalidColumns + " are required");
+      return false;
+    } else {
+      if (this.key) {
+        ref1 = this.columns;
+        for (j = 0, len1 = ref1.length; j < len1; j++) {
+          column = ref1[j];
+          DataMap.getDataMap().updatePathValue(["", this.tableName, this.key, column.getSource()].join("/"), form[column.getSource()]);
+        }
+        return this.hide();
+      } else {
+        if (this.onCreateNew(this.tableName, form)) {
+          DataMap.addData(this.tableName, form[this.keyElement], form);
+          return this.hide();
+        }
+      }
+    }
+  };
+
+  return PopupForm;
 
 })(ModalDialog);
 var DataSetConfig, TableViewColButton,
@@ -73117,472 +72928,6 @@ TableViewColCheckbox = (function(superClass) {
   };
 
   return TableViewColCheckbox;
-
-})(DataSetConfig.ColumnBase);
-var DataSetConfig, TableViewCol,
-  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  hasProp = {}.hasOwnProperty;
-
-DataSetConfig = require('edgecommondatasetconfig');
-
-TableViewCol = (function(superClass) {
-  extend(TableViewCol, superClass);
-
-  function TableViewCol(tableName) {
-    this.tableName = tableName;
-    this.deduceColumnType = bind(this.deduceColumnType, this);
-    this.deduceInitialColumnType = bind(this.deduceInitialColumnType, this);
-    this.UpdateSortIcon = bind(this.UpdateSortIcon, this);
-    this.RenderHeaderHorizontal = bind(this.RenderHeaderHorizontal, this);
-    this.RenderHeader = bind(this.RenderHeader, this);
-    this.getWidth = bind(this.getWidth, this);
-    this.getAutoSize = bind(this.getAutoSize, this);
-    this.getAlign = bind(this.getAlign, this);
-    this.getType = bind(this.getType, this);
-    this.getEditable = bind(this.getEditable, this);
-    this.getOptions = bind(this.getOptions, this);
-    this.getClickable = bind(this.getClickable, this);
-    this.getRequired = bind(this.getRequired, this);
-    this.getAlwaysHidden = bind(this.getAlwaysHidden, this);
-    this.getVisible = bind(this.getVisible, this);
-    this.getIsCalculation = bind(this.getIsCalculation, this);
-    this.getOrder = bind(this.getOrder, this);
-    this.getSource = bind(this.getSource, this);
-    this.getName = bind(this.getName, this);
-    this.getRenderFunction = bind(this.getRenderFunction, this);
-    this.internalMathRender = bind(this.internalMathRender, this);
-    this.renderValue = bind(this.renderValue, this);
-    this.renderTooltip = bind(this.renderTooltip, this);
-    this.changeColumn = bind(this.changeColumn, this);
-    this.data = {};
-  }
-
-  TableViewCol.prototype.changeColumn = function(varName, value) {
-    if (this.data[varName] === value) {
-      return;
-    }
-    if (varName === "renderFunction") {
-      this.renderFunctionCache = null;
-      this.render = value;
-    }
-    this.data[varName] = value;
-    delete this.formatter;
-    delete this.actualWidth;
-    return true;
-  };
-
-  TableViewCol.prototype.renderTooltip = function(row, value, tooltipWindow) {
-    var f;
-    f = this.getFormatter();
-    if ((f != null) && (f.renderTooltip != null)) {
-      console.log("Checking ", f.renderTooltip);
-      return f.renderTooltip(row, value, tooltipWindow);
-    } else {
-      console.log("renderTooltip formatter not found:", f);
-    }
-    return false;
-  };
-
-  TableViewCol.prototype.renderValue = function(value, keyValue, row) {
-    var f;
-    f = this.getRenderFunction();
-    if (f != null) {
-      return f(value, this.tableName, this.getSource(), keyValue, row);
-    }
-    f = this.getFormatter();
-    if (f != null) {
-      return f.format(value, this.getOptions(), this.tableName, keyValue);
-    }
-    return value;
-  };
-
-  TableViewCol.prototype.internalMathRender = function(a, b, c) {
-    console.log("INTERNAL MATH RENDER:", this.data, "a=", a, "b=", b, "c=", c);
-    return "X";
-  };
-
-  TableViewCol.prototype.getRenderFunction = function() {
-    var template;
-    if (this.renderFunctionCache != null) {
-      return this.renderFunctionCache;
-    }
-    if (this.data.renderCode == null) {
-      return null;
-    }
-    if (typeof this.data.renderCode === "string" && this.data.renderCode.charAt(0) === '=') {
-      return this.internalMathRender;
-    }
-    template = 'try {  // toStringWrapper\nXXCODEXX\n} catch (e) { console.log("Render error:",e); console.log("val=",val,"tableName=",tableName,"fieldName=",fieldName,"id=",id); return "Error"; }';
-    this.renderFunctionCache = new Function("val", "tableName", "fieldName", "id", "row", template.replace("XXCODEXX", renderText));
-    return this.renderFunctionCache;
-  };
-
-  TableViewCol.prototype.getName = function() {
-    return this.data.name;
-  };
-
-  TableViewCol.prototype.getSource = function() {
-    return this.data.source;
-  };
-
-  TableViewCol.prototype.getOrder = function() {
-    return this.data.order;
-  };
-
-  TableViewCol.prototype.getIsCalculation = function() {
-    if ((this.data != null) && (this.data.calculation != null) && this.data.calculation === true) {
-      return true;
-    }
-    if (this.getRenderFunction() !== null) {
-      return true;
-    }
-    return false;
-  };
-
-  TableViewCol.prototype.getVisible = function() {
-    if (this.getAlwaysHidden() === true) {
-      return false;
-    }
-    if ((this.data.visible != null) && this.data.visible === true) {
-      return true;
-    }
-    if ((this.data.visible != null) && this.data.visible === false) {
-      return false;
-    }
-    if ((this.isGrouped != null) && this.isGrouped === true) {
-      return false;
-    }
-    return true;
-  };
-
-  TableViewCol.prototype.getAlwaysHidden = function() {
-    if ((this.data.hideable != null) && this.data.hideable === true) {
-      return true;
-    }
-    return false;
-  };
-
-  TableViewCol.prototype.getRequired = function() {
-    if ((this.data.required != null) && this.data.required === true) {
-      return true;
-    }
-    return false;
-  };
-
-  TableViewCol.prototype.getClickable = function() {
-    var f;
-    if ((this.clickable != null) && this.clickable === true) {
-      return true;
-    }
-    if ((this.clickable != null) && this.clickable === false) {
-      return false;
-    }
-    if ((this.data.clickable != null) && this.data.clickable === true) {
-      return true;
-    }
-    if ((this.data.clickable != null) && this.data.clickable === false) {
-      return false;
-    }
-    f = this.getFormatter();
-    if ((f != null) && (f.clickable != null) && f.clickable === true) {
-      return true;
-    }
-    return false;
-  };
-
-  TableViewCol.prototype.getOptions = function() {
-    if (this.data.options != null) {
-      return this.data.options;
-    }
-    return null;
-  };
-
-  TableViewCol.prototype.getEditable = function() {
-    return this.data.editable;
-  };
-
-  TableViewCol.prototype.getType = function() {
-    if (this.data.type != null) {
-      return this.data.type;
-    }
-    return "text";
-  };
-
-  TableViewCol.prototype.getAlign = function() {
-
-    /*	
-    		if @data.align? and @data.align.length > 0
-    			return @data.align
-     */
-    var f;
-    f = this.getFormatter();
-    if ((f != null) && (f.align != null)) {
-      return f.align;
-    }
-    return null;
-  };
-
-  TableViewCol.prototype.getAutoSize = function() {
-    var width;
-    if ((this.data.autosize != null) && this.data.autosize === true) {
-      return true;
-    }
-    width = this.getWidth();
-    if ((width != null) && width > 0) {
-      return false;
-    }
-    return true;
-  };
-
-  TableViewCol.prototype.getWidth = function() {
-    var f;
-    if (typeof this.data.width === "string") {
-      this.data.width = parseInt(this.data.width);
-    }
-    if (this.data.width === 0 || this.data.width === '0px' || this.data.width === "" || (this.data.width == null)) {
-      f = this.getFormatter();
-      if ((f != null) && (f.width != null) && f.width > 0) {
-        return f.width;
-      }
-      return null;
-    }
-    return this.data.width;
-  };
-
-  TableViewCol.prototype.RenderHeader = function(parent, location) {
-    var html;
-    if (this.visible === false) {
-      return;
-    }
-    html = this.getName();
-    if (this.sort === -1) {
-      html += "<i class='pull-right fa fa-sort-down'></i>";
-    } else if (this.sort === 1) {
-      html += "<i class='pull-right fa fa-sort-up'></i>";
-    }
-    parent.html(html);
-    parent.addClass("tableHeaderField");
-    return parent;
-  };
-
-  TableViewCol.prototype.RenderHeaderHorizontal = function(parent, location) {
-    if (this.visible === false) {
-      return;
-    }
-    parent.html(this.getName());
-    parent.addClass("tableHeaderFieldHoriz");
-    parent.el.css({
-      "text-align": "right",
-      "padding-right": 8,
-      "border-right": "1px solid #CCCCCC",
-      "background-color": "linear-gradient(to right, #fff, #f2f2f2);"
-    });
-    this.sort = 0;
-    return parent;
-  };
-
-  TableViewCol.prototype.UpdateSortIcon = function(newSort) {
-    this.sort = newSort;
-    this.tagSort.removeClass("fa-sort");
-    this.tagSort.removeClass("fa-sort-up");
-    this.tagSort.removeClass("fa-sort-down");
-    if (this.sort === -1) {
-      this.tagSort.addClass("fa-sort-down");
-    } else if (this.sort === 0) {
-      this.tagSort.addClass("fa-sort");
-    } else if (this.sort === 1) {
-      this.tagSort.addClass("fa-sort-up");
-    }
-    return true;
-  };
-
-  TableViewCol.prototype.deduceInitialColumnType = function() {
-    var reDistance, reYear;
-    reYear = /year/i;
-    reDistance = /distance/i;
-    this.data.skipDeduce = false;
-    this.data.deduceAttempts = 0;
-    this.data.foundOnlyNumbers = true;
-    if (/ Date/i.test(this.data.name)) {
-      this.changeColumn("type", "age");
-      this.changeColumn("width", 110);
-      this.changeColumn("align", "left");
-      this.data.skipDeduce = true;
-      return;
-    }
-    if (/Date/i.test(this.data.name)) {
-      this.changeColumn("type", "datetime");
-      this.changeColumn("width", 110);
-      this.changeColumn("align", "left");
-      this.data.skipDeduce = true;
-      return;
-    }
-    if (/ Price/i.test(this.data.name)) {
-      this.changeColumn("type", "money");
-      this.changeColumn("width", 90);
-      this.changeColumn("align", "right");
-      this.data.skipDeduce = true;
-      return;
-    }
-    if (/Is /i.test(this.data.name)) {
-      this.changeColumn("type", "boolean");
-      this.changeColumn("width", 60);
-      this.changeColumn("align", "left");
-      this.data.skipDeduce = true;
-      return;
-    }
-    if (/^Is/i.test(this.data.name)) {
-      this.changeColumn("type", "boolean");
-      this.changeColumn("width", 60);
-      this.changeColumn("align", "left");
-      this.data.skipDeduce = true;
-      return;
-    }
-    if (reYear.test(this.data.name)) {
-      this.changeColumn("type", "int");
-      this.changeColumn("options", '####');
-      this.changeColumn("width", 50);
-      this.changeColumn("align", "right");
-      this.data.skipDeduce = true;
-      return;
-    }
-    if (reDistance.test(this.data.name)) {
-      this.changeColumn("type", "distance");
-      this.changeColumn("width", 66);
-      this.changeColumn("align", "right");
-      this.data.skipDeduce = true;
-      return;
-    }
-    if (this.data.name === "id") {
-      this.changeColumn("type", "text");
-      this.changeColumn("width", null);
-      this.changeColumn("visible", false);
-      this.changeColumn("align", "left");
-      this.changeColumn("name", "ID");
-      return;
-    }
-    if (this.data.source === "lat" || this.data.source === "lon") {
-      this.changeColumn("type", "decimal");
-      this.changeColumn("width", 60);
-      this.changeColumn("visible", true);
-      this.changeColumn("align", "right");
-      this.changeColumn("options", '#.######');
-      return;
-    }
-    if (/^sourcecode/i.test(this.data.name)) {
-      this.changeColumn("type", "sourcecode");
-      this.changeColumn("width", 60);
-      this.changeColumn("align", "left");
-      this.data.skipDeduce = true;
-      return;
-    }
-    if (/^memo/i.test(this.data.name)) {
-      this.changeColumn("type", "memo");
-      this.changeColumn("width", 60);
-      this.changeColumn("align", "left");
-      this.data.skipDeduce = true;
-      return;
-    }
-    if (/^imagelist/i.test(this.data.name)) {
-      this.changeColumn("type", "imagelist");
-      this.changeColumn("width", 60);
-      this.changeColumn("align", "left");
-      return;
-    }
-  };
-
-  TableViewCol.prototype.deduceColumnType = function(newData) {
-    if ((this.data.skipDeduce != null) && this.data.skipDeduce === true) {
-      return null;
-    }
-    if (this.data.deduceAttempts++ > 50) {
-      return null;
-    }
-    if (newData == null) {
-      return null;
-    }
-    if (this.data.type !== "text") {
-      return null;
-    }
-    if (typeof newData === "string") {
-      if (reDate1.test(newData)) {
-        this.changeColumn("type", "timeago");
-        this.changeColumn("width", 80);
-        this.data.skipDeduce = true;
-        return;
-      }
-      if (reDate2.test(newData)) {
-        this.changeColumn("type", "timeago");
-        this.changeColumn("width", 110);
-        this.data.skipDeduce = true;
-        true;
-      }
-      if (/^https*/.test(newData)) {
-        this.changeColumn("type", "link");
-        this.changeColumn("align", "center");
-        this.changeColumn("width", 80);
-        this.data.skipDeduce = true;
-        return true;
-      }
-      if (/^ftp*:/.test(newData)) {
-        this.changeColumn("type", "link");
-        this.changeColumn("align", "center");
-        this.changeColumn("width", 80);
-        this.data.skipDeduce = true;
-        return true;
-      }
-      if (this.data.foundOnlyNumbers && reNumber.test(newData)) {
-        this.changeColumn("type", "int");
-        this.changeColumn("width", 80);
-        return;
-      }
-      if (this.data.foundOnlyNumbers && reDecimal.test(newData)) {
-        this.changeColumn("type", "decimal");
-        this.changeColumn("width", 100);
-        return;
-      }
-      if (this.data.foundOnlyNumbers) {
-        this.changeColumn("type", "text");
-        this.data.foundOnlyNumbers = false;
-      }
-    } else if (typeof newData === "number") {
-      if (this.data.type === "text") {
-        this.changeColumn("type", "int");
-        this.changeColumn("align", "right");
-        this.changeColumn("width", 80);
-      }
-      if (Math.floor(newData) !== Math.ceil(newData)) {
-        this.changeColumn("type", "decimal");
-        this.changeColumn("align", "right");
-        this.changeColumn("width", 80);
-        this.changeColumn("options", "#,###.###");
-      }
-    } else if (typeof newData === "boolean") {
-      this.changeColumn("type", "boolean");
-      this.changeColumn("width", 60);
-      this.data.skipDeduce = true;
-      return true;
-    } else if (typeof newData === "object") {
-      if (newData.getTime != null) {
-        this.changeColumn("type", "age");
-        this.changeColumn("width", "130");
-        this.data.skipDeduce = true;
-      } else if (Array.isArray(newData)) {
-        this.changeColumn("type", "tags");
-        this.changeColumn("autosize", true);
-        this.changeColumn("width", null);
-      } else {
-        this.changeColumn("type", "simpleobject");
-        this.changeColumn("width", null);
-        this.data.skipDeduce = true;
-      }
-      return true;
-    }
-    return null;
-  };
-
-  return TableViewCol;
 
 })(DataSetConfig.ColumnBase);
 var TableViewDetailed,
