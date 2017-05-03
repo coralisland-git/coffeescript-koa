@@ -6881,6 +6881,7 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
 
   DataFormatterType = (function() {
     function DataFormatterType() {
+      this.renderTooltip = bind(this.renderTooltip, this);
       this.openEditor = bind(this.openEditor, this);
       this.onGlobalMouseDown = bind(this.onGlobalMouseDown, this);
       this.appendEditor = bind(this.appendEditor, this);
@@ -7025,6 +7026,32 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
 
     DataFormatterType.prototype.onFocus = null;
 
+    DataFormatterType.prototype.renderTooltip = function(row, value, tooltipWindow) {
+      var h, w;
+      if (value == null) {
+        return false;
+      }
+      if (typeof value === "string" || typeof value === "number") {
+        h = 60;
+        w = 320;
+        if (value.length > 100) {
+          w = 440;
+        }
+        if (value.length > 200) {
+          w = 640;
+        }
+        if (value.length > 300) {
+          h = 440;
+        }
+        tooltipWindow.setSize(w, h);
+        tooltipWindow.getBodyWidget().addClass("text");
+        tooltipWindow.html(value);
+        return true;
+      }
+      console.log("renderTooltip row=", row, "value=", value);
+      return false;
+    };
+
     return DataFormatterType;
 
   })();
@@ -7040,6 +7067,8 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
     }
 
     DataFormatText.prototype.name = "text";
+
+    DataFormatText.prototype.align = "left";
 
     DataFormatText.prototype.format = function(data, options, path) {
       var list, value, varName;
@@ -7065,9 +7094,6 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
       }
       if (data.length > 300) {
         return data.slice(0, 301) + "...";
-      }
-      if (typeof data === "number") {
-        return data.toString();
       }
       return data;
     };
@@ -7118,6 +7144,8 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
     }
 
     DataFormatMemo.prototype.name = "memo";
+
+    DataFormatMemo.prototype.align = "left";
 
     DataFormatMemo.prototype.format = function(data, options, path) {
       if (data == null) {
@@ -7229,6 +7257,8 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
 
     DataFormatSourceCode.prototype.name = "sourcecode";
 
+    DataFormatSourceCode.prototype.align = "left";
+
     DataFormatSourceCode.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
       var code, codeEditor, codeMode, h, navButtonCancel, navButtonSave, popup, tag, w;
       w = $(window).width();
@@ -7312,7 +7342,7 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
       if ((options != null) && options !== null) {
         return numeral(common.getNumber(data)).format(options);
       }
-      return numeral(common.getNumber(data)).format("#,#####");
+      return numeral(common.getNumber(data)).format("#,###");
     };
 
     DataFormatInt.prototype.unformat = function(data, path) {
@@ -7421,7 +7451,7 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
       if ((options != null) && /#/.test(options)) {
         return numeral(common.getNumber(data)).format(options);
       } else {
-        return numeral(common.getNumber(data)).format("#,#####.####");
+        return numeral(common.getNumber(data)).format("#,###.##");
       }
     };
 
@@ -7450,7 +7480,7 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
       if ((data == null) || data === null || data === 0 || data === "") {
         return "";
       }
-      return numeral(common.getNumber(data)).format('$ #,#####.[####]');
+      return numeral(common.getNumber(data)).format('$ #,###.[##]');
     };
 
     DataFormatCurrency.prototype.unformat = function(data, path) {
@@ -7475,7 +7505,7 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
     DataFormatPercent.prototype.align = "right";
 
     DataFormatPercent.prototype.format = function(data, options, path) {
-      return numeral(common.getNumber(data)).format('#,#####.[####] %');
+      return numeral(common.getNumber(data)).format('#,###.[##] %');
     };
 
     DataFormatPercent.prototype.unformat = function(data, path) {
@@ -7501,6 +7531,8 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
     DataFormatDate.prototype.name = "date";
 
     DataFormatDate.prototype.width = 65;
+
+    DataFormatDate.prototype.align = "left";
 
     DataFormatDate.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
       if (!this.elEditor) {
@@ -7582,6 +7614,8 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
 
     DataFormatTags.prototype.name = "tags";
 
+    DataFormatTags.prototype.align = "left";
+
     DataFormatTags.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
       var m;
       m = new ModalDialog({
@@ -7643,6 +7677,8 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
     DataFormatMultiselect.prototype.name = "multiselect";
 
     DataFormatMultiselect.prototype.options = [];
+
+    DataFormatMultiselect.prototype.align = "left";
 
     DataFormatMultiselect.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
       var m;
@@ -7706,6 +7742,8 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
     }
 
     DataFormatDateTime.prototype.name = "datetime";
+
+    DataFormatDateTime.prototype.align = "left";
 
     DataFormatDateTime.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
       if (!this.elEditor) {
@@ -7888,6 +7926,8 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
 
     DataFormatEnum.prototype.name = "enum";
 
+    DataFormatEnum.prototype.align = "left";
+
     DataFormatEnum.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
       var i, o, p, ref;
       p = new PopupMenu("Options", left, top);
@@ -7957,6 +7997,8 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
 
     DataFormatDistance.prototype.width = 100;
 
+    DataFormatDistance.prototype.align = "left";
+
     DataFormatDistance.prototype.format = function(data, options, path) {
       var feet;
       if (data === 0) {
@@ -7970,7 +8012,7 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
         return Math.ceil(feet) + " ft";
       }
       data = feet / 5280;
-      return numeral(data).format('#,#####.####') + " mi";
+      return numeral(data).format('#,###.##') + " mi";
     };
 
     DataFormatDistance.prototype.unformat = function(data, path) {
@@ -8003,6 +8045,8 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
     DataFormatBoolean.prototype.textNo = "<i class='fa fa-circle-thin'></i> No";
 
     DataFormatBoolean.prototype.textNotSet = "<i class='fa fa-fs'></i> Not Set";
+
+    DataFormatBoolean.prototype.align = "left";
 
     DataFormatBoolean.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
       if (currentValue) {
@@ -8063,6 +8107,8 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
     DataFormatTimeAgo.prototype.name = "timeago";
 
     DataFormatTimeAgo.prototype.width = 135;
+
+    DataFormatTimeAgo.prototype.align = "left";
 
     DataFormatTimeAgo.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
       if (!this.elEditor) {
@@ -8234,6 +8280,8 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
 
     DataFormatSimpleObject.prototype.name = "simpleobject";
 
+    DataFormatSimpleObject.prototype.align = "left";
+
     DataFormatSimpleObject.prototype.format = function(data, options, path) {
       if (data == null) {
         return "Not set";
@@ -8282,7 +8330,7 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
     };
 
     DataFormatSimpleObject.prototype.onFocus = function(e, col, data) {
-      return doPopupTableView(data, "Show " + col, "showTableClasses", 800, 400);
+      return doPopupTableView(data, "Show " + col, "showTableClasses", 800, 400).then(function(view) {});
     };
 
     DataFormatSimpleObject.prototype.unformat = function(data, path) {
@@ -8310,6 +8358,8 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
     DataFormatLink.prototype.width = 70;
 
     DataFormatLink.prototype.clickable = true;
+
+    DataFormatLink.prototype.align = "left";
 
     DataFormatLink.prototype.format = function(data, options, path) {
       if (data == null) {
@@ -8366,6 +8416,8 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
     }
 
     DataFormatImageList.prototype.name = "imagelist";
+
+    DataFormatImageList.prototype.align = "center";
 
     DataFormatImageList.prototype.options = [];
 
