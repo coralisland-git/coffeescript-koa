@@ -150,7 +150,8 @@ class ViewShowTableEditor extends View
                 editable: false
                 autosize: false
                 render: (val)->
-                    return "<i class='dragHandle fa fa-list-ul '></i> #{val}"
+                    #return "<i class='dragHandle fa fa-list-ul '></i> #{val}"
+                    return "#{val}"
             ,
                 name     : "Name"
                 source   : "name"
