@@ -6993,7 +6993,7 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
     };
 
     DataFormatterType.prototype.onGlobalMouseDown = function(e) {
-      if (e.target.className === "dynamic_edit") {
+      if (e.target.classList.contains("dynamic_edit")) {
         return true;
       }
       this.editorShowing = false;
@@ -7005,7 +7005,7 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
       if (!this.elEditor) {
         this.elEditor = $("<input />", {
           type: "text",
-          "class": "dynamic_edit"
+          "class": "dynamic_edit form-control"
         });
         this.appendEditor();
       }
@@ -7384,7 +7384,7 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
         return "[" + num + "]";
       }
       if ((options == null) || options === "") {
-        options = "#,#####.[####]";
+        options = "#,###.[##]";
       }
       try {
         return numeral(num).format(options);
@@ -8246,7 +8246,7 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
       }
       sec = data / 1000;
       if (sec < 60) {
-        txt = numeral(sec).format("#.#####") + " sec";
+        txt = numeral(sec).format("#.###") + " sec";
       } else if (sec < (60 * 60 * 2)) {
         min = Math.floor(sec / 60);
         sec = sec - (min * 60);
@@ -72306,6 +72306,14 @@ PopUpFormWrapper = (function(superClass) {
   extend(PopUpFormWrapper, superClass);
 
   function PopUpFormWrapper() {
+
+    /*
+    		 * @property [Array] fields the collection of fields to show
+    		@fields = []
+    
+    		 * @property [String] gid the unique key for the current form
+    		@gid = "form" + GlobalValueManager.NextGlobalID()
+     */
     PopUpFormWrapper.__super__.constructor.call(this);
   }
 

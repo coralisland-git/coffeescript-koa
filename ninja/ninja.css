@@ -1117,7 +1117,7 @@ span#ruler {
   margin-top: 4px;
   cursor: pointer;
 }
-.tableview div.tableHeaderField.calculation {
+.tableview div.tableHeaderField. calculation {
   background-color: #d1eef2;
   background-image: linear-gradient(to bottom, #e6fcfd, #e3f5f7);
 }

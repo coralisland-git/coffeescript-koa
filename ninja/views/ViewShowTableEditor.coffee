@@ -253,6 +253,7 @@ class ViewShowTableEditor extends View
                 editable : true
                 width    : 120
                 autosize : true
+                calculation: false
                 render:  (val)=>
                     if val? then return "Edit source"
                     return ""
