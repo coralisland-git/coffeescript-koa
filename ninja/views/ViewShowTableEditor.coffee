@@ -83,8 +83,7 @@ class ViewShowTableEditor extends View
         @editorTable.showFilters = false
         @editorTable.addTable "_editor"
         @editorTable.setAutoFillWidth()
-        #@editorTable.addSortRule("order", 1)
-
+        
         # @editorTable.elTableHolder.css "width", "100%"
         # @editorTable.elTableHolder.css "height", "400px"
 
@@ -98,7 +97,8 @@ class ViewShowTableEditor extends View
         # @editorTable.moveActionColumn "order"
         # @editorTable.sortByColumn("order")
         @editorTable.render()
-        @editorTable.updateRowData()
+        @editorTable.addSortRule("order", 1)
+        #@editorTable.updateRowData()
 
         ##|
         ##|  Save callback from the data map
