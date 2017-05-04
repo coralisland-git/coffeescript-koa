@@ -83,7 +83,7 @@ class ViewShowTableEditor extends View
         @editorTable.showFilters = false
         @editorTable.addTable "_editor"
         @editorTable.setAutoFillWidth()
-        @editorTable.addSortRule("order", 1)
+        #@editorTable.addSortRule("order", 1)
 
         # @editorTable.elTableHolder.css "width", "100%"
         # @editorTable.elTableHolder.css "height", "400px"
