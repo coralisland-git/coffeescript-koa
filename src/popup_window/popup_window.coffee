@@ -510,6 +510,9 @@ $ ->
 	$(document).on "keyup", (e)=>
 		if e.keyCode == 27
 			if globalOpenWindowList? and globalOpenWindowList.length > 0
-				win = globalOpenWindowList.pop()
+				visibleWindows = (w for w in globalOpenWindowList when w.isVisible is true)
+				win = visibleWindows[..].pop()
+				if !win then return
 				console.log "Escape closing window:", win
-				win.destroy()
+				if win.shield? then win.shield.remove()
+				if win.configurations and win.configurations.keyValue then win.close() else win.destroy()

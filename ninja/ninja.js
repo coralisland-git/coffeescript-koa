@@ -3919,12 +3919,33 @@ PopupWindow = (function() {
 $(function() {
   return $(document).on("keyup", (function(_this) {
     return function(e) {
-      var win;
+      var visibleWindows, w, win;
       if (e.keyCode === 27) {
         if ((globalOpenWindowList != null) && globalOpenWindowList.length > 0) {
-          win = globalOpenWindowList.pop();
+          visibleWindows = (function() {
+            var i, len, results;
+            results = [];
+            for (i = 0, len = globalOpenWindowList.length; i < len; i++) {
+              w = globalOpenWindowList[i];
+              if (w.isVisible === true) {
+                results.push(w);
+              }
+            }
+            return results;
+          })();
+          win = visibleWindows.slice(0).pop();
+          if (!win) {
+            return;
+          }
           console.log("Escape closing window:", win);
-          return win.destroy();
+          if (win.shield != null) {
+            win.shield.remove();
+          }
+          if (win.configurations && win.configurations.keyValue) {
+            return win.close();
+          } else {
+            return win.destroy();
+          }
         }
       }
     };
@@ -7349,7 +7370,7 @@ TableView = (function() {
     }
     this.layoutShadow();
     this.updateVisibleText();
-    this.elTableHolder.append(tableWrapper.el);
+    this.elTableHolder.append(this.widgetBase.el);
     this.internalSetupMouseEvents();
     this.contextMenuCallSetup = 0;
     this.setupContextMenu(this.contextMenuCallbackFunction);

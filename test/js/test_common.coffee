@@ -194,7 +194,11 @@ $ ->
 	##|
 	##|  Add a table to hold the results
 	window.elTestCase = $("#testCase")
-	window.elTestCase.html "<div class='table-responsive'><table id='testTable' class='testTable table'></table></div>"
+	## -xg
+	responsiveTable = new WidgetTag "div", "table-responsive"
+	responsiveTable.appendTo "#testCase"
+	responsiveTable.add "table", "testTable table", "testTable"
+	#window.elTestCase.html "<div class='table-responsive'><table id='testTable' class='testTable table'></table></div>"
 
 	##|  save a reference to the results table
 	window.elTestTable = $("#testTable")

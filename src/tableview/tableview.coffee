@@ -2300,7 +2300,7 @@ class TableView
 
 		@layoutShadow()
 		@updateVisibleText()
-		@elTableHolder.append tableWrapper.el
+		@elTableHolder.append @widgetBase.el
 		@internalSetupMouseEvents()
 
 		##|
