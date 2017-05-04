@@ -349,6 +349,6 @@ $ ->
 		table.addTable "zipcode"
 		table.setFixedHeaderAndScrollable()
 		table.render()
-		#table.updateRowData()
+		table.updateRowData()
 		true
 	go()

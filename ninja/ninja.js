@@ -72306,14 +72306,6 @@ PopUpFormWrapper = (function(superClass) {
   extend(PopUpFormWrapper, superClass);
 
   function PopUpFormWrapper() {
-
-    /*
-    		 * @property [Array] fields the collection of fields to show
-    		@fields = []
-    
-    		 * @property [String] gid the unique key for the current form
-    		@gid = "form" + GlobalValueManager.NextGlobalID()
-     */
     PopUpFormWrapper.__super__.constructor.call(this);
   }
 

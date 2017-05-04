@@ -384,9 +384,6 @@ class NinjaWebServer
         fs.writeFile "../ninja/ninja.css", strCss
         console.log "Writing ../ninja/ninja.css"
 
-        zlib.gzip str, (_, contentJs)=>
-            ninjaJavascript = contentJs
-
         zlib.gzip strCss, (_, contentCss)=>
             ninjaCss = contentCss
 
