@@ -3594,10 +3594,8 @@ PopupWindow = (function() {
     return $("body").append(this.shield);
   };
 
-  PopupWindow.prototype.resize = function(popupWidth, popupHeight) {
+  PopupWindow.prototype.resize = function(a, b) {
     var height, scrollX, scrollY, width;
-    this.popupWidth = popupWidth;
-    this.popupHeight = popupHeight;
     width = $(window).width();
     height = $(window).height();
     scrollX = window.pageXOffset || document.body.scrollLeft;
@@ -3616,17 +3614,22 @@ PopupWindow = (function() {
       console.log("popupWindow " + this.title + ", moving because " + this.x + " + " + this.popupWidth + " + 10 > " + width);
       this.x = width + scrollX - this.popupWidth - 10;
     }
-    this.popupHeight += 24;
     if (this.y - scrollY + this.popupHeight + 10 > height) {
       this.y = height + scrollY - this.popupHeight - 10;
     }
-    while (this.x < 10) {
-      this.x++;
-      this.popupWidth--;
+    if (this.x < scrollX + 10) {
+      this.popupWidth += this.x - scrollX - 10;
+      this.x = scrollX + 10;
     }
-    while (this.y < 10) {
-      this.y++;
-      this.popupHeight--;
+    if (this.popupWidth < 60) {
+      this.popupWidth = 60;
+    }
+    if (this.y < scrollY + 10) {
+      this.popupHeight += this.y - scrollY - 10;
+      this.y = scrollY + 10;
+    }
+    if (this.popupHeight < 60) {
+      this.popupHeight = 60;
     }
     console.log("popupWindow x=" + this.x + " y=" + this.y);
     this.popupWindowHolder.css({
@@ -3650,13 +3653,11 @@ PopupWindow = (function() {
     }
     this.popupWindowHolder.show();
     this.isVisible = true;
-    this.emitEvent("resize", [this.popupWidth, this.popupHeight]);
     return true;
   };
 
   PopupWindow.prototype.internalCheckSavedLocation = function() {
     var location;
-    return false;
     if (this.configurations.tableName && this.configurations.tableName.length) {
       location = localStorage.getItem("PopupLocation_" + this.configurations.tableName);
       console.log("Loaded saved PopupLocation_" + this.configurations.tableName + ": ", location);
@@ -3791,18 +3792,6 @@ PopupWindow = (function() {
         y = _this.dragabilly.position.y;
         w = $(window).width();
         h = $(window).height();
-        if (x + 50 > w) {
-          _this.dragabilly.position.x = w - 50;
-        }
-        if (y + 50 > h) {
-          _this.dragabilly.position.y = h - 50;
-        }
-        if (x < -50) {
-          _this.dragabilly.position.x = -50;
-        }
-        if (y < 0) {
-          _this.dragabilly.position.y = 0;
-        }
         _this.x = _this.dragabilly.position.x;
         _this.y = _this.dragabilly.position.y;
         _this.internalSavePosition();
@@ -3812,6 +3801,7 @@ PopupWindow = (function() {
     this.dragabilly.on("dragEnd", (function(_this) {
       return function(e) {
         _this.popupWindowHolder.css("opacity", "1.0");
+        _this.emitEvent("resize_popupwindow_" + _this.configurations.tableName);
         return false;
       };
     })(this));
@@ -3827,13 +3817,12 @@ PopupWindow = (function() {
         _this.windowWrapper.width(_this.popupWidth);
         _this.popupWindowHolder.height(_this.popupHeight);
         _this.windowWrapper.height(_this.popupHeight - _this.windowTitle.height() - 1 - _this.toolbarHeight);
-        _this.windowScroll.trigger('resize');
-        _this.emitEvent("resize", [_this.popupWidth, _this.popupHeight]);
         return true;
       };
     })(this);
     stopMove = (function(_this) {
       return function(e) {
+        _this.windowScroll.trigger('resize');
         $(document).unbind("mousemove", doMove);
         $(document).unbind("mouseup", stopMove);
         return _this.internalSavePosition();
@@ -3858,6 +3847,7 @@ PopupWindow = (function() {
     this.setBackgroundColor = bind(this.setBackgroundColor, this);
     this.setTitle = bind(this.setTitle, this);
     this.html = bind(this.html, this);
+    this.onRresize = bind(this.onRresize, this);
     this.createPopupHolder = bind(this.createPopupHolder, this);
     this.addToolbar = bind(this.addToolbar, this);
     this.internalSavePosition = bind(this.internalSavePosition, this);
@@ -3894,8 +3884,27 @@ PopupWindow = (function() {
     this.internalCheckSavedLocation();
     this.createPopupHolder();
     this.resize(this.popupWidth, this.popupHeight);
+    globalTableEvents.on("resize", this.onRresize);
+    this.on("resize_popupwindow_" + this.configurations.tableName, this.resize);
     true;
   }
+
+  PopupWindow.prototype.onRresize = function(a, b) {
+    var h, w;
+    if (!this.isVisible) {
+      return false;
+    }
+    w = 0;
+    h = 0;
+    if (this.popupWindowHolder != null) {
+      w = this.popupWindowHolder.width();
+      h = this.popupWindowHolder.height();
+    }
+    if (this.configurations.tableName) {
+      this.emitEvent("resize_popupwindow_" + this.configurations.tableName, [w, h]);
+    }
+    return true;
+  };
 
   PopupWindow.prototype.html = function(strHtml) {
     this.windowScroll.html(strHtml);

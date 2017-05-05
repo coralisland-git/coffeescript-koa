@@ -134,11 +134,11 @@ $ ->
 		popup.windowScroll.append $ "<div> Hello World </div>"
 
 	addTestButton "PopupViewOnce 1 Table", "Open", (e) ->
-		doPopupViewOnce "Table", "Test1", "", 600, 400, "Tab1", (view, tabText) ->
+		doPopupViewOnce "Table", "Test1", "test1_table", 600, 400, "Tab1", (view, tabText) ->
 			view.loadTable 'zipcode'
 
 	addTestButton "PopupViewOnce 1 ImageStrip", "Open", (e) ->
-		doPopupViewOnce "ImageStrip", "Test1", "", 600, 400, "Tab2", (view, tabText) ->
+		doPopupViewOnce "ImageStrip", "Test1", "test1_imagestrip", 600, 400, "Tab2", (view, tabText) ->
 			view.init()
 			view.addImage newImage1
 			view.addImage newImage2
@@ -155,7 +155,7 @@ $ ->
 			view.render()
 
 	addTestButton "PopupViewOnce 2 Form", "Open", (e) ->	
-		doPopupViewOnce "Form", "Test2", "form-popup", 399, 300, "Tab1", (view, tabText) ->
+		doPopupViewOnce "Form", "Test2", "test2_form-popup", 399, 300, "Tab1", (view, tabText) ->
 			view.init()
 			view.getForm().addTextInput "input1", "Example Input 1"
 			view.getForm().addTextInput "input2", "Example Input 2"
@@ -165,7 +165,7 @@ $ ->
 			view.show()
 
 	addTestButton "PopupViewOnce 2 Table", "Open", (e) ->
-		doPopupViewOnce "Table", "Test2", "", 399, 300, "Tab2", (view, tabText) ->
+		doPopupViewOnce "Table", "Test2", "test2_table", 399, 300, "Tab2", (view, tabText) ->
 			view.loadTable 'zipcode'
 
 

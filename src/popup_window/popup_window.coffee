@@ -186,8 +186,8 @@ class PopupWindow
 	## @param [Integer] popupHeight the new height
 	## @return [Boolean]
 	##
-	resize: (@popupWidth, @popupHeight) =>
-
+	#resize: (@popupWidth, @popupHeight) =>
+	resize: (a, b) =>
 		width  = $(window).width()
 		height = $(window).height()
 
@@ -205,28 +205,35 @@ class PopupWindow
 
 		if @y < 0
 			@y = 0
-
 		## 
 		## Calculate scroll position
-		if @x - scrollX + @popupWidth + 10> width
+		if @x - scrollX + @popupWidth + 10 > width
 			console.log "popupWindow #{@title}, moving because #{@x} + #{@popupWidth} + 10 > #{width}"
 			@x = width + scrollX - @popupWidth - 10
-
+			
 		## adjustment of 24px for the resize handle so resize handle doesn't overlap
-		@popupHeight += 24
+		#@popupHeight += 24
 
 		##
 		## Calculate scroll position
 		if @y - scrollY + @popupHeight + 10 > height
 			@y = height + scrollY - @popupHeight - 10
 
-		while @x < 10
-			@x++
-			@popupWidth--
+		## -xg
+		## set minimum x, y value
+		if @x < scrollX + 10
+			@popupWidth += (@x - scrollX - 10)
+			@x = scrollX + 10			
 
-		while @y < 10
-			@y++
-			@popupHeight--
+		if @popupWidth < 60
+			@popupWidth = 60		
+
+		if @y < scrollY + 10
+			@popupHeight += (@y - scrollY - 10)
+			@y = scrollY + 10
+
+		if @popupHeight < 60
+			@popupHeight = 60		
 
 		console.log "popupWindow x=#{@x} y=#{@y}"
 
@@ -250,7 +257,7 @@ class PopupWindow
 		@popupWindowHolder.show()
 		@isVisible = true
 
-		@emitEvent "resize", [ @popupWidth, @popupHeight ]
+		#@emitEvent "resize_#{@configurations.tableName}", [ @popupWidth, @popupHeight ]
 		true
 
 	## -------------------------------------------------------------------------------------------------------------
@@ -258,7 +265,7 @@ class PopupWindow
 	##
 	internalCheckSavedLocation: () =>
 
-		return false
+		#return false
 
 		# location = user.get "PopupLocation_#{@title}", 0
 		if @configurations.tableName and @configurations.tableName.length
@@ -401,10 +408,10 @@ class PopupWindow
 			y = @dragabilly.position.y
 			w = $(window).width()
 			h = $(window).height()
-			if x + 50 > w then @dragabilly.position.x = w - 50
-			if y + 50 > h then @dragabilly.position.y = h - 50
-			if x < -50 then @dragabilly.position.x = -50
-			if y < 0 then @dragabilly.position.y = 0
+			#if x + 50 > w then @dragabilly.position.x = w - 50
+			#if y + 50 > h then @dragabilly.position.y = h - 50
+			#if x < -50 then @dragabilly.position.x = -50
+			#if y < 0 then @dragabilly.position.y = 0
 
 			@x = @dragabilly.position.x
 			@y = @dragabilly.position.y
@@ -414,6 +421,7 @@ class PopupWindow
 
 		@dragabilly.on "dragEnd", (e) =>
 			@popupWindowHolder.css "opacity", "1.0"
+			@emitEvent "resize_popupwindow_#{@configurations.tableName}"
 			return false
 
 		startX      = 0
@@ -427,13 +435,13 @@ class PopupWindow
 			@windowWrapper.width @popupWidth
 			@popupWindowHolder.height @popupHeight
 			@windowWrapper.height @popupHeight - @windowTitle.height() - 1 - @toolbarHeight
-			@windowScroll.trigger('resize')
 
-			# console.log "emit [resize]", @popupWidth, @popupHeight, this
-			@emitEvent "resize", [ @popupWidth, @popupHeight ]
 			true
 
 		stopMove = (e) =>
+			@windowScroll.trigger('resize')
+			#console.log "Popupwindow/doMove: emit [resize]", @popupWidth, @popupHeight, this
+			#@emitEvent "resize_popupwindow_#{@configurations.tableName}", [ @popupWidth, @popupHeight ]
 			$(document).unbind "mousemove", doMove
 			$(document).unbind "mouseup", stopMove
 			@internalSavePosition()
@@ -479,8 +487,25 @@ class PopupWindow
 		##|
 		##|  Setup with default sizeing
 		@resize @popupWidth, @popupHeight
+		globalTableEvents.on "resize", @onRresize
+		@on "resize_popupwindow_#{@configurations.tableName}", @resize
 		true
 
+	## -xg
+	## function to emit resize event for popupwindow instance
+	##
+	onRresize: (a, b) =>
+		if !@isVisible
+			return false
+		
+		w = 0
+		h = 0
+		if @popupWindowHolder?
+			w = @popupWindowHolder.width()
+			h = @popupWindowHolder.height()
+		if @configurations.tableName 
+			@emitEvent "resize_popupwindow_#{@configurations.tableName}", [w, h]
+		return true
 	## -------------------------------------------------------------------------------------------------------------
 	## Set the contents of the window
 	##
