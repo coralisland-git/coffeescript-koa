@@ -222,15 +222,19 @@ class PopupWindow
 		## -xg
 		## set minimum x, y value
 		if @x < scrollX + 10
-			@popupWidth += (@x - scrollX - 10)
-			@x = scrollX + 10			
+			@x = scrollX + 10
+
+		if @popupWidth >= (width - 20)
+			@popupWidth = width - 20			
 
 		if @popupWidth < 60
-			@popupWidth = 60		
+			@popupWidth = 60
 
 		if @y < scrollY + 10
-			@popupHeight += (@y - scrollY - 10)
 			@y = scrollY + 10
+
+		if @popupHeight >= (height - 20)
+			@popupHeight = height - 20
 
 		if @popupHeight < 60
 			@popupHeight = 60		
@@ -421,7 +425,7 @@ class PopupWindow
 
 		@dragabilly.on "dragEnd", (e) =>
 			@popupWindowHolder.css "opacity", "1.0"
-			@emitEvent "resize_popupwindow_#{@configurations.tableName}"
+			@emitEvent "resize_popupwindow"
 			return false
 
 		startX      = 0
@@ -487,14 +491,14 @@ class PopupWindow
 		##|
 		##|  Setup with default sizeing
 		@resize @popupWidth, @popupHeight
-		globalTableEvents.on "resize", @onRresize
-		@on "resize_popupwindow_#{@configurations.tableName}", @resize
+		globalTableEvents.on "resize", @onResize
+		@on "resize_popupwindow", @resize
 		true
 
 	## -xg
 	## function to emit resize event for popupwindow instance
 	##
-	onRresize: (a, b) =>
+	onResize: (a, b) =>
 		if !@isVisible
 			return false
 		
@@ -503,8 +507,9 @@ class PopupWindow
 		if @popupWindowHolder?
 			w = @popupWindowHolder.width()
 			h = @popupWindowHolder.height()
+
 		if @configurations.tableName 
-			@emitEvent "resize_popupwindow_#{@configurations.tableName}", [w, h]
+			@emitEvent "resize_popupwindow", [w, h]
 		return true
 	## -------------------------------------------------------------------------------------------------------------
 	## Set the contents of the window

@@ -3618,15 +3618,19 @@ PopupWindow = (function() {
       this.y = height + scrollY - this.popupHeight - 10;
     }
     if (this.x < scrollX + 10) {
-      this.popupWidth += this.x - scrollX - 10;
       this.x = scrollX + 10;
+    }
+    if (this.popupWidth >= (width - 20)) {
+      this.popupWidth = width - 20;
     }
     if (this.popupWidth < 60) {
       this.popupWidth = 60;
     }
     if (this.y < scrollY + 10) {
-      this.popupHeight += this.y - scrollY - 10;
       this.y = scrollY + 10;
+    }
+    if (this.popupHeight >= (height - 20)) {
+      this.popupHeight = height - 20;
     }
     if (this.popupHeight < 60) {
       this.popupHeight = 60;
@@ -3801,7 +3805,7 @@ PopupWindow = (function() {
     this.dragabilly.on("dragEnd", (function(_this) {
       return function(e) {
         _this.popupWindowHolder.css("opacity", "1.0");
-        _this.emitEvent("resize_popupwindow_" + _this.configurations.tableName);
+        _this.emitEvent("resize_popupwindow");
         return false;
       };
     })(this));
@@ -3847,7 +3851,7 @@ PopupWindow = (function() {
     this.setBackgroundColor = bind(this.setBackgroundColor, this);
     this.setTitle = bind(this.setTitle, this);
     this.html = bind(this.html, this);
-    this.onRresize = bind(this.onRresize, this);
+    this.onResize = bind(this.onResize, this);
     this.createPopupHolder = bind(this.createPopupHolder, this);
     this.addToolbar = bind(this.addToolbar, this);
     this.internalSavePosition = bind(this.internalSavePosition, this);
@@ -3884,12 +3888,12 @@ PopupWindow = (function() {
     this.internalCheckSavedLocation();
     this.createPopupHolder();
     this.resize(this.popupWidth, this.popupHeight);
-    globalTableEvents.on("resize", this.onRresize);
-    this.on("resize_popupwindow_" + this.configurations.tableName, this.resize);
+    globalTableEvents.on("resize", this.onResize);
+    this.on("resize_popupwindow", this.resize);
     true;
   }
 
-  PopupWindow.prototype.onRresize = function(a, b) {
+  PopupWindow.prototype.onResize = function(a, b) {
     var h, w;
     if (!this.isVisible) {
       return false;
@@ -3901,7 +3905,7 @@ PopupWindow = (function() {
       h = this.popupWindowHolder.height();
     }
     if (this.configurations.tableName) {
-      this.emitEvent("resize_popupwindow_" + this.configurations.tableName, [w, h]);
+      this.emitEvent("resize_popupwindow", [w, h]);
     }
     return true;
   };
