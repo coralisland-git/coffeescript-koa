@@ -7386,7 +7386,7 @@ TableView = (function() {
     this.internalSetupMouseEvents();
     this.contextMenuCallSetup = 0;
     this.setupContextMenu(this.contextMenuCallbackFunction);
-    this.tooltipWindow = new FloatingWindow(0, 0, 100, 100, this.elTableHolder);
+    this.tooltipWindow = new FloatingWindow(0, 0, 100, 100);
     return true;
   };
 

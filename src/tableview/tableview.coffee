@@ -2311,7 +2311,7 @@ class TableView
 		##|  Setup context menu on the header
 		@setupContextMenu @contextMenuCallbackFunction
 
-		@tooltipWindow = new FloatingWindow(0, 0, 100, 100, @elTableHolder)
+		@tooltipWindow = new FloatingWindow(0, 0, 100, 100)
 
 		true
 
