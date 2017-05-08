@@ -227,8 +227,8 @@ class PopupWindow
 		if @popupWidth >= (width - 20)
 			@popupWidth = width - 20			
 
-		if @popupWidth < 60
-			@popupWidth = 60
+		if @popupWidth < 300
+			@popupWidth = 300
 
 		if @y < scrollY + 10
 			@y = scrollY + 10
@@ -236,8 +236,8 @@ class PopupWindow
 		if @popupHeight >= (height - 20)
 			@popupHeight = height - 20
 
-		if @popupHeight < 60
-			@popupHeight = 60		
+		if @popupHeight < 300
+			@popupHeight = 300		
 
 		console.log "popupWindow x=#{@x} y=#{@y}"
 
