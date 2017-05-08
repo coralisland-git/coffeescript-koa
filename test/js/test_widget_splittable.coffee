@@ -92,7 +92,7 @@ $ ->
 		true
 
 	addTestButton "Popup Splittable Widget", "Open", () ->
-		doPopupView "WidgetSplittable", "Splittable Widget", "popup_splittableWidget", 900, 600
+		doPopupView "WidgetSplittable", "Splittable Widget", "popup_splittableWidget1", 900, 600
 		.then (view) ->
 			view.setData SplitData_V
 			view.show()
@@ -112,7 +112,7 @@ $ ->
 	addTestButton "Popup Splittable-Widget : Text/Tabs(Table & ImageStrip)", "Open", () ->
 		div_first_child = null
 		div_second_child = null
-		doPopupView "WidgetSplittable", "Splittable Widget", "popup_splittableWidget", 900, 600
+		doPopupView "WidgetSplittable", "Splittable Widget", "popup_splittableWidget2", 900, 600
 		.then (view) ->
 			view.setData SplitData_V
 			view.show()

@@ -3623,8 +3623,8 @@ PopupWindow = (function() {
     if (this.popupWidth >= (width - 20)) {
       this.popupWidth = width - 20;
     }
-    if (this.popupWidth < 60) {
-      this.popupWidth = 60;
+    if (this.popupWidth < 300) {
+      this.popupWidth = 300;
     }
     if (this.y < scrollY + 10) {
       this.y = scrollY + 10;
@@ -3632,8 +3632,8 @@ PopupWindow = (function() {
     if (this.popupHeight >= (height - 20)) {
       this.popupHeight = height - 20;
     }
-    if (this.popupHeight < 60) {
-      this.popupHeight = 60;
+    if (this.popupHeight < 300) {
+      this.popupHeight = 300;
     }
     console.log("popupWindow x=" + this.x + " y=" + this.y);
     this.popupWindowHolder.css({
@@ -3657,6 +3657,7 @@ PopupWindow = (function() {
     }
     this.popupWindowHolder.show();
     this.isVisible = true;
+    this.internalSavePosition();
     return true;
   };
 
@@ -3798,7 +3799,6 @@ PopupWindow = (function() {
         h = $(window).height();
         _this.x = _this.dragabilly.position.x;
         _this.y = _this.dragabilly.position.y;
-        _this.internalSavePosition();
         return false;
       };
     })(this));
@@ -3828,8 +3828,7 @@ PopupWindow = (function() {
       return function(e) {
         _this.windowScroll.trigger('resize');
         $(document).unbind("mousemove", doMove);
-        $(document).unbind("mouseup", stopMove);
-        return _this.internalSavePosition();
+        return $(document).unbind("mouseup", stopMove);
       };
     })(this);
     return this.resizable.on("mousedown", (function(_this) {

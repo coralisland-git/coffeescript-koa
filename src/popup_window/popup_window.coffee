@@ -260,6 +260,7 @@ class PopupWindow
 
 		@popupWindowHolder.show()
 		@isVisible = true
+		@internalSavePosition()
 
 		#@emitEvent "resize_#{@configurations.tableName}", [ @popupWidth, @popupHeight ]
 		true
@@ -419,13 +420,13 @@ class PopupWindow
 
 			@x = @dragabilly.position.x
 			@y = @dragabilly.position.y
-			@internalSavePosition()
 
 			return false
 
 		@dragabilly.on "dragEnd", (e) =>
 			@popupWindowHolder.css "opacity", "1.0"
 			@emitEvent "resize_popupwindow"
+
 			return false
 
 		startX      = 0
@@ -448,7 +449,6 @@ class PopupWindow
 			#@emitEvent "resize_popupwindow_#{@configurations.tableName}", [ @popupWidth, @popupHeight ]
 			$(document).unbind "mousemove", doMove
 			$(document).unbind "mouseup", stopMove
-			@internalSavePosition()
 
 		@resizable.on "mousedown", (e) =>
 			startX = e.clientX
