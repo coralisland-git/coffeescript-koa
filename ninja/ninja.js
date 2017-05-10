@@ -3805,6 +3805,7 @@ PopupWindow = (function() {
     this.dragabilly.on("dragEnd", (function(_this) {
       return function(e) {
         _this.popupWindowHolder.css("opacity", "1.0");
+        console.log("drgEnded: width=" + (_this.popupWindowHolder.width()) + ", height=" + (_this.popupWindowHolder.height()));
         _this.emitEvent("resize_popupwindow");
         return false;
       };
