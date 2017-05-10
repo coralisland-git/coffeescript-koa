@@ -3594,10 +3594,8 @@ PopupWindow = (function() {
     return $("body").append(this.shield);
   };
 
-  PopupWindow.prototype.resize = function(popupWidth, popupHeight) {
+  PopupWindow.prototype.resize = function(a, b) {
     var height, scrollX, scrollY, width;
-    this.popupWidth = popupWidth;
-    this.popupHeight = popupHeight;
     width = $(window).width();
     height = $(window).height();
     scrollX = window.pageXOffset || document.body.scrollLeft;
@@ -3616,17 +3614,26 @@ PopupWindow = (function() {
       console.log("popupWindow " + this.title + ", moving because " + this.x + " + " + this.popupWidth + " + 10 > " + width);
       this.x = width + scrollX - this.popupWidth - 10;
     }
-    this.popupHeight += 24;
     if (this.y - scrollY + this.popupHeight + 10 > height) {
       this.y = height + scrollY - this.popupHeight - 10;
     }
-    while (this.x < 10) {
-      this.x++;
-      this.popupWidth--;
+    if (this.x < scrollX + 10) {
+      this.x = scrollX + 10;
     }
-    while (this.y < 10) {
-      this.y++;
-      this.popupHeight--;
+    if (this.popupWidth >= (width - 20)) {
+      this.popupWidth = width - 20;
+    }
+    if (this.popupWidth < 300) {
+      this.popupWidth = 300;
+    }
+    if (this.y < scrollY + 10) {
+      this.y = scrollY + 10;
+    }
+    if (this.popupHeight >= (height - 20)) {
+      this.popupHeight = height - 20;
+    }
+    if (this.popupHeight < 300) {
+      this.popupHeight = 300;
     }
     console.log("popupWindow x=" + this.x + " y=" + this.y);
     this.popupWindowHolder.css({
@@ -3650,13 +3657,12 @@ PopupWindow = (function() {
     }
     this.popupWindowHolder.show();
     this.isVisible = true;
-    this.emitEvent("resize", [this.popupWidth, this.popupHeight]);
+    this.internalSavePosition();
     return true;
   };
 
   PopupWindow.prototype.internalCheckSavedLocation = function() {
     var location;
-    return false;
     if (this.configurations.tableName && this.configurations.tableName.length) {
       location = localStorage.getItem("PopupLocation_" + this.configurations.tableName);
       console.log("Loaded saved PopupLocation_" + this.configurations.tableName + ": ", location);
@@ -3791,33 +3797,16 @@ PopupWindow = (function() {
         y = _this.dragabilly.position.y;
         w = $(window).width();
         h = $(window).height();
-        if (x + 50 > w) {
-          _this.dragabilly.position.x = w - 50;
-        }
-        if (y + 50 > h) {
-          _this.dragabilly.position.y = h - 50;
-        }
-        if (x < -50) {
-          _this.dragabilly.position.x = -50;
-        }
-        if (y < 0) {
-          _this.dragabilly.position.y = 0;
-        }
         _this.x = _this.dragabilly.position.x;
         _this.y = _this.dragabilly.position.y;
-        _this.internalSavePosition();
-        return false;
-      };
-    })(this));
-    this.dragabilly.on("dragStart", (function(_this) {
-      return function(e) {
-        _this.popupWindowHolder.css("opacity", "0.5");
         return false;
       };
     })(this));
     this.dragabilly.on("dragEnd", (function(_this) {
       return function(e) {
         _this.popupWindowHolder.css("opacity", "1.0");
+        console.log("drgEnded: width=" + (_this.popupWindowHolder.width()) + ", height=" + (_this.popupWindowHolder.height()));
+        _this.emitEvent("resize_popupwindow");
         return false;
       };
     })(this));
@@ -3833,16 +3822,14 @@ PopupWindow = (function() {
         _this.windowWrapper.width(_this.popupWidth);
         _this.popupWindowHolder.height(_this.popupHeight);
         _this.windowWrapper.height(_this.popupHeight - _this.windowTitle.height() - 1 - _this.toolbarHeight);
-        _this.windowScroll.trigger('resize');
-        _this.emitEvent("resize", [_this.popupWidth, _this.popupHeight]);
         return true;
       };
     })(this);
     stopMove = (function(_this) {
       return function(e) {
+        _this.windowScroll.trigger('resize');
         $(document).unbind("mousemove", doMove);
-        $(document).unbind("mouseup", stopMove);
-        return _this.internalSavePosition();
+        return $(document).unbind("mouseup", stopMove);
       };
     })(this);
     return this.resizable.on("mousedown", (function(_this) {
@@ -3864,6 +3851,7 @@ PopupWindow = (function() {
     this.setBackgroundColor = bind(this.setBackgroundColor, this);
     this.setTitle = bind(this.setTitle, this);
     this.html = bind(this.html, this);
+    this.onResize = bind(this.onResize, this);
     this.createPopupHolder = bind(this.createPopupHolder, this);
     this.addToolbar = bind(this.addToolbar, this);
     this.internalSavePosition = bind(this.internalSavePosition, this);
@@ -3900,8 +3888,27 @@ PopupWindow = (function() {
     this.internalCheckSavedLocation();
     this.createPopupHolder();
     this.resize(this.popupWidth, this.popupHeight);
+    globalTableEvents.on("resize", this.onResize);
+    this.on("resize_popupwindow", this.resize);
     true;
   }
+
+  PopupWindow.prototype.onResize = function(a, b) {
+    var h, w;
+    if (!this.isVisible) {
+      return false;
+    }
+    w = 0;
+    h = 0;
+    if (this.popupWindowHolder != null) {
+      w = this.popupWindowHolder.width();
+      h = this.popupWindowHolder.height();
+    }
+    if (this.configurations.tableName) {
+      this.emitEvent("resize_popupwindow", [w, h]);
+    }
+    return true;
+  };
 
   PopupWindow.prototype.html = function(strHtml) {
     this.windowScroll.html(strHtml);
@@ -3925,12 +3932,33 @@ PopupWindow = (function() {
 $(function() {
   return $(document).on("keyup", (function(_this) {
     return function(e) {
-      var win;
+      var visibleWindows, w, win;
       if (e.keyCode === 27) {
         if ((globalOpenWindowList != null) && globalOpenWindowList.length > 0) {
-          win = globalOpenWindowList.pop();
+          visibleWindows = (function() {
+            var i, len, results;
+            results = [];
+            for (i = 0, len = globalOpenWindowList.length; i < len; i++) {
+              w = globalOpenWindowList[i];
+              if (w.isVisible === true) {
+                results.push(w);
+              }
+            }
+            return results;
+          })();
+          win = visibleWindows.slice(0).pop();
+          if (!win) {
+            return;
+          }
           console.log("Escape closing window:", win);
-          return win.destroy();
+          if (win.shield != null) {
+            win.shield.remove();
+          }
+          if (win.configurations && win.configurations.keyValue) {
+            return win.close();
+          } else {
+            return win.destroy();
+          }
         }
       }
     };
@@ -4110,7 +4138,7 @@ TypeaheadInput = (function() {
   return TypeaheadInput;
 
 })();
-var Screens, Scripts, StyleManager, Views, activateCurrentScreen, doAppendView, doLoadDependencies, doLoadScreen, doLoadView, doPopupTableView, doPopupView, doReplaceScreenContent, doShowScreen, globalWindowManager, registerStyleSheet, showScreen, showViewAsScreen;
+var PopupViews, Screens, Scripts, StyleManager, Views, activateCurrentScreen, doAppendView, doLoadDependencies, doLoadScreen, doLoadView, doPopupView, doPopupViewOnce, doReplaceScreenContent, doShowScreen, globalWindowManager, registerStyleSheet, showScreen, showViewAsScreen;
 
 Screens = {};
 
@@ -4125,6 +4153,8 @@ Views = {};
 Scripts = {};
 
 StyleManager = {};
+
+PopupViews = {};
 
 globalWindowManager = null;
 
@@ -4255,31 +4285,44 @@ doPopupView = function(viewName, title, settingsName, w, h) {
   });
 };
 
-doPopupTableView = function(data, title, settingsName, w, h) {
-  return new Promise(function(resolve, reject) {
-    var table_name, vertical;
-    vertical = false;
-    table_name = title.split(' ').join('_');
-    if (Array.isArray(data)) {
-      vertical = false;
-    } else if (typeof data === 'object') {
-      vertical = true;
-    }
-    return doPopupView('PopupTable', title, settingsName, w, h).then(function(view) {
-      var id, rec;
-      if (vertical === true) {
-        DataMap.removeTableData(table_name);
-        DataMap.importDataFromObjects(table_name, data);
-        view.loadTable(table_name, vertical);
-      } else {
-        for (id in data) {
-          rec = data[id];
-          DataMap.addDataUpdateTable(table_name, id, rec);
-        }
-        view.loadTable(table_name, vertical);
-      }
-      return resolve(view);
+doPopupViewOnce = function(viewName, title, settingsName, w, h, tabName, callbackWithView) {
+  if (PopupViews[title] == null) {
+    PopupViews[title] = new Promise(function(resolve, reject) {
+      var tabs, view;
+      view = new View();
+      view.windowTitle = title;
+      view.showPopupwithConfig(settingsName, w, h, {
+        keyValue: title
+      });
+      tabs = new DynamicTabs(view.elHolder);
+      return view.once("view_ready", function() {
+        return resolve({
+          view: view,
+          tabs: tabs
+        });
+      });
     });
+    PopupViews[title].tabNames = [];
+  }
+  return PopupViews[title].then(function(arg) {
+    var tabs, view;
+    view = arg.view, tabs = arg.tabs;
+    if (view.popup.popupWindowHolder == null) {
+      view.showPopupwithConfig(settingsName, w, h, {
+        keyValue: title
+      });
+      tabs = new DynamicTabs(view.elHolder);
+    }
+    if (!view.popup.isVisible) {
+      view.popup.open();
+    }
+    if (PopupViews[title].tabNames.includes(tabName)) {
+      return tabs.show("tab" + (PopupViews[title].tabNames.indexOf(tabName)));
+    } else {
+      tabs.doAddViewTab(viewName, tabName, callbackWithView);
+      PopupViews[title].tabNames.push(tabName);
+      return tabs.show("tab" + (PopupViews[title].tabNames.indexOf(tabName)));
+    }
   });
 };
 
@@ -4507,6 +4550,7 @@ View = (function() {
     this.onHideScreen = bind(this.onHideScreen, this);
     this.onShowScreen = bind(this.onShowScreen, this);
     this.internalFindElements = bind(this.internalFindElements, this);
+    this.showPopupwithConfig = bind(this.showPopupwithConfig, this);
     this.showPopup = bind(this.showPopup, this);
     this.showInDiv = bind(this.showInDiv, this);
     this.closePopup = bind(this.closePopup, this);
@@ -4597,6 +4641,45 @@ View = (function() {
       w: w,
       h: h
     });
+    this.gid = "View" + GlobalValueManager.NextGlobalID();
+    this.elHolder = $("<div />", {
+      id: this.gid,
+      "class": "popupView " + this.constructor.name
+    });
+    $(document).ready((function(_this) {
+      return function() {
+        _this.internalFindElements(_this.elHolder);
+        _this.onShowScreen();
+        return _this.emitEvent("view_ready", []);
+      };
+    })(this));
+    this.elHolder.html(this.template);
+    this.popup.windowScroll.append(this.elHolder);
+    cssTag = $("<style>" + this.css + "</style>");
+    $("head").append(cssTag);
+    return true;
+  };
+
+  View.prototype.showPopupwithConfig = function(optionalName, w, h, config) {
+    var cssTag, scrollX, scrollY, x, y;
+    if (w == null) {
+      w = $(window).width() - 100;
+    }
+    if (h == null) {
+      h = $(window).height() - 100;
+    }
+    scrollX = window.pageXOffset || document.body.scrollLeft;
+    scrollY = window.pageYOffset || document.body.scrollTop;
+    x = ($(window).width() - w) / 2 + scrollX;
+    y = ($(window).height() - h) / 2 + scrollY;
+    y -= 34 / 2;
+    if (!config) {
+      config = {};
+    }
+    config.tableName = optionalName;
+    config.w = w;
+    config.h = h;
+    this.popup = new PopupWindow(this.windowTitle, x, y, config);
     this.gid = "View" + GlobalValueManager.NextGlobalID();
     this.elHolder = $("<div />", {
       id: this.gid,
@@ -7202,14 +7285,16 @@ TableView = (function() {
 
   TableView.prototype.layoutShadow = function() {
     var autoAdjustableColumns, col, colNum, diffAmount, i, j, k, l, len1, len2, len3, location, maxWidth, ref, ref1, totalWidth, w;
+    maxWidth = this.getTableVisibleWidth();
+    if (!((this.cachedLayoutShadowWidth != null) && this.cachedLayoutShadowWidth === maxWidth)) {
+      this.cachedLayoutShadowWidth = maxWidth;
+    }
     autoAdjustableColumns = [];
     ref = this.colList;
     for (j = 0, len1 = ref.length; j < len1; j++) {
       i = ref[j];
       if (i.getAutoSize()) {
-        if ((i.actualWidth == null) || isNaN(i.actualWidth)) {
-          i.actualWidth = this.findBestFit(i);
-        }
+        i.actualWidth = this.findBestFit(i);
         autoAdjustableColumns.push(i);
       }
     }
@@ -7234,17 +7319,12 @@ TableView = (function() {
       totalWidth += w;
       colNum++;
     }
-    maxWidth = this.getTableVisibleWidth();
     diffAmount = (maxWidth - totalWidth) / autoAdjustableColumns.length;
     diffAmount = Math.floor(diffAmount);
     for (l = 0, len3 = autoAdjustableColumns.length; l < len3; l++) {
       col = autoAdjustableColumns[l];
       col.actualWidth += diffAmount;
     }
-    if ((this.cachedLayoutShadowWidth != null) && this.cachedLayoutShadowWidth === maxWidth) {
-      return;
-    }
-    this.cachedLayoutShadowWidth = maxWidth;
     return true;
   };
 
@@ -7303,11 +7383,11 @@ TableView = (function() {
     }
     this.layoutShadow();
     this.updateVisibleText();
-    this.elTableHolder.append(tableWrapper.el);
+    this.elTableHolder.append(this.widgetBase.el);
     this.internalSetupMouseEvents();
     this.contextMenuCallSetup = 0;
     this.setupContextMenu(this.contextMenuCallbackFunction);
-    this.tooltipWindow = new FloatingWindow(0, 0, 100, 100, this.elTableHolder);
+    this.tooltipWindow = new FloatingWindow(0, 0, 100, 100);
     return true;
   };
 
@@ -10216,7 +10296,7 @@ DataFormatSimpleObject = (function(superClass) {
   };
 
   DataFormatSimpleObject.prototype.renderTooltip = function(row, value, tooltipWindow) {
-    var height, str, temp, val, varName;
+    var height, str, val, varName;
     if (value == null) {
       return false;
     }
@@ -10227,15 +10307,7 @@ DataFormatSimpleObject = (function(superClass) {
       str += "<tr><td>";
       str += varName;
       str += "</td><td>";
-      temp = '';
-      if (Array.isArray(val)) {
-        temp = val.length + ' Records';
-      } else if (typeof val === 'object') {
-        temp = Object.keys(val).length + ' Properties';
-      } else {
-        temp = val;
-      }
-      str += temp;
+      str += val;
       str += "</tr>";
       height += 20;
     }
@@ -10246,7 +10318,9 @@ DataFormatSimpleObject = (function(superClass) {
   };
 
   DataFormatSimpleObject.prototype.onFocus = function(e, col, data) {
-    return doPopupTableView(data, "Show " + col, "showTableClasses", 800, 400).then(function(view) {});
+    console.log("e=", e);
+    console.log("col=", col);
+    return console.log("data=", data);
   };
 
   DataFormatSimpleObject.prototype.unformat = function(data, path) {

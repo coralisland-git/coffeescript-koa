@@ -186,8 +186,8 @@ class PopupWindow
 	## @param [Integer] popupHeight the new height
 	## @return [Boolean]
 	##
-	resize: (@popupWidth, @popupHeight) =>
-
+	#resize: (@popupWidth, @popupHeight) =>
+	resize: (a, b) =>
 		width  = $(window).width()
 		height = $(window).height()
 
@@ -205,28 +205,39 @@ class PopupWindow
 
 		if @y < 0
 			@y = 0
-
 		## 
 		## Calculate scroll position
-		if @x - scrollX + @popupWidth + 10> width
+		if @x - scrollX + @popupWidth + 10 > width
 			console.log "popupWindow #{@title}, moving because #{@x} + #{@popupWidth} + 10 > #{width}"
 			@x = width + scrollX - @popupWidth - 10
-
+			
 		## adjustment of 24px for the resize handle so resize handle doesn't overlap
-		@popupHeight += 24
+		#@popupHeight += 24
 
 		##
 		## Calculate scroll position
 		if @y - scrollY + @popupHeight + 10 > height
 			@y = height + scrollY - @popupHeight - 10
 
-		while @x < 10
-			@x++
-			@popupWidth--
+		## -xg
+		## set minimum x, y value
+		if @x < scrollX + 10
+			@x = scrollX + 10
 
-		while @y < 10
-			@y++
-			@popupHeight--
+		if @popupWidth >= (width - 20)
+			@popupWidth = width - 20			
+
+		if @popupWidth < 300
+			@popupWidth = 300
+
+		if @y < scrollY + 10
+			@y = scrollY + 10
+
+		if @popupHeight >= (height - 20)
+			@popupHeight = height - 20
+
+		if @popupHeight < 300
+			@popupHeight = 300		
 
 		console.log "popupWindow x=#{@x} y=#{@y}"
 
@@ -249,8 +260,9 @@ class PopupWindow
 
 		@popupWindowHolder.show()
 		@isVisible = true
+		@internalSavePosition()
 
-		@emitEvent "resize", [ @popupWidth, @popupHeight ]
+		#@emitEvent "resize_#{@configurations.tableName}", [ @popupWidth, @popupHeight ]
 		true
 
 	## -------------------------------------------------------------------------------------------------------------
@@ -258,7 +270,7 @@ class PopupWindow
 	##
 	internalCheckSavedLocation: () =>
 
-		return false
+		#return false
 
 		# location = user.get "PopupLocation_#{@title}", 0
 		if @configurations.tableName and @configurations.tableName.length
@@ -401,23 +413,20 @@ class PopupWindow
 			y = @dragabilly.position.y
 			w = $(window).width()
 			h = $(window).height()
-			if x + 50 > w then @dragabilly.position.x = w - 50
-			if y + 50 > h then @dragabilly.position.y = h - 50
-			if x < -50 then @dragabilly.position.x = -50
-			if y < 0 then @dragabilly.position.y = 0
+			#if x + 50 > w then @dragabilly.position.x = w - 50
+			#if y + 50 > h then @dragabilly.position.y = h - 50
+			#if x < -50 then @dragabilly.position.x = -50
+			#if y < 0 then @dragabilly.position.y = 0
 
 			@x = @dragabilly.position.x
 			@y = @dragabilly.position.y
-			@internalSavePosition()
 
-			return false
-
-		@dragabilly.on "dragStart", (e) =>
-			@popupWindowHolder.css "opacity", "0.5"
 			return false
 
 		@dragabilly.on "dragEnd", (e) =>
 			@popupWindowHolder.css "opacity", "1.0"
+			@emitEvent "resize_popupwindow"
+
 			return false
 
 		startX      = 0
@@ -431,16 +440,15 @@ class PopupWindow
 			@windowWrapper.width @popupWidth
 			@popupWindowHolder.height @popupHeight
 			@windowWrapper.height @popupHeight - @windowTitle.height() - 1 - @toolbarHeight
-			@windowScroll.trigger('resize')
 
-			# console.log "emit [resize]", @popupWidth, @popupHeight, this
-			@emitEvent "resize", [ @popupWidth, @popupHeight ]
 			true
 
 		stopMove = (e) =>
+			@windowScroll.trigger('resize')
+			#console.log "Popupwindow/doMove: emit [resize]", @popupWidth, @popupHeight, this
+			#@emitEvent "resize_popupwindow_#{@configurations.tableName}", [ @popupWidth, @popupHeight ]
 			$(document).unbind "mousemove", doMove
 			$(document).unbind "mouseup", stopMove
-			@internalSavePosition()
 
 		@resizable.on "mousedown", (e) =>
 			startX = e.clientX
@@ -483,8 +491,26 @@ class PopupWindow
 		##|
 		##|  Setup with default sizeing
 		@resize @popupWidth, @popupHeight
+		globalTableEvents.on "resize", @onResize
+		@on "resize_popupwindow", @resize
 		true
 
+	## -xg
+	## function to emit resize event for popupwindow instance
+	##
+	onResize: (a, b) =>
+		if !@isVisible
+			return false
+		
+		w = 0
+		h = 0
+		if @popupWindowHolder?
+			w = @popupWindowHolder.width()
+			h = @popupWindowHolder.height()
+
+		if @configurations.tableName 
+			@emitEvent "resize_popupwindow", [w, h]
+		return true
 	## -------------------------------------------------------------------------------------------------------------
 	## Set the contents of the window
 	##
@@ -514,6 +540,9 @@ $ ->
 	$(document).on "keyup", (e)=>
 		if e.keyCode == 27
 			if globalOpenWindowList? and globalOpenWindowList.length > 0
-				win = globalOpenWindowList.pop()
+				visibleWindows = (w for w in globalOpenWindowList when w.isVisible is true)
+				win = visibleWindows[..].pop()
+				if !win then return
 				console.log "Escape closing window:", win
-				win.destroy()
+				if win.shield? then win.shield.remove()
+				if win.configurations and win.configurations.keyValue then win.close() else win.destroy()

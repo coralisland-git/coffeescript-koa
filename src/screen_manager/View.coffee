@@ -164,6 +164,68 @@ class View
 
         true
 
+    # -xg
+    # show popup window with configuration
+    showPopupwithConfig: (optionalName, w, h, config)=>
+
+        if !w? then w = $(window).width() - 100
+        if !h? then h = $(window).height() - 100
+
+        ##
+        ## Calculate scrolled position
+        scrollX = window.pageXOffset || document.body.scrollLeft
+        scrollY = window.pageYOffset || document.body.scrollTop
+        
+        x = ($(window).width() - w)  / 2 + scrollX
+        y = ($(window).height() - h) / 2 + scrollY
+
+        ##|
+        ##|  Remove space that title bar takes up
+        y -= (34/2)
+
+        if !config then config = {}
+        config.tableName = optionalName
+        config.w = w
+        config.h = h
+        @popup = new PopupWindow @windowTitle, x, y, config
+            
+        ##|
+        ##|  Append the view's HTML
+        @gid = "View" + GlobalValueManager.NextGlobalID()
+        @elHolder = $ "<div />",
+            id: @gid
+            class: "popupView " + @constructor.name
+
+        ##|
+        ##|  Because we are adding CSS, we want to wait until the CSS is loaded
+        ##|  before we continue and generate the ready event.
+        ##|
+
+        $(document).ready ()=>
+
+            ##|
+            ##|  Create internal elements
+            @internalFindElements @elHolder
+            @onShowScreen()
+            @emitEvent "view_ready", []
+
+        ##|
+        ##|  Put the HTML template into the new popup window
+        @elHolder.html this.template
+
+        ##|
+        ##|  Put the holder element and template into the scrollable
+        ##|  section of the popup window.
+        @popup.windowScroll.append @elHolder
+
+        ##|
+        ##|  Append CSS
+        cssTag = $ "<style>#{this.css}</style>"
+        $("head").append(cssTag)
+
+        true
+
+
     internalFindElements: (parentTag) =>
         ##|
         ##|  If you find a tag in the template with an id then create the variable automatically

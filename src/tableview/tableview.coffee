@@ -2184,11 +2184,16 @@ class TableView
 	##|
 	layoutShadow: ()=>
 
+		maxWidth   = @getTableVisibleWidth()
+
+		unless @cachedLayoutShadowWidth? and @cachedLayoutShadowWidth == maxWidth
+			@cachedLayoutShadowWidth = maxWidth
+
 		autoAdjustableColumns = []
 		for i in @colList
 			if i.getAutoSize()
-				if !i.actualWidth? or isNaN(i.actualWidth)
-					i.actualWidth = @findBestFit(i)
+				#if !i.actualWidth? or isNaN(i.actualWidth)
+				i.actualWidth = @findBestFit(i)
 				autoAdjustableColumns.push(i)
 
 		if !@autoFitWidth? or @autoFitWidth == false then return false
@@ -2210,7 +2215,6 @@ class TableView
 			totalWidth += w
 			colNum++
 		
-		maxWidth   = @getTableVisibleWidth()
 		diffAmount = (maxWidth - totalWidth) / autoAdjustableColumns.length
 		# console.log "diffAmount=#{diffAmount}", (maxWidth - totalWidth)
 
@@ -2221,9 +2225,6 @@ class TableView
 
 		# console.log "layoutShadow maxWidth=#{maxWidth} totalWidth=#{totalWidth}", autoAdjustableColumns
 		# console.log "diffAmount=#{diffAmount}"
-		
-		if @cachedLayoutShadowWidth? and @cachedLayoutShadowWidth == maxWidth then return
-		@cachedLayoutShadowWidth = maxWidth
 
 		true
 
@@ -2299,7 +2300,7 @@ class TableView
 
 		@layoutShadow()
 		@updateVisibleText()
-		@elTableHolder.append tableWrapper.el
+		@elTableHolder.append @widgetBase.el
 		@internalSetupMouseEvents()
 
 		##|
@@ -2310,7 +2311,7 @@ class TableView
 		##|  Setup context menu on the header
 		@setupContextMenu @contextMenuCallbackFunction
 
-		@tooltipWindow = new FloatingWindow(0, 0, 100, 100, @elTableHolder)
+		@tooltipWindow = new FloatingWindow(0, 0, 100, 100)
 
 		true
 

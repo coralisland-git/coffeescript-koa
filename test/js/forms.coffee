@@ -118,7 +118,7 @@ $ ->
 			view.show()
 
 	addTestButton "Form on Popup", "Open", () ->
-		doPopupView "Form", "Form-Popup", "form-popup", 399, 300
+		doPopupView "Form", "Form-Popup", "form-popup1", 399, 300
 		.then (view) ->
 			view.init()
 			view.getForm().addTextInput "input1", "Example Input 1"
@@ -130,7 +130,7 @@ $ ->
 		true
 	
 	addTestButton "Form  on Popup with Many Fields", "Open", () ->
-		doPopupView "Form", "Form-Popup", "form-popup", 399, 300
+		doPopupView "Form", "Form-Popup", "form-popup2", 399, 300
 		.then (view) ->
 			view.init()
 			view.getForm().addTextInput "input1", "Example Input 1"
