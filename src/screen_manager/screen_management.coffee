@@ -159,7 +159,7 @@ doPopupViewOnce = (viewName, title, settingsName, w, h, tabName, callbackWithVie
             view.windowTitle = title
             view.showPopupwithConfig settingsName, w, h, 
                 keyValue: title
-            tabs = new DynamicTabs view.elHolder
+            tabs = new DynamicTabs view.wgt_elHolder
             view.once "view_ready", ()->
                 #view.onSetupButtons()
                 resolve({view, tabs})
@@ -169,7 +169,7 @@ doPopupViewOnce = (viewName, title, settingsName, w, h, tabName, callbackWithVie
         if !view.popup.popupWindowHolder?
             view.showPopupwithConfig settingsName, w, h, 
                 keyValue: title
-            tabs = new DynamicTabs view.elHolder
+            tabs = new DynamicTabs view.wgt_elHolder
 
         if !view.popup.isVisible
             view.popup.open()

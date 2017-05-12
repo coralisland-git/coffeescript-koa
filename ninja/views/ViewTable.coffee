@@ -15,9 +15,11 @@ class ViewTable extends View
         @table.setStatusBarEnabled()
         @table.setHolderToBottom()
         @table.render()
+
         @table.updateRowData()
 
         @on "resize", ()=>
             setTimeout @table.setHolderToBottom, 10
 
         return @table
+

@@ -192,10 +192,12 @@ class View
         ##|
         ##|  Append the view's HTML
         @gid = "View" + GlobalValueManager.NextGlobalID()
-        @elHolder = $ "<div />",
-            id: @gid
-            class: "popupView " + @constructor.name
+        @wgt_elHolder = @popup.wgt_WindowScroll.add "div", "popupView#{@constructor.name}", @gid
+        #@elHolder = $ "<div />",
+        #    id: @gid
+        #    class: "popupView " + @constructor.name
 
+        @elHolder = @wgt_elHolder.el
         ##|
         ##|  Because we are adding CSS, we want to wait until the CSS is loaded
         ##|  before we continue and generate the ready event.
@@ -216,7 +218,7 @@ class View
         ##|
         ##|  Put the holder element and template into the scrollable
         ##|  section of the popup window.
-        @popup.windowScroll.append @elHolder
+        #@popup.windowScroll.append @elHolder
 
         ##|
         ##|  Append CSS

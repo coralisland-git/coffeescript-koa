@@ -290,17 +290,32 @@ class WidgetTag
 
     ##|
     ##|  Call this function if the outside container changes size
-    onResize: ()=>
+    onResize: (w, h)=>
         delete @cachedWidth
         delete @cachedHeight
+        ## -xg
+        if !w? or w <= 0
+            w = @width()
+        if !h? or h <= 0
+            h = @height()
+        
         for c in @children
-            c.onResize()
+            size = c.onResize(w, h)
+            h -= size.height
 
+        if @el.attr("fixedHeight") is "true"
+            return {
+                width: @width()
+                height: @height()                
+                } 
+        else
+            @el.height(h)
         if @view?
-            console.log "Resizing widget view to ", @width(), @height()
-            @view.onResize(@width(), @height())
+            console.log "Resizing widget view to ", w, h
+            #@view.onResize(@width(), @height())
+            @view.onResize(w, h)
 
-        true
+        return {width:0, height: 0}
 
     ##|
     ##|   Set the text value or get the text value if nothing passed in

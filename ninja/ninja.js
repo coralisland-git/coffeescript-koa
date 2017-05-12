@@ -3658,6 +3658,7 @@ PopupWindow = (function() {
     this.popupWindowHolder.show();
     this.isVisible = true;
     this.internalSavePosition();
+    this.wgt_PopupWindowHolder.onResize();
     return true;
   };
 
@@ -3725,10 +3726,12 @@ PopupWindow = (function() {
       "class": "PopupWindow",
       id: "popup" + id
     });
-    this.popupWindowHolder = $(html);
+    this.wgt_PopupWindowHolder = new WidgetTag("div", "PopupWindow", "popup" + id);
+    this.popupWindowHolder = this.wgt_PopupWindowHolder.el;
     $("body").append(this.popupWindowHolder);
     this.windowTitle = new WidgetTag("div", "title", "popuptitle" + id, {
-      dragable: true
+      dragable: true,
+      fixedHeight: true
     });
     this.windowTitleText = this.windowTitle.add("span", "title_text");
     this.windowTitleText.html(this.title);
@@ -3747,30 +3750,25 @@ PopupWindow = (function() {
       };
     })(this));
     this.popupWindowHolder.append(this.windowTitle.el);
-    this.windowScroll = $("<div />", {
-      "class": "scrollcontent"
+    this.wgt_WindowBodyWrapperTop = this.wgt_PopupWindowHolder.add("div", "windowbody");
+    this.windowBodyWrapperTop = this.wgt_WindowBodyWrapperTop.el;
+    this.windowBodyWrapperTop.css({
+      position: "absolute",
+      top: this.windowTitle.outerHeight(),
+      left: 0,
+      right: 0,
+      bottom: 0
     });
-    this.windowWrapper = $("<div />", {
-      id: "windowwrapper" + id,
-      "class": "scrollable"
-    });
-    this.windowWrapper.append(this.windowScroll);
+    this.wgt_WindowWrapper = this.wgt_WindowBodyWrapperTop.add("div", "scrollable", "windowwrapper" + id);
+    this.windowWrapper = this.wgt_WindowWrapper.el;
+    this.wgt_WindowScroll = this.wgt_WindowWrapper.add("div", "scrollcontent");
+    this.windowScroll = this.wgt_WindowScroll.el;
     if (this.configurations.resizable) {
       this.resizable = $("<div />", {
         id: "windowResizeHandler" + id,
         "class": "resizeHandle"
       }).appendTo(this.windowWrapper);
     }
-    this.windowBodyWrapperTop = $("<div />", {
-      "class": "windowbody"
-    }).css({
-      position: "absolute",
-      top: this.windowTitle.outerHeight(),
-      left: 0,
-      right: 0,
-      bottom: 0
-    }).append(this.windowWrapper);
-    this.popupWindowHolder.append(this.windowBodyWrapperTop);
     if (this.configurations.scrollable) {
       this.myScroll = new IScroll("#windowwrapper" + id, {
         mouseWheel: true,
@@ -3805,7 +3803,6 @@ PopupWindow = (function() {
     this.dragabilly.on("dragEnd", (function(_this) {
       return function(e) {
         _this.popupWindowHolder.css("opacity", "1.0");
-        console.log("drgEnded: width=" + (_this.popupWindowHolder.width()) + ", height=" + (_this.popupWindowHolder.height()));
         _this.emitEvent("resize_popupwindow");
         return false;
       };
@@ -4294,7 +4291,7 @@ doPopupViewOnce = function(viewName, title, settingsName, w, h, tabName, callbac
       view.showPopupwithConfig(settingsName, w, h, {
         keyValue: title
       });
-      tabs = new DynamicTabs(view.elHolder);
+      tabs = new DynamicTabs(view.wgt_elHolder);
       return view.once("view_ready", function() {
         return resolve({
           view: view,
@@ -4311,7 +4308,7 @@ doPopupViewOnce = function(viewName, title, settingsName, w, h, tabName, callbac
       view.showPopupwithConfig(settingsName, w, h, {
         keyValue: title
       });
-      tabs = new DynamicTabs(view.elHolder);
+      tabs = new DynamicTabs(view.wgt_elHolder);
     }
     if (!view.popup.isVisible) {
       view.popup.open();
@@ -4681,10 +4678,8 @@ View = (function() {
     config.h = h;
     this.popup = new PopupWindow(this.windowTitle, x, y, config);
     this.gid = "View" + GlobalValueManager.NextGlobalID();
-    this.elHolder = $("<div />", {
-      id: this.gid,
-      "class": "popupView " + this.constructor.name
-    });
+    this.wgt_elHolder = this.popup.wgt_WindowScroll.add("div", "popupView" + this.constructor.name, this.gid);
+    this.elHolder = this.wgt_elHolder.el;
     $(document).ready((function(_this) {
       return function() {
         _this.internalFindElements(_this.elHolder);
@@ -4693,7 +4688,6 @@ View = (function() {
       };
     })(this));
     this.elHolder.html(this.template);
-    this.popup.windowScroll.append(this.elHolder);
     cssTag = $("<style>" + this.css + "</style>");
     $("head").append(cssTag);
     return true;
@@ -8162,12 +8156,18 @@ DynamicTabs = (function() {
     this.tabs = {};
     this.tabCount = 0;
     this.activeTab = null;
-    this.elHolder = new WidgetTag("div", "ninja-tabs");
-    this.tabList = this.elHolder.add("ul", "ninja-tab-list");
-    this.elHolder.addDiv("clr");
+    if (holderElement.constructor.name === "WidgetTag") {
+      this.elHolder = holderElement.add("div", "ninja-tabs");
+    } else {
+      this.elHolder = new WidgetTag("div", "ninja-tabs");
+      $(holderElement).append(this.elHolder.el);
+    }
+    this.tabList = this.elHolder.add("ul", "ninja-tab-list", "ninja-tab-list", {
+      fixedHeight: true
+    });
+    this.elHolder.el.append($('<div class="clr"></div>'));
     this.tabContent = this.elHolder.add("div", "ninja-tab-content tab-content");
     this.tabData = [];
-    $(holderElement).append(this.elHolder.el);
     GlobalClassTools.addEventManager(this);
     globalTableEvents.on("row_count", this.onCheckTableUpdateRowcount);
   }
@@ -8223,7 +8223,9 @@ DynamicTabs = (function() {
       return this.tabs[tabName];
     }
     id = "tab" + (this.tabCount++);
-    elTab = this.tabList.add("li", "ninja-nav-tab");
+    elTab = this.tabList.add("li", "ninja-nav-tab", "ninja-nav-tab", {
+      fixedHeight: true
+    });
     elTab.setDataPath(id);
     elTab.on("click", this.onClickTab);
     elTabText = elTab.add("div", "ninja-tab-text");
@@ -8386,16 +8388,12 @@ DynamicTabs = (function() {
   DynamicTabs.prototype.doAddViewTab = function(viewName, tabText, callbackWithView) {
     return new Promise((function(_this) {
       return function(resolve, reject) {
-        var content, elViewHolder, gid, tab;
+        var content, gid, tab, wgt_Content;
         gid = GlobalValueManager.NextGlobalID();
         content = "<div id='tab_" + gid + "' class='tab_content'></div>";
         tab = _this.addTab(tabText, content);
-        elViewHolder = $("#tab_" + gid);
-        return doAppendView(viewName, elViewHolder).then(function(view) {
-          view.elHolder = elViewHolder;
-          callbackWithView(view, tabText);
-          return resolve(tab);
-        });
+        wgt_Content = tab.body.add("div", "tab_content", "tab_" + gid);
+        return wgt_Content.setView(viewName, callbackWithView);
       };
     })(this));
   };
@@ -12223,20 +12221,38 @@ WidgetTag = (function() {
     return this.el.append($(html));
   };
 
-  WidgetTag.prototype.onResize = function() {
-    var c, i, len, ref;
+  WidgetTag.prototype.onResize = function(w, h) {
+    var c, i, len, ref, size;
     delete this.cachedWidth;
     delete this.cachedHeight;
+    if ((w == null) || w <= 0) {
+      w = this.width();
+    }
+    if ((h == null) || h <= 0) {
+      h = this.height();
+    }
     ref = this.children;
     for (i = 0, len = ref.length; i < len; i++) {
       c = ref[i];
-      c.onResize();
+      size = c.onResize(w, h);
+      h -= size.height;
+    }
+    if (this.el.attr("fixedHeight") === "true") {
+      return {
+        width: this.width(),
+        height: this.height()
+      };
+    } else {
+      this.el.height(h);
     }
     if (this.view != null) {
-      console.log("Resizing widget view to ", this.width(), this.height());
-      this.view.onResize(this.width(), this.height());
+      console.log("Resizing widget view to ", w, h);
+      this.view.onResize(w, h);
     }
-    return true;
+    return {
+      width: 0,
+      height: 0
+    };
   };
 
   WidgetTag.prototype.text = function(str) {
