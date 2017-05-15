@@ -286,6 +286,8 @@ class DynamicTabs
 			wgt_Content	 = tab.body.add "div", "tab_content", "tab_#{gid}"
 			#elViewHolder = $("#tab_#{gid}")
 			wgt_Content.setView viewName, callbackWithView
+			.then (view)=>
+				resolve(view)
 
 			#doAppendView viewName, elViewHolder
 			#.then (view)=>
