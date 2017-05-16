@@ -98,7 +98,8 @@ class DynamicTabs
 		elTabBadge = elTab.addDiv "ninja-badge"
 
 		elBody = @tabContent.add "div", "ninja-nav-body"
-		elBody.html defaultHtml
+		if defaultHtml?		
+			elBody.html defaultHtml
 
 		if !@activeTab?
 			@activeTab = id
@@ -226,10 +227,10 @@ class DynamicTabs
 			if id == @activeTab
 				tag.tab.addClass "active"
 				tag.body.show()
-				if tag.body.onResize?
+				#if tag.body.onResize?
 					##|
 					##|  Todo: check on this
-					tag.body.onResize(-1, -1)
+					#tag.body.onResize(-1, -1)
 
 				setTimeout ()->
 					w = $(window).width()
@@ -280,13 +281,14 @@ class DynamicTabs
 		new Promise (resolve, reject) =>
 
 			gid          = GlobalValueManager.NextGlobalID() 
-			content      = "<div id='tab_#{gid}' class='tab_content'></div>"
-			tab          = @addTab tabText, content
+			#content      = "<div id='tab_#{gid}' class='tab_content'></div>"
+			tab          = @addTab tabText#, content
 			## -xg
 			wgt_Content	 = tab.body.add "div", "tab_content", "tab_#{gid}"
 			#elViewHolder = $("#tab_#{gid}")
 			wgt_Content.setView viewName, callbackWithView
 			.then (view)=>
+				view.elHolder = wgt_Content.el
 				resolve(view)
 
 			#doAppendView viewName, elViewHolder

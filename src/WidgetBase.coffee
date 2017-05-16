@@ -311,6 +311,8 @@ class WidgetTag
         else
             @el.height(h)
         if @view?
+            if w <= 0 or h <= 0 
+                return {width:0, height: 0}            
             console.log "Resizing widget view to ", w, h
             #@view.onResize(@width(), @height())
             @view.onResize(w, h)
