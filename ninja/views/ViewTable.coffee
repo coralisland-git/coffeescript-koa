@@ -20,7 +20,7 @@ class ViewTable extends View
         if @elHolder.height() > 0
             viewTableHolder = @elHolder.find ".viewTableHolder"
             viewTableHolder.height "100%"
-        else 
+        else if @table?
             @table.onResize()
 
         true
@@ -41,8 +41,7 @@ class ViewTable extends View
         @table.render()
 
         @table.updateRowData()
-        @table.off "resize", @table.onResize
-        @on "resize", ()=>
-            setTimeout @table.setHolderToBottom, 10
+        #@on "resize", ()=>
+        #    setTimeout @table.setHolderToBottom, 10
 
         return @table
