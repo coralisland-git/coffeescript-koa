@@ -77,4 +77,19 @@ $ ->
 		.then ()->
 			console.log "Done."
 
+	addTestButton "Tabs with tables", "Open", (e)->
+		addHolder("renderTest1")
+		$("#renderTest1").height(800)
+
+		newPromise ()->
+
+			yield loadZipcodes()
+			yield loadStockData()
+
+			tabs = new DynamicTabs("#renderTest1")
+			tabs.doAddTableTab "zipcode", "Zipcodes"
+			tabs.doAddTableTab "stocks", "Stock Data"
+
+		.then ()->
+			console.log "Done."
 	go()

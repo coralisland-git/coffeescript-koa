@@ -453,9 +453,9 @@ class PopupWindow
 			true
 
 		stopMove = (e) =>
-			@windowScroll.trigger('resize')
+			#@windowScroll.trigger('resize')
 			#console.log "Popupwindow/doMove: emit [resize]", @popupWidth, @popupHeight, this
-			#@emitEvent "resize_popupwindow_#{@configurations.tableName}", [ @popupWidth, @popupHeight ]
+			@emitEvent "resize_popupwindow"
 			$(document).unbind "mousemove", doMove
 			$(document).unbind "mouseup", stopMove
 

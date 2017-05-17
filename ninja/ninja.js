@@ -3824,7 +3824,7 @@ PopupWindow = (function() {
     })(this);
     stopMove = (function(_this) {
       return function(e) {
-        _this.windowScroll.trigger('resize');
+        _this.emitEvent("resize_popupwindow");
         $(document).unbind("mousemove", doMove);
         return $(document).unbind("mouseup", stopMove);
       };
@@ -4721,9 +4721,8 @@ View = (function() {
     h = 0;
     if (this.elHolder != null) {
       w = this.elHolder.width();
-      h = this.elHolder.height();
+      return h = this.elHolder.height();
     }
-    return this.emitEvent("resize", [w, h]);
   };
 
   View.prototype.onResetScreen = function() {
@@ -5259,7 +5258,7 @@ TableView = (function() {
     globalKeyboardEvents.on("global_mouse_down", this.onGlobalMouseDown);
     globalKeyboardEvents.on("change", this.onGlobalDataChange);
     globalTableEvents.on("table_change", this.onGlobalTableChange);
-    globalTableEvents.on("resize", this.onResize);
+    this.on("resize", this.onResize);
     window.addEventListener("new_data", this.onGlobalNewData, false);
     if (this.gid == null) {
       this.gid = GlobalValueManager.NextGlobalID();
@@ -8232,7 +8231,9 @@ DynamicTabs = (function() {
     elTabText.html(tabName);
     elTabBadge = elTab.addDiv("ninja-badge");
     elBody = this.tabContent.add("div", "ninja-nav-body");
-    elBody.html(defaultHtml);
+    if (defaultHtml != null) {
+      elBody.html(defaultHtml);
+    }
     if (this.activeTab == null) {
       this.activeTab = id;
     }
@@ -8347,9 +8348,6 @@ DynamicTabs = (function() {
       if (id === this.activeTab) {
         tag.tab.addClass("active");
         tag.body.show();
-        if (tag.body.onResize != null) {
-          tag.body.onResize(-1, -1);
-        }
         setTimeout(function() {
           var h, w;
           w = $(window).width();
@@ -8388,12 +8386,14 @@ DynamicTabs = (function() {
   DynamicTabs.prototype.doAddViewTab = function(viewName, tabText, callbackWithView) {
     return new Promise((function(_this) {
       return function(resolve, reject) {
-        var content, gid, tab, wgt_Content;
+        var gid, tab, wgt_Content;
         gid = GlobalValueManager.NextGlobalID();
-        content = "<div id='tab_" + gid + "' class='tab_content'></div>";
-        tab = _this.addTab(tabText, content);
+        tab = _this.addTab(tabText);
         wgt_Content = tab.body.add("div", "tab_content", "tab_" + gid);
-        return wgt_Content.setView(viewName, callbackWithView);
+        return wgt_Content.setView(viewName, callbackWithView).then(function(view) {
+          view.elHolder = wgt_Content.el;
+          return resolve(view);
+        });
       };
     })(this));
   };
@@ -12242,16 +12242,22 @@ WidgetTag = (function() {
         width: this.width(),
         height: this.height()
       };
-    } else {
+    } else if (h > 0) {
       this.el.height(h);
     }
     if (this.view != null) {
+      if (w <= 0 || h <= 0) {
+        return {
+          width: 0,
+          height: 0
+        };
+      }
       console.log("Resizing widget view to ", w, h);
       this.view.onResize(w, h);
     }
     return {
-      width: 0,
-      height: 0
+      width: w,
+      height: h
     };
   };
 

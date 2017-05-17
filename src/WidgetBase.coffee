@@ -308,16 +308,16 @@ class WidgetTag
                 width: @width()
                 height: @height()                
                 } 
-        else
+        else if h > 0
             @el.height(h)
         if @view?
             if w <= 0 or h <= 0 
-                return {width:0, height: 0}            
+                return { width: 0, height: 0 }            
             console.log "Resizing widget view to ", w, h
             #@view.onResize(@width(), @height())
             @view.onResize(w, h)
 
-        return {width:0, height: 0}
+        return { width: w, height: h}
 
     ##|
     ##|   Set the text value or get the text value if nothing passed in

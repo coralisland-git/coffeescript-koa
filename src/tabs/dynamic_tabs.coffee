@@ -187,7 +187,7 @@ class DynamicTabs
 			return current.order
 		return arrayToOrder
 
-	##-------------------------------------------------------------------------------------------------------------------	
+	## - xg
 	## function to be used to sort elements in array of tabs	
 	## @param [Object] : object of tag that is to be ordered
 	## @param [Object] : object of tag that is to be ordered

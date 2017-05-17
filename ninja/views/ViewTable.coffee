@@ -14,6 +14,15 @@ class ViewTable extends View
             @elHolder.css "width", "100%"
         if h > 0
             @elHolder.css "max-height", "100%"
+
+        ## - xg
+        ## To make tableView responsive when it is on PopupWindow
+        if @elHolder.height() > 0
+            viewTableHolder = @elHolder.find ".viewTableHolder"
+            viewTableHolder.height "100%"
+        else 
+            @table.onResize()
+
         true
 
     onResize: (w, h)=>
@@ -32,7 +41,7 @@ class ViewTable extends View
         @table.render()
 
         @table.updateRowData()
-
+        @table.off "resize", @table.onResize
         @on "resize", ()=>
             setTimeout @table.setHolderToBottom, 10
 
