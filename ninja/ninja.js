@@ -3887,6 +3887,7 @@ PopupWindow = (function() {
     this.resize(this.popupWidth, this.popupHeight);
     globalTableEvents.on("resize", this.onResize);
     this.on("resize_popupwindow", this.resize);
+    this.wgt_PopupWindowHolder.setAsOriginWidget();
     true;
   }
 
@@ -4542,6 +4543,8 @@ View = (function() {
   View.prototype.windowTitle = "** Unknown View **";
 
   function View() {
+    this.height = bind(this.height, this);
+    this.width = bind(this.width, this);
     this.onResetScreen = bind(this.onResetScreen, this);
     this.onResize = bind(this.onResize, this);
     this.onHideScreen = bind(this.onHideScreen, this);
@@ -4561,7 +4564,7 @@ View = (function() {
       };
     })(this));
     GlobalClassTools.addEventManager(this);
-    globalTableEvents.on("resize", this.onResize);
+    this.on("resize", this.onResize);
   }
 
   View.prototype.getDependencyList = function() {
@@ -4639,10 +4642,8 @@ View = (function() {
       h: h
     });
     this.gid = "View" + GlobalValueManager.NextGlobalID();
-    this.elHolder = $("<div />", {
-      id: this.gid,
-      "class": "popupView " + this.constructor.name
-    });
+    this.wgt_elHolder = this.popup.wgt_WindowScroll.add("div", "popupView " + this.constructor.name, "" + this.gid);
+    this.elHolder = this.wgt_elHolder.el;
     $(document).ready((function(_this) {
       return function() {
         _this.internalFindElements(_this.elHolder);
@@ -4651,7 +4652,7 @@ View = (function() {
       };
     })(this));
     this.elHolder.html(this.template);
-    this.popup.windowScroll.append(this.elHolder);
+    this.wgt_elHolder.view = this;
     cssTag = $("<style>" + this.css + "</style>");
     $("head").append(cssTag);
     return true;
@@ -4678,7 +4679,7 @@ View = (function() {
     config.h = h;
     this.popup = new PopupWindow(this.windowTitle, x, y, config);
     this.gid = "View" + GlobalValueManager.NextGlobalID();
-    this.wgt_elHolder = this.popup.wgt_WindowScroll.add("div", "popupView" + this.constructor.name, this.gid);
+    this.wgt_elHolder = this.popup.wgt_WindowScroll.add("div", "popupView " + this.constructor.name, this.gid);
     this.elHolder = this.wgt_elHolder.el;
     $(document).ready((function(_this) {
       return function() {
@@ -4732,6 +4733,14 @@ View = (function() {
   resetAllInputs = function() {
     $("input[type=text], textarea").val("");
     return $("input[type=number], textarea").val("");
+  };
+
+  View.prototype.width = function() {
+    return this.elHolder.width();
+  };
+
+  View.prototype.height = function() {
+    return this.elHolder.height();
   };
 
   return View;
@@ -5093,6 +5102,7 @@ TableView = (function() {
   function TableView(elTableHolder, showCheckboxes) {
     this.elTableHolder = elTableHolder;
     this.showCheckboxes = showCheckboxes;
+    this.setParentView = bind(this.setParentView, this);
     this.ungroupColumn = bind(this.ungroupColumn, this);
     this.getColumnType = bind(this.getColumnType, this);
     this.findRowFromPath = bind(this.findRowFromPath, this);
@@ -5765,11 +5775,16 @@ TableView = (function() {
     this.cachedVisibleHeight = null;
     this.cachedTotalVisibleCols = null;
     this.cachedTotalVisibleRows = null;
-    if ((this.fixedWidth != null) && (this.fixedHeight != null)) {
-      this.elTableHolder.width(this.fixedWidth);
-      this.elTableHolder.height(this.fixedHeight);
-    } else if (this.elTableHolder.width() > 0) {
-      this.updateFixedPosition();
+    if (this.parentView) {
+      this.elTableHolder.width(this.parentView.width());
+      this.elTableHolder.height(this.parentView.height());
+    } else {
+      if ((this.fixedWidth != null) && (this.fixedHeight != null)) {
+        this.elTableHolder.width(this.fixedWidth);
+        this.elTableHolder.height(this.fixedHeight);
+      } else if (this.elTableHolder.width() > 0) {
+        this.updateFixedPosition();
+      }
     }
     this.updateRowData();
     return true;
@@ -7751,6 +7766,11 @@ TableView = (function() {
       }
     }
     return false;
+  };
+
+  TableView.prototype.setParentView = function(parentView) {
+    this.parentView = parentView;
+    return true;
   };
 
   return TableView;
@@ -10475,7 +10495,6 @@ DataFormatImageList = (function(superClass) {
       return formattedValue;
     }
     imgCount = currentValue.length;
-    console.log(imgCount);
     if (imgCount === 1) {
       formattedValue = "1 Image";
     } else {
@@ -11945,6 +11964,7 @@ WidgetTag = (function() {
 
   function WidgetTag(tagName, classes, id, attributes) {
     this.destroy = bind(this.destroy, this);
+    this.setAsOriginWidget = bind(this.setAsOriginWidget, this);
     this.bindToPath = bind(this.bindToPath, this);
     this.renderField = bind(this.renderField, this);
     this.bind = bind(this.bind, this);
@@ -12184,17 +12204,27 @@ WidgetTag = (function() {
     return true;
   };
 
-  WidgetTag.prototype.height = function() {
-    if (this.cachedHeight != null) {
-      return this.cachedHeight;
+  WidgetTag.prototype.height = function(h) {
+    if ((h != null) && h > 0) {
+      this.el.height(h);
+      this.cachedHeight = h;
+    } else if (typeof w === "undefined" || w === null) {
+      if (this.cachedHeight != null) {
+        return this.cachedHeight;
+      }
     }
     this.cachedHeight = this.el.height();
     return this.cachedHeight;
   };
 
-  WidgetTag.prototype.width = function() {
-    if (this.cachedWidth != null) {
-      return this.cachedWidth;
+  WidgetTag.prototype.width = function(w) {
+    if ((w != null) && w > 0) {
+      this.el.width(w);
+      this.cachedWidth = w;
+    } else if (w == null) {
+      if (this.cachedWidth != null) {
+        return this.cachedWidth;
+      }
     }
     this.cachedWidth = this.el.width();
     return this.cachedWidth;
@@ -12225,10 +12255,8 @@ WidgetTag = (function() {
     var c, i, len, ref, size;
     delete this.cachedWidth;
     delete this.cachedHeight;
-    if ((w == null) || w <= 0) {
+    if (this.el.attr("fixedHeight") === "true" || this.isOrigin) {
       w = this.width();
-    }
-    if ((h == null) || h <= 0) {
       h = this.height();
     }
     ref = this.children;
@@ -12427,6 +12455,12 @@ WidgetTag = (function() {
       };
     })(this));
     return true;
+  };
+
+  WidgetTag.prototype.setAsOriginWidget = function() {
+    this.isOrigin = true;
+    GlobalClassTools.addEventManager(this);
+    return globalTableEvents.on("resize", this.onResize);
   };
 
   WidgetTag.prototype.destroy = function() {
