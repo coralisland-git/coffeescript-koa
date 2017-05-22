@@ -258,14 +258,23 @@ class WidgetTag
 
         return true
 
-    height: ()=>
-        if @cachedHeight? then return @cachedHeight
+    height: (h)=>
+        if h? and h > 0
+            @el.height h
+            @cachedHeight = h
+        else if !w?
+            if @cachedHeight? then return @cachedHeight
         @cachedHeight = @el.height()
         return @cachedHeight
 
-    width: ()=>
-        if @cachedWidth? then return @cachedWidth
-        @cachedWidth = @el.width()
+    width: (w)=>
+        if w? and w > 0
+            @el.width w
+            @cachedWidth = w
+        else if !w?
+            if @cachedWidth? then return @cachedWidth
+        
+        @cachedWidth = @el.width()        
         return @cachedWidth
 
     outerWidth: ()=>
@@ -294,9 +303,10 @@ class WidgetTag
         delete @cachedWidth
         delete @cachedHeight
         ## -xg
-        if !w? or w <= 0
+        #if !w? or w <= 0
+        if @el.attr("fixedHeight") is "true" or @isOrigin
             w = @width()
-        if !h? or h <= 0
+            #if !h? or h <= 0
             h = @height()
         
         for c in @children
@@ -306,7 +316,7 @@ class WidgetTag
         if @el.attr("fixedHeight") is "true"
             return {
                 width: @width()
-                height: @height()                
+                height: @height()
                 } 
         else if h > 0
             @el.height(h)
@@ -492,8 +502,16 @@ class WidgetTag
                     @renderField tableName, idValue, fieldName
             )
         true
-        
-        
+
+    ##
+    ## -xg
+    ## Make this widgetTag a original one that starts to pass "resize" 
+    ## event to its children/views
+    ##
+    setAsOriginWidget: () =>
+        @isOrigin = true
+        GlobalClassTools.addEventManager(this)
+        globalTableEvents.on "resize", @onResize
 
     ##|  Destroy an element, remove all children and destroy them.
     ##|  Remove global variables and cleanup the DOM after.
