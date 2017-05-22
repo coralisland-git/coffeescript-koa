@@ -502,6 +502,7 @@ class PopupWindow
 		@resize @popupWidth, @popupHeight
 		globalTableEvents.on "resize", @onResize
 		@on "resize_popupwindow", @resize
+		@wgt_PopupWindowHolder.setAsOriginWidget()
 		true
 
 	## -xg
