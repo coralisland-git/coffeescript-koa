@@ -195,7 +195,8 @@ class TableView
 		globalKeyboardEvents.on "global_mouse_down", @onGlobalMouseDown
 		globalKeyboardEvents.on "change", @onGlobalDataChange
 		globalTableEvents.on "table_change", @onGlobalTableChange
-		globalTableEvents.on "resize", @onResize
+		#globalTableEvents.on "resize", @onResize
+		@on "resize", @onResize
 		window.addEventListener "new_data", @onGlobalNewData, false
 
 		##|
@@ -732,11 +733,16 @@ class TableView
 		@cachedTotalVisibleCols = null
 		@cachedTotalVisibleRows = null
 
-		if @fixedWidth? and @fixedHeight?
-			@elTableHolder.width(@fixedWidth)
-			@elTableHolder.height(@fixedHeight);
-		else if @elTableHolder.width() > 0
-			@updateFixedPosition()
+		# -xg
+		if @parentView
+			@elTableHolder.width @parentView.width()
+			@elTableHolder.height @parentView.height()
+		else
+			if @fixedWidth? and @fixedHeight?
+				@elTableHolder.width(@fixedWidth)
+				@elTableHolder.height(@fixedHeight);
+			else if @elTableHolder.width() > 0
+				@updateFixedPosition()
 
 		@updateRowData()
 		true
@@ -2693,3 +2699,6 @@ class TableView
 				return true
 
 		return false
+
+	setParentView: (@parentView) =>
+		true
