@@ -121,7 +121,8 @@ $ ->
 			div_first_child.html '<p style="font-size:30px;">Dummy Text</p>'
 			newPromise () ->
 				yield loadZipcodes()
-				tabs = new DynamicTabs(div_second_child.getTag())
+				tabs = new DynamicTabs(div_second_child)
+				div_second_child.setAsOriginWidget()
 				tabs.doAddViewTab "Table", "Table", (view, tabText) ->
 					view.loadTable "zipcode"
 				tabs.doAddViewTab "ImageStrip", "Images", (view, tabText) ->

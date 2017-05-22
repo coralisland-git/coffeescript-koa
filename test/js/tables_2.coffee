@@ -95,6 +95,9 @@ $ ->
 		addHolder "renderTest1"
 		$("#renderTest1").height 800
 		tabs = new DynamicTabs "#renderTest1"
+		tabs.elHolder.setAsOriginWidget()
+		tabs.elHolder.width 1000
+		tabs.elHolder.height 800
 		tab1 = tabs.addTab "Parent Tab1", '<div id="parentTab1"></div>'
 		tab2 = tabs.addTab "Parent Tab2", '<div id="parentTab2"></div>'
 		newPromise ()->
@@ -104,11 +107,16 @@ $ ->
 			yield loadDatafromJSONFile("SaveZipcodeData")
 			DataMap.changeColumnAttribute "testData", "imagelist", "editable", true
 			tabs1 = new DynamicTabs "#parentTab1"
+			tabs1.elHolder.setAsOriginWidget()
+			tabs1.elHolder.width 1000
+			tabs1.elHolder.height 800
 			tabs1.doAddTableTab "zipcode", "Zipcodes"
 			tabs1.doAddTableTab "stocks", "Stocks"
 
 			tabs2 = new DynamicTabs "#parentTab2"
-			
+			tabs2.elHolder.setAsOriginWidget()
+			tabs2.elHolder.width 1000
+			tabs2.elHolder.height 800			
 			tabs2.doAddTableTab "SaveZipcodeData", "SaveZipcodeData"	
 			tab = yield tabs2.doAddTableTab "testData", "TestData"
 			tab.table.moveActionColumn "distance"

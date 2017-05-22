@@ -69,6 +69,9 @@ $ ->
 			yield loadStockData()
 
 			tabs = new DynamicTabs("#renderTest1")
+			tabs.elHolder.setAsOriginWidget()
+			tabs.elHolder.width 1000
+			tabs.elHolder.height 800
 			tabs.doAddTableTabData "zipcode", "Zipcodes", 1
 			tabs.doAddTableTabData "stocks", "Stock Data", 0
 
@@ -77,19 +80,4 @@ $ ->
 		.then ()->
 			console.log "Done."
 
-	addTestButton "Tabs with tables", "Open", (e)->
-		addHolder("renderTest1")
-		$("#renderTest1").height(800)
-
-		newPromise ()->
-
-			yield loadZipcodes()
-			yield loadStockData()
-
-			tabs = new DynamicTabs("#renderTest1")
-			tabs.doAddTableTab "zipcode", "Zipcodes"
-			tabs.doAddTableTab "stocks", "Stock Data"
-
-		.then ()->
-			console.log "Done."
 	go()
