@@ -1814,7 +1814,6 @@ class DataFormatImageList extends DataFormatterType
 			return formattedValue
 
 		imgCount = currentValue.length
-		console.log imgCount
 		if imgCount == 1
 			formattedValue = "1 Image"
 		else 
