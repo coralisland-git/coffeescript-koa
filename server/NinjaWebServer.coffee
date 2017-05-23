@@ -374,7 +374,9 @@ class NinjaWebServer
             throw error if error?
             zlib.gzip result + str, (_, contentJs)=>
                 ninjaJavascript = contentJs
-                fs.writeFile "../ninja/ninja.js", [result, str]
+                # fs.writeFile "../ninja/ninja.js", [result, str]
+                fs.writeFile "../ninja/ninja.js", result.toString()+str, (err, done) ->
+                    if err? then console.log "Error writing Ninja.js:", err
 
         #fs.writeFile "../ninja/ninja.js", str
         console.log "Writing ../ninja/ninja.js"
