@@ -25,7 +25,6 @@ class TableViewDetailed extends TableView
     getTableTotalCols: ()=>
         return @totalAvailableRows + 1
 
-    ##|
     ##|  Number of visible columns
     getTableVisibleCols: ()=>
 

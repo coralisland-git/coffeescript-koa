@@ -12,13 +12,7 @@ class PopUpFormWrapper extends FormWrapper
 	## constructor
 	##
 	constructor: () ->
-    ###
-		# @property [Array] fields the collection of fields to show
-		@fields = []
 
-		# @property [String] gid the unique key for the current form
-		@gid = "form" + GlobalValueManager.NextGlobalID()
-    ###
     super()
 		# @property [String] templateFormFieldText the template for the form field
 		@templateFormFieldText = Handlebars.compile '''

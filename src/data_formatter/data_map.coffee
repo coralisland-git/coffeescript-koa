@@ -4,7 +4,7 @@
 ## @param [Element] e the element in which the editor to create
 ## @return [Boolean]
 ##
-
+DataSetConfig = require 'edgecommondatasetconfig'
 
 globalOpenEditor = (e) ->
 	##|
@@ -176,13 +176,13 @@ class DataMap
 	@importDataTypes: (tableName, savedConfig) =>
 
 		dm = DataMap.getDataMap()
-		dm.types[tableName] = new DataTypeCollection(tableName)
+		dm.types[tableName] = new DataSetConfig.Table(tableName)
 
 		for sourceName, obj of savedConfig
 
 			if sourceName == "_lastModified" then continue
 			if typeof obj != "object" then continue
-			dm.types[tableName].configureColumns([ obj ], true)
+			dm.types[tableName].unserialize([ obj ], true)
 
 		# console.log  "importDataTypes table=#{tableName}:", dm.types[tableName]
 
@@ -200,9 +200,9 @@ class DataMap
 		dm = DataMap.getDataMap()
 
 		if !dm.types[tableName]?
-		   dm.types[tableName] = new DataTypeCollection(tableName)
+		   dm.types[tableName] = new DataSetConfig.Table(tableName)
 
-		dm.types[tableName].configureColumns columns
+		dm.types[tableName].unserialize columns
 
 		# console.log "ADDING:", tableName, columns
 		# console.log dm.types[tableName]
@@ -256,7 +256,7 @@ class DataMap
 		##|
 		##|  Save this new column entirely
 		##|
-		saveText = dm.types[tableName].toSave()
+		saveText = dm.types[tableName].serialize()
 		dm.emitEvent "table_change", [tableName, saveText]
 		return dm.types[tableName].col[config.source]
 
@@ -269,7 +269,7 @@ class DataMap
 	@setDataTypesFromObject: (tableName, objects) =>
 
 		dm = DataMap.getDataMap()
-		dm.types[tableName] = new DataTypeCollection(tableName)
+		dm.types[tableName] = new DataSetConfig.Table(tableName)
 
 		updated = false
 		for i, o of objects
@@ -282,7 +282,7 @@ class DataMap
 	setDataTypesFromSingleObject: (tableName, newData)=>
 
 		if !@types[tableName]?
-			@types[tableName] = new DataTypeCollection(tableName)
+			@types[tableName] = new DataSetConfig.Table(tableName)
 
 		##|
 		##|  Returns updated = true if the data type(s) found in this table
@@ -458,7 +458,7 @@ class DataMap
 
 		dm = DataMap.getDataMap()
 		if !dm.types[tableName]?
-			dm.types[tableName] = new DataTypeCollection(tableName)
+			dm.types[tableName] = new DataSetConfig.Table(tableName)
 
 		updated = dm.setDataTypesFromSingleObject(tableName, newData)
 

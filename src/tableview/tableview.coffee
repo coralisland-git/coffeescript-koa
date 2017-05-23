@@ -21,6 +21,8 @@ globalKeyboardEvents    = new EvEmitter()
 globalTableEvents       = new EvEmitter()
 globalTableAdmin        = true
 minHeightOfTable        = 400
+DataSetConfig 			= require 'edgecommondatasetconfig'
+dataFormatter   		= new DataSetConfig.DataFormatter()
 
 $(window).on "resize", (e)=>
 	w = $(window).width()
@@ -767,7 +769,7 @@ class TableView
 	contextMenuChangeType: (source, coords)=>
 
 		popupMenu = new PopupMenu "New Type: #{source}", coords.x-150, coords.y-200
-		for name in Object.keys(globalDataFormatter.formats)
+		for name in Object.keys(dataFormatter.formats)
 			popupMenu.addItem name, (e, opt)=>
 				console.log "Change type of #{source} to #{opt}"
 
@@ -1099,7 +1101,7 @@ class TableView
 		## to show sorting arrow on ActionColumn header
 		for acol in @actionColList
 			acol.sort = 0
-			if acol.constructor.name is "TableViewCol"
+			if acol.constructor.name is "Column"
 				for sortrule in @sortRules
 					if sortrule.tableName is @primaryTableName and sortrule.source is acol.getSource()
 						acol.sort = sortrule.state

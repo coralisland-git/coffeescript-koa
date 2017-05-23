@@ -68,11 +68,12 @@ $ ->
 
         DataMap.setDataTypes "zipcode", [
             name    : "Custom"
-            source  : "code2"
+            source  : "code"
             visible : true
             type    : "text"
             width   : 300
-            render  : (val, path) ->
+            render  : (val, tableName, fieldName) ->
+                path = tableName + '/' + fieldName
                 return "{" + path + "} = " + val
         ]
 

@@ -1,3 +1,6 @@
+DataSetConfig = require 'edgecommondatasetconfig'
+dataFormatter   = new DataSetConfig.DataFormatter()
+
 allTests = []
 
 doEdit = (num, obj)=>
@@ -5,7 +8,7 @@ doEdit = (num, obj)=>
     console.log "Test=", allTests[num]
 
     existingValue = $(obj).text().trim()
-    formatter = globalDataFormatter.getFormatter allTests[num][0]
+    formatter = dataFormatter.getFormatter allTests[num][0]
     formatter.editData $(obj), existingValue, "/test/#{num}", (path, value) =>
         console.log "Saving", path, value
         $("#results").html "Saving path=#{path}, value=#{value} type=#{typeof value}"
@@ -52,6 +55,9 @@ $ ->
         padding-top: 20px;
         font-size: 14px;
     }
+    .scrollcontent {
+        height: 100%;
+    }
     </style>
     '''
 
@@ -60,8 +66,8 @@ $ ->
 
     addExample = (format, value, comment, options) ->
 
-        fValue = globalDataFormatter.formatData format, value, options, null
-        uValue = globalDataFormatter.unformatData format, value, options, null
+        fValue = dataFormatter.formatData format, value, options, null
+        uValue = dataFormatter.unformatData format, value, options, null
 
         num = allTests.length
         allTests.push [format, value, options]

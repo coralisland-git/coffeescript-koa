@@ -11,6 +11,15 @@ coffeeScript        = require 'coffee-script'
 mime                = require 'mime-types'
 co                  = require 'co'
 WebServerHelper     = require './WebServerHelper'
+browserify          = require 'browserify'
+coffeeify           = require 'coffeeify'
+
+bundle = browserify
+  extensions: ['.coffee']
+
+bundle.transform coffeeify,
+  bare: true
+  header: true
 
 WebPath         = "../ninja/"
 server          = null
@@ -303,6 +312,10 @@ class NinjaWebServer
             if m1 then return { class: m1[1], extends: m1[2], name: name }
             return null
 
+        getRequireInfo = (name)=>
+            m1 = @ninjaCoffeeRaw[name].match /require (.*)/
+            if m1 then return { class: m1[1], useRequire: true, name: name }
+            return null
 
         co ()=>
 
@@ -315,7 +328,10 @@ class NinjaWebServer
                 @ninjaCoffeeMap[file]   = output.v3SourceMap
 
                 info = getClassInfo(file)
-                if info? and info.extends?
+                useRequire = getRequireInfo(file)
+                if useRequire? and useRequire.useRequire == false
+                    bundle.add file
+                else if info? and info.extends?
                     for name in @ninjaCoffeeExtends
                         if name == file then return true
                     @ninjaCoffeeExtends.push info
@@ -323,6 +339,7 @@ class NinjaWebServer
                     for name in @ninjaCoffeeNormal
                         if name == file then return true
                     @ninjaCoffeeNormal.push file
+                
 
             else if /.styl/.test file
                 # console.log "Adding stylus file:", file
@@ -342,6 +359,7 @@ class NinjaWebServer
         str = ""
         for name in @ninjaCoffeeNormal
             str += @ninjaCoffeeFiles[name]
+        bundle.require 'edgecommondatasetconfig', {basedir: '../node_modules/'}
 
         @ninjaCoffeeExtends = @ninjaCoffeeExtends.sort (a, b)->
             return a.name < b.name
@@ -350,16 +368,21 @@ class NinjaWebServer
             console.log "Extends:", info
             str += @ninjaCoffeeFiles[info.name]
 
-        fs.writeFile "../ninja/ninja.js", str
+        ##
+        ##--xg
+        bundle.bundle (error, result) ->
+            throw error if error?
+            zlib.gzip result + str, (_, contentJs)=>
+                ninjaJavascript = contentJs
+                fs.writeFile "../ninja/ninja.js", [result, str]
+
+        #fs.writeFile "../ninja/ninja.js", str
         console.log "Writing ../ninja/ninja.js"
 
         strCss = ""
         strCss += css for file, css of @ninjaStylusFiles
         fs.writeFile "../ninja/ninja.css", strCss
         console.log "Writing ../ninja/ninja.css"
-
-        zlib.gzip str, (_, contentJs)=>
-            ninjaJavascript = contentJs
 
         zlib.gzip strCss, (_, contentCss)=>
             ninjaCss = contentCss

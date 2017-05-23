@@ -3,7 +3,8 @@
 ## global functions required to use tables. the cell id is a counter
 ## used to create elements with a new unique ID
 ##
-class TableViewColButton extends TableViewColBase
+DataSetConfig = require 'edgecommondatasetconfig'
+class TableViewColButton extends DataSetConfig.ColumnBase
 
     ## -------------------------------------------------------------------------------------------------------------
     ## constructor create new column object
