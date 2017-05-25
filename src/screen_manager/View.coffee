@@ -31,7 +31,8 @@ class View
         ##|  Event manager for Event Emitter style events
         GlobalClassTools.addEventManager(this)
 
-        globalTableEvents.on "resize", @onResize
+        #globalTableEvents.on "resize", @onResize
+        @on "resize", @onResize
 
 
     ##|
@@ -131,9 +132,12 @@ class View
         ##|
         ##|  Append the view's HTML
         @gid = "View" + GlobalValueManager.NextGlobalID()
-        @elHolder = $ "<div />",
-            id: @gid
-            class: "popupView " + @constructor.name
+        # -xg
+        @wgt_elHolder = @popup.wgt_WindowScroll.add "div", "popupView #{@constructor.name}", "#{@gid}"
+        @elHolder = @wgt_elHolder.el 
+        #@elHolder = $ "<div />",
+        #    id: @gid
+        #    class: "popupView " + @constructor.name
 
         ##|
         ##|  Because we are adding CSS, we want to wait until the CSS is loaded
@@ -151,11 +155,13 @@ class View
         ##|
         ##|  Put the HTML template into the new popup window
         @elHolder.html this.template
+        # -xg
+        @wgt_elHolder.view = this
 
         ##|
         ##|  Put the holder element and template into the scrollable
         ##|  section of the popup window.
-        @popup.windowScroll.append @elHolder
+        #@popup.windowScroll.append @elHolder
 
         ##|
         ##|  Append CSS
@@ -192,10 +198,12 @@ class View
         ##|
         ##|  Append the view's HTML
         @gid = "View" + GlobalValueManager.NextGlobalID()
-        @elHolder = $ "<div />",
-            id: @gid
-            class: "popupView " + @constructor.name
+        @wgt_elHolder = @popup.wgt_WindowScroll.add "div", "popupView #{@constructor.name}", @gid
+        #@elHolder = $ "<div />",
+        #    id: @gid
+        #    class: "popupView " + @constructor.name
 
+        @elHolder = @wgt_elHolder.el
         ##|
         ##|  Because we are adding CSS, we want to wait until the CSS is loaded
         ##|  before we continue and generate the ready event.
@@ -216,7 +224,7 @@ class View
         ##|
         ##|  Put the holder element and template into the scrollable
         ##|  section of the popup window.
-        @popup.windowScroll.append @elHolder
+        #@popup.windowScroll.append @elHolder
 
         ##|
         ##|  Append CSS
@@ -256,7 +264,7 @@ class View
             h = @elHolder.height()
             # console.log "View.coffee onResize a=#{a} b=#{b} w=#{w} h=#{h}:", @elHolder
 
-        @emitEvent "resize", [ w, h ]
+        #@emitEvent "resize", [ w, h ]
 
     ## called when the screen is reset due to logout or otherwise
     ## no action is required in most cases
@@ -268,3 +276,11 @@ class View
     resetAllInputs = () ->
         $("input[type=text], textarea").val ""
         $("input[type=number], textarea").val ""
+
+    #
+    # -xg
+    width: () =>
+        return @elHolder.width()
+
+    height: () =>
+        return @elHolder.height()

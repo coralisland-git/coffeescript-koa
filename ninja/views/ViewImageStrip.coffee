@@ -36,7 +36,8 @@ class ViewImageStrip extends View
     ##
     ## function to change width and height of the view when it is resized
     ##
-    onResizeViewImageStrip : (w, h)=>
+    #onResizeViewImageStrip : (w, h)=>
+    onResize: (w, h) =>
         if w < 400 or h < 400
             @setThumbSize 100, 75
         else if w < 600 or h < 600
@@ -63,6 +64,7 @@ class ViewImageStrip extends View
     render: ()=>        
         @renderThumbList()
         @renderControls()
+        @onResize()
         if !@setSelectedImgNumber(0)?
             return false
         true
@@ -76,7 +78,7 @@ class ViewImageStrip extends View
         @imageViewer = new ImageViewer @elHolder.find("#image#{@gid}")
         @selectedImgNumber = 0
         @setImgData []
-        @on "resize", @onResizeViewImageStrip
+        #@on "resize", @onResizeViewImageStrip
         true
 
     ## 

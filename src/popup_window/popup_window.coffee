@@ -262,6 +262,9 @@ class PopupWindow
 		@isVisible = true
 		@internalSavePosition()
 
+		## -xg
+		@wgt_PopupWindowHolder.onResize()
+
 		#@emitEvent "resize_#{@configurations.tableName}", [ @popupWidth, @popupHeight ]
 		true
 
@@ -339,8 +342,9 @@ class PopupWindow
 		html = $ "<div />",
 			class: "PopupWindow"
 			id:    "popup#{id}"
-
-		@popupWindowHolder = $(html)
+		@wgt_PopupWindowHolder = new WidgetTag "div", "PopupWindow", "popup#{id}"
+		#@popupWindowHolder = $(html)
+		@popupWindowHolder = @wgt_PopupWindowHolder.el
 		$("body").append @popupWindowHolder
 
 		##|
@@ -348,6 +352,7 @@ class PopupWindow
 
 		@windowTitle = new WidgetTag "div", "title", "popuptitle#{id}",
 			dragable: true
+			fixedHeight: true
 
 		@windowTitleText = @windowTitle.add "span", "title_text"
 		@windowTitleText.html @title
@@ -360,16 +365,29 @@ class PopupWindow
 
 		@popupWindowHolder.append @windowTitle.el
 
+		@wgt_WindowBodyWrapperTop = @wgt_PopupWindowHolder.add "div", "windowbody" 
+		@windowBodyWrapperTop  = @wgt_WindowBodyWrapperTop.el
+		@windowBodyWrapperTop.css
+			position: "absolute"
+			top:      @windowTitle.outerHeight()
+			left:     0
+			right:    0
+			bottom:   0
+		@wgt_WindowWrapper = @wgt_WindowBodyWrapperTop.add "div", "scrollable", "windowwrapper#{id}"
+		#@windowWrapper = $ "<div />",
+		#	id: "windowwrapper#{id}"
+		#	class: "scrollable"
+		@windowWrapper = @wgt_WindowWrapper.el
+
 		##|
 		##| Body div with IScroll wrapper
-		@windowScroll  = $ "<div />",
-			class: "scrollcontent"
+		@wgt_WindowScroll = @wgt_WindowWrapper.add "div", "scrollcontent"
+		#@windowScroll  = $ "<div />",
+		#	class: "scrollcontent"
+		@windowScroll = @wgt_WindowScroll.el
 
-		@windowWrapper = $ "<div />",
-			id: "windowwrapper#{id}"
-			class: "scrollable"
 
-		@windowWrapper.append @windowScroll
+		#@windowWrapper.append @windowScroll
 
 		if @configurations.resizable
 			@resizable = $ "<div />",
@@ -377,18 +395,9 @@ class PopupWindow
 				class: "resizeHandle"
 			.appendTo @windowWrapper
 
-		@windowBodyWrapperTop  = $ "<div />",
-			class: "windowbody"
-		.css
-			position: "absolute"
-			top:      @windowTitle.outerHeight()
-			left:     0
-			right:    0
-			bottom:   0
+		#.append @windowWrapper
 
-		.append @windowWrapper
-
-		@popupWindowHolder.append @windowBodyWrapperTop
+		#@popupWindowHolder.append @windowBodyWrapperTop
 
 		##|
 		##|  Setup a scroll area within the body
@@ -444,9 +453,9 @@ class PopupWindow
 			true
 
 		stopMove = (e) =>
-			@windowScroll.trigger('resize')
+			#@windowScroll.trigger('resize')
 			#console.log "Popupwindow/doMove: emit [resize]", @popupWidth, @popupHeight, this
-			#@emitEvent "resize_popupwindow_#{@configurations.tableName}", [ @popupWidth, @popupHeight ]
+			@emitEvent "resize_popupwindow"
 			$(document).unbind "mousemove", doMove
 			$(document).unbind "mouseup", stopMove
 
@@ -493,6 +502,7 @@ class PopupWindow
 		@resize @popupWidth, @popupHeight
 		globalTableEvents.on "resize", @onResize
 		@on "resize_popupwindow", @resize
+		@wgt_PopupWindowHolder.setAsOriginWidget()
 		true
 
 	## -xg
