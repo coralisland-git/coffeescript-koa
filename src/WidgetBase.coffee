@@ -258,14 +258,23 @@ class WidgetTag
 
         return true
 
-    height: ()=>
-        if @cachedHeight? then return @cachedHeight
+    height: (h)=>
+        if h? and h > 0
+            @el.height h
+            @cachedHeight = h
+        else if !w?
+            if @cachedHeight? then return @cachedHeight
         @cachedHeight = @el.height()
         return @cachedHeight
 
-    width: ()=>
-        if @cachedWidth? then return @cachedWidth
-        @cachedWidth = @el.width()
+    width: (w)=>
+        if w? and w > 0
+            @el.width w
+            @cachedWidth = w
+        else if !w?
+            if @cachedWidth? then return @cachedWidth
+        
+        @cachedWidth = @el.width()        
         return @cachedWidth
 
     outerWidth: ()=>
@@ -290,17 +299,35 @@ class WidgetTag
 
     ##|
     ##|  Call this function if the outside container changes size
-    onResize: ()=>
+    onResize: (w, h)=>
         delete @cachedWidth
         delete @cachedHeight
+        ## -xg
+        #if !w? or w <= 0
+        if @el.attr("fixedHeight") is "true" or @isOrigin
+            w = @width()
+            #if !h? or h <= 0
+            h = @height()
+        
         for c in @children
-            c.onResize()
+            size = c.onResize(w, h)
+            h -= size.height
 
+        if @el.attr("fixedHeight") is "true"
+            return {
+                width: @width()
+                height: @height()
+                } 
+        else if h > 0
+            @el.height(h)
         if @view?
-            console.log "Resizing widget view to ", @width(), @height()
-            @view.onResize(@width(), @height())
+            if w <= 0 or h <= 0 
+                return { width: 0, height: 0 }            
+            console.log "Resizing widget view to ", w, h
+            #@view.onResize(@width(), @height())
+            @view.onResize(w, h)
 
-        true
+        return { width: w, height: h}
 
     ##|
     ##|   Set the text value or get the text value if nothing passed in
@@ -475,8 +502,16 @@ class WidgetTag
                     @renderField tableName, idValue, fieldName
             )
         true
-        
-        
+
+    ##
+    ## -xg
+    ## Make this widgetTag a original one that starts to pass "resize" 
+    ## event to its children/views
+    ##
+    setAsOriginWidget: () =>
+        @isOrigin = true
+        GlobalClassTools.addEventManager(this)
+        globalTableEvents.on "resize", @onResize
 
     ##|  Destroy an element, remove all children and destroy them.
     ##|  Remove global variables and cleanup the DOM after.

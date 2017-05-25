@@ -19,13 +19,21 @@ class DynamicTabs
 		@tabs       = {}
 		@tabCount   = 0
 		@activeTab  = null
-		@elHolder   = new WidgetTag("div", "ninja-tabs")
-		@tabList    = @elHolder.add "ul", "ninja-tab-list"
-		@elHolder.addDiv "clr"
+
+		## -xg
+		if holderElement.constructor.name is "WidgetTag"
+			@elHolder = holderElement.add "div", "ninja-tabs"
+		else
+			@elHolder   = new WidgetTag("div", "ninja-tabs")
+			$(holderElement).append @elHolder.el
+		@tabList    = @elHolder.add "ul", "ninja-tab-list", "ninja-tab-list",
+						fixedHeight: true
+		#@elHolder.addDiv "clr"
+		@elHolder.el.append $('<div class="clr"></div>')
 		@tabContent = @elHolder.add "div", "ninja-tab-content tab-content"
 		@tabData  	= []
 
-		$(holderElement).append @elHolder.el
+		#$(holderElement).append @elHolder.el
 
 		GlobalClassTools.addEventManager(this)
 		globalTableEvents.on "row_count", @onCheckTableUpdateRowcount
@@ -79,7 +87,8 @@ class DynamicTabs
 
 		id = "tab#{@tabCount++}"
 
-		elTab = @tabList.add "li", "ninja-nav-tab"
+		elTab = @tabList.add "li", "ninja-nav-tab", "ninja-nav-tab",
+			fixedHeight: true
 		elTab.setDataPath id
 		elTab.on "click", @onClickTab
 
@@ -89,7 +98,8 @@ class DynamicTabs
 		elTabBadge = elTab.addDiv "ninja-badge"
 
 		elBody = @tabContent.add "div", "ninja-nav-body"
-		elBody.html defaultHtml
+		if defaultHtml?		
+			elBody.html defaultHtml
 
 		if !@activeTab?
 			@activeTab = id
@@ -177,7 +187,7 @@ class DynamicTabs
 			return current.order
 		return arrayToOrder
 
-	##-------------------------------------------------------------------------------------------------------------------	
+	## - xg
 	## function to be used to sort elements in array of tabs	
 	## @param [Object] : object of tag that is to be ordered
 	## @param [Object] : object of tag that is to be ordered
@@ -217,10 +227,10 @@ class DynamicTabs
 			if id == @activeTab
 				tag.tab.addClass "active"
 				tag.body.show()
-				if tag.body.onResize?
+				#if tag.body.onResize?
 					##|
 					##|  Todo: check on this
-					tag.body.onResize(-1, -1)
+					#tag.body.onResize(-1, -1)
 
 				setTimeout ()->
 					w = $(window).width()
@@ -270,16 +280,23 @@ class DynamicTabs
 
 		new Promise (resolve, reject) =>
 
-			gid          = GlobalValueManager.NextGlobalID()
-			content      = "<div id='tab_#{gid}' class='tab_content'></div>"
-			tab          = @addTab tabText, content
-			elViewHolder = $("#tab_#{gid}")
-			doAppendView viewName, elViewHolder
+			gid          = GlobalValueManager.NextGlobalID() 
+			#content      = "<div id='tab_#{gid}' class='tab_content'></div>"
+			tab          = @addTab tabText#, content
+			## -xg
+			wgt_Content	 = tab.body.add "div", "tab_content", "tab_#{gid}"
+			#elViewHolder = $("#tab_#{gid}")
+			wgt_Content.setView viewName, callbackWithView
 			.then (view)=>
+				view.elHolder = wgt_Content.el
+				resolve(view)
 
-				view.elHolder = elViewHolder
-				callbackWithView(view, tabText)
-				resolve(tab)
+			#doAppendView viewName, elViewHolder
+			#.then (view)=>
+
+			#	view.elHolder = elViewHolder
+			#	callbackWithView(view, tabText)
+			#	resolve(tab)
 
 	## -------------------------------------------------------------------------------------------------------------
 	## Add a new tableTab data to array named "tabData"
