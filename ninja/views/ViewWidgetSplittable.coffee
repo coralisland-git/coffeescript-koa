@@ -62,7 +62,7 @@ class ViewWidgetSplittable extends View
         if sizes?
             @optionData.sizes = sizes
 
-        if name? 
+        if name?
             @gid = name
         else
             @gid = GlobalValueManager.NextGlobalID()
