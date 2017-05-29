@@ -327,7 +327,8 @@ activateCurrentScreen = (optionalArgs, screenName) ->
         Screens.current.onSetupButtons()
         Screens.current.initialized = true
 
-    document.location.hash = screenName
+    if screenName != "Login"
+        document.location.hash = screenName
 
     ##
     ## Allow the screen to make any changes before goint live on the display

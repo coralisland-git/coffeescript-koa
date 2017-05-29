@@ -68436,7 +68436,9 @@ activateCurrentScreen = function(optionalArgs, screenName) {
     Screens.current.onSetupButtons();
     Screens.current.initialized = true;
   }
-  document.location.hash = screenName;
+  if (screenName !== "Login") {
+    document.location.hash = screenName;
+  }
   doReplaceScreenContent(screenName);
   Screens.current.onResetScreen();
   w = $(window).width();
