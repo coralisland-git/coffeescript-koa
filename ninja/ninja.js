@@ -68488,6 +68488,7 @@ Screen = (function() {
     var cssTag;
     this.classid = "#" + this.constructor.name + ".screen";
     this.firstEvents = true;
+    $(window).on("resize", this.getScreenSize);
     if (this.css != null) {
       cssTag = $("<style type='text/css'>" + this.css + "</style>");
       $("head").append(cssTag);

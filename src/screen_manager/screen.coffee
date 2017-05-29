@@ -18,6 +18,8 @@ class Screen
         @classid = "#" + @constructor.name + ".screen"
         @firstEvents = true
 
+        $(window).on "resize", @getScreenSize
+
         if this.css?
             ##|
             ##|  Append CSS
