@@ -153,4 +153,4 @@ class WebServerHelper
                 catch ex
 
                     console.log "Content=", content
-                    console.log "Inner exception from CoffeeScript: ", chalk.yellow(ex)
+                    console.log "[filename=#{filename}] Inner exception from CoffeeScript: ", ex.toString()

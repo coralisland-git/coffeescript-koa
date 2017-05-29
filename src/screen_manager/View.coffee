@@ -133,11 +133,13 @@ class View
         ##|  Append the view's HTML
         @gid = "View" + GlobalValueManager.NextGlobalID()
         # -xg
+        console.log "showPopup adding to", @popup.wgt_WindowScroll
         @wgt_elHolder = @popup.wgt_WindowScroll.add "div", "popupView #{@constructor.name}", "#{@gid}"
+
+        @wgt_elHolder.onResize = (x,y)=>
+            return @onResize(x, y)
+
         @elHolder = @wgt_elHolder.el 
-        #@elHolder = $ "<div />",
-        #    id: @gid
-        #    class: "popupView " + @constructor.name
 
         ##|
         ##|  Because we are adding CSS, we want to wait until the CSS is loaded
@@ -150,18 +152,19 @@ class View
             ##|  Create internal elements
             @internalFindElements @elHolder
             @onShowScreen()
+
+            ##|  force a top level resize to any windows that may be open
+            setTimeout ()=>
+                w = $(window).width()
+                h = $(window).height()
+                globalTableEvents.emitEvent "resize", [w, h]
+            , 10
+
             @emitEvent "view_ready", []
 
         ##|
         ##|  Put the HTML template into the new popup window
         @elHolder.html this.template
-        # -xg
-        @wgt_elHolder.view = this
-
-        ##|
-        ##|  Put the holder element and template into the scrollable
-        ##|  section of the popup window.
-        #@popup.windowScroll.append @elHolder
 
         ##|
         ##|  Append CSS
@@ -181,7 +184,7 @@ class View
         ## Calculate scrolled position
         scrollX = window.pageXOffset || document.body.scrollLeft
         scrollY = window.pageYOffset || document.body.scrollTop
-        
+
         x = ($(window).width() - w)  / 2 + scrollX
         y = ($(window).height() - h) / 2 + scrollY
 
@@ -262,7 +265,7 @@ class View
         if @elHolder?
             w = @elHolder.width()
             h = @elHolder.height()
-            # console.log "View.coffee onResize a=#{a} b=#{b} w=#{w} h=#{h}:", @elHolder
+            console.log "View.coffee onResize a=#{a} b=#{b} w=#{w} h=#{h}:", @elHolder
 
         #@emitEvent "resize", [ w, h ]
 

@@ -262,8 +262,9 @@ class WidgetTag
         if h? and h > 0
             @el.height h
             @cachedHeight = h
-        else if !w?
-            if @cachedHeight? then return @cachedHeight
+            return h
+
+        # if @cachedHeight? then return @cachedHeight
         @cachedHeight = @el.height()
         return @cachedHeight
 
@@ -273,7 +274,7 @@ class WidgetTag
             @cachedWidth = w
         else if !w?
             if @cachedWidth? then return @cachedWidth
-        
+
         @cachedWidth = @el.width()        
         return @cachedWidth
 
@@ -298,36 +299,30 @@ class WidgetTag
         @el.append $(html)
 
     ##|
+    ##|  Called when a parent widget resizes
+    ##|  w / h - The size of the parent!
+    onParentResize: (w, h)=>
+        return true
+
+    ##|
     ##|  Call this function if the outside container changes size
     onResize: (w, h)=>
+        # console.log @el, "WidgetBase received onResize(#{w}, #{h})"
         delete @cachedWidth
         delete @cachedHeight
-        ## -xg
-        #if !w? or w <= 0
-        if @el.attr("fixedHeight") is "true" or @isOrigin
-            w = @width()
-            #if !h? or h <= 0
-            h = @height()
-        
-        for c in @children
-            size = c.onResize(w, h)
-            h -= size.height
 
-        if @el.attr("fixedHeight") is "true"
-            return {
-                width: @width()
-                height: @height()
-                } 
-        else if h > 0
-            @el.height(h)
+        if w < 0 then w = 0
+        if h < 0 then h = 0
+
         if @view?
-            if w <= 0 or h <= 0 
-                return { width: 0, height: 0 }            
-            console.log "Resizing widget view to ", w, h
-            #@view.onResize(@width(), @height())
+            # console.log @el, "Resizing self.view to ", w, h
             @view.onResize(w, h)
 
-        return { width: w, height: h}
+        for c in @children
+            # console.log @el, "WidgetBase sending to child resize #{w},#{h} vs #{@width()}, #{@height()} to ", c.el
+            c.onResize(w, h)
+
+        return { width: @width(), height: @height() }
 
     ##|
     ##|   Set the text value or get the text value if nothing passed in
@@ -383,6 +378,8 @@ class WidgetTag
     ##|  Reposition aboslute elements
     move: (x, y, w, h)=>
 
+        # console.log "WidgetBase move (#{x}, #{y}, #{w}, #{h})", @isOrigin
+
         if x != @x
             @x = x
             @element.style.left   = @x + "px"
@@ -427,7 +424,8 @@ class WidgetTag
                     viewCallback(view)
 
                 @view = view
-                @onResize()
+                # console.log @el, "WidgetBase setView name=#{viewName}, calling resize", @width(), @height()
+                @onResize(@width(), @height())
 
                 resolve(view)
 
@@ -503,15 +501,6 @@ class WidgetTag
             )
         true
 
-    ##
-    ## -xg
-    ## Make this widgetTag a original one that starts to pass "resize" 
-    ## event to its children/views
-    ##
-    setAsOriginWidget: () =>
-        @isOrigin = true
-        GlobalClassTools.addEventManager(this)
-        globalTableEvents.on "resize", @onResize
 
     ##|  Destroy an element, remove all children and destroy them.
     ##|  Remove global variables and cleanup the DOM after.

@@ -69,7 +69,6 @@ $ ->
 			yield loadStockData()
 
 			tabs = new DynamicTabs("#renderTest1")
-			tabs.elHolder.setAsOriginWidget()
 			tabs.elHolder.width 1000
 			tabs.elHolder.height 800
 			tabs.doAddTableTabData "zipcode", "Zipcodes", 1

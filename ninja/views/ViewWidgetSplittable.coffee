@@ -1,37 +1,55 @@
+##|
+##| Based on https://github.com/nathancahill/Split.js/
+
 class ViewWidgetSplittable extends View
-	##
-	## default function of class View that is necessary 
-	##
-	onSetupButtons: () =>
+    ##
+    ## default function of class View that is necessary
+    ##
+    onSetupButtons: () =>
 
-	##
-	## default function of class View
-	##    
-	setTitle: (title)=>
-		return
+    ##
+    ## default function of class View
+    ##
+    setTitle: (title)=>
+        return
 
-	setSize: (w, h)=>
-    	if w > 0
-        	@elHolder.width(w)
-        if h > 0
-        	@elHolder.height(h)
+    onResize: (w, h)=>
+        ##|
+        ##|  Parent container has changed size.  The parent is now w x h
+        if @wdtSplittable?
+            @wdtSplittable.setSize(w, h)
+        true
 
-	getDependencyList: () =>
-		return ["/vendor/split.min.js"]
+    setSize: (w, h)=>
+        if @wdtSplittable?
+            @wdtSplittable.setSize(w, h)
+        true
 
-	setData: (@optionData) =>
+    getDependencyList: () =>
+        return ["/vendor/split.min.js"]
 
-	show: (name) =>
-		if name? 
-			@gid = name
-		else
-			@gid = GlobalValueManager.NextGlobalID()
-	
-		@elHolder.find(".widgetsplittable-container").attr "id","widgetsplittable#{@gid}"
-		@wdtSplittable = new WidgetSplittable @elHolder.find("#widgetsplittable#{@gid}")
-		@wdtSplittable.render(@optionData)
-		true
+    setData: (@optionData) =>
 
-	getWidget: () =>
-		return @wdtSplittable
+    show: (name) =>
+        if name? 
+            @gid = name
+        else
+            @gid = GlobalValueManager.NextGlobalID()
+    
+        @elHolder.find(".widgetsplittable-container").attr "id","widgetsplittable#{@gid}"
+        @wdtSplittable = new WidgetSplittable @elHolder.find("#widgetsplittable#{@gid}")
+        @wdtSplittable.render(@optionData)
+
+        @elHolder.onResize = (w, h)=>
+            console.log "ViewWidgetSplittable elHolder.onResize(#{w}, #{h})"
+            true
+
+        @wdtSplittable.onResize = (w, h)=>
+            console.log "wdtSplittable onResize(#{w}, #{h})"
+            true
+
+        true
+
+    getWidget: () =>
+        return @wdtSplittable
 

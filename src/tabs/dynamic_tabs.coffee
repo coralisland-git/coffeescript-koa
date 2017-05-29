@@ -22,13 +22,21 @@ class DynamicTabs
 
 		## -xg
 		if holderElement.constructor.name is "WidgetTag"
+			console.log "DynamicTabs holderElement is widget:", holderElement
 			@elHolder = holderElement.add "div", "ninja-tabs"
+
+			@elHolder.onResize = (ww, hh)=>
+				console.log "DynamicTabs test onResize", ww, hh
+				@setSize(ww, hh)
+				return { width: ww, height: hh }
+
 		else
-			@elHolder   = new WidgetTag("div", "ninja-tabs")
+			console.log "DynamicTabs holderElement is not a widget, no auto-resize"
+			@elHolder = new WidgetTag("div", "ninja-tabs")
 			$(holderElement).append @elHolder.el
-		@tabList    = @elHolder.add "ul", "ninja-tab-list", "ninja-tab-list",
-						fixedHeight: true
-		#@elHolder.addDiv "clr"
+
+
+		@tabList    = @elHolder.add "ul", "ninja-tab-list", "ninja-tab-list"
 		@elHolder.el.append $('<div class="clr"></div>')
 		@tabContent = @elHolder.add "div", "ninja-tab-content tab-content"
 		@tabData  	= []
@@ -54,7 +62,7 @@ class DynamicTabs
 		return @tags[@activeTab]
 
 	show: (id)=>
-		console.log "dynamic tabs show #{id}"
+		console.log "DynamicTabs show(#{id})"
 		if !id? then return false
 		if typeof id == "object" and id.id? then id = id.id
 		if @tags[id]?
@@ -63,6 +71,7 @@ class DynamicTabs
 			@updateTabs()
 		else
 			console.log "Warning: DynamicTabs show(#{id}) invalid tab"
+
 		return true
 
 	getTab: (tabName) =>
@@ -87,8 +96,7 @@ class DynamicTabs
 
 		id = "tab#{@tabCount++}"
 
-		elTab = @tabList.add "li", "ninja-nav-tab", "ninja-nav-tab",
-			fixedHeight: true
+		elTab = @tabList.add "li", "ninja-nav-tab", "ninja-nav-tab"
 		elTab.setDataPath id
 		elTab.on "click", @onClickTab
 
@@ -120,7 +128,6 @@ class DynamicTabs
 		##|
 		##|  A reference to the data by name
 		@tabs[tabName] = @tags[id]
-
 		@updateTabs()
 
 		return @tags[id]
@@ -212,13 +219,32 @@ class DynamicTabs
 			return 1
 		## if only b has not 'order' param, it will be after a
 		else 
-			return -1 
+			return -1
 
+	##|
+	##|  Set a fixed width/height
+	setSize: (w, h)=>
+		console.log "DynamicTabs setSize w=#{w} h=#{h}"
+		@elHolder.width(w)
+		@elHolder.height(h)
 
-	onResize: (w, h)=>
-		##|
-		##|  Received resize event
-		# console.log "DynamicTabs onResize w=#{w} h=#{h}"
+		for id, tag of @tags
+			if id != @activeTab then continue
+
+			tag.tab.addClass "active"
+			tag.body.show()
+
+			##|
+			##|  Pass along the event to children except subtract the space of our ul list
+			ww = w
+			hh = h - @tabList.height()
+			console.log "DynamicTabs updateTabs sending global resize mySize=#{ww} x #{hh}"
+			if tag.body.onResize?
+				tag.body.width(ww)
+				tag.body.height(hh)
+				tag.body.onResize(ww, hh)
+
+		true
 
 	updateTabs: ()=>
 
@@ -227,16 +253,10 @@ class DynamicTabs
 			if id == @activeTab
 				tag.tab.addClass "active"
 				tag.body.show()
-				#if tag.body.onResize?
-					##|
-					##|  Todo: check on this
-					#tag.body.onResize(-1, -1)
 
-				setTimeout ()->
-					w = $(window).width()
-					h = $(window).height()
-					globalTableEvents.emitEvent "resize", [w, h]
-				, 10
+				w = $(window).width()
+				h = $(window).height()
+				globalTableEvents.emitEvent "resize", [w, h]
 
 			else
 				tag.tab.removeClass "active"
@@ -281,22 +301,13 @@ class DynamicTabs
 		new Promise (resolve, reject) =>
 
 			gid          = GlobalValueManager.NextGlobalID() 
-			#content      = "<div id='tab_#{gid}' class='tab_content'></div>"
 			tab          = @addTab tabText#, content
-			## -xg
-			wgt_Content	 = tab.body.add "div", "tab_content", "tab_#{gid}"
-			#elViewHolder = $("#tab_#{gid}")
-			wgt_Content.setView viewName, callbackWithView
+			tab.body.setView viewName, callbackWithView
 			.then (view)=>
-				view.elHolder = wgt_Content.el
+				view.elHolder = tab.body.el
 				resolve(view)
 
-			#doAppendView viewName, elViewHolder
-			#.then (view)=>
-
-			#	view.elHolder = elViewHolder
-			#	callbackWithView(view, tabText)
-			#	resolve(tab)
+			true
 
 	## -------------------------------------------------------------------------------------------------------------
 	## Add a new tableTab data to array named "tabData"
@@ -336,6 +347,7 @@ class DynamicTabs
 				@tables[tableName].tab = @tabs[tabText]
 
 				@tabs[tabText].table = table
+				return true
 
 			.then (tab)=>
 

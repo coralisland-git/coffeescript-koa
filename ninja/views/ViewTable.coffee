@@ -16,16 +16,10 @@ class ViewTable extends View
         if h > 0
             @elHolder.css "height", h
 
-        ## To make tableView responsive when it is on PopupWindow
-        #if @elHolder.height() > 0
-        #    viewTableHolder = @elHolder.find ".viewTableHolder"
-        #    viewTableHolder.height "100%"
-        #else if @table?
-        #    @table.onResize()
-
         true
 
     onResize: (w, h)=>
+        console.log "ViewTable onResize(#{w}, #{h})"
         @setSize w, h
         if @table
             @table.onResize()

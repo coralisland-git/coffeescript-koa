@@ -182,7 +182,7 @@ doPopupViewOnce = (viewName, title, settingsName, w, h, tabName, callbackWithVie
         PopupViews[title] = new Promise (resolve, reject) ->
             view = new View()
             view.windowTitle = title
-            view.showPopupwithConfig settingsName, w, h, 
+            view.showPopupwithConfig settingsName, w, h,
                 keyValue: title
             tabs = new DynamicTabs view.wgt_elHolder
             view.once "view_ready", ()->

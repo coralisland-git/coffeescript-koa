@@ -18,6 +18,7 @@ newImage9 = new Image()
 newImage9.src = "./js/test_Data/images/9.jpg"
 newImage10 = new Image()
 newImage10.src = "./js/test_Data/images/10.jpg"
+
 $ ->
 
 	$("body").append '''
@@ -122,7 +123,6 @@ $ ->
 			newPromise () ->
 				yield loadZipcodes()
 				tabs = new DynamicTabs(div_second_child)
-				div_second_child.setAsOriginWidget()
 				tabs.doAddViewTab "Table", "Table", (view, tabText) ->
 					view.loadTable "zipcode"
 				tabs.doAddViewTab "ImageStrip", "Images", (view, tabText) ->
