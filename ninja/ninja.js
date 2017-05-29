@@ -68457,6 +68457,7 @@ activateCurrentScreen = function(optionalArgs, screenName) {
   }
   $(Screens.current.classid).show();
   Screens.current.getScreenSize();
+  Screens.current.onShowScreen();
 };
 var Screen,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
@@ -68486,7 +68487,7 @@ Screen = (function() {
     this.internalFindElements = bind(this.internalFindElements, this);
     var cssTag;
     this.classid = "#" + this.constructor.name + ".screen";
-    this.firstEvents = false;
+    this.firstEvents = true;
     if (this.css != null) {
       cssTag = $("<style type='text/css'>" + this.css + "</style>");
       $("head").append(cssTag);
@@ -68548,11 +68549,8 @@ Screen = (function() {
     }
     width -= pos.left;
     height -= pos.top;
-    if (this.firstEvents === false) {
-      this.firstEvents = true;
-      this.onShowScreen();
-    }
-    this.onResize(width, height);
+    this.onResize(width, height, this.firstEvents);
+    this.firstEvents = false;
     return {
       width: width,
       height: height
