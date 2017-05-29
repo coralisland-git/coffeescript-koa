@@ -28,9 +28,40 @@ class ViewWidgetSplittable extends View
     getDependencyList: () =>
         return ["/vendor/split.min.js"]
 
-    setData: (@optionData) =>
+    setData: (options) =>
 
-    show: (name) =>
+        if !@optionData?
+            @optionData = {}
+
+        if options?
+            $.extend @optionData, options, true
+
+        if !@optionData.sizes?
+            @optionData.sizes = [ 50, 50 ]
+
+        if !@optionData.direction?
+            @optionData.direction = "vertical"
+
+        if !@optionData.gutterSize?
+            @optionData.gutterSize = 6
+
+        if !@optionData.gutterSize?
+            @optionData.gutterSize = 6
+
+        if !@optionData.cursor?
+            @optionData.cursor = "row-resize"
+
+        if !@optionData.minSize?
+            @optionData.minSize = 10
+
+        true
+
+    show: (name, sizes) =>
+
+        @setData()
+        if sizes?
+            @optionData.sizes = sizes
+
         if name? 
             @gid = name
         else
