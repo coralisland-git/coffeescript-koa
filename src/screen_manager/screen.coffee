@@ -53,6 +53,7 @@ class Screen
     ## called when the screen is reset due to logout or otherwise
     ## no action is required in most cases
     onResetScreen : () =>
+        @firstEvents = true
         for el in $(@classid)
             @internalFindElements(el)
             true

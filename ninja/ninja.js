@@ -68519,6 +68519,7 @@ Screen = (function() {
 
   Screen.prototype.onResetScreen = function() {
     var el, i, len, ref;
+    this.firstEvents = true;
     ref = $(this.classid);
     for (i = 0, len = ref.length; i < len; i++) {
       el = ref[i];
