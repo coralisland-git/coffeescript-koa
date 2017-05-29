@@ -16,6 +16,7 @@ class Screen
     constructor   : () ->
 
         @classid = "#" + @constructor.name + ".screen"
+        @firstEvents = false
 
         if this.css?
             ##|
@@ -64,3 +65,29 @@ class Screen
     resetAllInputs = () ->
         $("input[type=text], textarea").val ""
         $("input[type=number], textarea").val ""
+
+    onResize: (w, h)=>
+        ##|
+        ##|  Nothing
+
+    getScreenSize: ()=>
+        height = $(window).height()
+        width  = $(window).width()
+        screen = $(@classid)
+        pos    = screen.position()
+        offset = screen.offset()
+
+        if !height? or height == 0 or !pos? or pos.top == 0
+            setTimeout @getScreenSize, 10
+            return
+
+        width -= pos.left
+        height -= pos.top
+
+        if @firstEvents == false
+            @firstEvents = true
+            @onShowScreen()
+
+        @onResize width, height
+        return { width: width, height: height }
+

@@ -68436,13 +68436,14 @@ activateCurrentScreen = function(optionalArgs, screenName) {
     Screens.current.onSetupButtons();
     Screens.current.initialized = true;
   }
+  document.location.hash = screenName;
   doReplaceScreenContent(screenName);
   Screens.current.onResetScreen();
   w = $(window).width();
   h = $(window).height();
   globalTableEvents.emitEvent("resize", [w, h]);
   window.scrollTo(0, 0);
-  Screens.current.onShowScreen(optionalArgs);
+  Screens.current.optionalArgs = optionalArgs;
   $("#MainTitle").html(Screens.current.windowTitle);
   if (Screens.current.windowSubTitle.length > 0) {
     $("#SubTitle").html(Screens.current.windowSubTitle);
@@ -68453,6 +68454,7 @@ activateCurrentScreen = function(optionalArgs, screenName) {
     $("#MainTitle").addClass("alone");
   }
   $(Screens.current.classid).show();
+  Screens.current.getScreenSize();
 };
 var Screen,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
@@ -68473,6 +68475,8 @@ Screen = (function() {
   Screen.prototype.windowSubTitle = "** windowSubTitle not set **";
 
   function Screen() {
+    this.getScreenSize = bind(this.getScreenSize, this);
+    this.onResize = bind(this.onResize, this);
     this.onSetupButtons = bind(this.onSetupButtons, this);
     this.onResetScreen = bind(this.onResetScreen, this);
     this.onHideScreen = bind(this.onHideScreen, this);
@@ -68480,6 +68484,7 @@ Screen = (function() {
     this.internalFindElements = bind(this.internalFindElements, this);
     var cssTag;
     this.classid = "#" + this.constructor.name + ".screen";
+    this.firstEvents = false;
     if (this.css != null) {
       cssTag = $("<style type='text/css'>" + this.css + "</style>");
       $("head").append(cssTag);
@@ -68524,6 +68529,32 @@ Screen = (function() {
   resetAllInputs = function() {
     $("input[type=text], textarea").val("");
     return $("input[type=number], textarea").val("");
+  };
+
+  Screen.prototype.onResize = function(w, h) {};
+
+  Screen.prototype.getScreenSize = function() {
+    var height, offset, pos, screen, width;
+    height = $(window).height();
+    width = $(window).width();
+    screen = $(this.classid);
+    pos = screen.position();
+    offset = screen.offset();
+    if ((height == null) || height === 0 || (pos == null) || pos.top === 0) {
+      setTimeout(this.getScreenSize, 10);
+      return;
+    }
+    width -= pos.left;
+    height -= pos.top;
+    if (this.firstEvents === false) {
+      this.firstEvents = true;
+      this.onShowScreen();
+    }
+    this.onResize(width, height);
+    return {
+      width: width,
+      height: height
+    };
   };
 
   return Screen;

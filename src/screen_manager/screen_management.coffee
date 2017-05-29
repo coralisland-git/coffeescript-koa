@@ -327,6 +327,8 @@ activateCurrentScreen = (optionalArgs, screenName) ->
         Screens.current.onSetupButtons()
         Screens.current.initialized = true
 
+    document.location.hash = screenName
+
     ##
     ## Allow the screen to make any changes before goint live on the display
     doReplaceScreenContent(screenName)
@@ -336,7 +338,7 @@ activateCurrentScreen = (optionalArgs, screenName) ->
     h = $(window).height()
     globalTableEvents.emitEvent "resize", [w, h]
     window.scrollTo 0, 0
-    Screens.current.onShowScreen(optionalArgs)
+    Screens.current.optionalArgs = optionalArgs
 
     ##
     ## Update the window title
@@ -352,4 +354,5 @@ activateCurrentScreen = (optionalArgs, screenName) ->
         $("#MainTitle").addClass("alone")
 
     $(Screens.current.classid).show();
+    Screens.current.getScreenSize()
     return
