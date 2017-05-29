@@ -16,7 +16,7 @@ class Screen
     constructor   : () ->
 
         @classid = "#" + @constructor.name + ".screen"
-        @firstEvents = false
+        @firstEvents = true
 
         if this.css?
             ##|
@@ -84,10 +84,8 @@ class Screen
         width -= pos.left
         height -= pos.top
 
-        if @firstEvents == false
-            @firstEvents = true
-            @onShowScreen()
+        @onResize width, height, @firstEvents
+        @firstEvents = false
 
-        @onResize width, height
         return { width: width, height: height }
 

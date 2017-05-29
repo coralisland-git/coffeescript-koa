@@ -356,4 +356,6 @@ activateCurrentScreen = (optionalArgs, screenName) ->
 
     $(Screens.current.classid).show();
     Screens.current.getScreenSize()
+    Screens.current.onShowScreen()
+
     return
