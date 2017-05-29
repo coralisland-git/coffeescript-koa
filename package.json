@@ -1,6 +1,6 @@
 {
   "name": "NinjaCommon",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "private": "true",
   "dependencies": {
     "browserify": "^14.3.0",
