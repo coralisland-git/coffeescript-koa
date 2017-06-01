@@ -72593,8 +72593,8 @@ WidgetSplittable = (function() {
         second.onResize(w - allSpacingW, y2);
       }
     } else {
-      x1 = Math.floor(w * (sizes[0] / 100)) - 3;
-      x2 = w - x1 - 3;
+      x1 = Math.floor(w * (sizes[0] / 100)) - 6;
+      x2 = w - x1 - 6;
       if (first.onResize != null) {
         first.onResize(x1, h - allSpacingH);
       }

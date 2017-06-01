@@ -51,8 +51,8 @@ class WidgetSplittable
             if first.onResize? then first.onResize(w - allSpacingW, y1)
             if second.onResize? then second.onResize(w - allSpacingW, y2)
         else
-            x1 = Math.floor(w * (sizes[0]/100)) - 3
-            x2 = w - x1 - 3
+            x1 = Math.floor(w * (sizes[0]/100)) - 6
+            x2 = w - x1 - 6
             # console.log "WidgetSplittable new sizes x1=#{x1} x2=#{x2}"
             if first.onResize? then first.onResize(x1, h - allSpacingH)
             if second.onResize? then second.onResize(x2, h - allSpacingH)
