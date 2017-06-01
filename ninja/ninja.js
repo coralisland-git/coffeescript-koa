@@ -72091,6 +72091,8 @@ DynamicTabs = (function() {
       tag.body.show();
       ww = w;
       hh = h - this.tabList.height();
+      this.currentSetWidth = ww;
+      this.currentSetHeight = hh;
       console.log("DynamicTabs updateTabs sending global resize mySize=" + ww + " x " + hh);
       if (tag.body.onResize != null) {
         tag.body.width(ww);
@@ -72102,16 +72104,18 @@ DynamicTabs = (function() {
   };
 
   DynamicTabs.prototype.updateTabs = function() {
-    var h, id, ref, tag, w;
+    var id, ref, tag;
     ref = this.tags;
     for (id in ref) {
       tag = ref[id];
       if (id === this.activeTab) {
         tag.tab.addClass("active");
         tag.body.show();
-        w = $(window).width();
-        h = $(window).height();
-        globalTableEvents.emitEvent("resize", [w, h]);
+        if ((this.currentSetWidth != null) && (this.currentSetHeight != null) && this.currentSetWidth > 0 && this.currentSetHeight > 0) {
+          if (tag.body.onResize != null) {
+            tag.body.onResize(this.currentSetWidth, this.currentSetHeight);
+          }
+        }
       } else {
         tag.tab.removeClass("active");
         tag.body.hide();

@@ -238,6 +238,8 @@ class DynamicTabs
 			##|  Pass along the event to children except subtract the space of our ul list
 			ww = w
 			hh = h - @tabList.height()
+			@currentSetWidth = ww
+			@currentSetHeight = hh
 			console.log "DynamicTabs updateTabs sending global resize mySize=#{ww} x #{hh}"
 			if tag.body.onResize?
 				tag.body.width(ww)
@@ -254,9 +256,13 @@ class DynamicTabs
 				tag.tab.addClass "active"
 				tag.body.show()
 
-				w = $(window).width()
-				h = $(window).height()
-				globalTableEvents.emitEvent "resize", [w, h]
+				if @currentSetWidth? and @currentSetHeight? and @currentSetWidth > 0 and @currentSetHeight > 0
+					if tag.body.onResize?
+						tag.body.onResize @currentSetWidth, @currentSetHeight
+
+				# w = $(window).width()
+				# h = $(window).height()
+				# globalTableEvents.emitEvent "resize", [w, h]
 
 			else
 				tag.tab.removeClass "active"
