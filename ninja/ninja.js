@@ -72566,7 +72566,6 @@ WidgetSplittable = (function() {
 
   WidgetSplittable.prototype.setSize = function(w, h) {
     var allSpacingH, allSpacingW, first, second, sizes, x1, x2, y1, y2;
-    console.log("ViewWidgetSplittable setSize(" + w + ", " + h + ")");
     if (w > 0) {
       this.elementHolder.width(w);
     }
@@ -72574,16 +72573,13 @@ WidgetSplittable = (function() {
       this.elementHolder.height(h);
     }
     sizes = this.getSizes();
-    console.log("ViewWidgetSplittable onResize(" + w + ", " + h + ")", sizes);
     first = this.getFirstChild();
     second = this.getSecondChild();
     allSpacingH = 2;
     allSpacingW = 2;
-    console.log("ViewWidgetSplittable setSize, allSpacing=" + allSpacingW + "," + allSpacingH + " for first=", first.el, "second=", second.el);
     if (this.splitData.direction === "vertical") {
       y1 = Math.floor(h * (sizes[0] / 100)) - allSpacingH - 3;
       y2 = Math.floor(h * (sizes[1] / 100)) - allSpacingH - 3;
-      console.log("ViewWidgetSplittable new sizes y1=" + y1 + " y2=" + y2 + " w=" + w + "-" + allSpacingW);
       if (first.onResize != null) {
         first.onResize(w - allSpacingW, y1);
       }
@@ -72593,7 +72589,6 @@ WidgetSplittable = (function() {
     } else {
       x1 = Math.floor(w * (sizes[0] / 100)) - 3;
       x2 = w - x1 - 3;
-      console.log("ViewWidgetSplittable new sizes x1=" + x1 + " x2=" + x2);
       if (first.onResize != null) {
         first.onResize(x1, h - allSpacingH);
       }
