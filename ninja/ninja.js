@@ -68140,6 +68140,9 @@ doPopupViewOnce = function(viewName, title, settingsName, w, h, tabName, callbac
         keyValue: title
       });
       tabs = new DynamicTabs(view.wgt_elHolder);
+      view.onResize = function(w, h) {
+        return tabs.setSize(w, h);
+      };
       return view.once("view_ready", function() {
         return resolve({
           view: view,
@@ -68157,6 +68160,9 @@ doPopupViewOnce = function(viewName, title, settingsName, w, h, tabName, callbac
         keyValue: title
       });
       tabs = new DynamicTabs(view.wgt_elHolder);
+      view.onResize = function(w, h) {
+        return tabs.setSize(w, h);
+      };
     }
     if (!view.popup.isVisible) {
       view.popup.open();
@@ -68583,6 +68589,11 @@ View = (function() {
     this.popup = new PopupWindow(this.windowTitle, x, y, config);
     this.gid = "View" + GlobalValueManager.NextGlobalID();
     this.wgt_elHolder = this.popup.wgt_WindowScroll.add("div", "popupView " + this.constructor.name, this.gid);
+    this.wgt_elHolder.onResize = (function(_this) {
+      return function(x, y) {
+        return _this.onResize(x, y);
+      };
+    })(this);
     this.elHolder = this.wgt_elHolder.el;
     $(document).ready((function(_this) {
       return function() {
@@ -68594,6 +68605,7 @@ View = (function() {
     this.elHolder.html(this.template);
     cssTag = $("<style>" + this.css + "</style>");
     $("head").append(cssTag);
+    this.popup.emitEvent("resize_popupwindow");
     return true;
   };
 
@@ -71878,6 +71890,7 @@ DynamicTabs = (function() {
     this.doAddViewTabData = bind(this.doAddViewTabData, this);
     this.updateTabs = bind(this.updateTabs, this);
     this.setSize = bind(this.setSize, this);
+    this.onResize = bind(this.onResize, this);
     this.refreshTagOrders = bind(this.refreshTagOrders, this);
     this.addSortedTags = bind(this.addSortedTags, this);
     this.addTabData = bind(this.addTabData, this);
@@ -71891,9 +71904,11 @@ DynamicTabs = (function() {
     this.tabCount = 0;
     this.activeTab = null;
     if (holderElement.constructor.name === "WidgetTag") {
+      console.log("DynamicTabs holderElement is widget:", holderElement);
       this.elHolder = holderElement.add("div", "ninja-tabs");
       this.elHolder.onResize = (function(_this) {
         return function(ww, hh) {
+          console.log("DynamicTabs test onResize", ww, hh);
           _this.setSize(ww, hh);
           return {
             width: ww,
@@ -71902,6 +71917,7 @@ DynamicTabs = (function() {
         };
       })(this);
     } else {
+      console.log("DynamicTabs holderElement is not a widget, no auto-resize", holderElement);
       this.elHolder = new WidgetTag("div", "ninja-tabs");
       $(holderElement).append(this.elHolder.el);
     }
@@ -72076,6 +72092,10 @@ DynamicTabs = (function() {
     }
   };
 
+  DynamicTabs.prototype.onResize = function(w, h) {
+    return console.log("DynamicTabs onResize:", w, h);
+  };
+
   DynamicTabs.prototype.setSize = function(w, h) {
     var hh, id, ref, tag, ww;
     console.log("DynamicTabs setSize w=" + w + " h=" + h);
@@ -72104,7 +72124,7 @@ DynamicTabs = (function() {
   };
 
   DynamicTabs.prototype.updateTabs = function() {
-    var id, ref, tag;
+    var h, id, ref, tag, w;
     ref = this.tags;
     for (id in ref) {
       tag = ref[id];
@@ -72114,6 +72134,13 @@ DynamicTabs = (function() {
         if ((this.currentSetWidth != null) && (this.currentSetHeight != null) && this.currentSetWidth > 0 && this.currentSetHeight > 0) {
           if (tag.body.onResize != null) {
             tag.body.onResize(this.currentSetWidth, this.currentSetHeight);
+          }
+        } else {
+          w = this.elHolder.width();
+          h = this.elHolder.height();
+          console.log("DynamicTabs updateTabs w=" + w + ", h=" + h);
+          if ((w != null) && w > 0 && (h != null) && h > 0 && (tag.body != null) && (tag.body.onResize != null)) {
+            tag.body.onResize(w, h);
           }
         }
       } else {

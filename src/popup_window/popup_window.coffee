@@ -447,7 +447,6 @@ class PopupWindow
 
             console.log "PopupWindow doMove changing height=", @popupHeight, "wrapper=", @getInnerWindowSize()
             @windowWrapper.height @getInnerWindowSize()
-
             true
 
         stopMove = (e) =>

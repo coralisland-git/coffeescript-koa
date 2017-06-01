@@ -211,6 +211,8 @@ class View
         ##|  Append the view's HTML
         @gid = "View" + GlobalValueManager.NextGlobalID()
         @wgt_elHolder = @popup.wgt_WindowScroll.add "div", "popupView #{@constructor.name}", @gid
+        @wgt_elHolder.onResize = (x,y)=>
+            return @onResize(x, y)
         #@elHolder = $ "<div />",
         #    id: @gid
         #    class: "popupView " + @constructor.name
@@ -242,6 +244,7 @@ class View
         ##|  Append CSS
         cssTag = $ "<style>#{this.css}</style>"
         $("head").append(cssTag)
+        @popup.emitEvent "resize_popupwindow"
 
         true
 

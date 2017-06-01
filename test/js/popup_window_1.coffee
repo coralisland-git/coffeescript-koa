@@ -137,6 +137,13 @@ $ ->
 		doPopupViewOnce "Table", "Test1", "test1_table", 600, 400, "Tab1", (view, tabText) ->
 			view.loadTable 'zipcode'
 
+	addTestButton "PopupViewOnce 1 Table (Empty)", "Open", (e) ->
+		doPopupViewOnce "Table", "Test1", "test1_table", 600, 400, "Tab1", (view, tabText) ->
+			view.loadTable 'zipcode'
+		doPopupViewOnce "Table", "Test1", "test2_table", 600, 400, "Tab with empty", (view, tabText) ->
+			# view.loadTable 'zipcode'
+			view.loadTable "totally_empty_table"
+
 	addTestButton "PopupViewOnce 1 ImageStrip", "Open", (e) ->
 		doPopupViewOnce "ImageStrip", "Test1", "test1_imagestrip", 600, 400, "Tab2", (view, tabText) ->
 			view.init()

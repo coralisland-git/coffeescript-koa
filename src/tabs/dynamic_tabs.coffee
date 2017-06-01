@@ -22,16 +22,17 @@ class DynamicTabs
 
 		## -xg
 		if holderElement.constructor.name is "WidgetTag"
-			# console.log "DynamicTabs holderElement is widget:", holderElement
-			@elHolder = holderElement.add "div", "ninja-tabs"
+			console.log "DynamicTabs holderElement is widget:", holderElement
 
+			@elHolder = holderElement.add "div", "ninja-tabs"
 			@elHolder.onResize = (ww, hh)=>
-				# console.log "DynamicTabs test onResize", ww, hh
+				console.log "DynamicTabs test onResize", ww, hh
 				@setSize(ww, hh)
 				return { width: ww, height: hh }
 
 		else
-			# console.log "DynamicTabs holderElement is not a widget, no auto-resize"
+
+			console.log "DynamicTabs holderElement is not a widget, no auto-resize", holderElement
 			@elHolder = new WidgetTag("div", "ninja-tabs")
 			$(holderElement).append @elHolder.el
 
@@ -177,7 +178,7 @@ class DynamicTabs
 
 	##-----------------------------------------------------------------------------------------------------------------
 	## Refresh value of each Tag's order if there is duplicated one
-	## @param [Array] : arrayToOrder array to be refreshed 
+	## @param [Array] : arrayToOrder array to be refreshed
 	## @return [Array] : array that is refreshed finally
 	##
 	refreshTagOrders: (arrayToOrder) =>
@@ -222,6 +223,11 @@ class DynamicTabs
 			return -1
 
 	##|
+	##|
+	onResize: (w, h)=>
+		console.log "DynamicTabs onResize:", w, h
+
+	##|
 	##|  Set a fixed width/height
 	setSize: (w, h)=>
 		console.log "DynamicTabs setSize w=#{w} h=#{h}"
@@ -259,6 +265,12 @@ class DynamicTabs
 				if @currentSetWidth? and @currentSetHeight? and @currentSetWidth > 0 and @currentSetHeight > 0
 					if tag.body.onResize?
 						tag.body.onResize @currentSetWidth, @currentSetHeight
+				else
+					w = @elHolder.width()
+					h = @elHolder.height()
+					console.log "DynamicTabs updateTabs w=#{w}, h=#{h}"
+					if w? and w >0 and h? and h > 0 and tag.body? and tag.body.onResize?
+						tag.body.onResize w, h
 
 				# w = $(window).width()
 				# h = $(window).height()
