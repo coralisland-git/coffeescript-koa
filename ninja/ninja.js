@@ -67072,7 +67072,6 @@ TableDropdownMenu = (function() {
       return function(e) {
         _this.initFloatingWindow();
         return globalKeyboardEvents.once("global_mouse_down", function(ee) {
-          console.log("Onetime mouse down, closing after other events");
           setTimeout(function() {
             return _this.win.hide();
           }, 1050);
@@ -71331,7 +71330,6 @@ TableView = (function() {
         path = tag_data.path;
         rowNum = tag_data.rn;
         colNum = tag_data.cn;
-        console.log("find data-id=" + tag_id + ":", element[0]);
         break;
       }
     }
@@ -71362,7 +71360,6 @@ TableView = (function() {
         colNum: colNum
       });
     }
-    console.log("setFocusCell " + visibleRow + ", " + visColNum + " = " + cellType + " | " + source);
     if ((visibleRow == null) || (visColNum == null) || cellType !== "data") {
       this.updateStatusText("Nothing selected");
       return false;
@@ -71894,11 +71891,9 @@ DynamicTabs = (function() {
     this.tabCount = 0;
     this.activeTab = null;
     if (holderElement.constructor.name === "WidgetTag") {
-      console.log("DynamicTabs holderElement is widget:", holderElement);
       this.elHolder = holderElement.add("div", "ninja-tabs");
       this.elHolder.onResize = (function(_this) {
         return function(ww, hh) {
-          console.log("DynamicTabs test onResize", ww, hh);
           _this.setSize(ww, hh);
           return {
             width: ww,
@@ -71907,7 +71902,6 @@ DynamicTabs = (function() {
         };
       })(this);
     } else {
-      console.log("DynamicTabs holderElement is not a widget, no auto-resize");
       this.elHolder = new WidgetTag("div", "ninja-tabs");
       $(holderElement).append(this.elHolder.el);
     }
@@ -71928,7 +71922,6 @@ DynamicTabs = (function() {
   };
 
   DynamicTabs.prototype.onClickTab = function(e) {
-    console.log("dnymictabs onClicktab");
     if ((e != null) && (e.path != null)) {
       this.show(e.path);
     }
@@ -71940,7 +71933,6 @@ DynamicTabs = (function() {
   };
 
   DynamicTabs.prototype.show = function(id) {
-    console.log("DynamicTabs show(" + id + ")");
     if (id == null) {
       return false;
     }

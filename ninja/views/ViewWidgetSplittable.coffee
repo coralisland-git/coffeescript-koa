@@ -72,11 +72,11 @@ class ViewWidgetSplittable extends View
         @wdtSplittable.render(@optionData)
 
         @elHolder.onResize = (w, h)=>
-            console.log "ViewWidgetSplittable elHolder.onResize(#{w}, #{h})"
+            # console.log "ViewWidgetSplittable elHolder.onResize(#{w}, #{h})"
             true
 
         @wdtSplittable.onResize = (w, h)=>
-            console.log "wdtSplittable onResize(#{w}, #{h})"
+            # console.log "wdtSplittable onResize(#{w}, #{h})"
             true
 
         true

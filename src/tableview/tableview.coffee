@@ -2554,7 +2554,7 @@ class TableView
 				path    = tag_data.path
 				rowNum  = tag_data.rn
 				colNum  = tag_data.cn
-				console.log "find data-id=#{tag_id}:", element[0]
+				# console.log "find data-id=#{tag_id}:", element[0]
 				break
 
 		if !element?
@@ -2574,7 +2574,7 @@ class TableView
 		if !source?
 			source = @getCellSource { visibleRow: visibleRow, visibleCol: visColNum, rowNum: rowNum, colNum: colNum }
 
-		console.log "setFocusCell #{visibleRow}, #{visColNum} = #{cellType} | #{source}"
+		# console.log "setFocusCell #{visibleRow}, #{visColNum} = #{cellType} | #{source}"
 		if !visibleRow? or !visColNum? or cellType != "data"
 			@updateStatusText "Nothing selected"
 			return false

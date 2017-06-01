@@ -22,16 +22,16 @@ class DynamicTabs
 
 		## -xg
 		if holderElement.constructor.name is "WidgetTag"
-			console.log "DynamicTabs holderElement is widget:", holderElement
+			# console.log "DynamicTabs holderElement is widget:", holderElement
 			@elHolder = holderElement.add "div", "ninja-tabs"
 
 			@elHolder.onResize = (ww, hh)=>
-				console.log "DynamicTabs test onResize", ww, hh
+				# console.log "DynamicTabs test onResize", ww, hh
 				@setSize(ww, hh)
 				return { width: ww, height: hh }
 
 		else
-			console.log "DynamicTabs holderElement is not a widget, no auto-resize"
+			# console.log "DynamicTabs holderElement is not a widget, no auto-resize"
 			@elHolder = new WidgetTag("div", "ninja-tabs")
 			$(holderElement).append @elHolder.el
 
@@ -48,13 +48,13 @@ class DynamicTabs
 
 	onSetBadge: (num, classname)->
 		id = this.id
-		# console.log "onSetBadge num=#{num} classname=#{classname}", id, this.parent
+		# console.log "DynamicTabs onSetBadge num=#{num} classname=#{classname}", id, this.parent
 		@parent.tags[id].badge = num
 		@parent.tags[id].badgeText.addClass classname
 		@parent.updateTabs()
 
 	onClickTab: (e)=>
-		console.log "dnymictabs onClicktab"
+		# console.log "DynamicTabs onClickTab"
 		if e? and e.path? then @show(e.path)
 		return true
 
@@ -62,7 +62,7 @@ class DynamicTabs
 		return @tags[@activeTab]
 
 	show: (id)=>
-		console.log "DynamicTabs show(#{id})"
+		# console.log "DynamicTabs show(#{id})"
 		if !id? then return false
 		if typeof id == "object" and id.id? then id = id.id
 		if @tags[id]?

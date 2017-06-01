@@ -51,7 +51,7 @@ class TableDropdownMenu
             ##|
             ##|  Setup an event so we can close this popup
             globalKeyboardEvents.once "global_mouse_down", (ee)=>
-                console.log "Onetime mouse down, closing after other events"
+                # console.log "Onetime mouse down, closing after other events"
                 setTimeout ()=>
                     @win.hide()
                 , 1050
