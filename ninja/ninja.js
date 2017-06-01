@@ -67468,6 +67468,9 @@ PopupWindow = (function() {
     this.isVisible = true;
     this.internalSavePosition();
     this.wgt_PopupWindowHolder.onResize(this.popupWidth, this.getInnerWindowSize());
+    if ((this.view != null) && (this.view.onResize != null)) {
+      this.view.onResize(this.popupWidth, this.getInnerWindowSize());
+    }
     return true;
   };
 
@@ -67663,6 +67666,7 @@ PopupWindow = (function() {
     this.setTitle = bind(this.setTitle, this);
     this.html = bind(this.html, this);
     this.onResize = bind(this.onResize, this);
+    this.setView = bind(this.setView, this);
     this.createPopupHolder = bind(this.createPopupHolder, this);
     this.addToolbar = bind(this.addToolbar, this);
     this.internalSavePosition = bind(this.internalSavePosition, this);
@@ -67704,6 +67708,10 @@ PopupWindow = (function() {
     this.on("resize_popupwindow", this.resize);
     true;
   }
+
+  PopupWindow.prototype.setView = function(view) {
+    this.view = view;
+  };
 
   PopupWindow.prototype.onResize = function(a, b) {
     var h, w;
@@ -68131,48 +68139,34 @@ doPopupTableView = function(data, title, settingsName, w, h) {
 };
 
 doPopupViewOnce = function(viewName, title, settingsName, w, h, tabName, callbackWithView) {
-  if (PopupViews[title] == null) {
-    PopupViews[title] = new Promise(function(resolve, reject) {
-      var tabs, view;
-      view = new View();
-      view.windowTitle = title;
-      view.showPopupwithConfig(settingsName, w, h, {
-        keyValue: title
-      });
-      tabs = new DynamicTabs(view.wgt_elHolder);
-      view.onResize = function(w, h) {
-        return tabs.setSize(w, h);
-      };
-      return view.once("view_ready", function() {
-        return resolve({
-          view: view,
-          tabs: tabs
+  var createPopup;
+  createPopup = function() {
+    return new Promise(function(resolve, reject) {
+      return doLoadView("DynamicTabs").then(function(view) {
+        view.windowTitle = title;
+        view.showPopupwithConfig(settingsName, w, h, {
+          keyValue: title
+        });
+        return view.once("view_ready", function() {
+          view.tabNames = [];
+          return resolve(view);
         });
       });
     });
-    PopupViews[title].tabNames = [];
+  };
+  if (PopupViews[title] == null) {
+    PopupViews[title] = createPopup();
   }
-  return PopupViews[title].then(function(arg) {
-    var tabs, view;
-    view = arg.view, tabs = arg.tabs;
-    if (view.popup.popupWindowHolder == null) {
-      view.showPopupwithConfig(settingsName, w, h, {
-        keyValue: title
-      });
-      tabs = new DynamicTabs(view.wgt_elHolder);
-      view.onResize = function(w, h) {
-        return tabs.setSize(w, h);
-      };
-    }
+  return PopupViews[title].then(function(view) {
     if (!view.popup.isVisible) {
       view.popup.open();
     }
-    if (PopupViews[title].tabNames.includes(tabName)) {
-      return tabs.show("tab" + (PopupViews[title].tabNames.indexOf(tabName)));
+    if (view.tabNames.includes(tabName)) {
+      return view.tabs.show("tab" + (view.tabNames.indexOf(tabName)));
     } else {
-      tabs.doAddViewTab(viewName, tabName, callbackWithView);
-      PopupViews[title].tabNames.push(tabName);
-      return tabs.show("tab" + (PopupViews[title].tabNames.indexOf(tabName)));
+      view.tabNames.push(tabName);
+      view.tabs.doAddViewTab(viewName, tabName, callbackWithView);
+      return view.tabs.show("tab" + (view.tabNames.indexOf(tabName)));
     }
   });
 };
@@ -68584,11 +68578,13 @@ View = (function() {
       config = {};
     }
     config.tableName = optionalName;
+    config.scrollable = false;
     config.w = w;
     config.h = h;
     this.popup = new PopupWindow(this.windowTitle, x, y, config);
     this.gid = "View" + GlobalValueManager.NextGlobalID();
     this.wgt_elHolder = this.popup.wgt_WindowScroll.add("div", "popupView " + this.constructor.name, this.gid);
+    this.popup.setView(this);
     this.wgt_elHolder.onResize = (function(_this) {
       return function(x, y) {
         return _this.onResize(x, y);
@@ -68638,7 +68634,11 @@ View = (function() {
     if (this.elHolder != null) {
       w = this.elHolder.width();
       h = this.elHolder.height();
-      return console.log("View.coffee onResize a=" + a + " b=" + b + " w=" + w + " h=" + h + ":", this.elHolder);
+      console.log("View.coffee onResize a=" + a + " b=" + b + " w=" + w + " h=" + h + ":", this.elHolder.el);
+      if ((a != null) && (b != null) && a > 0 && b > 0) {
+        this.elHolder.width(a);
+        return this.elHolder.height(b);
+      }
     }
   };
 
@@ -71904,7 +71904,7 @@ DynamicTabs = (function() {
     this.tabCount = 0;
     this.activeTab = null;
     if (holderElement.constructor.name === "WidgetTag") {
-      console.log("DynamicTabs holderElement is widget:", holderElement);
+      console.log("DynamicTabs holderElement is widget:", holderElement, holderElement.width(), holderElement.height());
       this.elHolder = holderElement.add("div", "ninja-tabs");
       this.elHolder.onResize = (function(_this) {
         return function(ww, hh) {
@@ -71916,6 +71916,7 @@ DynamicTabs = (function() {
           };
         };
       })(this);
+      this.setSize(holderElement.width(), holderElement.height());
     } else {
       console.log("DynamicTabs holderElement is not a widget, no auto-resize", holderElement);
       this.elHolder = new WidgetTag("div", "ninja-tabs");
@@ -71932,12 +71933,14 @@ DynamicTabs = (function() {
   DynamicTabs.prototype.onSetBadge = function(num, classname) {
     var id;
     id = this.id;
+    console.log("DynamicTabs onSetBadge num=" + num + " classname=" + classname, id, this.parent);
     this.parent.tags[id].badge = num;
     this.parent.tags[id].badgeText.addClass(classname);
     return this.parent.updateTabs();
   };
 
   DynamicTabs.prototype.onClickTab = function(e) {
+    console.log("DynamicTabs onClickTab");
     if ((e != null) && (e.path != null)) {
       this.show(e.path);
     }
@@ -71949,6 +71952,7 @@ DynamicTabs = (function() {
   };
 
   DynamicTabs.prototype.show = function(id) {
+    console.log("DynamicTabs show(" + id + ")");
     if (id == null) {
       return false;
     }
@@ -72093,7 +72097,8 @@ DynamicTabs = (function() {
   };
 
   DynamicTabs.prototype.onResize = function(w, h) {
-    return console.log("DynamicTabs onResize:", w, h);
+    console.log("DynamicTabs onResize:", w, h);
+    return this.setSize(w, h);
   };
 
   DynamicTabs.prototype.setSize = function(w, h) {
@@ -72101,6 +72106,10 @@ DynamicTabs = (function() {
     console.log("DynamicTabs setSize w=" + w + " h=" + h);
     this.elHolder.width(w);
     this.elHolder.height(h);
+    ww = w;
+    hh = h - 33 - 4;
+    this.currentSetWidth = ww;
+    this.currentSetHeight = hh;
     ref = this.tags;
     for (id in ref) {
       tag = ref[id];
@@ -72109,10 +72118,6 @@ DynamicTabs = (function() {
       }
       tag.tab.addClass("active");
       tag.body.show();
-      ww = w;
-      hh = h - this.tabList.height();
-      this.currentSetWidth = ww;
-      this.currentSetHeight = hh;
       console.log("DynamicTabs updateTabs sending global resize mySize=" + ww + " x " + hh);
       if (tag.body.onResize != null) {
         tag.body.width(ww);
@@ -72124,23 +72129,17 @@ DynamicTabs = (function() {
   };
 
   DynamicTabs.prototype.updateTabs = function() {
-    var h, id, ref, tag, w;
+    var id, ref, tag;
     ref = this.tags;
     for (id in ref) {
       tag = ref[id];
       if (id === this.activeTab) {
         tag.tab.addClass("active");
         tag.body.show();
+        console.log("Showing tab with ", tag.body, this.currentSetWidth, this.currentSetHeight);
         if ((this.currentSetWidth != null) && (this.currentSetHeight != null) && this.currentSetWidth > 0 && this.currentSetHeight > 0) {
           if (tag.body.onResize != null) {
             tag.body.onResize(this.currentSetWidth, this.currentSetHeight);
-          }
-        } else {
-          w = this.elHolder.width();
-          h = this.elHolder.height();
-          console.log("DynamicTabs updateTabs w=" + w + ", h=" + h);
-          if ((w != null) && w > 0 && (h != null) && h > 0 && (tag.body != null) && (tag.body.onResize != null)) {
-            tag.body.onResize(w, h);
           }
         }
       } else {

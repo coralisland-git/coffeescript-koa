@@ -22,13 +22,15 @@ class DynamicTabs
 
 		## -xg
 		if holderElement.constructor.name is "WidgetTag"
-			console.log "DynamicTabs holderElement is widget:", holderElement
+			console.log "DynamicTabs holderElement is widget:", holderElement, holderElement.width(), holderElement.height()
 
 			@elHolder = holderElement.add "div", "ninja-tabs"
 			@elHolder.onResize = (ww, hh)=>
 				console.log "DynamicTabs test onResize", ww, hh
 				@setSize(ww, hh)
 				return { width: ww, height: hh }
+
+			@setSize holderElement.width(), holderElement.height()
 
 		else
 
@@ -49,13 +51,13 @@ class DynamicTabs
 
 	onSetBadge: (num, classname)->
 		id = this.id
-		# console.log "DynamicTabs onSetBadge num=#{num} classname=#{classname}", id, this.parent
+		console.log "DynamicTabs onSetBadge num=#{num} classname=#{classname}", id, this.parent
 		@parent.tags[id].badge = num
 		@parent.tags[id].badgeText.addClass classname
 		@parent.updateTabs()
 
 	onClickTab: (e)=>
-		# console.log "DynamicTabs onClickTab"
+		console.log "DynamicTabs onClickTab"
 		if e? and e.path? then @show(e.path)
 		return true
 
@@ -63,7 +65,7 @@ class DynamicTabs
 		return @tags[@activeTab]
 
 	show: (id)=>
-		# console.log "DynamicTabs show(#{id})"
+		console.log "DynamicTabs show(#{id})"
 		if !id? then return false
 		if typeof id == "object" and id.id? then id = id.id
 		if @tags[id]?
@@ -226,6 +228,7 @@ class DynamicTabs
 	##|
 	onResize: (w, h)=>
 		console.log "DynamicTabs onResize:", w, h
+		@setSize(w, h)
 
 	##|
 	##|  Set a fixed width/height
@@ -234,18 +237,19 @@ class DynamicTabs
 		@elHolder.width(w)
 		@elHolder.height(h)
 
+		##|
+		##|  Pass along the event to children except subtract the space of our ul list
+		ww = w
+		hh = h - 33 - 4
+		@currentSetWidth  = ww
+		@currentSetHeight = hh
+
 		for id, tag of @tags
 			if id != @activeTab then continue
 
 			tag.tab.addClass "active"
 			tag.body.show()
 
-			##|
-			##|  Pass along the event to children except subtract the space of our ul list
-			ww = w
-			hh = h - @tabList.height()
-			@currentSetWidth = ww
-			@currentSetHeight = hh
 			console.log "DynamicTabs updateTabs sending global resize mySize=#{ww} x #{hh}"
 			if tag.body.onResize?
 				tag.body.width(ww)
@@ -262,19 +266,10 @@ class DynamicTabs
 				tag.tab.addClass "active"
 				tag.body.show()
 
+				console.log "Showing tab with ", tag.body, @currentSetWidth, @currentSetHeight
 				if @currentSetWidth? and @currentSetHeight? and @currentSetWidth > 0 and @currentSetHeight > 0
 					if tag.body.onResize?
 						tag.body.onResize @currentSetWidth, @currentSetHeight
-				else
-					w = @elHolder.width()
-					h = @elHolder.height()
-					console.log "DynamicTabs updateTabs w=#{w}, h=#{h}"
-					if w? and w >0 and h? and h > 0 and tag.body? and tag.body.onResize?
-						tag.body.onResize w, h
-
-				# w = $(window).width()
-				# h = $(window).height()
-				# globalTableEvents.emitEvent "resize", [w, h]
 
 			else
 				tag.tab.removeClass "active"

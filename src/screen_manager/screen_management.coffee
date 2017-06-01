@@ -183,39 +183,38 @@ doPopupTableView = (data, title, settingsName, w, h) ->
 ## - Popup a view with DynamicTabls, only once
 doPopupViewOnce = (viewName, title, settingsName, w, h, tabName, callbackWithView) ->
 
+    createPopup = ()->
+
+        new Promise (resolve, reject) ->
+
+            doLoadView("DynamicTabs")
+            .then (view)->
+                view.windowTitle = title
+                view.showPopupwithConfig settingsName, w, h,
+                    keyValue: title
+
+                view.once "view_ready", ()->
+                    # view.onShowScreen()
+                    view.tabNames = []
+                    resolve(view)
+
     if !PopupViews[title]?
-        PopupViews[title] = new Promise (resolve, reject) ->
-            view = new View()
-            view.windowTitle = title
-            view.showPopupwithConfig settingsName, w, h,
-                keyValue: title
-            tabs = new DynamicTabs view.wgt_elHolder
+        PopupViews[title] = createPopup()
 
-            view.onResize = (w,h)->
-                tabs.setSize(w, h)
+    PopupViews[title].then (view) ->
 
-            view.once "view_ready", ()->
-                #view.onSetupButtons()
-                resolve({view, tabs})
-        PopupViews[title].tabNames = []
-
-    PopupViews[title].then ({view, tabs}) ->
-        if !view.popup.popupWindowHolder?
-            view.showPopupwithConfig settingsName, w, h,
-                keyValue: title
-
-            tabs = new DynamicTabs view.wgt_elHolder
-            view.onResize = (w,h)->
-                tabs.setSize(w, h)
+        # if !view.popup.popupWindowHolder?
+        #     createPopup()
 
         if !view.popup.isVisible
             view.popup.open()
-        if PopupViews[title].tabNames.includes(tabName)
-            tabs.show "tab#{PopupViews[title].tabNames.indexOf(tabName)}"
+
+        if view.tabNames.includes(tabName)
+            view.tabs.show "tab#{view.tabNames.indexOf(tabName)}"
         else
-            tabs.doAddViewTab viewName, tabName, callbackWithView
-            PopupViews[title].tabNames.push tabName
-            tabs.show "tab#{PopupViews[title].tabNames.indexOf(tabName)}"
+            view.tabNames.push tabName
+            view.tabs.doAddViewTab viewName, tabName, callbackWithView
+            view.tabs.show "tab#{view.tabNames.indexOf(tabName)}"
 
 doLoadScreen = (screenName, optionalArgs) ->
 

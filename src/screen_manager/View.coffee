@@ -203,6 +203,7 @@ class View
 
         if !config then config = {}
         config.tableName = optionalName
+        config.scrollable = false
         config.w = w
         config.h = h
         @popup = new PopupWindow @windowTitle, x, y, config
@@ -211,6 +212,7 @@ class View
         ##|  Append the view's HTML
         @gid = "View" + GlobalValueManager.NextGlobalID()
         @wgt_elHolder = @popup.wgt_WindowScroll.add "div", "popupView #{@constructor.name}", @gid
+        @popup.setView(this)
         @wgt_elHolder.onResize = (x,y)=>
             return @onResize(x, y)
         #@elHolder = $ "<div />",
@@ -277,7 +279,10 @@ class View
         if @elHolder?
             w = @elHolder.width()
             h = @elHolder.height()
-            console.log "View.coffee onResize a=#{a} b=#{b} w=#{w} h=#{h}:", @elHolder
+            console.log "View.coffee onResize a=#{a} b=#{b} w=#{w} h=#{h}:", @elHolder.el
+            if a? and b? and a > 0 and b > 0
+                @elHolder.width(a)
+                @elHolder.height(b)
 
         #@emitEvent "resize", [ w, h ]
 

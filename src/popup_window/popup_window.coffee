@@ -268,6 +268,10 @@ class PopupWindow
 
         ## -xg
         @wgt_PopupWindowHolder.onResize(@popupWidth, @getInnerWindowSize())
+
+        if @view? and @view.onResize?
+            @view.onResize(@popupWidth, @getInnerWindowSize())
+
         true
 
     ## -------------------------------------------------------------------------------------------------------------
@@ -499,6 +503,8 @@ class PopupWindow
         globalTableEvents.on "resize", @onResize
         @on "resize_popupwindow", @resize
         true
+
+    setView: (@view)=>
 
     ## -xg
     ## function to emit resize event for popupwindow instance
