@@ -1,6 +1,9 @@
 ##|  Function for switching the app to different screens and also contains
 ##|  navigation button values.
 
+DataSetConfig = require 'edgecommondatasetconfig'
+
+
 Screens = {}
 Screens.history      = []
 Screens.current      = 0
@@ -15,10 +18,12 @@ PopupViews   = {}
 ##|  An instance of the Window Manager anchored in the area that screens will swap
 globalWindowManager = null
 
+##|
+##|  A global instance of the data formatter
+globalDataFormatter = new DataSetConfig.DataFormatter()
 
 ##|
 ##|  Add a style sheet to the main document if it doesn't already exist
-
 registerStyleSheet = (name, content) ->
 
     if not StyleManager[name]?
