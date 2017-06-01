@@ -19,10 +19,17 @@ class ViewTable extends View
         true
 
     onResize: (w, h)=>
+        if w == 0 or h == 0
+            if @table? then @table.hide()
+            return
+
         console.log "ViewTable onResize(#{w}, #{h})"
         @setSize w, h
         if @table
-            @table.onResize()
+            @table.show()
+            @table.onResize(w, h)
+
+        true
 
     loadTable: (@tableName)=>
 

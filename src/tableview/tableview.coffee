@@ -727,13 +727,15 @@ class TableView
 
 		true
 
-	onResize: ()=>
+	onResize: (w, h)=>
 		if !@isVisible() then return
 
-		@cachedVisibleWidth     = null
-		@cachedVisibleHeight    = null
-		@cachedTotalVisibleCols = null
-		@cachedTotalVisibleRows = null
+		@cachedVisibleWidth        = null
+		@cachedVisibleHeight       = null
+		@cachedTotalVisibleCols    = null
+		@cachedTotalVisibleRows    = null
+		@cachedMaxTotalVisibleCol  = null
+		@cachedMaxTotalVisibleRows = null
 
 		# -xg
 		if @parentView
