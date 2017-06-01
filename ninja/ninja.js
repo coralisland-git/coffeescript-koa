@@ -68479,6 +68479,7 @@ Screen = (function() {
 
   function Screen() {
     this.getScreenSize = bind(this.getScreenSize, this);
+    this.onScreenReady = bind(this.onScreenReady, this);
     this.onResize = bind(this.onResize, this);
     this.onSetupButtons = bind(this.onSetupButtons, this);
     this.onResetScreen = bind(this.onResetScreen, this);
@@ -68538,6 +68539,8 @@ Screen = (function() {
 
   Screen.prototype.onResize = function(w, h) {};
 
+  Screen.prototype.onScreenReady = function(w, h) {};
+
   Screen.prototype.getScreenSize = function() {
     var height, offset, pos, screen, width;
     height = $(window).height();
@@ -68551,8 +68554,13 @@ Screen = (function() {
     }
     width -= pos.left;
     height -= pos.top;
-    this.onResize(width, height, this.firstEvents);
-    this.firstEvents = false;
+    if (this.firstEvents) {
+      this.onScreenReady(width, height);
+      this.onResize(width, height, true);
+      this.firstEvents = false;
+    } else {
+      this.onResize(width, height, false);
+    }
     return {
       width: width,
       height: height
@@ -68624,7 +68632,12 @@ View = (function() {
 
   View.prototype.AddToElement = function(holderElement) {
     var cssTag;
-    this.elHolder = $(holderElement);
+    if ((holderElement != null) && typeof holderElement === "object" && (holderElement.el != null)) {
+      this.elHolder = holderElement.el;
+      holderElement.view = this;
+    } else {
+      this.elHolder = $(holderElement);
+    }
     this.elHolder.addClass(this.constructor.name);
     this.elHolder.html(this.template);
     cssTag = $("<style>" + this.css + "</style>");

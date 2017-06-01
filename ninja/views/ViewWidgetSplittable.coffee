@@ -81,6 +81,20 @@ class ViewWidgetSplittable extends View
 
         true
 
+    setHorizontal: ()=>
+
+        if !@optionData?
+            @optionData = {}
+
+        @optionData.direction = "horizontal"
+        return true
+
+    getFirst: ()=>
+        return @wdtSplittable.getFirstChild()
+
+    getSecond: ()=>
+        return @wdtSplittable.getSecondChild()
+
     getWidget: () =>
         return @wdtSplittable
 

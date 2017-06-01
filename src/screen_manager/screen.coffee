@@ -73,6 +73,10 @@ class Screen
         ##|
         ##|  Nothing
 
+    onScreenReady: (w, h)=>
+        ##|
+        ##|  Nothing
+
     getScreenSize: ()=>
         height = $(window).height()
         width  = $(window).width()
@@ -87,8 +91,12 @@ class Screen
         width -= pos.left
         height -= pos.top
 
-        @onResize width, height, @firstEvents
-        @firstEvents = false
+        if @firstEvents
+            @onScreenReady width, height
+            @onResize width, height, true
+            @firstEvents = false
+        else
+            @onResize width, height, false
 
         return { width: width, height: height }
 

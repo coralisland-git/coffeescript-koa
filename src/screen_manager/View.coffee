@@ -56,10 +56,19 @@ class View
     AddToElement: (holderElement)=>
 
         ##|
-        ##|  Because we are adding CSS, we want to wait until the CSS is loaded
-        ##|  before we continue and generate the ready event.
-        ##|
-        @elHolder = $(holderElement)
+        ##|  brian - Allowing view to be added to a Widget directly.
+        if holderElement? and typeof holderElement == "object" and holderElement.el?
+
+            @elHolder = holderElement.el
+            holderElement.view = this
+
+        else
+
+            ##|
+            ##|  Because we are adding CSS, we want to wait until the CSS is loaded
+            ##|  before we continue and generate the ready event.
+            ##|
+            @elHolder = $(holderElement)
 
         ##|
         ##|  Put the HTML template into the new element
