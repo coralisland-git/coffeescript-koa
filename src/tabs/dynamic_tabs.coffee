@@ -22,11 +22,11 @@ class DynamicTabs
 
 		## -xg
 		if holderElement.constructor.name is "WidgetTag"
-			console.log "DynamicTabs holderElement is widget:", holderElement, holderElement.width(), holderElement.height()
+			# console.log "DynamicTabs holderElement is widget:", holderElement, holderElement.width(), holderElement.height()
 
 			@elHolder = holderElement.add "div", "ninja-tabs"
 			@elHolder.onResize = (ww, hh)=>
-				console.log "DynamicTabs test onResize", ww, hh
+				# console.log "DynamicTabs test onResize", ww, hh
 				@setSize(ww, hh)
 				return { width: ww, height: hh }
 
@@ -34,7 +34,7 @@ class DynamicTabs
 
 		else
 
-			console.log "DynamicTabs holderElement is not a widget, no auto-resize", holderElement
+			# console.log "DynamicTabs holderElement is not a widget, no auto-resize", holderElement
 			@elHolder = new WidgetTag("div", "ninja-tabs")
 			$(holderElement).append @elHolder.el
 
@@ -51,13 +51,13 @@ class DynamicTabs
 
 	onSetBadge: (num, classname)->
 		id = this.id
-		console.log "DynamicTabs onSetBadge num=#{num} classname=#{classname}", id, this.parent
+		# console.log "DynamicTabs onSetBadge num=#{num} classname=#{classname}", id, this.parent
 		@parent.tags[id].badge = num
 		@parent.tags[id].badgeText.addClass classname
 		@parent.updateTabs()
 
 	onClickTab: (e)=>
-		console.log "DynamicTabs onClickTab"
+		# console.log "DynamicTabs onClickTab"
 		if e? and e.path? then @show(e.path)
 		return true
 
@@ -65,15 +65,15 @@ class DynamicTabs
 		return @tags[@activeTab]
 
 	show: (id)=>
-		console.log "DynamicTabs show(#{id})"
+		# console.log "DynamicTabs show(#{id})"
 		if !id? then return false
 		if typeof id == "object" and id.id? then id = id.id
 		if @tags[id]?
 			@emitEvent "showtab", [ id, @tags[id] ]
 			@activeTab = id
 			@updateTabs()
-		else
-			console.log "Warning: DynamicTabs show(#{id}) invalid tab"
+		# else
+			# console.log "Warning: DynamicTabs show(#{id}) invalid tab"
 
 		return true
 
@@ -227,13 +227,13 @@ class DynamicTabs
 	##|
 	##|
 	onResize: (w, h)=>
-		console.log "DynamicTabs onResize:", w, h
+		# console.log "DynamicTabs onResize:", w, h
 		@setSize(w, h)
 
 	##|
 	##|  Set a fixed width/height
 	setSize: (w, h)=>
-		console.log "DynamicTabs setSize w=#{w} h=#{h}"
+		# console.log "DynamicTabs setSize w=#{w} h=#{h}"
 		@elHolder.width(w)
 		@elHolder.height(h)
 
@@ -250,7 +250,7 @@ class DynamicTabs
 			tag.tab.addClass "active"
 			tag.body.show()
 
-			console.log "DynamicTabs updateTabs sending global resize mySize=#{ww} x #{hh}"
+			# console.log "DynamicTabs updateTabs sending global resize mySize=#{ww} x #{hh}"
 			if tag.body.onResize?
 				tag.body.width(ww)
 				tag.body.height(hh)
@@ -266,7 +266,7 @@ class DynamicTabs
 				tag.tab.addClass "active"
 				tag.body.show()
 
-				console.log "Showing tab with ", tag.body, @currentSetWidth, @currentSetHeight
+				# console.log "Showing tab with ", tag.body, @currentSetWidth, @currentSetHeight
 				if @currentSetWidth? and @currentSetHeight? and @currentSetWidth > 0 and @currentSetHeight > 0
 					if tag.body.onResize?
 						tag.body.onResize @currentSetWidth, @currentSetHeight

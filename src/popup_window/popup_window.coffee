@@ -149,7 +149,7 @@ class PopupWindow
             @y++
             @popupHeight--
 
-        console.log "Center: #{@x}, #{@y} (#{@popupWidth}, #{@popupHeight})"
+        # console.log "Center: #{@x}, #{@y} (#{@popupWidth}, #{@popupHeight})"
 
         @popupWindowHolder.css
             left:   @x
@@ -171,7 +171,7 @@ class PopupWindow
             backgroundColor : "rgba(0,0,0,0.6)"
 
         $(document).on "keypress", (e)=>
-            console.log "KEY=", e
+            # console.log "KEY=", e
             false
 
         @center()
@@ -200,7 +200,7 @@ class PopupWindow
         scrollX = window.pageXOffset || document.body.scrollLeft
         scrollY = window.pageYOffset || document.body.scrollTop
 
-        console.log "popupWindow.resize #{@title}, window size=#{width} x #{height}, popup= #{@popupWidth} x #{@popupHeight} (x=#{@x}, y=#{@y})"
+        # console.log "popupWindow.resize #{@title}, window size=#{width} x #{height}, popup= #{@popupWidth} x #{@popupHeight} (x=#{@x}, y=#{@y})"
         if @x == 0 and @y == 0
             @center()
 
@@ -213,7 +213,7 @@ class PopupWindow
         ## 
         ## Calculate scroll position
         if @x - scrollX + @popupWidth + 10 > width
-            console.log "popupWindow #{@title}, moving because #{@x} + #{@popupWidth} + 10 > #{width}"
+            # console.log "popupWindow #{@title}, moving because #{@x} + #{@popupWidth} + 10 > #{width}"
             @x = width + scrollX - @popupWidth - 10
             
         ##
@@ -243,7 +243,7 @@ class PopupWindow
 
         # console.log "popupWindow x=#{@x} y=#{@y}"
 
-        console.log "popupWindow.resize setting holder #{@x}, #{@y} popup=#{@popupWidth} x #{@popupHeight} windowWrapper height=", @getInnerWindowSize()
+        # console.log "popupWindow.resize setting holder #{@x}, #{@y} popup=#{@popupWidth} x #{@popupHeight} windowWrapper height=", @getInnerWindowSize()
 
         @popupWindowHolder.css
             left:   @x
@@ -284,7 +284,7 @@ class PopupWindow
         # location = user.get "PopupLocation_#{@title}", 0
         if @configurations.tableName and @configurations.tableName.length
             location = localStorage.getItem "PopupLocation_#{@configurations.tableName}"
-            console.log "Loaded saved PopupLocation_#{@configurations.tableName}: ", location
+            # console.log "Loaded saved PopupLocation_#{@configurations.tableName}: ", location
             if location != null
                 location = JSON.parse location
             if location != 0 && location != null
@@ -332,7 +332,7 @@ class PopupWindow
 
         @windowBodyWrapperTop.css "top", @windowTitle.outerHeight()
 
-        console.log "PopupWindow addToolbar, resizing height of windowWrapper"
+        # console.log "PopupWindow addToolbar, resizing height of windowWrapper"
         @windowWrapper.height @getInnerWindowSize()
 
         true
@@ -383,7 +383,7 @@ class PopupWindow
             right:    0
             bottom:   0
 
-        console.log "createPopupHolder windowBodyWrapper is ", @windowBodyWrapperTop.height()
+        # console.log "createPopupHolder windowBodyWrapper is ", @windowBodyWrapperTop.height()
         @wgt_WindowWrapper = @wgt_WindowBodyWrapperTop.add "div", "scrollable", "windowwrapper#{id}"
         @windowWrapper = @wgt_WindowWrapper.el
 
@@ -449,12 +449,12 @@ class PopupWindow
             @windowWrapper.width @popupWidth
             @popupWindowHolder.height @popupHeight
 
-            console.log "PopupWindow doMove changing height=", @popupHeight, "wrapper=", @getInnerWindowSize()
+            # console.log "PopupWindow doMove changing height=", @popupHeight, "wrapper=", @getInnerWindowSize()
             @windowWrapper.height @getInnerWindowSize()
             true
 
         stopMove = (e) =>
-            console.log "Popupwindow/doMove: emit [resize]", @popupWidth, @popupHeight
+            # console.log "Popupwindow/doMove: emit [resize]", @popupWidth, @popupHeight
             @emitEvent "resize_popupwindow"
             $(document).unbind "mousemove", doMove
             $(document).unbind "mouseup", stopMove
@@ -522,7 +522,7 @@ class PopupWindow
         ##|
         ##|  Here w, h is the entire inner size excluding the border
         ##|  this includes the title bar at the top.
-        console.log "PopupWindow onResize (#{a}, #{b}) w=#{w}, h=#{h}", @configurations.tableName
+        # console.log "PopupWindow onResize (#{a}, #{b}) w=#{w}, h=#{h}", @configurations.tableName
 
         if @configurations.tableName
             @emitEvent "resize_popupwindow", [w, h]
@@ -561,6 +561,6 @@ $ ->
                 visibleWindows = (w for w in globalOpenWindowList when w.isVisible is true)
                 win = visibleWindows[..].pop()
                 if !win then return
-                console.log "Escape closing window:", win
+                # console.log "Escape closing window:", win
                 if win.shield? then win.shield.remove()
                 if win.configurations and win.configurations.keyValue then win.close() else win.destroy()

@@ -10,7 +10,7 @@ class ViewTable extends View
     setSize: (w, h)=>
         ## - xg
         if !@elHolder? then return false
-        console.log "TableView set size to #{w}, #{h}"
+        # console.log "TableView set size to #{w}, #{h}"
         if w > 0
             @elHolder.css "width", w
         if h > 0
@@ -23,7 +23,7 @@ class ViewTable extends View
             if @table? then @table.hide()
             return
 
-        console.log "ViewTable onResize(#{w}, #{h})"
+        # console.log "ViewTable onResize(#{w}, #{h})"
         @setSize w, h
         if @table
             @table.show()

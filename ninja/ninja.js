@@ -67369,7 +67369,6 @@ PopupWindow = (function() {
       this.y++;
       this.popupHeight--;
     }
-    console.log("Center: " + this.x + ", " + this.y + " (" + this.popupWidth + ", " + this.popupHeight + ")");
     return this.popupWindowHolder.css({
       left: this.x,
       top: this.y
@@ -67391,7 +67390,6 @@ PopupWindow = (function() {
     });
     $(document).on("keypress", (function(_this) {
       return function(e) {
-        console.log("KEY=", e);
         return false;
       };
     })(this));
@@ -67409,7 +67407,6 @@ PopupWindow = (function() {
     height = $(window).height();
     scrollX = window.pageXOffset || document.body.scrollLeft;
     scrollY = window.pageYOffset || document.body.scrollTop;
-    console.log("popupWindow.resize " + this.title + ", window size=" + width + " x " + height + ", popup= " + this.popupWidth + " x " + this.popupHeight + " (x=" + this.x + ", y=" + this.y + ")");
     if (this.x === 0 && this.y === 0) {
       this.center();
     }
@@ -67420,7 +67417,6 @@ PopupWindow = (function() {
       this.y = 0;
     }
     if (this.x - scrollX + this.popupWidth + 10 > width) {
-      console.log("popupWindow " + this.title + ", moving because " + this.x + " + " + this.popupWidth + " + 10 > " + width);
       this.x = width + scrollX - this.popupWidth - 10;
     }
     if (this.y - scrollY + this.popupHeight + 10 > height) {
@@ -67444,7 +67440,6 @@ PopupWindow = (function() {
     if (this.popupHeight < 300) {
       this.popupHeight = 300;
     }
-    console.log("popupWindow.resize setting holder " + this.x + ", " + this.y + " popup=" + this.popupWidth + " x " + this.popupHeight + " windowWrapper height=", this.getInnerWindowSize());
     this.popupWindowHolder.css({
       left: this.x,
       top: this.y,
@@ -67478,7 +67473,6 @@ PopupWindow = (function() {
     var location;
     if (this.configurations.tableName && this.configurations.tableName.length) {
       location = localStorage.getItem("PopupLocation_" + this.configurations.tableName);
-      console.log("Loaded saved PopupLocation_" + this.configurations.tableName + ": ", location);
       if (location !== null) {
         location = JSON.parse(location);
       }
@@ -67525,7 +67519,6 @@ PopupWindow = (function() {
     }
     this.toolbar.render();
     this.windowBodyWrapperTop.css("top", this.windowTitle.outerHeight());
-    console.log("PopupWindow addToolbar, resizing height of windowWrapper");
     this.windowWrapper.height(this.getInnerWindowSize());
     return true;
   };
@@ -67573,7 +67566,6 @@ PopupWindow = (function() {
       right: 0,
       bottom: 0
     });
-    console.log("createPopupHolder windowBodyWrapper is ", this.windowBodyWrapperTop.height());
     this.wgt_WindowWrapper = this.wgt_WindowBodyWrapperTop.add("div", "scrollable", "windowwrapper" + id);
     this.windowWrapper = this.wgt_WindowWrapper.el;
     this.wgt_WindowScroll = this.wgt_WindowWrapper.add("div", "scrollcontent");
@@ -67633,14 +67625,12 @@ PopupWindow = (function() {
         _this.popupWindowHolder.width(_this.popupWidth);
         _this.windowWrapper.width(_this.popupWidth);
         _this.popupWindowHolder.height(_this.popupHeight);
-        console.log("PopupWindow doMove changing height=", _this.popupHeight, "wrapper=", _this.getInnerWindowSize());
         _this.windowWrapper.height(_this.getInnerWindowSize());
         return true;
       };
     })(this);
     stopMove = (function(_this) {
       return function(e) {
-        console.log("Popupwindow/doMove: emit [resize]", _this.popupWidth, _this.popupHeight);
         _this.emitEvent("resize_popupwindow");
         $(document).unbind("mousemove", doMove);
         return $(document).unbind("mouseup", stopMove);
@@ -67724,7 +67714,6 @@ PopupWindow = (function() {
       w = this.popupWindowHolder.width();
       h = this.popupWindowHolder.height();
     }
-    console.log("PopupWindow onResize (" + a + ", " + b + ") w=" + w + ", h=" + h, this.configurations.tableName);
     if (this.configurations.tableName) {
       this.emitEvent("resize_popupwindow", [w, h]);
     }
@@ -67771,7 +67760,6 @@ $(function() {
           if (!win) {
             return;
           }
-          console.log("Escape closing window:", win);
           if (win.shield != null) {
             win.shield.remove();
           }
@@ -71904,11 +71892,9 @@ DynamicTabs = (function() {
     this.tabCount = 0;
     this.activeTab = null;
     if (holderElement.constructor.name === "WidgetTag") {
-      console.log("DynamicTabs holderElement is widget:", holderElement, holderElement.width(), holderElement.height());
       this.elHolder = holderElement.add("div", "ninja-tabs");
       this.elHolder.onResize = (function(_this) {
         return function(ww, hh) {
-          console.log("DynamicTabs test onResize", ww, hh);
           _this.setSize(ww, hh);
           return {
             width: ww,
@@ -71918,7 +71904,6 @@ DynamicTabs = (function() {
       })(this);
       this.setSize(holderElement.width(), holderElement.height());
     } else {
-      console.log("DynamicTabs holderElement is not a widget, no auto-resize", holderElement);
       this.elHolder = new WidgetTag("div", "ninja-tabs");
       $(holderElement).append(this.elHolder.el);
     }
@@ -71933,14 +71918,12 @@ DynamicTabs = (function() {
   DynamicTabs.prototype.onSetBadge = function(num, classname) {
     var id;
     id = this.id;
-    console.log("DynamicTabs onSetBadge num=" + num + " classname=" + classname, id, this.parent);
     this.parent.tags[id].badge = num;
     this.parent.tags[id].badgeText.addClass(classname);
     return this.parent.updateTabs();
   };
 
   DynamicTabs.prototype.onClickTab = function(e) {
-    console.log("DynamicTabs onClickTab");
     if ((e != null) && (e.path != null)) {
       this.show(e.path);
     }
@@ -71952,7 +71935,6 @@ DynamicTabs = (function() {
   };
 
   DynamicTabs.prototype.show = function(id) {
-    console.log("DynamicTabs show(" + id + ")");
     if (id == null) {
       return false;
     }
@@ -71963,8 +71945,6 @@ DynamicTabs = (function() {
       this.emitEvent("showtab", [id, this.tags[id]]);
       this.activeTab = id;
       this.updateTabs();
-    } else {
-      console.log("Warning: DynamicTabs show(" + id + ") invalid tab");
     }
     return true;
   };
@@ -72097,13 +72077,11 @@ DynamicTabs = (function() {
   };
 
   DynamicTabs.prototype.onResize = function(w, h) {
-    console.log("DynamicTabs onResize:", w, h);
     return this.setSize(w, h);
   };
 
   DynamicTabs.prototype.setSize = function(w, h) {
     var hh, id, ref, tag, ww;
-    console.log("DynamicTabs setSize w=" + w + " h=" + h);
     this.elHolder.width(w);
     this.elHolder.height(h);
     ww = w;
@@ -72118,7 +72096,6 @@ DynamicTabs = (function() {
       }
       tag.tab.addClass("active");
       tag.body.show();
-      console.log("DynamicTabs updateTabs sending global resize mySize=" + ww + " x " + hh);
       if (tag.body.onResize != null) {
         tag.body.width(ww);
         tag.body.height(hh);
@@ -72136,7 +72113,6 @@ DynamicTabs = (function() {
       if (id === this.activeTab) {
         tag.tab.addClass("active");
         tag.body.show();
-        console.log("Showing tab with ", tag.body, this.currentSetWidth, this.currentSetHeight);
         if ((this.currentSetWidth != null) && (this.currentSetHeight != null) && this.currentSetWidth > 0 && this.currentSetHeight > 0) {
           if (tag.body.onResize != null) {
             tag.body.onResize(this.currentSetWidth, this.currentSetHeight);
