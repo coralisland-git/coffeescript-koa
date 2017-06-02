@@ -1,6 +1,6 @@
 {
   "name": "NinjaCommon",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "private": "true",
   "dependencies": {
     "browserify": "^14.3.0",
@@ -24,10 +24,12 @@
     "nib": "^1.1.0",
     "pug": "^2.0.0-beta6",
     "serve-favicon": "^2.3.0",
-    "stylus": "^0.52.4"
+    "stylus": "^0.52.4",
+    "yargs": "^8.0.1"
   },
   "scripts": {
     "start": "cd server && coffee NinjaServer.coffee",
-    "docs": "codo"
+    "docs": "codo",
+    "gen": "cd server && coffee NinjaServer.coffee --gen"
   }
 }
