@@ -154,4 +154,23 @@ $ ->
 
 		true
 
+	addTestButton "Splitter with Tables", "Open", () ->
+		addHolder("renderTest1")
+		div = new WidgetTag "div", "testWidget"
+		div.setAbsolute()
+		div.appendTo("#renderTest1")
+		div.setView "WidgetSplittable", (view)->
+			view.setData SplitData_V
+			view.setSize(900, 600)
+			view.show()
+			wgt_first = view.getFirst()	
+			wgt_second = view.getSecond()
+
+			loadZipcodes().then ->
+				wgt_first.setView "Table", (view)->
+					view.loadTable "zipcode"
+				wgt_second.setView "Table", (view)->
+					view.loadTable "zipcode"
+		true
+
 	go()
