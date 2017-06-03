@@ -103,8 +103,8 @@ $ ->
 		addHolder "renderTest1"
 		tabs = new DynamicTabs("#renderTest1")
 		tabs.doAddViewTab("WidgetSplittable", "Tab Splittable Widget", (view) ->
+			view.setSize(900, 600)
 			view.setData SplitData_V
-			view.setSize(0, 600)
 			view.show()
 		)
 		tabs.addTab "Empty Tab", "<p style='font-size:xx-large;'>--- Another Tab ---</p>"
@@ -151,7 +151,30 @@ $ ->
 					view.render()
 			.then ()->
 				console.log "Done."
+				true
+	
+	addTestButton "Splitter with Tables", "Open", () ->
+		addHolder("renderTest1")
+		div = new WidgetTag "div", "testWidget"
+		div.setAbsolute()
+		div.appendTo("#renderTest1")
+		div.setView "WidgetSplittable", (view)->
+			view.setData SplitData_V
+			view.setSize(900, 600)
+			view.show()
+			div_first_child = view.getWidget().getFirstChild()	
+			div_second_child = view.getWidget().getSecondChild()
 
+			loadZipcodes().then ->
+				table1 = new TableView div_first_child.el
+				table1.addTable "zipcode"
+				table1.setFixedHeaderAndScrollable()
+				table1.render()
+				table1.updateRowData()	
+				table2 = new TableView div_second_child.el
+				table2.addTable "zipcode"
+				table2.render()
+				table2.updateRowData()
 		true
 
 	addTestButton "Splitter with Tables", "Open", () ->
