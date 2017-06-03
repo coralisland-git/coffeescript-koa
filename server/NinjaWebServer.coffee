@@ -19,15 +19,15 @@ argv = require('yargs')
     .demandOption([])
     .argv
 
-SAVE_NINJAFILE_AND_EXIT = (strCSS, strJS) =>
-    if !argv.gen then return
+saveNinjaFileAndExit = (strCSS, strJS) =>
+    
     console.log "Writing ../ninja/ninja.css"
     fs.writeFile "../ninja/ninja.css", strCSS, (err, done) ->
         if err? then return console.log "Error writing Ninja.css", err
     console.log "Writing ../ninja/ninja.js"
     fs.writeFile "../ninja/ninja.js", strJS, (err, done) ->
         if err? then return console.log "Error writing Ninja.js:", err
-        process.exit(0)
+    if argv.gen then process.exit(0)
 
 bundle = browserify
   extensions: ['.coffee']
@@ -392,7 +392,7 @@ class NinjaWebServer
             throw error if error?
             zlib.gzip result + str, (_, contentJs)=>
                 ninjaJavascript = contentJs
-            SAVE_NINJAFILE_AND_EXIT(strCss, result.toString() + str)
+            saveNinjaFileAndExit(strCss, result.toString() + str)
 
         zlib.gzip strCss, (_, contentCss)=>
             ninjaCss = contentCss
