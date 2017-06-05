@@ -72599,8 +72599,8 @@ WidgetSplittable = (function() {
         second.onResize(w - allSpacingW, y2);
       }
     } else {
-      x1 = Math.floor(w * (sizes[0] / 100)) - 6;
-      x2 = w - x1 - 6;
+      x1 = Math.floor(w * (sizes[0] / 100)) - 3;
+      x2 = w - x1 - 3;
       if (first.onResize != null) {
         first.onResize(x1, h - allSpacingH);
       }
@@ -74055,8 +74055,11 @@ WidgetTag = (function() {
             viewCallback(view);
           }
           _this.view = view;
-          _this.onResize(_this.width(), _this.height());
-          return resolve(view);
+          return setTimeout(function() {
+            console.log(_this.el, "2 WidgetBase setView name=" + viewName + ", calling resize", _this.width(), _this.height(), _this.el.height());
+            view.onResize(_this.width(), _this.height());
+            return resolve(view);
+          }, 50);
         });
       };
     })(this));

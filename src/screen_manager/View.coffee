@@ -250,7 +250,6 @@ class View
 
         true
 
-
     internalFindElements: (parentTag) =>
         ##|
         ##|  If you find a tag in the template with an id then create the variable automatically

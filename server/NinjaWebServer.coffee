@@ -448,8 +448,8 @@ class NinjaWebServer
         ninjaPathMiddleware @app
 
         staticPathMiddleware @app, "../node_modules/mathjs/dist/", "/vendor/mathjs"
-        staticPathMiddleware @app, "../node_modules/mathjax/", "/vendor/mathjax"
-        staticPathMiddleware @app, "../node_modules/mathjax/extensions/", "/extensions"
+        # staticPathMiddleware @app, "../node_modules/mathjax/", "/vendor/mathjax"
+        # staticPathMiddleware @app, "../node_modules/mathjax/extensions/", "/extensions"
 
         ##|
         ##| Vendor or 3rd party
