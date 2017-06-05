@@ -68624,8 +68624,14 @@ View = (function() {
       h = this.elHolder.height();
       console.log("View.coffee onResize a=" + a + " b=" + b + " w=" + w + " h=" + h + ":", this.elHolder.el);
       if ((a != null) && (b != null) && a > 0 && b > 0) {
-        this.elHolder.width(a);
-        return this.elHolder.height(b);
+        if (this.elHolder.setAbsolute != null) {
+          console.log("View.coffee using absolute 0,0," + w + "," + h);
+          this.elHolder.setAbsolute(true);
+          return this.elHolder.move(0, 0, w, h);
+        } else {
+          this.elHolder.width(a);
+          return this.elHolder.height(b);
+        }
       }
     }
   };
