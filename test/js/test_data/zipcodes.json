@@ -6,7 +6,7 @@
             "city": "Holtsville",
             "state": "NY",
             "county": "SUFFOLK",
-            "area_code": "",
+            "area_code": "12345",
             "lat": "40.922326",
             "lon": "-72.637078"
         },
