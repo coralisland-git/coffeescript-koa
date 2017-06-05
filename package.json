@@ -1,7 +1,7 @@
 {
   "name": "NinjaCommon",
-  "version": "0.12.0",
-  "private": "true",
+  "version": "0.13.0",
+  "private": true,
   "dependencies": {
     "browserify": "^14.3.0",
     "coffee-exception-report": "^1.0.0",
@@ -16,11 +16,7 @@
     "koa": "^1.2.4",
     "koa-session": "^3.3.1",
     "less": "^2.7.1",
-    "lodash": "^4.3.0",
-    "mathjax": "^2.7.0",
     "mathjs": "^3.6.0",
-    "minimatch": "^3.0.3",
-    "morgan": "^1.6.1",
     "nib": "^1.1.0",
     "pug": "^2.0.0-beta6",
     "serve-favicon": "^2.3.0",
