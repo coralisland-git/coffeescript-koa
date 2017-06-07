@@ -69574,7 +69574,16 @@ TableView = (function() {
   };
 
   TableView.prototype.onContextMenuHeader = function(source, coords) {
-    var col, index, j, len1, popupMenu, ref, ref1;
+    var col, index, j, k, len1, len2, popupMenu, ref, ref1, w;
+    if ((typeof globalOpenWindowList !== "undefined" && globalOpenWindowList !== null) && globalOpenWindowList.length > 0) {
+      for (j = 0, len1 = globalOpenWindowList.length; j < len1; j++) {
+        w = globalOpenWindowList[j];
+        if (w.isVisible && w.title === ("Editing table: " + this.primaryTableName) && w.configurations.tableName === ("" + this.primaryTableName)) {
+          console.log("Table Editor is already existing...");
+          return false;
+        }
+      }
+    }
     console.log("Context on header:", source);
     popupMenu = null;
     ref = this.colByNum;
@@ -69622,7 +69631,7 @@ TableView = (function() {
                   col = ref1[index];
                   if (col.getSource() === source) {
                     console.log("Emitting open_editor");
-                    results.push(doPopupView("ShowTableEditor", "Editing table: " + _this.primaryTableName, null, 1300, 800).then(function(view) {
+                    results.push(doPopupView("ShowTableEditor", "Editing table: " + _this.primaryTableName, "" + _this.primaryTableName, 1300, 800).then(function(view) {
                       return view.showTableEditor(_this.primaryTableName);
                     }));
                   } else {
@@ -69640,8 +69649,8 @@ TableView = (function() {
       popupMenu = new PopupMenu("Unknown " + source, coords.x - 150, coords.y);
     }
     ref1 = this.colList;
-    for (j = 0, len1 = ref1.length; j < len1; j++) {
-      col = ref1[j];
+    for (k = 0, len2 = ref1.length; k < len2; k++) {
+      col = ref1[k];
       if ((col.visible != null) && col.visible === false) {
         popupMenu.addItem("Show " + (col.getName()), (function(_this) {
           return function(e, list) {
