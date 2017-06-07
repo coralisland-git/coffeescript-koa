@@ -214,7 +214,8 @@ doPopupViewOnce = (viewName, title, settingsName, w, h, tabName, callbackWithVie
         else
             view.tabNames.push tabName
             view.tabs.doAddViewTab viewName, tabName, callbackWithView
-            view.tabs.show "tab#{view.tabNames.indexOf(tabName)}"
+            .then (v)=>
+                view.tabs.show "tab#{view.tabNames.indexOf(tabName)}"
 
 doLoadScreen = (screenName, optionalArgs) ->
 
