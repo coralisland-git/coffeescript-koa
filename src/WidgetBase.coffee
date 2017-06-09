@@ -466,7 +466,9 @@ class WidgetTag
         dm = DataMap.getDataMap()
         path = "/#{tableName}/#{idValue}/#{fieldName}"
         currentValue = DataMap.getDataFieldFormatted tableName, idValue, fieldName
-
+        if (width = dm.types[tableName]?.col[fieldName]?.getFormatter()?.width)?
+            @element.style.width = "#{width}px"
+        
         ## Add class `data` as a default one for widget binded to a table field    
         classes = ["data"]
 
