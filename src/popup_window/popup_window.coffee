@@ -330,7 +330,7 @@ class PopupWindow
             @toolbar.addElement button
         @toolbar.render()
 
-        @windowBodyWrapperTop.css "top", @windowTitle.outerHeight()
+        @windowBodyWrapperTop.css "top", @windowTitle.outerHeight() + @toolbarHeight
 
         # console.log "PopupWindow addToolbar, resizing height of windowWrapper"
         @windowWrapper.height @getInnerWindowSize()
