@@ -158,7 +158,6 @@ $ ->
 			view.addImage newImage9
 			view.addImage newImage10
 			view.addImage newImage11
-			view.setSize 0, 400
 			view.render()
 
 	addTestButton "PopupViewOnce 2 Form", "Open", (e) ->	

@@ -800,6 +800,12 @@ class TableView
 		true
 
 	onContextMenuHeader: (source, coords)=>
+		## -g
+		if globalOpenWindowList? and globalOpenWindowList.length > 0
+			for w in globalOpenWindowList
+				if w.isVisible and w.title == "Editing table: #{@primaryTableName}" and w.configurations.tableName == "#{@primaryTableName}"
+					console.log "Table Editor is already existing..."
+					return false
 
 		console.log "Context on header:", source
 		popupMenu = null
@@ -845,7 +851,7 @@ class TableView
 									console.log "Emitting open_editor"
 									# globalTableEvents.emitEvent "open_editor", [ col.tableName ]
 
-									doPopupView "ShowTableEditor", "Editing table: #{@primaryTableName}", null, 1300, 800
+									doPopupView "ShowTableEditor", "Editing table: #{@primaryTableName}", "#{@primaryTableName}", 1300, 800
 									.then (view)=>
 										view.showTableEditor @primaryTableName
 
