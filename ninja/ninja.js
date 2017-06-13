@@ -72611,6 +72611,7 @@ WidgetSplittable = (function() {
     if (this.splitData.direction === "vertical") {
       y1 = Math.floor(h * (sizes[0] / 100)) - allSpacingH - 3;
       y2 = Math.floor(h * (sizes[1] / 100)) - allSpacingH - 3;
+      console.log("WidgetSplittable new sizes y1=" + y1 + " y2=" + y2 + " w=" + w + "-" + allSpacingW);
       if (first.onResize != null) {
         first.onResize(w - allSpacingW, y1);
       }
@@ -72618,8 +72619,8 @@ WidgetSplittable = (function() {
         second.onResize(w - allSpacingW, y2);
       }
     } else {
-      x1 = Math.floor(w * (sizes[0] / 100)) - 3;
-      x2 = w - x1 - 3;
+      x1 = Math.floor(w * (sizes[0] / 100)) - 3 - 2;
+      x2 = w - x1 - 3 - 2;
       if (first.onResize != null) {
         first.onResize(x1, h - allSpacingH);
       }
