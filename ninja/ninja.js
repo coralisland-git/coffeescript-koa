@@ -6410,6 +6410,11 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
         this.changeColumn("align", "left");
         return;
       }
+      if (/^number system/i.test(this.data.name)) {
+        this.changeColumn("type", "number_system");
+        this.changeColumn("width", 60);
+        return;
+      }
     };
 
     Column.prototype.deduceColumnType = function(newData) {
@@ -7151,7 +7156,7 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
       if (data == null) {
         return "";
       }
-      if (data.length === 0) {
+      if (data.length === 0 || data.length === void 0) {
         return "";
       }
       return "<span class='memo'>" + data.slice(0, 201) + "</span><span class='fieldicon'><i class='si si-eyeglasses'></i></span>";
@@ -8108,7 +8113,7 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
 
     DataFormatTimeAgo.prototype.width = 135;
 
-    DataFormatTimeAgo.prototype.align = "left";
+    DataFormatTimeAgo.prototype.align = "right";
 
     DataFormatTimeAgo.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
       if (!this.elEditor) {
