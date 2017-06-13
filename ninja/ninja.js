@@ -72111,8 +72111,10 @@ DynamicTabs = (function() {
     hh = h - 33 - 4;
     this.currentSetWidth = ww;
     this.currentSetHeight = hh;
-    this.tabContent.width(ww);
-    this.tabContent.height(hh);
+    if (this.tabContent != null) {
+      this.tabContent.width(ww);
+      this.tabContent.height(hh);
+    }
     ref = this.tags;
     for (id in ref) {
       tag = ref[id];
