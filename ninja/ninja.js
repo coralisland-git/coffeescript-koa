@@ -72704,402 +72704,6 @@ PopUpFormWrapper = (function(superClass) {
   return PopUpFormWrapper;
 
 })(FormWrapper);
-var ErrorMessageBox,
-  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  hasProp = {}.hasOwnProperty;
-
-ErrorMessageBox = (function(superClass) {
-  extend(ErrorMessageBox, superClass);
-
-  ErrorMessageBox.prototype.content = "Default content";
-
-  ErrorMessageBox.prototype.title = "Default title";
-
-  ErrorMessageBox.prototype.ok = "Ok";
-
-  ErrorMessageBox.prototype.close = "Close";
-
-  ErrorMessageBox.prototype.showFooter = true;
-
-  ErrorMessageBox.prototype.showOnCreate = true;
-
-  function ErrorMessageBox(message) {
-    this.showOnCreate = false;
-    ErrorMessageBox.__super__.constructor.call(this);
-    console.log("MESSAGE=", message);
-    this.title = "Error";
-    this.position = 'center';
-    this.ok = 'Close';
-    this.close = '';
-    this.content = message;
-    this.show();
-  }
-
-  return ErrorMessageBox;
-
-})(ModalDialog);
-var ModalViewDialog,
-  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  hasProp = {}.hasOwnProperty;
-
-ModalViewDialog = (function(superClass) {
-  extend(ModalViewDialog, superClass);
-
-  function ModalViewDialog(options) {
-    this.show = bind(this.show, this);
-    ModalViewDialog.__super__.constructor.call(this, options);
-    this.view = new View();
-  }
-
-  ModalViewDialog.prototype.show = function(options) {
-    this.content += "<div class='modal_ViewDialog' id='modal_ViewDialog" + this.gid + "' />";
-    this.html = this.template(this);
-    $("body").append(this.html);
-    this.view.AddToElement("#modal_ViewDialog" + this.gid);
-    this.view.elHolder.append(this.getForm().getHtml());
-    this.modal = $("#modal" + this.gid);
-    this.modal.modal(options);
-    this.modal.on("hidden.bs.modal", (function(_this) {
-      return function() {
-        _this.modal.remove();
-        return _this.onClose();
-      };
-    })(this));
-    this.modal.find(".btn1").bind("click", (function(_this) {
-      return function() {
-        return _this.onButton1();
-      };
-    })(this));
-    this.modal.find(".btn2").bind("click", (function(_this) {
-      return function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        options = {};
-        _this.modal.find("input,select").each(function(idx, el) {
-          var name, val;
-          name = $(el).attr("name");
-          val = $(el).val();
-          return options[name] = val;
-        });
-        if (_this.onButton2(e, options) === true) {
-          _this.onClose();
-        }
-        return true;
-      };
-    })(this));
-    if (this.position === "center") {
-      this.modal.css({
-        'margin-top': (function(_this) {
-          return function() {
-            return Math.max(0, $(window).scrollTop() + ($(window).height() - _this.modal.height()) / 2);
-          };
-        })(this)
-      });
-    }
-    if (this.formWrapper != null) {
-      return setTimeout((function(_this) {
-        return function() {
-          return _this.formWrapper.onAfterShow();
-        };
-      })(this), 10);
-    }
-  };
-
-  return ModalViewDialog;
-
-})(ModalDialog);
-var FloatingSelect,
-  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  hasProp = {}.hasOwnProperty;
-
-FloatingSelect = (function(superClass) {
-  extend(FloatingSelect, superClass);
-
-  function FloatingSelect() {
-    this.showTable = bind(this.showTable, this);
-    this.setTable = bind(this.setTable, this);
-    this.onResize = bind(this.onResize, this);
-    this.show = bind(this.show, this);
-    this.hide = bind(this.hide, this);
-    this.destroy = bind(this.destroy, this);
-    this.getOptionHeight = bind(this.getOptionHeight, this);
-    return FloatingSelect.__super__.constructor.apply(this, arguments);
-  }
-
-  FloatingSelect.prototype.table = null;
-
-  FloatingSelect.prototype.optionHeight = 24;
-
-  FloatingSelect.prototype.getOptionHeight = function() {
-    return this.optionHeight;
-  };
-
-  FloatingSelect.prototype.destroy = function() {
-    if (this.table != null) {
-      this.table.destroy();
-    }
-    delete this.table;
-    FloatingSelect.__super__.destroy.call(this);
-    return true;
-  };
-
-  FloatingSelect.prototype.hide = function() {
-    if (this.table != null) {
-      this.table.hide();
-    }
-    FloatingSelect.__super__.hide.call(this);
-    return true;
-  };
-
-  FloatingSelect.prototype.show = function() {
-    FloatingSelect.__super__.show.apply(this, arguments).show();
-    this.showTable();
-    setTimeout(this.table.onResize, 10);
-    return true;
-  };
-
-  FloatingSelect.prototype.onResize = function() {
-    if (this.table != null) {
-      this.table.onResize();
-    }
-    return true;
-  };
-
-  FloatingSelect.prototype.setTable = function(tableName, columns, config) {
-    this.tableName = tableName;
-    this.columns = columns;
-    return GlobalClassTools.addEventManager(this);
-  };
-
-  FloatingSelect.prototype.showTable = function() {
-    if (this.table != null) {
-      return this.table;
-    }
-    this.table = new TableView(this.elHolder.el, false);
-    this.table.showGroupPadding = false;
-    this.table.showResize = false;
-    this.table.setAutoFillWidth();
-    this.table.addTable(this.tableName, (function(_this) {
-      return function(colName) {
-        var i, len, opt, ref;
-        if (_this.columns == null) {
-          return true;
-        }
-        ref = _this.columns;
-        for (i = 0, len = ref.length; i < len; i++) {
-          opt = ref[i];
-          if (opt === colName.getSource()) {
-            return true;
-          }
-        }
-        return false;
-      };
-    })(this));
-    this.table.on("click_row", (function(_this) {
-      return function(row, e) {
-        _this.emitEvent("select", [row]);
-        return true;
-      };
-    })(this));
-    this.table.on("focus_cell", (function(_this) {
-      return function(path, item) {
-        console.log("on focus cell:", path, item);
-        _this.emitEvent("preselect", [item.id, item]);
-        return true;
-      };
-    })(this));
-    if ((typeof config !== "undefined" && config !== null) && config.showHeaders) {
-      this.table.showHeaders = true;
-    }
-    this.table.setFixedSize(this.width, this.height);
-    this.table.render();
-    this.table.onResize();
-    return true;
-  };
-
-  return FloatingSelect;
-
-})(FloatingWindow);
-var ModalSortItems,
-  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  hasProp = {}.hasOwnProperty;
-
-ModalSortItems = (function(superClass) {
-  extend(ModalSortItems, superClass);
-
-  ModalSortItems.prototype.content = "Sort Columns";
-
-  ModalSortItems.prototype.title = "Customize Columns";
-
-  ModalSortItems.prototype.ok = "Close";
-
-  ModalSortItems.prototype.close = "";
-
-  ModalSortItems.prototype.showFooter = true;
-
-  ModalSortItems.prototype.showOnCreate = false;
-
-  ModalSortItems.prototype.imgChecked = "<img src='/images/checkbox.png' width='16' height='16' alt='Selected' />";
-
-  ModalSortItems.prototype.imgNotChecked = "<img src='/images/checkbox_no.png' width='16' height='16' alt='Selected' />";
-
-  ModalSortItems.prototype.updateColumnText = function() {
-    var col, i, len, ref;
-    ref = this.columns;
-    for (i = 0, len = ref.length; i < len; i++) {
-      col = ref[i];
-      if (col.getAlwaysHidden()) {
-        continue;
-      }
-      col.tagName.html(col.getName());
-      col.tagOrderText.html(col.getOrder() + 1);
-      if (col.getVisible()) {
-        col.tagCheck.html(this.imgChecked);
-        col.tag.removeClass("notVisible");
-      } else {
-        col.tagCheck.html(this.imgNotChecked);
-        col.tag.addClass("notVisible");
-      }
-      col.tag.setClass("calculation", col.getIsCalculation());
-    }
-    return true;
-  };
-
-  ModalSortItems.prototype.onClickVisible = function(e) {
-    var col, i, len, ref, results;
-    ref = this.columns;
-    results = [];
-    for (i = 0, len = ref.length; i < len; i++) {
-      col = ref[i];
-      if (col.getAlwaysHidden()) {
-        continue;
-      }
-      if (col.getSource() !== e.path) {
-        continue;
-      }
-      DataMap.changeColumnAttribute(this.tableName, e.path, "visible", col.getVisible() === false);
-      results.push(this.updateColumnText());
-    }
-    return results;
-  };
-
-  function ModalSortItems(tableName) {
-    var col, i, len, ref;
-    this.tableName = tableName;
-    this.onClickVisible = bind(this.onClickVisible, this);
-    this.updateColumnText = bind(this.updateColumnText, this);
-    ModalSortItems.__super__.constructor.call(this);
-    GlobalClassTools.addEventManager(this);
-    this.content = '<div id=\'tableColumnSortingList\' class=\'tableColumnSortingList\'>\n</div>';
-    this.show();
-    this.sortItemsList = new WidgetTag("ul", "sortedItemsList", "sortedItemsList");
-    $("#tableColumnSortingList").append(this.sortItemsList.el);
-    this.columns = DataMap.getColumnsFromTable(this.tableName);
-    this.columns = this.columns.sort(function(a, b) {
-      return a.getOrder() - b.getOrder();
-    });
-    ref = this.columns;
-    for (i = 0, len = ref.length; i < len; i++) {
-      col = ref[i];
-      if (col.getAlwaysHidden()) {
-        continue;
-      }
-      col.tag = this.sortItemsList.add("li", "columnItem");
-      col.gid = col.tag.gid;
-      col.tagCheck = col.tag.add("div", "colVisible");
-      col.tagName = col.tag.add("div", "colName");
-      col.tagOrderText = col.tag.add("div", "orderText");
-      col.tagCheck.setDataPath(col.getSource());
-      col.tagCheck.on("click", this.onClickVisible);
-    }
-    this.updateColumnText();
-    sortable("#sortedItemsList", {
-      forcePlaceholderSize: true,
-      placeholderClass: 'placeholder'
-    });
-    sortable('#sortedItemsList')[0].addEventListener('sortupdate', (function(_this) {
-      return function(e) {
-        var el, id, j, k, len1, len2, oldOrder, order, ref1, ref2;
-        console.log("SORT UPDATE:", e.detail);
-        order = 0;
-        ref1 = _this.sortItemsList.el.children();
-        for (j = 0, len1 = ref1.length; j < len1; j++) {
-          el = ref1[j];
-          id = $(el).data("id");
-          ref2 = _this.columns;
-          for (k = 0, len2 = ref2.length; k < len2; k++) {
-            col = ref2[k];
-            if (col.getAlwaysHidden()) {
-              continue;
-            }
-            if (col.gid !== id) {
-              continue;
-            }
-            oldOrder = col.getOrder();
-            if (oldOrder !== order) {
-              DataMap.changeColumnAttribute(_this.tableName, col.getSource(), "order", order);
-              console.log("Change " + (col.getSource()) + " order from " + oldOrder + " to " + order);
-            }
-            order++;
-          }
-        }
-        _this.updateColumnText();
-        return true;
-      };
-    })(this));
-    this.onButton1 = (function(_this) {
-      return function(e) {
-        _this.hide();
-        return true;
-      };
-    })(this);
-    this.onButton2 = (function(_this) {
-      return function() {
-        _this.hide();
-        return true;
-      };
-    })(this);
-  }
-
-  return ModalSortItems;
-
-})(ModalDialog);
-var ModalMessageBox,
-  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  hasProp = {}.hasOwnProperty;
-
-ModalMessageBox = (function(superClass) {
-  extend(ModalMessageBox, superClass);
-
-  ModalMessageBox.prototype.content = "Default content";
-
-  ModalMessageBox.prototype.title = "Default title";
-
-  ModalMessageBox.prototype.ok = "Ok";
-
-  ModalMessageBox.prototype.close = "Close";
-
-  ModalMessageBox.prototype.showFooter = true;
-
-  ModalMessageBox.prototype.showOnCreate = true;
-
-  function ModalMessageBox(message) {
-    this.showOnCreate = false;
-    ModalMessageBox.__super__.constructor.call(this);
-    this.title = "Information";
-    this.position = 'center';
-    this.ok = 'Close';
-    this.close = '';
-    this.content = message;
-    this.show();
-  }
-
-  return ModalMessageBox;
-
-})(ModalDialog);
 var PopupForm,
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
@@ -73196,185 +72800,6 @@ PopupForm = (function(superClass) {
   return PopupForm;
 
 })(ModalDialog);
-var DataSetConfig, TableViewColButton,
-  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  hasProp = {}.hasOwnProperty;
-
-DataSetConfig = require('edgecommondatasetconfig');
-
-TableViewColButton = (function(superClass) {
-  extend(TableViewColButton, superClass);
-
-  function TableViewColButton(tableName, id) {
-    this.tableName = tableName;
-    this.id = id;
-    this.UpdateSortIcon = bind(this.UpdateSortIcon, this);
-    this.RenderHeaderHorizontal = bind(this.RenderHeaderHorizontal, this);
-    this.RenderHeader = bind(this.RenderHeader, this);
-    this.getWidth = bind(this.getWidth, this);
-    this.getEditable = bind(this.getEditable, this);
-    this.getClickable = bind(this.getClickable, this);
-    this.getAlign = bind(this.getAlign, this);
-    this.getFormatterName = bind(this.getFormatterName, this);
-    this.getSource = bind(this.getSource, this);
-    this.getOrder = bind(this.getOrder, this);
-    this.getName = bind(this.getName, this);
-    this.render = bind(this.render, this);
-    this.visible = true;
-    this.width = 60;
-    this.sort = 0;
-    this.name = this.id;
-  }
-
-  TableViewColButton.prototype.render = function(val) {
-    return this.id;
-  };
-
-  TableViewColButton.prototype.getName = function() {
-    return this.name;
-  };
-
-  TableViewColButton.prototype.getOrder = function() {
-    return 99;
-  };
-
-  TableViewColButton.prototype.getSource = function() {
-    if (this.source != null) {
-      return this.source;
-    }
-    return this.id;
-  };
-
-  TableViewColButton.prototype.getFormatterName = function() {
-    return "table_button";
-  };
-
-  TableViewColButton.prototype.getAlign = function() {
-    return "center";
-  };
-
-  TableViewColButton.prototype.getClickable = function() {
-    return true;
-  };
-
-  TableViewColButton.prototype.getEditable = function() {
-    return false;
-  };
-
-  TableViewColButton.prototype.getWidth = function() {
-    return this.width;
-  };
-
-  TableViewColButton.prototype.RenderHeader = function(parent, location) {
-    parent.html(this.getName());
-    parent.addClass("text-center");
-    parent.addClass("tableHeaderField");
-    return parent;
-  };
-
-  TableViewColButton.prototype.RenderHeaderHorizontal = function(parent, location) {
-    parent.html(this.tableName);
-    parent.addClass("text-center");
-    parent.addClass("tableHeaderFieldHoriz");
-    return parent;
-  };
-
-  TableViewColButton.prototype.UpdateSortIcon = function(newSort) {
-    return true;
-  };
-
-  return TableViewColButton;
-
-})(DataSetConfig.ColumnBase);
-var DataSetConfig, TableViewColCheckbox,
-  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  hasProp = {}.hasOwnProperty;
-
-DataSetConfig = require('edgecommondatasetconfig');
-
-TableViewColCheckbox = (function(superClass) {
-  extend(TableViewColCheckbox, superClass);
-
-  function TableViewColCheckbox(tableName) {
-    this.tableName = tableName;
-    this.UpdateSortIcon = bind(this.UpdateSortIcon, this);
-    this.RenderHeaderHorizontal = bind(this.RenderHeaderHorizontal, this);
-    this.RenderHeader = bind(this.RenderHeader, this);
-    this.getWidth = bind(this.getWidth, this);
-    this.getEditable = bind(this.getEditable, this);
-    this.getOrder = bind(this.getOrder, this);
-    this.getAlign = bind(this.getAlign, this);
-    this.getFormatterName = bind(this.getFormatterName, this);
-    this.getSource = bind(this.getSource, this);
-    this.getName = bind(this.getName, this);
-    this.visible = true;
-    this.width = 32;
-    this.sort = 0;
-  }
-
-  TableViewColCheckbox.prototype.getName = function() {
-    return "row_selected";
-  };
-
-  TableViewColCheckbox.prototype.getSource = function() {
-    return "row_selected";
-  };
-
-  TableViewColCheckbox.prototype.getFormatterName = function() {
-    return "boolean";
-  };
-
-  TableViewColCheckbox.prototype.getAlign = function() {
-    return "center";
-  };
-
-  TableViewColCheckbox.prototype.getOrder = function() {
-    return -99;
-  };
-
-  TableViewColCheckbox.prototype.getEditable = function() {
-    return false;
-  };
-
-  TableViewColCheckbox.prototype.getWidth = function() {
-    return this.width;
-  };
-
-  TableViewColCheckbox.prototype.RenderHeader = function(parent, location) {
-    if (this.visible === false) {
-      return;
-    }
-    parent.addClass("checkable");
-    parent.addClass("tableHeaderField");
-    parent.html("");
-    return parent;
-  };
-
-  TableViewColCheckbox.prototype.RenderHeaderHorizontal = function(parent, location) {
-    if (this.visible === false) {
-      return;
-    }
-    parent.addClass("checkable");
-    parent.addClass("tableHeaderFieldHoriz");
-    parent.html("Select Row");
-    parent.el.css({
-      "text-align": "right",
-      "padding-right": 8,
-      "border-right": "1px solid #CCCCCC",
-      "background": "linear-gradient(to right, #fff, #f2f2f2);"
-    });
-    return parent;
-  };
-
-  TableViewColCheckbox.prototype.UpdateSortIcon = function(newSort) {
-    return true;
-  };
-
-  return TableViewColCheckbox;
-
-})(DataSetConfig.ColumnBase);
 var TableViewDetailed,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
@@ -73613,6 +73038,581 @@ TableViewDetailed = (function(superClass) {
   return TableViewDetailed;
 
 })(TableView);
+var DataSetConfig, TableViewColCheckbox,
+  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+  hasProp = {}.hasOwnProperty;
+
+DataSetConfig = require('edgecommondatasetconfig');
+
+TableViewColCheckbox = (function(superClass) {
+  extend(TableViewColCheckbox, superClass);
+
+  function TableViewColCheckbox(tableName) {
+    this.tableName = tableName;
+    this.UpdateSortIcon = bind(this.UpdateSortIcon, this);
+    this.RenderHeaderHorizontal = bind(this.RenderHeaderHorizontal, this);
+    this.RenderHeader = bind(this.RenderHeader, this);
+    this.getWidth = bind(this.getWidth, this);
+    this.getEditable = bind(this.getEditable, this);
+    this.getOrder = bind(this.getOrder, this);
+    this.getAlign = bind(this.getAlign, this);
+    this.getFormatterName = bind(this.getFormatterName, this);
+    this.getSource = bind(this.getSource, this);
+    this.getName = bind(this.getName, this);
+    this.visible = true;
+    this.width = 32;
+    this.sort = 0;
+  }
+
+  TableViewColCheckbox.prototype.getName = function() {
+    return "row_selected";
+  };
+
+  TableViewColCheckbox.prototype.getSource = function() {
+    return "row_selected";
+  };
+
+  TableViewColCheckbox.prototype.getFormatterName = function() {
+    return "boolean";
+  };
+
+  TableViewColCheckbox.prototype.getAlign = function() {
+    return "center";
+  };
+
+  TableViewColCheckbox.prototype.getOrder = function() {
+    return -99;
+  };
+
+  TableViewColCheckbox.prototype.getEditable = function() {
+    return false;
+  };
+
+  TableViewColCheckbox.prototype.getWidth = function() {
+    return this.width;
+  };
+
+  TableViewColCheckbox.prototype.RenderHeader = function(parent, location) {
+    if (this.visible === false) {
+      return;
+    }
+    parent.addClass("checkable");
+    parent.addClass("tableHeaderField");
+    parent.html("");
+    return parent;
+  };
+
+  TableViewColCheckbox.prototype.RenderHeaderHorizontal = function(parent, location) {
+    if (this.visible === false) {
+      return;
+    }
+    parent.addClass("checkable");
+    parent.addClass("tableHeaderFieldHoriz");
+    parent.html("Select Row");
+    parent.el.css({
+      "text-align": "right",
+      "padding-right": 8,
+      "border-right": "1px solid #CCCCCC",
+      "background": "linear-gradient(to right, #fff, #f2f2f2);"
+    });
+    return parent;
+  };
+
+  TableViewColCheckbox.prototype.UpdateSortIcon = function(newSort) {
+    return true;
+  };
+
+  return TableViewColCheckbox;
+
+})(DataSetConfig.ColumnBase);
+var DataSetConfig, TableViewColButton,
+  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+  hasProp = {}.hasOwnProperty;
+
+DataSetConfig = require('edgecommondatasetconfig');
+
+TableViewColButton = (function(superClass) {
+  extend(TableViewColButton, superClass);
+
+  function TableViewColButton(tableName, id) {
+    this.tableName = tableName;
+    this.id = id;
+    this.UpdateSortIcon = bind(this.UpdateSortIcon, this);
+    this.RenderHeaderHorizontal = bind(this.RenderHeaderHorizontal, this);
+    this.RenderHeader = bind(this.RenderHeader, this);
+    this.getWidth = bind(this.getWidth, this);
+    this.getEditable = bind(this.getEditable, this);
+    this.getClickable = bind(this.getClickable, this);
+    this.getAlign = bind(this.getAlign, this);
+    this.getFormatterName = bind(this.getFormatterName, this);
+    this.getSource = bind(this.getSource, this);
+    this.getOrder = bind(this.getOrder, this);
+    this.getName = bind(this.getName, this);
+    this.render = bind(this.render, this);
+    this.visible = true;
+    this.width = 60;
+    this.sort = 0;
+    this.name = this.id;
+  }
+
+  TableViewColButton.prototype.render = function(val) {
+    return this.id;
+  };
+
+  TableViewColButton.prototype.getName = function() {
+    return this.name;
+  };
+
+  TableViewColButton.prototype.getOrder = function() {
+    return 99;
+  };
+
+  TableViewColButton.prototype.getSource = function() {
+    if (this.source != null) {
+      return this.source;
+    }
+    return this.id;
+  };
+
+  TableViewColButton.prototype.getFormatterName = function() {
+    return "table_button";
+  };
+
+  TableViewColButton.prototype.getAlign = function() {
+    return "center";
+  };
+
+  TableViewColButton.prototype.getClickable = function() {
+    return true;
+  };
+
+  TableViewColButton.prototype.getEditable = function() {
+    return false;
+  };
+
+  TableViewColButton.prototype.getWidth = function() {
+    return this.width;
+  };
+
+  TableViewColButton.prototype.RenderHeader = function(parent, location) {
+    parent.html(this.getName());
+    parent.addClass("text-center");
+    parent.addClass("tableHeaderField");
+    return parent;
+  };
+
+  TableViewColButton.prototype.RenderHeaderHorizontal = function(parent, location) {
+    parent.html(this.tableName);
+    parent.addClass("text-center");
+    parent.addClass("tableHeaderFieldHoriz");
+    return parent;
+  };
+
+  TableViewColButton.prototype.UpdateSortIcon = function(newSort) {
+    return true;
+  };
+
+  return TableViewColButton;
+
+})(DataSetConfig.ColumnBase);
+var ModalSortItems,
+  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+  hasProp = {}.hasOwnProperty;
+
+ModalSortItems = (function(superClass) {
+  extend(ModalSortItems, superClass);
+
+  ModalSortItems.prototype.content = "Sort Columns";
+
+  ModalSortItems.prototype.title = "Customize Columns";
+
+  ModalSortItems.prototype.ok = "Close";
+
+  ModalSortItems.prototype.close = "";
+
+  ModalSortItems.prototype.showFooter = true;
+
+  ModalSortItems.prototype.showOnCreate = false;
+
+  ModalSortItems.prototype.imgChecked = "<img src='/images/checkbox.png' width='16' height='16' alt='Selected' />";
+
+  ModalSortItems.prototype.imgNotChecked = "<img src='/images/checkbox_no.png' width='16' height='16' alt='Selected' />";
+
+  ModalSortItems.prototype.updateColumnText = function() {
+    var col, i, len, ref;
+    ref = this.columns;
+    for (i = 0, len = ref.length; i < len; i++) {
+      col = ref[i];
+      if (col.getAlwaysHidden()) {
+        continue;
+      }
+      col.tagName.html(col.getName());
+      col.tagOrderText.html(col.getOrder() + 1);
+      if (col.getVisible()) {
+        col.tagCheck.html(this.imgChecked);
+        col.tag.removeClass("notVisible");
+      } else {
+        col.tagCheck.html(this.imgNotChecked);
+        col.tag.addClass("notVisible");
+      }
+      col.tag.setClass("calculation", col.getIsCalculation());
+    }
+    return true;
+  };
+
+  ModalSortItems.prototype.onClickVisible = function(e) {
+    var col, i, len, ref, results;
+    ref = this.columns;
+    results = [];
+    for (i = 0, len = ref.length; i < len; i++) {
+      col = ref[i];
+      if (col.getAlwaysHidden()) {
+        continue;
+      }
+      if (col.getSource() !== e.path) {
+        continue;
+      }
+      DataMap.changeColumnAttribute(this.tableName, e.path, "visible", col.getVisible() === false);
+      results.push(this.updateColumnText());
+    }
+    return results;
+  };
+
+  function ModalSortItems(tableName) {
+    var col, i, len, ref;
+    this.tableName = tableName;
+    this.onClickVisible = bind(this.onClickVisible, this);
+    this.updateColumnText = bind(this.updateColumnText, this);
+    ModalSortItems.__super__.constructor.call(this);
+    GlobalClassTools.addEventManager(this);
+    this.content = '<div id=\'tableColumnSortingList\' class=\'tableColumnSortingList\'>\n</div>';
+    this.show();
+    this.sortItemsList = new WidgetTag("ul", "sortedItemsList", "sortedItemsList");
+    $("#tableColumnSortingList").append(this.sortItemsList.el);
+    this.columns = DataMap.getColumnsFromTable(this.tableName);
+    this.columns = this.columns.sort(function(a, b) {
+      return a.getOrder() - b.getOrder();
+    });
+    ref = this.columns;
+    for (i = 0, len = ref.length; i < len; i++) {
+      col = ref[i];
+      if (col.getAlwaysHidden()) {
+        continue;
+      }
+      col.tag = this.sortItemsList.add("li", "columnItem");
+      col.gid = col.tag.gid;
+      col.tagCheck = col.tag.add("div", "colVisible");
+      col.tagName = col.tag.add("div", "colName");
+      col.tagOrderText = col.tag.add("div", "orderText");
+      col.tagCheck.setDataPath(col.getSource());
+      col.tagCheck.on("click", this.onClickVisible);
+    }
+    this.updateColumnText();
+    sortable("#sortedItemsList", {
+      forcePlaceholderSize: true,
+      placeholderClass: 'placeholder'
+    });
+    sortable('#sortedItemsList')[0].addEventListener('sortupdate', (function(_this) {
+      return function(e) {
+        var el, id, j, k, len1, len2, oldOrder, order, ref1, ref2;
+        console.log("SORT UPDATE:", e.detail);
+        order = 0;
+        ref1 = _this.sortItemsList.el.children();
+        for (j = 0, len1 = ref1.length; j < len1; j++) {
+          el = ref1[j];
+          id = $(el).data("id");
+          ref2 = _this.columns;
+          for (k = 0, len2 = ref2.length; k < len2; k++) {
+            col = ref2[k];
+            if (col.getAlwaysHidden()) {
+              continue;
+            }
+            if (col.gid !== id) {
+              continue;
+            }
+            oldOrder = col.getOrder();
+            if (oldOrder !== order) {
+              DataMap.changeColumnAttribute(_this.tableName, col.getSource(), "order", order);
+              console.log("Change " + (col.getSource()) + " order from " + oldOrder + " to " + order);
+            }
+            order++;
+          }
+        }
+        _this.updateColumnText();
+        return true;
+      };
+    })(this));
+    this.onButton1 = (function(_this) {
+      return function(e) {
+        _this.hide();
+        return true;
+      };
+    })(this);
+    this.onButton2 = (function(_this) {
+      return function() {
+        _this.hide();
+        return true;
+      };
+    })(this);
+  }
+
+  return ModalSortItems;
+
+})(ModalDialog);
+var FloatingSelect,
+  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+  hasProp = {}.hasOwnProperty;
+
+FloatingSelect = (function(superClass) {
+  extend(FloatingSelect, superClass);
+
+  function FloatingSelect() {
+    this.showTable = bind(this.showTable, this);
+    this.setTable = bind(this.setTable, this);
+    this.onResize = bind(this.onResize, this);
+    this.show = bind(this.show, this);
+    this.hide = bind(this.hide, this);
+    this.destroy = bind(this.destroy, this);
+    this.getOptionHeight = bind(this.getOptionHeight, this);
+    return FloatingSelect.__super__.constructor.apply(this, arguments);
+  }
+
+  FloatingSelect.prototype.table = null;
+
+  FloatingSelect.prototype.optionHeight = 24;
+
+  FloatingSelect.prototype.getOptionHeight = function() {
+    return this.optionHeight;
+  };
+
+  FloatingSelect.prototype.destroy = function() {
+    if (this.table != null) {
+      this.table.destroy();
+    }
+    delete this.table;
+    FloatingSelect.__super__.destroy.call(this);
+    return true;
+  };
+
+  FloatingSelect.prototype.hide = function() {
+    if (this.table != null) {
+      this.table.hide();
+    }
+    FloatingSelect.__super__.hide.call(this);
+    return true;
+  };
+
+  FloatingSelect.prototype.show = function() {
+    FloatingSelect.__super__.show.apply(this, arguments).show();
+    this.showTable();
+    setTimeout(this.table.onResize, 10);
+    return true;
+  };
+
+  FloatingSelect.prototype.onResize = function() {
+    if (this.table != null) {
+      this.table.onResize();
+    }
+    return true;
+  };
+
+  FloatingSelect.prototype.setTable = function(tableName, columns, config) {
+    this.tableName = tableName;
+    this.columns = columns;
+    return GlobalClassTools.addEventManager(this);
+  };
+
+  FloatingSelect.prototype.showTable = function() {
+    if (this.table != null) {
+      return this.table;
+    }
+    this.table = new TableView(this.elHolder.el, false);
+    this.table.showGroupPadding = false;
+    this.table.showResize = false;
+    this.table.setAutoFillWidth();
+    this.table.addTable(this.tableName, (function(_this) {
+      return function(colName) {
+        var i, len, opt, ref;
+        if (_this.columns == null) {
+          return true;
+        }
+        ref = _this.columns;
+        for (i = 0, len = ref.length; i < len; i++) {
+          opt = ref[i];
+          if (opt === colName.getSource()) {
+            return true;
+          }
+        }
+        return false;
+      };
+    })(this));
+    this.table.on("click_row", (function(_this) {
+      return function(row, e) {
+        _this.emitEvent("select", [row]);
+        return true;
+      };
+    })(this));
+    this.table.on("focus_cell", (function(_this) {
+      return function(path, item) {
+        console.log("on focus cell:", path, item);
+        _this.emitEvent("preselect", [item.id, item]);
+        return true;
+      };
+    })(this));
+    if ((typeof config !== "undefined" && config !== null) && config.showHeaders) {
+      this.table.showHeaders = true;
+    }
+    this.table.setFixedSize(this.width, this.height);
+    this.table.render();
+    this.table.onResize();
+    return true;
+  };
+
+  return FloatingSelect;
+
+})(FloatingWindow);
+var ModalViewDialog,
+  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+  hasProp = {}.hasOwnProperty;
+
+ModalViewDialog = (function(superClass) {
+  extend(ModalViewDialog, superClass);
+
+  function ModalViewDialog(options) {
+    this.show = bind(this.show, this);
+    ModalViewDialog.__super__.constructor.call(this, options);
+    this.view = new View();
+  }
+
+  ModalViewDialog.prototype.show = function(options) {
+    this.content += "<div class='modal_ViewDialog' id='modal_ViewDialog" + this.gid + "' />";
+    this.html = this.template(this);
+    $("body").append(this.html);
+    this.view.AddToElement("#modal_ViewDialog" + this.gid);
+    this.view.elHolder.append(this.getForm().getHtml());
+    this.modal = $("#modal" + this.gid);
+    this.modal.modal(options);
+    this.modal.on("hidden.bs.modal", (function(_this) {
+      return function() {
+        _this.modal.remove();
+        return _this.onClose();
+      };
+    })(this));
+    this.modal.find(".btn1").bind("click", (function(_this) {
+      return function() {
+        return _this.onButton1();
+      };
+    })(this));
+    this.modal.find(".btn2").bind("click", (function(_this) {
+      return function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        options = {};
+        _this.modal.find("input,select").each(function(idx, el) {
+          var name, val;
+          name = $(el).attr("name");
+          val = $(el).val();
+          return options[name] = val;
+        });
+        if (_this.onButton2(e, options) === true) {
+          _this.onClose();
+        }
+        return true;
+      };
+    })(this));
+    if (this.position === "center") {
+      this.modal.css({
+        'margin-top': (function(_this) {
+          return function() {
+            return Math.max(0, $(window).scrollTop() + ($(window).height() - _this.modal.height()) / 2);
+          };
+        })(this)
+      });
+    }
+    if (this.formWrapper != null) {
+      return setTimeout((function(_this) {
+        return function() {
+          return _this.formWrapper.onAfterShow();
+        };
+      })(this), 10);
+    }
+  };
+
+  return ModalViewDialog;
+
+})(ModalDialog);
+var ModalMessageBox,
+  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+  hasProp = {}.hasOwnProperty;
+
+ModalMessageBox = (function(superClass) {
+  extend(ModalMessageBox, superClass);
+
+  ModalMessageBox.prototype.content = "Default content";
+
+  ModalMessageBox.prototype.title = "Default title";
+
+  ModalMessageBox.prototype.ok = "Ok";
+
+  ModalMessageBox.prototype.close = "Close";
+
+  ModalMessageBox.prototype.showFooter = true;
+
+  ModalMessageBox.prototype.showOnCreate = true;
+
+  function ModalMessageBox(message) {
+    this.showOnCreate = false;
+    ModalMessageBox.__super__.constructor.call(this);
+    this.title = "Information";
+    this.position = 'center';
+    this.ok = 'Close';
+    this.close = '';
+    this.content = message;
+    this.show();
+  }
+
+  return ModalMessageBox;
+
+})(ModalDialog);
+var ErrorMessageBox,
+  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+  hasProp = {}.hasOwnProperty;
+
+ErrorMessageBox = (function(superClass) {
+  extend(ErrorMessageBox, superClass);
+
+  ErrorMessageBox.prototype.content = "Default content";
+
+  ErrorMessageBox.prototype.title = "Default title";
+
+  ErrorMessageBox.prototype.ok = "Ok";
+
+  ErrorMessageBox.prototype.close = "Close";
+
+  ErrorMessageBox.prototype.showFooter = true;
+
+  ErrorMessageBox.prototype.showOnCreate = true;
+
+  function ErrorMessageBox(message) {
+    this.showOnCreate = false;
+    ErrorMessageBox.__super__.constructor.call(this);
+    console.log("MESSAGE=", message);
+    this.title = "Error";
+    this.position = 'center';
+    this.ok = 'Close';
+    this.close = '';
+    this.content = message;
+    this.show();
+  }
+
+  return ErrorMessageBox;
+
+})(ModalDialog);
 var WidgetBase, WidgetTag, globalTagData, globalTagID, globalTagPath,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },

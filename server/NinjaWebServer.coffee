@@ -359,7 +359,6 @@ class NinjaWebServer
         str = ""
         for name in @ninjaCoffeeNormal
             str += @ninjaCoffeeFiles[name]
-        bundle.require 'edgecommondatasetconfig', {basedir: '../node_modules/'}
 
         @ninjaCoffeeExtends = @ninjaCoffeeExtends.sort (a, b)->
             return a.name < b.name
@@ -431,7 +430,7 @@ class NinjaWebServer
         @staticContent = {}
         @fileWatch     = {}
         @fileTimer     = {}
-
+        bundle.require 'edgecommondatasetconfig', {basedir: '../node_modules/'}
         @rebuildNinja()
 
         @app = koa()
