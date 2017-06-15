@@ -88,10 +88,7 @@ doLoadView = (viewName) ->
             if window[className]?
                 view = new window[className]
 
-                depList = view.getDependencyList()
-                doLoadDependencies(depList)
-                .then ()->
-                    resolve(view)
+                resolve(view)
 
             else
                 console.log "Unable to find view: ", className
