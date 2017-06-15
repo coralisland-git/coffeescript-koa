@@ -68026,7 +68026,18 @@ doLoadView = function(viewName) {
   var className;
   className = "View" + viewName;
   if (Views[viewName] != null) {
-    return Views[viewName];
+    return new Promise(function(resolve, reject) {
+      var depList, view;
+      if (window[className] != null) {
+        view = new window[className];
+        depList = view.getDependencyList();
+        return doLoadDependencies(depList).then(function() {
+          return resolve(view);
+        });
+      } else {
+        return console.log("Unable to find view: ", className);
+      }
+    });
   }
   return Views[viewName] = new Promise(function(resolve, reject) {
     return doLoadScript("/views/View" + viewName + ".js").then(function() {

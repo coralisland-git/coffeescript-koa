@@ -80,7 +80,22 @@ doLoadView = (viewName) ->
 
     className = "View" + viewName
 
-    if Views[viewName]? then return Views[viewName]
+    # -gao
+    #if Views[viewName]? then return Views[viewName]
+    if Views[viewName]?
+        return new Promise (resolve, reject) ->
+
+            if window[className]?
+                view = new window[className]
+
+                depList = view.getDependencyList()
+                doLoadDependencies(depList)
+                .then ()->
+                    resolve(view)
+
+            else
+                console.log "Unable to find view: ", className
+
     Views[viewName] = new Promise (resolve, reject) ->
 
         doLoadScript("/views/View" + viewName + ".js")
