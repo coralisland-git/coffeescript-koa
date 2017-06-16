@@ -21,7 +21,8 @@
     "npmc": "^5.0.3-canary.10",
     "pug": "^2.0.0-beta6",
     "serve-favicon": "^2.3.0",
-    "stylus": "^0.52.4"
+    "stylus": "^0.52.4",
+    "yargs": "^8.0.2"
   },
   "scripts": {
     "start": "cd server && coffee NinjaServer.coffee",
