@@ -250,7 +250,6 @@ class View
 
         true
 
-
     internalFindElements: (parentTag) =>
         ##|
         ##|  If you find a tag in the template with an id then create the variable automatically
@@ -281,8 +280,13 @@ class View
             h = @elHolder.height()
             console.log "View.coffee onResize a=#{a} b=#{b} w=#{w} h=#{h}:", @elHolder.el
             if a? and b? and a > 0 and b > 0
-                @elHolder.width(a)
-                @elHolder.height(b)
+                if @elHolder.setAbsolute?
+                    console.log "View.coffee using absolute 0,0,#{w},#{h}"
+                    @elHolder.setAbsolute(true)
+                    @elHolder.move(0,0,w,h)
+                else
+                    @elHolder.width(a)
+                    @elHolder.height(b)
 
         #@emitEvent "resize", [ w, h ]
 

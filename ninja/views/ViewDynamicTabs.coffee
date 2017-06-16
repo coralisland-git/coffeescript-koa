@@ -6,6 +6,7 @@ class ViewDynamicTabs extends View
         @currentSizeW = w
         @currentSizeH = h
         # console.log "ViewDynamicTabs onResize #{w}, #{h}", @elHolder
+        # console.log "THIS:", this
         if @tabs? then @tabs.onResize(w, h)
         true
 

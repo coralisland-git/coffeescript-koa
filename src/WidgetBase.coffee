@@ -424,10 +424,13 @@ class WidgetTag
                     viewCallback(view)
 
                 @view = view
-                # console.log @el, "WidgetBase setView name=#{viewName}, calling resize", @width(), @height()
-                @onResize(@width(), @height())
+                setTimeout ()=>
+                    console.log @el, "2 WidgetBase setView name=#{viewName}, calling resize", @width(), @height(), @el.height()
+                    view.onResize @width(), @height()
+                    resolve(view)
+                , 50
 
-                resolve(view)
+
 
     ##|
     ##|  Bind helper function, does a jQuery bind but first

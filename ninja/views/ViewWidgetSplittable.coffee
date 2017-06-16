@@ -21,8 +21,9 @@ class ViewWidgetSplittable extends View
         true
 
     setSize: (w, h)=>
-        if @wdtSplittable?
-            @wdtSplittable.setSize(w, h)
+        if @elHolder?
+            @elHolder.width w
+            @elHolder.height h
         true
 
     getDependencyList: () =>

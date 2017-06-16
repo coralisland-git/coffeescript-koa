@@ -244,6 +244,12 @@ class DynamicTabs
 		@currentSetWidth  = ww
 		@currentSetHeight = hh
 
+		##
+		## -gao
+		if @tabContent?
+			@tabContent.width ww
+			@tabContent.height hh
+
 		for id, tag of @tags
 			if id != @activeTab then continue
 

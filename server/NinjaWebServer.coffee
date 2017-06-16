@@ -374,7 +374,6 @@ class NinjaWebServer
         str = ""
         for name in @ninjaCoffeeNormal
             str += @ninjaCoffeeFiles[name]
-        bundle.require 'edgecommondatasetconfig', {basedir: '../node_modules/'}
 
         @ninjaCoffeeExtends = @ninjaCoffeeExtends.sort (a, b)->
             return a.name < b.name
@@ -439,7 +438,7 @@ class NinjaWebServer
         @staticContent = {}
         @fileWatch     = {}
         @fileTimer     = {}
-
+        bundle.require 'edgecommondatasetconfig', {basedir: '../node_modules/'}
         @rebuildNinja()
 
         @app = koa()
@@ -456,8 +455,8 @@ class NinjaWebServer
         ninjaPathMiddleware @app
 
         staticPathMiddleware @app, "../node_modules/mathjs/dist/", "/vendor/mathjs"
-        staticPathMiddleware @app, "../node_modules/mathjax/", "/vendor/mathjax"
-        staticPathMiddleware @app, "../node_modules/mathjax/extensions/", "/extensions"
+        # staticPathMiddleware @app, "../node_modules/mathjax/", "/vendor/mathjax"
+        # staticPathMiddleware @app, "../node_modules/mathjax/extensions/", "/extensions"
 
         ##|
         ##| Vendor or 3rd party

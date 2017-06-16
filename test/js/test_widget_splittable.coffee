@@ -43,6 +43,47 @@ $ ->
 		cursor: "col-resize"
 	}
 
+	addTestButton "Popup Splittable-Widget : Text/Tabs(Table & ImageStrip)", "Open", () ->
+		doPopupView "WidgetSplittable", "Splittable Widget", "popup_splittableWidget2", 900, 600
+		.then (view) ->
+			view.setData SplitData_V
+			view.show()
+
+			div_first_child = view.getFirst()
+			div_first_child.html '<p style="font-size:30px;">Dummy Text</p>'
+
+			view.getSecond().setView "DynamicTabs", (tabsView)->
+				newPromise () ->
+					yield loadZipcodes()
+					tabsView.tabs.doAddViewTab "Table", "Table", (view, tabText) ->
+						view.loadTable "zipcode"
+					tabsView.tabs.doAddViewTab "ImageStrip", "Images", (view, tabText) ->
+						view.init()
+						view.addImage newImage1
+						view.addImage newImage2
+						view.addImage newImage3
+						view.addImage newImage4
+						view.addImage newImage5
+						view.addImage newImage6
+						view.addImage newImage7
+						view.addImage newImage8
+						view.addImage newImage9
+						view.addImage newImage10
+						view.addImage newImage1.src
+						view.addImage newImage2.src
+						view.addImage newImage3.src
+						view.addImage newImage4.src
+						view.addImage newImage5.src
+						view.addImage newImage6.src
+						view.addImage newImage7.src
+						view.addImage newImage8.src
+						view.addImage newImage9.src
+						view.addImage newImage10.src
+						view.setSize 0, 400
+						view.render()
+				.then ()->
+					console.log "Done."
+					true
 
 	addTestButton "Simple Vertical Splittable Widget", "Open", () ->
 		addHolder("renderTest1")
@@ -103,55 +144,30 @@ $ ->
 		addHolder "renderTest1"
 		tabs = new DynamicTabs("#renderTest1")
 		tabs.doAddViewTab("WidgetSplittable", "Tab Splittable Widget", (view) ->
+			view.setSize(900, 600)
 			view.setData SplitData_V
-			view.setSize(0, 600)
 			view.show()
 		)
 		tabs.addTab "Empty Tab", "<p style='font-size:xx-large;'>--- Another Tab ---</p>"
 		true
 
-	addTestButton "Popup Splittable-Widget : Text/Tabs(Table & ImageStrip)", "Open", () ->
-		div_first_child = null
-		div_second_child = null
-		doPopupView "WidgetSplittable", "Splittable Widget", "popup_splittableWidget2", 900, 600
-		.then (view) ->
+	addTestButton "Splitter with Tables", "Open", () ->
+		addHolder("renderTest1")
+		div = new WidgetTag "div", "testWidget"
+		div.setAbsolute()
+		div.appendTo("#renderTest1")
+		div.setView "WidgetSplittable", (view)->
 			view.setData SplitData_V
+			view.setSize(900, 600)
 			view.show()
-			div_first_child = view.getWidget().getFirstChild()	
-			div_second_child = view.getWidget().getSecondChild()
-			div_first_child.html '<p style="font-size:30px;">Dummy Text</p>'
-			newPromise () ->
-				yield loadZipcodes()
-				tabs = new DynamicTabs(div_second_child)
-				tabs.doAddViewTab "Table", "Table", (view, tabText) ->
-					view.loadTable "zipcode"
-				tabs.doAddViewTab "ImageStrip", "Images", (view, tabText) ->
-					view.init()
-					view.addImage newImage1
-					view.addImage newImage2
-					view.addImage newImage3
-					view.addImage newImage4
-					view.addImage newImage5
-					view.addImage newImage6
-					view.addImage newImage7
-					view.addImage newImage8
-					view.addImage newImage9
-					view.addImage newImage10
-					view.addImage newImage1.src
-					view.addImage newImage2.src
-					view.addImage newImage3.src
-					view.addImage newImage4.src
-					view.addImage newImage5.src
-					view.addImage newImage6.src
-					view.addImage newImage7.src
-					view.addImage newImage8.src
-					view.addImage newImage9.src
-					view.addImage newImage10.src
-					view.setSize 0, 400
-					view.render()
-			.then ()->
-				console.log "Done."
+			wgt_first = view.getFirst()	
+			wgt_second = view.getSecond()
 
+			loadZipcodes().then ->
+				wgt_first.setView "Table", (view)->
+					view.loadTable "zipcode"
+				wgt_second.setView "Table", (view)->
+					view.loadTable "zipcode"
 		true
 
 	go()
