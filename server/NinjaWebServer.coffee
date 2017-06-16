@@ -14,6 +14,21 @@ WebServerHelper     = require './WebServerHelper'
 browserify          = require 'browserify'
 coffeeify           = require 'coffeeify'
 
+argv = require('yargs')
+    .usage('Usage: $0 --gen')
+    .demandOption([])
+    .argv
+
+saveNinjaFileAndExit = (strCSS, strJS) =>
+    
+    console.log "Writing ../ninja/ninja.css"
+    fs.writeFile "../ninja/ninja.css", strCSS, (err, done) ->
+        if err? then return console.log "Error writing Ninja.css", err
+    console.log "Writing ../ninja/ninja.js"
+    fs.writeFile "../ninja/ninja.js", strJS, (err, done) ->
+        if err? then return console.log "Error writing Ninja.js:", err
+    if argv.gen then process.exit(0)
+
 bundle = browserify
   extensions: ['.coffee']
 
@@ -367,23 +382,16 @@ class NinjaWebServer
             console.log "Extends:", info
             str += @ninjaCoffeeFiles[info.name]
 
+        strCss = ""
+        strCss += css for file, css of @ninjaStylusFiles
+
         ##
         ##--xg
         bundle.bundle (error, result) ->
             throw error if error?
             zlib.gzip result + str, (_, contentJs)=>
                 ninjaJavascript = contentJs
-                # fs.writeFile "../ninja/ninja.js", [result, str]
-                fs.writeFile "../ninja/ninja.js", result.toString()+str, (err, done) ->
-                    if err? then console.log "Error writing Ninja.js:", err
-
-        #fs.writeFile "../ninja/ninja.js", str
-        console.log "Writing ../ninja/ninja.js"
-
-        strCss = ""
-        strCss += css for file, css of @ninjaStylusFiles
-        fs.writeFile "../ninja/ninja.css", strCss
-        console.log "Writing ../ninja/ninja.css"
+            saveNinjaFileAndExit(strCss, result.toString() + str)
 
         zlib.gzip strCss, (_, contentCss)=>
             ninjaCss = contentCss
