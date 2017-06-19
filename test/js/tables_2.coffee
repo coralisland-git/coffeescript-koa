@@ -135,6 +135,25 @@ $ ->
 			table.sortByColumn('city','ASC')
 		true
 
+	addTestButton "cell color test", "Open", ()->
+		DataMap.setDataTypes "zipcode", [
+			name    : "color"
+			source  : "code"
+			visible : true
+			type    : "text"
+			width   : 300
+			hasColorFunction: true
+			cellColor  : (val, path) ->
+				if parseInt(val) > 1100
+					return "#0000ff"
+				return "#00ff00"
+		]
+		addHolder("renderTest1");
+		table = new TableView $("#renderTest1")
+		table.addTable "zipcode"
+		table.real_render()
+		true
+
 	addTestButton "auto hide columns from left on resize", "Open", ()->
 		DataMap.setDataTypes "zipcode", [
 			name    : "Custom-1"
@@ -145,6 +164,7 @@ $ ->
 			render  : (val, path) ->
 				return "250px"
 		]
+
 		DataMap.setDataTypes "zipcode", [
 			name    : "hidden column1"
 			source  : "code2"
