@@ -1636,6 +1636,11 @@ class TableView
 		else
 			displayValue = DataMap.getDataFieldFormatted col.tableName, location.recordId, location.sourceName
 			location.cell.html displayValue
+			colorValue = DataMap.getCellColor col.tableName, location.recordId, location.sourceName
+			if !colorValue? or colorValue is null
+				location.cell.css 'color', ''
+			else
+				location.cell.css 'color', colorValue
 
 		if @lockList? and @lockList.length > 0
 
