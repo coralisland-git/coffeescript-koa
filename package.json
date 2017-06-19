@@ -25,7 +25,8 @@
     "yargs": "^8.0.2"
   },
   "scripts": {
-    "start": "cd server && coffee NinjaServer.coffee --gen",
-    "docs": "codo"
+    "start": "cd server && coffee NinjaServer.coffee",
+    "docs": "codo",
+    "gen": "cd server && coffee NinjaServer.coffee --gen"
   }
 }
