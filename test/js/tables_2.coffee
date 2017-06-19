@@ -135,13 +135,30 @@ $ ->
 			table.sortByColumn('city','ASC')
 		true
 
-	addTestButton "cell color test", "Open", ()->
+	addTestButton "Cell color test 1", "Open", ()->
 		DataMap.setDataTypes "zipcode", [
-			name    : "color"
+			name    : "coloredCity"
+			source  : "city"
+			visible : true
+			type    : "text"
+			width   : 200
+			hasColorFunction: true
+			cellColor  : (val, path) ->
+				return "red"
+		]
+		addHolder("renderTest1");
+		table = new TableView $("#renderTest1")
+		table.addTable "zipcode"
+		table.real_render()
+		true
+
+	addTestButton "Cell color test 2", "Open", ()->
+		DataMap.setDataTypes "zipcode", [
+			name    : "coloredCode"
 			source  : "code"
 			visible : true
 			type    : "text"
-			width   : 300
+			width   : 100
 			hasColorFunction: true
 			cellColor  : (val, path) ->
 				if parseInt(val) > 1100
