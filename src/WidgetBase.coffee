@@ -477,8 +477,8 @@ class WidgetTag
 
         ## -gao
         ## set width of element to the value its data-formatter has
-        if (width = dm.types[tableName]?.col[fieldName]?.getFormatter()?.width)?
-            @element.style.maxWidth = "#{width}px"
+        if (inputWidth = dm.types[tableName]?.col[fieldName]?.getFormatter()?.input_width)?
+            @element.style.maxWidth = "#{inputWidth}px"
         
         ## Add class `data` as a default one for widget binded to a table field    
         classes = ["data"]

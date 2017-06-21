@@ -22,11 +22,11 @@ newImage10.src = "./js/test_Data/images/10.jpg"
 $ ->
 
 	$("body").append '''
-	    <style type="text/css">
-	    .scrollcontent {
-	        height : 100% !important;
-	    }
-	    </style>
+		<style type="text/css">
+		.scrollcontent {
+			height : 100% !important;
+		}
+		</style>
 	'''
 	
 	SplitData_V = {
@@ -169,5 +169,20 @@ $ ->
 				wgt_second.setView "Table", (view)->
 					view.loadTable "zipcode"
 		true
+
+
+	addTestButton "Table & TableDetailed in Splittable", "Open", () ->
+		doPopupView "WidgetSplittable", "Splittable Widget", "popup_splittableWidget3", 1500, 800
+		.then (view) ->
+			view.setData SplitData_H
+			view.show()
+			wgt_first = view.getFirst()
+			wgt_second = view.getSecond()
+			loadZipcodes().then ->
+				wgt_first.setView "Table", (view)->
+					view.loadTable "zipcode"
+				wgt_second.setView "PopupTable", (view)->
+					view.loadTable "zipcode", true
+				true    	
 
 	go()
