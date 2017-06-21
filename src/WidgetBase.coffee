@@ -364,6 +364,14 @@ class WidgetTag
 
         return this
 
+    ##
+    ## -gao
+    ## set or get style of the current element
+    css: (attr, value) =>
+        if !value? or value is null
+            return @el.css attr
+        return @el.css attr, value
+
     show: ()=>
         if @visible != true then @el.show()
         @visible = true

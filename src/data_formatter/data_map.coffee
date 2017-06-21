@@ -542,3 +542,20 @@ class DataMap
 
 		dm.cachedFormat[path] = currentValue
 		return currentValue
+
+	@getCellColor: (tableName, keyValue, fieldName) =>
+		column = {}
+		dm = DataMap.getDataMap()
+		if dm.types[tableName]?.col[fieldName]?
+			column = dm.types[tableName]?.col[fieldName]
+		
+		if !column.getHasColorFunction? or !column.getHasColorFunction()
+			return null
+
+		dm = DataMap.getDataMap()
+
+		value = dm.engine.getFast tableName, keyValue, fieldName
+		rowData = {}
+		colorValue = column.getCellColor(value, keyValue, rowData)
+
+		return colorValue		

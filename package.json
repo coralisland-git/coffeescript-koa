@@ -1,6 +1,6 @@
 {
   "name": "NinjaCommon",
-  "version": "0.13.0",
+  "version": "0.20.0",
   "private": true,
   "dependencies": {
     "browserify": "^14.3.0",
@@ -8,8 +8,9 @@
     "coffee-middleware": "^0.3.0",
     "coffee-script": "^1.10.0",
     "coffeeify": "^2.1.0",
+    "concat-map": "0.0.1",
     "connect-coffee-script": "^0.2.1",
-    "edgecommondatasetconfig": "git+ssh://git@gitlab.protovate.com:Edge/EdgeCommonDataSetConfig.git",
+    "edgecommondatasetconfig": "git+ssh://git@gitlab.protovate.com/Edge/EdgeCommonDataSetConfig.git",
     "fluidity": "^0.2.3",
     "glob-all": "^3.1.0",
     "ico": "^0.3.3",
@@ -20,10 +21,12 @@
     "nib": "^1.1.0",
     "pug": "^2.0.0-beta6",
     "serve-favicon": "^2.3.0",
-    "stylus": "^0.52.4"
+    "stylus": "^0.52.4",
+    "yargs": "^8.0.2"
   },
   "scripts": {
     "start": "cd server && coffee NinjaServer.coffee",
-    "docs": "codo"
+    "docs": "codo",
+    "gen": "cd server && coffee NinjaServer.coffee --gen"
   }
 }

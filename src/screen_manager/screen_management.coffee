@@ -80,7 +80,19 @@ doLoadView = (viewName) ->
 
     className = "View" + viewName
 
-    if Views[viewName]? then return Views[viewName]
+    # -gao
+    #if Views[viewName]? then return Views[viewName]
+    if Views[viewName]?
+        return new Promise (resolve, reject) ->
+
+            if window[className]?
+                view = new window[className]
+
+                resolve(view)
+
+            else
+                console.log "Unable to find view: ", className
+
     Views[viewName] = new Promise (resolve, reject) ->
 
         doLoadScript("/views/View" + viewName + ".js")
@@ -214,7 +226,8 @@ doPopupViewOnce = (viewName, title, settingsName, w, h, tabName, callbackWithVie
         else
             view.tabNames.push tabName
             view.tabs.doAddViewTab viewName, tabName, callbackWithView
-            view.tabs.show "tab#{view.tabNames.indexOf(tabName)}"
+            .then (v)=>
+                view.tabs.show "tab#{view.tabNames.indexOf(tabName)}"
 
 doLoadScreen = (screenName, optionalArgs) ->
 
