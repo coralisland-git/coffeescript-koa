@@ -2,7 +2,7 @@
 ##  This is the template for a generic screen
 ##
 
-class Screen
+class Screen extends NinjaContainer
 
     classid          : ""
     initialized      : false
@@ -15,7 +15,9 @@ class Screen
     ## Initialize the screen object and store the screen's main class
     constructor   : () ->
 
-        @classid = "#" + @constructor.name + ".screen"
+        super()
+
+        @classid     = "#" + @constructor.name + ".screen"
         @firstEvents = true
 
         $(window).on "resize", @getScreenSize
@@ -78,8 +80,8 @@ class Screen
         ##|  Nothing
 
     getScreenSize: ()=>
-        height = $(window).height()
-        width  = $(window).width()
+        height = $(window).outerHeight()
+        width  = $(window).outerWidth()
         screen = $(@classid)
         pos    = screen.position()
         offset = screen.offset()
@@ -88,15 +90,20 @@ class Screen
             setTimeout @getScreenSize, 10
             return
 
+        pos.top++
         width -= pos.left
         height -= pos.top
 
         if @firstEvents
+
+            @setHolder $(@classid)
+            @setAbsolute()
+            @move pos.left, pos.top, width, height
+            # console.log "getScreenSize width=", width, "height=", height, "first=", @firstEvents, @el, @element
             @onScreenReady width, height
-            @onResize width, height, true
             @firstEvents = false
         else
-            @onResize width, height, false
+            @setSize width, height
 
         return { width: width, height: height }
 

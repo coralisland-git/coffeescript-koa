@@ -112,7 +112,7 @@ class ViewDynamicTabs extends View
     ##|  Add a table to a tab which is a common function so
     ##|  we have included management for tabs with tables globally
     ##|
-    doAddTableTab : (tableName, tabText, sortOrder = null) =>
+    doAddTableTab : (tableName, tabText, sortOrder = null, callbackWithTableView) =>
 
         new Promise (resolve, reject)=>
 
@@ -121,12 +121,13 @@ class ViewDynamicTabs extends View
                 if !@tables? then @tables = {}
                 table = view.loadTable tableName
                 table.showCheckboxes = true
-                table.setStatusBarEnabled()
-                table.updateRowData()
                 @tables[tableName] = table
                 @tables[tableName].tab = @tabs[tabText]
-
                 @tabs[tabText].table = table
+
+                if callbackWithTableView?
+                    callbackWithTableView(view)
+
                 return true
             , sortOrder
 

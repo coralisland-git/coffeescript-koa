@@ -77,7 +77,7 @@ class NinjaContainer
     ##|  Creates a splitter from the current view and calls the callback with splitter, and
     ##|  two other defined views created
     ##|
-    doSplitView: (locationName, viewName1, viewName2, callBackWithViews)=>
+    doSplitView: (viewName1, viewName2, callBackWithViews)=>
 
         new Promise (resolve, reject)=>
 
@@ -550,8 +550,13 @@ class NinjaContainer
             @cachedOuterWidth  = @outerWidth()
             @cachedOffset      = @el.offset()
             @cachedPosition    = @el.position()
-            @x                 = @cachedPosition.left
-            @y                 = @cachedPosition.top
+
+            if @cachedPosition? and @cachedPosition.top?
+                @x = @cachedPosition.left
+                @y = @cachedPosition.top
+            else
+                @x = 0
+                @y = 0
 
             @onResize(@cachedOuterWidth, @cachedOuterHeight)
 

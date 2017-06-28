@@ -274,7 +274,7 @@ class TableView
 			@on "click_#{button.getSource()}", config.callback
 
 		@resetCachedFromSize()
-		@updateVisibleText()			
+		@updateVisibleText()
 
 		true
 

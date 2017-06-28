@@ -16,6 +16,15 @@ class ViewTable extends View
         @resetSize()
         true
 
+    setAutoFillWidth: ()=>
+        if !@table?
+            setTimeout @setAutoFillWidth, 100
+            return
+
+        @table.setAutoFillWidth(true)
+        @resetSize()
+        true
+
     ##|
     ##|  Show or hide the user input filters
     setShowFilter: (showFilters)=>
