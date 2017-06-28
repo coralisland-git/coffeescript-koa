@@ -21,44 +21,19 @@ newImage10.src = "./js/test_Data/images/10.jpg"
 
 $ ->
 
-	$("body").append '''
-		<style type="text/css">
-		.scrollcontent {
-			height : 100% !important;
-		}
-		</style>
-	'''
-	
-	SplitData_V = {
-		sizes: [40, 60]
-		direction: "vertical"
-		gutterSize: 6
-		cursor: "row-resize"
-		minSize: 20
-	}
-	SplitData_H = {
-		sizes: [30, 70]
-		direction: "horizontal"
-		gutterSize: 6
-		cursor: "col-resize"
-	}
-
 	addTestButton "Popup Splittable-Widget : Text/Tabs(Table & ImageStrip)", "Open", () ->
-		doPopupView "WidgetSplittable", "Splittable Widget", "popup_splittableWidget2", 900, 600
-		.then (view) ->
-			view.setData SplitData_V
-			view.show()
+		doPopupView "Splittable", "Splittable Widget", "popup_splittableWidget2", 900, 600, (view)->
 
-			div_first_child = view.getFirst()
-			div_first_child.html '<p style="font-size:30px;">Dummy Text</p>'
+			view.getFirst().html '<p style="font-size:30px;">Dummy Text</p>'
 
 			view.getSecond().setView "DynamicTabs", (tabsView)->
 				newPromise () ->
 					yield loadZipcodes()
-					tabsView.tabs.doAddViewTab "Table", "Table", (view, tabText) ->
+
+					tabsView.doAddViewTab "Table", "Table", (view) ->
 						view.loadTable "zipcode"
-					tabsView.tabs.doAddViewTab "ImageStrip", "Images", (view, tabText) ->
-						view.init()
+
+					tabsView.doAddViewTab "ImageStrip", "Images", (view) ->
 						view.addImage newImage1
 						view.addImage newImage2
 						view.addImage newImage3
@@ -79,110 +54,97 @@ $ ->
 						view.addImage newImage8.src
 						view.addImage newImage9.src
 						view.addImage newImage10.src
-						view.setSize 0, 400
-						view.render()
-				.then ()->
-					console.log "Done."
-					true
 
-	addTestButton "Simple Vertical Splittable Widget", "Open", () ->
-		addHolder("renderTest1")
-		div = new WidgetTag "div", "testWidget"
-		div.setAbsolute()
-		div.appendTo("#renderTest1")
-		div.setView "WidgetSplittable", (view)->
-			view.setData SplitData_V
-			view.setSize(900, 600)
-			view.show()
-		true
-	
-	addTestButton "Simple Horizontal Splittable Widget", "Open", () ->
-		addHolder "renderTest1"
-		div = new WidgetTag "div", "testWidget"
-		div.setAbsolute()
-		div.appendTo "#renderTest1"
-		div.setView "WidgetSplittable", (view) ->
-			view.setData SplitData_H
-			view.setSize(900, 600)
-			view.show()
-		true
+	addTestButton "Simple Vertical 50/50", "Open", () ->
+		addHolder("")
+		.setView "Splittable", (splitter)->
+			splitter.setPercent(50)
+			splitter.getFirst().html "Left side should be 50%"
+			splitter.getSecond().html "Right side should be 50%"
+
+	addTestButton "Simple Vertical 50/50 - Left Min Size", "Open", () ->
+		addHolder("")
+		.setView "Splittable", (splitter)->
+			splitter.setPercent(50)
+			splitter.getFirst().html "Left side should be 50%, min 200px"
+			splitter.getSecond().html "Right side should be 50%"
+			splitter.getFirst().setMinWidth(200)
+
+	addTestButton "Simple Horizontal 50/50", "Open", () ->
+		addHolder("")
+		.setView "Splittable", (splitter)->
+			splitter.setHorizontal()
+			splitter.setPercent(50)
+			splitter.getFirst().html "Top should be 50%"
+			splitter.getSecond().html "Bottom should be 50%"
+
+	addTestButton "Simple Horizontal 50/50 with Events", "Open", () ->
+		addHolder("")
+		.setView "Splittable", (splitter)->
+			splitter.setHorizontal()
+			splitter.setPercent(50)
+			splitter.getFirst().html "Top should be 50%"
+			splitter.getSecond().html "Bottom should be 50%"
+
+			superResize = splitter.onResize
+			splitter.onResize = (w, h)->
+				superResize(w,h)
+				PercentTop = Math.ceil(splitter.getPercent())
+				PercentBot = 100 - PercentTop
+				splitter.getFirst().html "Top should be #{PercentTop}% or #{splitter.size1} px"
+				splitter.getSecond().html "Bottom should be #{PercentBot}% or #{splitter.size2} px"
 
 	addTestButton "Vertical & Horizontal Splittable Widgets", "Open", () ->
-		addHolder("renderTest1")
-		div_first_child = null
-		div_second_child = null
-		div_parent = new WidgetTag "div", "testWidget", "widget_Parent"
-		div_parent.setAbsolute()
-
-		div_parent.appendTo("#renderTest1")
-		div_parent.setView "WidgetSplittable", (view)->
-			view.setData SplitData_H
-			view.setSize(900, 600)
-			view.show()
-			div_first_child = view.getWidget().getFirstChild()	
-			div_second_child = view.getWidget().getSecondChild()
-
-		setTimeout ->
-			console.log "setTimeout"
-			div_first_child.setView "WidgetSplittable", (view) ->
-				view.setData SplitData_V
-				view.show()
-			div_second_child.setView "WidgetSplittable", (view) ->
-				view.setData SplitData_V
-				view.show()
-		, 300
-		true
-
-	addTestButton "Popup Splittable Widget", "Open", () ->
-		doPopupView "WidgetSplittable", "Splittable Widget", "popup_splittableWidget1", 900, 600
-		.then (view) ->
-			view.setData SplitData_V
-			view.show()
-		true
+		addHolder("")
+		.setView "Splittable", (splitter)->
+			splitter.setHorizontal()
+			splitter.setPercent(40)
+			splitter.getFirst().html "Top should be 40%"
+			splitter.getSecond().setView "Splittable", (splitter2)->
+				splitter2.setPercent(40)
+				splitter2.getFirst().html "Bottom Left side should be 40%"
+				splitter2.getSecond().html "Bottom Right side should be 60%"
 
 	addTestButton "Tab Splittable Widget", "Open", () ->
-		addHolder "renderTest1"
-		tabs = new DynamicTabs("#renderTest1")
-		tabs.doAddViewTab("WidgetSplittable", "Tab Splittable Widget", (view) ->
-			view.setSize(900, 600)
-			view.setData SplitData_V
-			view.show()
-		)
-		tabs.addTab "Empty Tab", "<p style='font-size:xx-large;'>--- Another Tab ---</p>"
+		addHolder()
+		.setView "DynamicTabs", (tabs)->
+			tabs.doAddViewTab "Splittable", "Tab Splittable Widget", (splitter) ->
+				splitter.setPercent(25)
+				splitter.getFirst().html "Left side should be 25%"
+				splitter.getSecond().html "Right side should be 75%"
+
+			tabs.addTab "Empty Tab", "<p style='font-size:xx-large;'>--- Another Tab ---</p>"
+
 		true
 
 	addTestButton "Splitter with Tables", "Open", () ->
-		addHolder("renderTest1")
-		div = new WidgetTag "div", "testWidget"
-		div.setAbsolute()
-		div.appendTo("#renderTest1")
-		div.setView "WidgetSplittable", (view)->
-			view.setData SplitData_V
-			view.setSize(900, 600)
-			view.show()
-			wgt_first = view.getFirst()	
-			wgt_second = view.getSecond()
+
+		addHolder("")
+		.setView "Splittable", (splitter)->
+			splitter.setHorizontal()
+			splitter.setPercent(40)
 
 			loadZipcodes().then ->
-				wgt_first.setView "Table", (view)->
-					view.loadTable "zipcode"
-				wgt_second.setView "Table", (view)->
-					view.loadTable "zipcode"
+				splitter.getFirst().setView "Table", (viewTable1)->
+					viewTable1.loadTable "zipcode"
+
+				splitter.getSecond().setView "Table", (viewTable2)->
+					viewTable2.loadTable "zipcode"
 		true
 
 
 	addTestButton "Table & TableDetailed in Splittable", "Open", () ->
-		doPopupView "WidgetSplittable", "Splittable Widget", "popup_splittableWidget3", 1500, 800
-		.then (view) ->
-			view.setData SplitData_H
-			view.show()
-			wgt_first = view.getFirst()
-			wgt_second = view.getSecond()
+
+		doPopupView "Splittable", "Splittable Widget", "popup_splittableWidget3", 1500, 800, (view)->
+			view.setPercent(70)
+			view.getSecond().setMinWidth(300)
+
 			loadZipcodes().then ->
-				wgt_first.setView "Table", (view)->
-					view.loadTable "zipcode"
-				wgt_second.setView "PopupTable", (view)->
-					view.loadTable "zipcode", true
-				true    	
+
+				view.getFirst().setView "Table", (viewTable1)->
+					viewTable1.loadTable "zipcode"
+
+				view.getSecond().setView "TableDetail", (viewTable2)->
+					viewTable2.loadTable "zipcode"
 
 	go()

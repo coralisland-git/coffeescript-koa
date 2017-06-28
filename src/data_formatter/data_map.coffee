@@ -180,7 +180,7 @@ class DataMap
 
 		for sourceName, obj of savedConfig
 
-			if sourceName == "_lastModified" then continue
+			if sourceName == "_lastModgetified" then continue
 			if typeof obj != "object" then continue
 			dm.types[tableName].unserialize([ obj ], true)
 
@@ -544,18 +544,21 @@ class DataMap
 		return currentValue
 
 	@getCellColor: (tableName, keyValue, fieldName) =>
-		column = {}
+
+		column = null
 		dm = DataMap.getDataMap()
 		if dm.types[tableName]?.col[fieldName]?
 			column = dm.types[tableName]?.col[fieldName]
-		
+		else
+			return null
+
 		if !column.getHasColorFunction? or !column.getHasColorFunction()
 			return null
 
-		dm = DataMap.getDataMap()
-
 		value = dm.engine.getFast tableName, keyValue, fieldName
 		rowData = {}
-		colorValue = column.getCellColor(value, keyValue, rowData)
 
-		return colorValue		
+		colorFunction = column.getColorFunction()
+		colorValue = colorFunction(value, keyValue, rowData)
+
+		return colorValue

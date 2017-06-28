@@ -131,7 +131,7 @@ class WebServerHelper
 
         new Promise (resolve, reject)->
 
-            # console.log "Reading File:", filename, typeof filename
+            console.log "Reading File:", filename, typeof filename
 
             fs.readFile filename, 'utf8', (err, content)->
 

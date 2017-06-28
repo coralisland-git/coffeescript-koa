@@ -23,13 +23,6 @@ newImage11.src = "https://www.e-architect.co.uk/images/jpgs/concept/large-span-t
 
 $ ->
 
-	$("body").append '''
-	    <style type="text/css">
-	    .scrollcontent {
-	        height : 100% !important;
-	    }
-	    </style>
-	'''
 	##|
 	##|  Load the zipcodes JSON file.
 	##|  This will insert the zipcodes into the global data map.
@@ -61,12 +54,13 @@ $ ->
 	addTestButton "Hello World", "Open", (e)->
 
 		popup = new PopupWindow "Test Window", 50, 50
-		popup.windowScroll.append $ "<div> Hello World </div>"
+		popup.getBody().html "<div> Hello World </div>"
 		return 1
 
 	addTestButton "Scroll Test", "Open", (e)->
 
 		popup = new PopupWindow "Test Window", 50, 50
+		popup.getBody().setScrollable()
 
 		str = ""
 		for x in [0..100]
@@ -77,7 +71,8 @@ $ ->
 
 	addTestButton "Toolbar Test", "Open", (e)->
 
-		popup = new PopupWindow "Test Window", 500, 400
+		popup = new PopupWindow "Test Window", 500, 400,
+			scrollable: true
 
 		navButton = new NavButton("Test", "toolbar-btn navbar-btn", {
 			"data-click": "sampleAttribute"
@@ -115,7 +110,8 @@ $ ->
 			tableName: "testTable"
 			w: 400
 			h: 500
-		popup.windowScroll.append $ "<div> Hello World </div>"
+
+		popup.getBody().html $ "<div> Hello World </div>"
 
 	addTestButton "Popup Modal", "Open", (e) ->
 
@@ -123,30 +119,22 @@ $ ->
 		popup.modal(500, 400)
 		popup.html "Testing"
 
-	addTestButton "Hide Popup with keyValue Test", "Open", (e) ->
-
-		popup = new PopupWindow "Test Window",50,50,
-			tableName: "zipcodes"
-			keyValue: 28117
-			windowName: "ZipcodeDetailWindow"
-			w: 600
-			h: 200
-		popup.windowScroll.append $ "<div> Hello World </div>"
-
 	addTestButton "PopupViewOnce 1 Table", "Open", (e) ->
+
 		doPopupViewOnce "Table", "Test1", "test1_table", 600, 400, "Tab1", (view, tabText) ->
 			view.loadTable 'zipcode'
 
 	addTestButton "PopupViewOnce 1 Table (Empty)", "Open", (e) ->
+
 		doPopupViewOnce "Table", "Test1", "test1_table", 600, 400, "Tab1", (view, tabText) ->
 			view.loadTable 'zipcode'
+
 		doPopupViewOnce "Table", "Test1", "test2_table", 600, 400, "Tab with empty", (view, tabText) ->
-			# view.loadTable 'zipcode'
 			view.loadTable "totally_empty_table"
 
 	addTestButton "PopupViewOnce 1 ImageStrip", "Open", (e) ->
+
 		doPopupViewOnce "ImageStrip", "Test1", "test1_imagestrip", 600, 400, "Tab2", (view, tabText) ->
-			view.init()
 			view.addImage newImage1
 			view.addImage newImage2
 			view.addImage newImage3
@@ -158,7 +146,6 @@ $ ->
 			view.addImage newImage9
 			view.addImage newImage10
 			view.addImage newImage11
-			view.render()
 
 	addTestButton "PopupViewOnce 2 Form", "Open", (e) ->	
 		doPopupViewOnce "Form", "Test2", "test2_form-popup", 399, 300, "Tab1", (view, tabText) ->

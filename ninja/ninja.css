@@ -364,12 +364,9 @@
 .scrollable {
   background-color: #fff;
 }
-.scrollcontent .navbar-default {
+.navbar-default {
   background: #fff;
-  margin-top: 15px;
-}
-.scrollcontent .navbar-default .cancel-btn {
-  margin-right: 5px;
+  border-bottom: 1px solid #aaa;
 }
 .PopupMenuCal {
   position: absolute;
@@ -477,6 +474,9 @@
   font-weight: 300;
   border-top: 1px solid #bbb;
   font-size: 0.8vw;
+}
+viewHolder {
+  overflow: auto;
 }
 .PopupMenu {
   -webkit-touch-callout: none;
@@ -622,6 +622,9 @@ column-rule-color: #707070 li.title {
 }
 .floatingDropdown:hover {
   border: 1px solid #0b0;
+}
+viewHolder {
+  overflow: auto;
 }
 .popupNavBar {
   position: absolute;
@@ -1365,155 +1368,6 @@ span.fage {
 .marker .dragging {
   background-color: #ec9720;
 }
-.ninja-tabs {
-  -webkit-touch-callout: none;
-  -moz-touch-callout: none;
-  -ms-touch-callout: none;
-  -o-touch-callout: none;
-  touch-callout: none;
-  webkit-tap-highlight-color: #000;
-  tap-highlight-color: #000;
-  -webkit-text-size-adjust: none;
-  -moz-text-size-adjust: none;
-  -o-text-size-adjust: none;
-  text-size-adjust: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -o-user-select: none;
-  user-select: none;
-  float: none;
-  list-style: disc outside none;
-  text-decoration: none;
-  font-size: 100%;
-  outline: none;
-}
-.ninja-tabs .clr {
-  clear: both;
-}
-.ninja-tabs ul {
-  list-style: none;
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  border-bottom: 1px solid #909090;
-  background-color: #fff;
-}
-.ninja-tabs li {
-  height: 32px;
-  font-size: 11px;
-  cursor: pointer;
-  display: inline-block;
-  margin-left: 0px;
-  margin-right: 0px;
-  margin-top: 0px;
-  margin-bottom: 0px;
-  padding-left: 8px;
-  padding-right: 8px;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  color: #143c60;
-  vertical-align: middle;
-  border-right: 1px solid #eee;
-}
-.ninja-tabs li .badge {
-  margin-right: 10px;
-}
-.ninja-tabs li.badge-warning {
-  background-color: #f0ad4e;
-  color: #fff;
-}
-.ninja-tabs li.badge-primary {
-  background-color: #337ab7;
-  color: #fff;
-}
-.ninja-tabs li.badge-success {
-  background-color: #5cb85c;
-  color: #fff;
-}
-.ninja-tabs li.badge-danger {
-  background-color: #d9534f;
-  color: #fff;
-}
-.ninja-tabs li.badge-info {
-  background-color: #5bc0de;
-  color: #fff;
-}
-.ninja-tabs li .ninja-tab-text {
-  display: inline-block;
-  line-height: 24px;
-  font-size: 14px;
-}
-.ninja-tabs li .ninja-badge {
-  display: inline-block;
-  margin-right: 4px;
-  margin-left: 10px;
-  border-radius: 50%;
-  border: 1px solid #ddd;
-  background-color: #eee;
-  width: auto;
-  min-width: 20px;
-  height: 20px;
-  padding-top: 4px;
-  text-align: center;
-}
-.ninja-tabs li.active {
-  border-bottom: 2px solid #007cc0;
-  color: #002c80;
-  font-weight: 500;
-}
-.ninja-tabs li.active .ninja-badge {
-  border: 1px solid darker(#007cc0, 30);
-  background-color: #007cc0;
-  color: #fff;
-}
-.ninja-nav-body {
-  padding: 0;
-  margin: 0;
-  background-color: #fff;
-}
-.ViewWidgetSplittable {
-  background: transparent;
-  width: 100%;
-  max-width: 100%;
-  height: 100%;
-  border: none !important;
-}
-.widgetsplittable-container {
-  width: 100%;
-  height: 100%;
-  background-color: #f6f6f6;
-  box-sizing: border-box;
-}
-.widgetsplittable-container .widgetsplittable {
-  height: 100%;
-  width: 100%;
-}
-.split {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  overflow-y: hidden;
-  overflow-x: hidden;
-  border: 1px solid #c0c0c0;
-  background-color: #fff;
-}
-.split.split-horizontal {
-  height: 100%;
-  float: left;
-}
-.gutter {
-  background-color: transparent;
-  background-repeat: no-repeat;
-  background-position: 50%;
-}
-.gutter.gutter-horizontal {
-  cursor: col-resize;
-  background-image: url("/images/grips_horizontal.png");
-  height: 100%;
-  float: left;
-}
-.gutter.gutter-vertical {
-  cursor: row-resize;
-  background-image: url("images/grips_vertical.png");
+viewHolder {
+  overflow: auto;
 }

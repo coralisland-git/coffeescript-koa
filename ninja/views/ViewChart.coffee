@@ -16,10 +16,6 @@ class ViewChart extends View
         @table.addTable @tableName
         @table.setFixedHeaderAndScrollable()
         @table.setStatusBarEnabled()
-        @table.setHolderToBottom()
         @table.render()
-
-        @on "resize", ()=>
-            setTimeout @table.setHolderToBottom, 10
 
         return @table

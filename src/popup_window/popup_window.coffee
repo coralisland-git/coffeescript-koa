@@ -26,9 +26,6 @@ class PopupWindow
     # @property [Boolean] isVisible if popup is visible on current screen default false
     isVisible:   false
 
-    # @property [Boolean] allowHorizontalScroll if horizontal scrollable default false
-    allowHorizontalScroll: false
-
     # @property [Object] configurations the configurations about table and savable popup
     configurations:
         tableName  : null
@@ -62,12 +59,6 @@ class PopupWindow
     ## @return [Boolean]
     ##
     open: () =>
-
-        if @configurations.scrollable
-            setTimeout () =>
-                @update()
-            , 20
-
         @popupWindowHolder.show()
         @isVisible = true
         true
@@ -268,6 +259,7 @@ class PopupWindow
 
         ## -xg
         @wgt_PopupWindowHolder.onResize(@popupWidth, @getInnerWindowSize())
+        @getBody().setSize(@popupWidth, @getInnerWindowSize())
 
         if @view? and @view.onResize?
             @view.onResize(@popupWidth, @getInnerWindowSize())
@@ -305,37 +297,9 @@ class PopupWindow
                     h: @popupHeight
                     w: @popupWidth
 
-    ##|
-    ##|
-    addToolbar: (buttonList)=>
 
-        @toolbarHeight = 42
-
-        gid = "pnav" + GlobalValueManager.NextGlobalID()
-        @navBar = $ "<div />",
-            id: gid
-            class : 'popupNavBar'
-
-        @navBar.css
-            position : "absolute"
-            top      : @windowTitle.height()+6
-            left     : 0
-            height   : @toolbarHeight
-            width    : "100%"
-
-        @popupWindowHolder.append @navBar
-
-        @toolbar = new DynamicNav("#" + gid)
-        for button in buttonList
-            @toolbar.addElement button
-        @toolbar.render()
-
-        @windowBodyWrapperTop.css "top", @windowTitle.outerHeight() + @toolbarHeight
-
-        # console.log "PopupWindow addToolbar, resizing height of windowWrapper"
-        @windowWrapper.height @getInnerWindowSize()
-
-        true
+    getBody: ()=>
+        return @wgt_WindowScroll
 
     ## -------------------------------------------------------------------------------------------------------------
     ## function to create popup window holder only if keyValue is not defined
@@ -506,7 +470,12 @@ class PopupWindow
 
     setView: (@view)=>
 
-    ## -xg
+    ##|
+    ##|  force the window to update after an external resize or something
+    resetSize: ()=>
+        @resize @popupWidth, @popupHeight
+        true
+
     ## function to emit resize event for popupwindow instance
     ##
     onResize: (a, b) =>

@@ -30,13 +30,6 @@ TableTestdata.push
     source      : "imagelist"
     editable    : true
 $ ->
-    $("body").append '''
-        <style type="text/css">
-        .scrollcontent {
-            height: 100%;
-        }
-        </style>
-    '''
 
 ##|
 ##|  This is just for diagnostics,  you don't need to verify the data map is
@@ -75,65 +68,44 @@ $ ->
 
         true
 
-	addTestButton "context menu with sorting in header according to DataType", "Open", ()->
-		addHolder("renderTest1")
-		table = new TableView $("#renderTest1")
-		table.addTable "zipcode"
-		table.real_render()
-		#table.updateRowData()
+	addTestButton "Show Table Editor", "Open", ()->
+
+		tableName = "zipcode"
+		doPopupView "ShowTableEditor", "Editing table: #{tableName}", "tableditor", 1300, 800, (view)->
+			view.showTableEditor tableName
+
 		true
 
-	addTestButton "Image Strip from Table", "Open", ()->
-		addHolder("renderTest1")
-		table = new TableView $("#renderTest1")
-		table.addTable "testData"
-		table.real_render()
-		#table.updateRowData()
-		true
-	
 	addTestButton "Tabs in Tabs with Table", "Open", ()->
-		addHolder "renderTest1"
-		$("#renderTest1").height 800
-		tabs = new DynamicTabs "#renderTest1"
-		tabs.elHolder.width 1000
-		tabs.elHolder.height 800
-		tab1 = tabs.addTab "Parent Tab1", '<div id="parentTab1"></div>'
-		tab2 = tabs.addTab "Parent Tab2", '<div id="parentTab2"></div>'
-		newPromise ()->
-			yield loadZipcodes()
-			yield loadStockData()
-			yield loadDatafromJSONFile("testData")
-			yield loadDatafromJSONFile("SaveZipcodeData")
-			DataMap.changeColumnAttribute "testData", "imagelist", "editable", true
-			tabs1 = new DynamicTabs "#parentTab1"
-			tabs1.elHolder.width 1000
-			tabs1.elHolder.height 800
-			tabs1.doAddTableTab "zipcode", "Zipcodes"
-			tabs1.doAddTableTab "stocks", "Stocks"
+		addHolder().setView "DynamicTabs", (viewTabs1)->
 
-			tabs2 = new DynamicTabs "#parentTab2"
-			tabs2.elHolder.width 1000
-			tabs2.elHolder.height 800			
-			tabs2.doAddTableTab "SaveZipcodeData", "SaveZipcodeData"	
-			tab = yield tabs2.doAddTableTab "testData", "TestData"
-			tab.table.moveActionColumn "distance"
+			newPromise ()->
+
+				yield loadZipcodes()
+				yield loadStockData()
+				yield loadDatafromJSONFile("testData")
+				yield loadDatafromJSONFile("SaveZipcodeData")
+
+				DataMap.changeColumnAttribute "testData", "imagelist", "editable", true
+
+			.then ()->
+
+				viewTabs1.doAddViewTab "DynamicTabs", "Top Tab 1", (viewTabs1A)->
+					viewTabs1A.doAddTableTab "zipcode", "Zipcodes"
+					viewTabs1A.doAddTableTab "stocks", "Stocks"
+
+				viewTabs1.doAddViewTab "DynamicTabs", "Top Tab 2", (viewTabs1B)->
+					viewTabs1B.doAddTableTab "zipcode", "Zipcodes2"
+					viewTabs1B.doAddTableTab "stocks", "Stocks2"
+
+					# console.log "HERE Adding TOp2", viewTabs1B
+					# viewTabs1B.doAddTableTab "SaveZipcodeData", "SaveZipcodeData"
+
+					# viewTabs1B.doAddTableTab "testData", "TestData"
+					# .then (viewTable)->
+					# 	viewTable.table.moveActionColumn "distance"
+
 		return
-
-	addTestButton "inline sorting with icon in header according to DataType", "Open", ()->
-		addHolder("renderTest1");
-		table = new TableView $("#renderTest1")
-		table.addTable "zipcode"
-		table.real_render()
-		$('#renderTest1').prepend "<input type='button' id='sortByCityDSC' class='btn btn-info' style='margin-bottom:15px; margin-left:30px;' value='Sort By City DSC' />"
-		$('#sortByCityDSC').on 'click', ()->
-			table.sortByColumn('city','DSC')
-		$('#renderTest1').prepend "<input type='button' id='sortByCityTOG' class='btn btn-info' style='margin-bottom:15px; margin-left:30px;' value='Sort By City Toggle' />"
-		$('#sortByCityTOG').on 'click', ()->
-			table.sortByColumn('city','Random')
-		$('#renderTest1').prepend "<input type='button' id='sortByCityASC' class='btn btn-info' style='margin-bottom:15px;' value='Sort By City ASC' />"
-		$('#sortByCityASC').on 'click', ()->
-			table.sortByColumn('city','ASC')
-		true
 
 	addTestButton "Cell color test 1", "Open", ()->
 		DataMap.setDataTypes "zipcode", [
@@ -142,14 +114,13 @@ $ ->
 			visible : true
 			type    : "text"
 			width   : 200
-			hasColorFunction: true
-			cellColor  : (val, path) ->
+			cellColor : (val, path) ->
 				return "red"
 		]
-		addHolder("renderTest1");
-		table = new TableView $("#renderTest1")
-		table.addTable "zipcode"
-		table.real_render()
+
+		addHolder().setView "Table", (table)->
+			table.addTable "zipcode"
+
 		true
 
 	addTestButton "Cell color test 2", "Open", ()->
@@ -159,54 +130,19 @@ $ ->
 			visible : true
 			type    : "text"
 			width   : 100
-			hasColorFunction: true
 			cellColor  : (val, path) ->
 				if parseInt(val) > 1100
 					return "#0000ff"
 				return "#00ff00"
 		]
-		addHolder("renderTest1");
-		table = new TableView $("#renderTest1")
-		table.addTable "zipcode"
-		table.real_render()
-		true
 
-	addTestButton "auto hide columns from left on resize", "Open", ()->
-		DataMap.setDataTypes "zipcode", [
-			name    : "Custom-1"
-			source  : "city"
-			visible : true
-			type    : "text"
-			width   : 300
-			render  : (val, path) ->
-				return "250px"
-		]
+		addHolder().setView "Table", (table)->
+			table.addTable "zipcode"
 
-		DataMap.setDataTypes "zipcode", [
-			name    : "hidden column1"
-			source  : "code2"
-			visible : true
-			type    : "text"
-			render  : (val, path) ->
-				return "can hide"
-		]
-		DataMap.setDataTypes "zipcode", [
-			name    : "Hidden Column2"
-			source  : "code3"
-			visible : true
-			type    : "text"
-			render  : (val, path) ->
-				return "hide"
-		]
-		addHolder("renderTest1");
-		table = new TableView $("#renderTest1")
-		table.addTable "zipcode"
-		table.real_render()
-		#width can be dynamic as parameter | default = 32
-		#table.setAutoHideColumn()
 		true
 
 	addTestButton "simpleobject data type test", "Open", ()->
+
 		##| set the address as object in data map, to manipulate address field as simple object
 		for key,obj of DataMap.getDataMap().engine.export("zipcode")
 			obj.address = {city:obj.city,state:obj.state,county:obj.county}
@@ -220,107 +156,69 @@ $ ->
 			options:
 				compile: "{{city}}, {{state}}, {{county}}"
 		]
-		addHolder("renderTest1");
-		table = new TableView $("#renderTest1")
-		table.addTable "zipcode"
-		table.real_render()
-		true
+
+		addHolder().setView "Table", (table)->
+			table.addTable "zipcode"
 
 	addTestButton "dynamic add/remove row test case", "Open", ()->
-		addHolder("renderTest1");
-		table = new TableView $("#renderTest1")
-		table.addTable "zipcode"
-		table.render()
-		table.updateRowData()
-		_btnText = "&lt;input type='button' id='deleteFirstRow' class='btn btn-danger' style='margin-bottom:15px;' value='Delete First Row' /&gt;"
-		_btnText = _btnText.replace('&lt;','<').replace('&gt;','>')
-		$('#renderTest1').prepend _btnText
-		_btnText = "&lt;input type='button' id='addNewRow' class='btn btn-success' style='margin-bottom:15px;' value='Add New Row' /&gt;"
-		_btnText = _btnText.replace('&lt;','<').replace('&gt;','>')
-		$('#renderTest1').prepend _btnText
-		$('#addNewRow').on 'click', () ->
-			##| manipulate data
-			_randomKey = Math.floor Math.random()*90000 + 10000
-			#_randomData = DataMap.getDataMap().data['zipcode']["0#{Math.floor Math.random() * (1344 - 1337 + 1) + 1337}"]
-			_randomData = Object.assign({}, DataMap.getDataForKey("zipcode", "0#{Math.floor Math.random() * (1344 - 1337 + 1) + 1337}"))
-			if _randomData
-				_randomData['code'] = _randomKey
-				_randomData['id'] = _randomKey
-			##| add data
-			DataMap.addData 'zipcode', _randomKey, _randomData
-			table.updateRowData()
-		$('#deleteFirstRow').on 'click', () ->
-			##| get first row key from table to pass as arg in function
-			_key = $('#renderTest1 .table-wrapper .tableRow').first().find('.cell').first().text()
-			##| function to delete the data from dataMap and from screen
-			DataMap.deleteDataByKey 'zipcode', _key
-			console.log "First Row was deleted"
-			table.updateRowData()
+
+		addHolder()
+		.setView "Splittable", (splitter)->
+
+			splitter.getFirst().setMinHeight(100)
+			splitter.setPercent 0
+			splitter.setHorizontal()
+
+			splitter.getSecond().setView "Table", (table)->
+				table.addTable "zipcode"
+
+			button = splitter.getFirst().add "input", "btn btn-danger", "btn1", { type: "button", value: "Delete first row" }
+			button.bind "click", (data)->
+				console.log "Click button"
+
+
 		true
 
 	addTestButton "Locked Column Sorting", "Open", ()->		
 		theTable = "mlsactive"
 		for id, newData of Data
 			newData.distance = Math.random() * 1000
-			#newData.Something1 = ""
-			#newData.Another = null
-	        # for varName, value of newData
-	        #     if !/address/i.test varName
-	        #         delete newData[varName]
-
 			DataMap.addDataUpdateTable theTable, id, newData
 
-		addHolder("renderTest1");
-		$("#renderTest1").css
-			width   : 1000
-			height  : 500
-			padding : 0
-			margin  : 0
-			border  : "1px solid blue"
+		addHolder().setView "Table", (table)->
+			table.addTable theTable
+			table.moveActionColumn "distance"
 
-		table = new TableView $("#renderTest1")
-		table.addTable "mlsactive"
-		table.setFixedHeaderAndScrollable()
-		table.moveActionColumn "distance"
-		table.setStatusBarEnabled(true)
-		#table.addSortRule("distance", 1)
-		
-		DataMap.changeColumnAttribute "mlsactive", "Unique ID", "calculation", true
-		DataMap.changeColumnAttribute "mlsactive", "Photo Count", "editable", true
-		DataMap.changeColumnAttribute "mlsactive", "Listing Status", "editable", true
+			DataMap.changeColumnAttribute theTable, "Unique ID", "calculation", true
+			DataMap.changeColumnAttribute theTable, "Photo Count", "editable", true
+			DataMap.changeColumnAttribute theTable, "Listing Status", "editable", true
 
-		table.addActionColumn
-			name: "Run"
-			width: 50
-			callback: (row)=>
-				console.log "run action:", row
+			table.addActionColumn
+				name: "Run"
+				width: 50
+				callback: (row)=>
+					console.log "run action:", row
 
-		table.addActionColumn
-			name 	: "Edit"
-			source	: "editData"
-			width 	: 50
-			callback: (row) =>
-				doPopupView "Form", "Form-Popup", "form-popup", 500, 1000
-				.then (view) ->
-					view.init()
-					for key, value of row
-						view.getForm().addPathField "data-#{key}", "mlsactive", key
-					view.getForm().setPath "mlsactive", row.id
-					view.getForm().addSubmit "submit", "Click this button to submit", "Submit"
-					view.getForm().onSubmit = (form) =>
-						alert "Form was submitted successfully."
-					view.show()
-				
-				return true
-
-		table.render()
+			table.addActionColumn
+				name 	: "Edit"
+				source	: "editData"
+				width 	: 50
+				callback: (row) =>
+					doPopupView "Form", "Form-Popup", "form-popup", 500, 1000, (view)->
+						view.init()
+						for key, value of row
+							view.getForm().addPathField "data-#{key}", theTable, key
+						view.getForm().setPath theTable, row.id
+						view.getForm().addSubmit "submit", "Click this button to submit", "Submit"
+						view.getForm().onSubmit = (form) =>
+							alert "Form was submitted successfully."
+						view.show()
 
 	addTestButton "editable popup on click", "Open", ()->
-		addHolder("renderTest1");
-		table = new TableView $("#renderTest1")
-		table.addTable "zipcode"
-		table.render()
-		table.updateRowData()
+
+		addHolder().setView "Table", (table)->
+			table.addTable "zipcode"
+
 		$('#renderTest1').prepend "<input type='button' id='createNew' class='btn btn-info' style='margin-bottom:15px;' value='Create New' />"
 		$('#createNew').on 'click', ()->
 			p = new PopupForm('zipcode', 'code')

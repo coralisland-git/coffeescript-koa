@@ -27,44 +27,35 @@ $ ->
                 console.log "Error loading zipcode data: ", e
                 resolve(false)
 
-    addTestButton "Render table", "Open", ()->
+    addTestButton "Render table - Simplest Example", "Open", ()->
 
-        addHolder("renderTest1");
-        table = new TableView $("#renderTest1")
-        table.addTable "zipcode"
-        table.render()
-        table.updateRowData()
+        addHolder()
+        .setView "Table", (view)->
+            table = view.addTable "zipcode"
+
         true
 
-    addTestButton "Render table 2", "Open", ()->
+    addTestButton "Render table - Sort and Filter function to hide Areacode", "Open", ()->
 
-        addHolder("renderTest1");
-        table = new TableView $("#renderTest1")
-        noAreaCode = (col)  -> col.name != "Area Code"
-        filter = (obj, key) -> obj.county == "HAMPDEN"
-        table.sort = (a, b) ->
+        addHolder()
+        .setView "Table", (view)->
 
-            aa = DataMap.getDataField("zipcode", a.key, "city")
-            bb = DataMap.getDataField("zipcode", b.key, "city")
-            if aa < bb then return -1
-            if aa > bb then return 1
-            return 0
+            noAreaCode = (col)  -> col.name != "Area Code"
+            filter = (obj, key) -> obj.county == "HAMPDEN"
+            table = view.addTable "zipcode", noAreaCode, filter
+            table.sort = (a, b) ->
 
-        table.addTable "zipcode", noAreaCode, filter
-        table.render()
-        table.updateRowData()
+                aa = DataMap.getDataField("zipcode", a.key, "city")
+                bb = DataMap.getDataField("zipcode", b.key, "city")
+                if aa < bb then return -1
+                if aa > bb then return 1
+                return 0
+
+
+
         true
 
-    addTestButton "Configure Columns", "Open", ()->
-
-        addHolder("renderTest1");
-        table = new TableView $("#renderTest1")
-        table.addTable "zipcode"
-        table.allowCustomize()
-        table.real_render()
-        true
-
-    addTestButton "Custom Column", "Open", ()->
+    addTestButton "Custom Column - Zipcode has a custom render function", "Open", ()->
 
         DataMap.setDataTypes "zipcode", [
             name    : "Custom"
@@ -77,53 +68,33 @@ $ ->
                 return "{" + path + "} = " + val
         ]
 
-        addHolder("renderTest1");
-        table = new TableView $("#renderTest1")
-        table.addTable "zipcode"
-        table.real_render()
+        addHolder()
+        .setView "Table", (view)->
+            table = view.addTable "zipcode"
+
         true
 
-    addTestButton "Grouping Columns", "Open", () ->
-        addHolder("renderTest1")
-        $('#renderTest1').height(400); ##| to add scroll the height is fix
-        table = new TableView $("#renderTest1"), true
-        table.addTable "zipcode"
-        table.setFixedHeaderAndScrollable()
-        table.groupBy("county")
-        # table.groupBy("city")
-        table.addActionColumn
-            name: "Run"
-            source: "id"
-            callback: (row)=>
-                console.log "Zipcode action column selected row:", row
-            # render: (currentValue, tableName, colName, id)=>
-            #     console.log "c=", currentValue, "t=", tableName, "c=", colName
-            #     return "[" + id + "]"
-            width: 80
+    addTestButton "Grouping Columns and adding action column 'Run'", "Open", () ->
 
-        # DataMap.changeColumnAttribute "zipcode", "city", "render", (val, row)=>
-        #     console.log "Render city val=", val, "row=", row
-        #     return "City"
+        addHolder()
+        .setView "Table", (view)->
+            table = view.addTable "zipcode"
+            table.groupBy("county")
+            # table.groupBy("city")
+            table.addActionColumn
+                name    : "Run"
+                source  : "id"
+                width   : 80
+                callback: (row)=>
+                    console.log "Zipcode action column selected row:", row
 
-        table.render()
-        true
-
-
-    addTestButton "Join Table", "Open", ()->
-
-        addHolder("renderTest1");
-        table = new TableView $("#renderTest1")
-        table.addTable "zipcode"
-        #table.addJoinTable "county", null, "county"
-        table.real_render()
         true
 
     addTestButton "Checkboxes", "Open", ()->
 
-        addHolder("renderTest1");
-        table = new TableView $("#renderTest1"), true
-        table.addTable "zipcode"
-        table.real_render()
-        true
+        addHolder()
+        .setView "Table", (view)->
+            table = view.addTable "zipcode"
+            table.setEnableCheckboxes(true)
 
     go()

@@ -3,7 +3,7 @@ class ViewShowTableEditor extends View
     getDependencyList: ()=>
         return [ "/ace/ace.js", "/ace/ext-language_tools.js" ]
 
-    onSetupButtons: () =>
+    setupNavbar: ()=>
 
         ##|
         ##|  Toolbar button that allows a new column to be added
@@ -44,19 +44,7 @@ class ViewShowTableEditor extends View
 
             m.show()
 
-        @addToolbar [ navButtonCreateNew ]
-        true
-
-    onShowScreen: ()=>
-
-    onResize: (pw, ph)=>
-        # if !@elHolder? then return
-        # if !@editorTable? or !@editorTable.rowDataRaw? then return
-        # if @editorTable.rowDataRaw.length == 0 then return
-        h = @elHolder.parent().parent().height()
-        # w = @elHolder.width()
-        # @editorTable.elTableHolder.height h
-        # @editorTable.onResize()
+        @viewNavbar.addToolbar [ navButtonCreateNew ]
         true
 
     updateData: ()=>
@@ -75,45 +63,40 @@ class ViewShowTableEditor extends View
         @rowsList = DataMap.getColumnsFromTable(@editedTableKey, null)
         @internalSetDataTypes()
 
-        @editorTable = new TableView @elHolder.find(".viewTableHolder")
-        @editorTable.showConfigTable = false
-        @editorTable.showFilters = false
-        @editorTable.addTable "_editor"
-        @editorTable.setAutoFillWidth()
+        console.log "Setting doSetViewWithNav"
+        @doSetViewWithNavbar "Table", (@viewTable, @viewNavbar)=>
 
-        # @editorTable.elTableHolder.css "width", "100%"
-        # @editorTable.elTableHolder.css "height", "400px"
+            @editorTable = @viewTable.addTable "_editor"
+            @editorTable.showConfigTable = false
+            @editorTable.showFilters = false
+            @editorTable.setAutoFillWidth()
 
-        @editorTable.addActionColumn
-            width  : 80
-            source : "delete",
-            name   : "Delete"
-            callback: (row)=>
-                console.log "Delete on:", row
+            @editorTable.addActionColumn
+                width  : 80
+                source : "delete",
+                name   : "Delete"
+                callback: (row)=>
+                    console.log "Delete on:", row
 
-        # @editorTable.moveActionColumn "order"
-        # @editorTable.sortByColumn("order")
-        @editorTable.render()
-        @editorTable.addSortRule("order", 1)
+            @editorTable.addSortRule("order", 1)
 
-        ##|
-        ##|  Save callback from the data map
-        DataMap.setSaveCallback "_editor", (id, field, oldValue, newValue)=>
-            console.log @editedTableKey, "CHANGE id=#{id} field=#{field} newValue=#{newValue}"
-            DataMap.changeColumnAttribute @editedTableKey, id, field, newValue
-            true
+            ##|
+            ##|  Save callback from the data map
+            DataMap.setSaveCallback "_editor", (id, field, oldValue, newValue)=>
+                console.log @editedTableKey, "CHANGE id=#{id} field=#{field} newValue=#{newValue}"
+                DataMap.changeColumnAttribute @editedTableKey, id, field, newValue
+                true
 
-        ##|
-        ##|  Custom change event
-        globalTableEvents.on "table_change", (tableName, source, field, newValue)=>
+            ##|
+            ##|  Custom change event
+            globalTableEvents.on "table_change", (tableName, source, field, newValue)=>
+                console.log "Editor Custom #{tableName}/#{source}"
+                if tableName == @editedTableKey
+                    path = "/_editor/#{source}/#{field}"
+                    console.log "Global....", path, newValue
+                    @editorTable.updateRowData()
 
-            console.log "Editor Custom #{tableName}/#{source}"
-
-            if tableName == @editedTableKey
-                path = "/_editor/#{source}/#{field}"
-                console.log "Global....", path, newValue
-                @editorTable.updateRowData()
-
+            @setupNavbar()
 
     ## -------------------------------------------------------------------------------------------------------------
     ## function to get the created table instance
@@ -243,12 +226,15 @@ class ViewShowTableEditor extends View
                 width    : 120
                 autosize : true
             ,
-                name     : "HasColor"
-                source   : "hasColorFunction"
+                name     : "Text Color"
+                source   : "cellColor"
                 visible  : true,
-                type     : "boolean"
+                type     : "sourcecode"
                 editable : true
                 width    : 60
+                render:  (val)=>
+                    if val? then return "Edit source"
+                    return ""
             ,
                 name     : "Formula/Code"
                 source   : "render"

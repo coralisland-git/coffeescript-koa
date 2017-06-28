@@ -1,5 +1,9 @@
-allTests = []
-counter  = 0
+allTests        = []
+counter         = 0
+wgtMain         = null
+viewTestCode    = null
+viewTestCases   = null
+viewTestExecute = null
 
 ##|
 ##|  Common function to load test data
@@ -39,32 +43,15 @@ loadDatafromJSONFile = (fileName) ->
 
 			resolve(true)
 
-
 addHolder = (name) ->
-
-	$("#" + name).remove()
-	$("#testCase").append($("<div id='" + name + "' style='padding-top: 20px;' />"))
-
-	##|
-	##| Added by @xgao
-	##| Automatically scroll down to where the newly added element is appears.
-	##|
-	###setTimeout ->
-		document.getElementById(name).scrollIntoView()
-	, 500
-	###
-	$('html, body').animate {
-       scrollTop: $('#' + name).offset().top
-    }, 1000
-
-	true
+	return viewTestExecute.addHolder(name)
 
 addHolderWidget = (name, w, h)->
+	w = viewTestExecute.addHolder name
+	w.setSize(w, h)
+	return w
 
-	@addHolder("test_#{name}")
-	div = new WidgetTag "div", "testWidget"
-	div.appendTo("#test_#{name}")
-	return div
+allTestData = {}
 
 ##|
 ##|  Very simple call that takes a label (some notes for the user) and
@@ -73,6 +60,8 @@ addHolderWidget = (name, w, h)->
 ##|  function.   Each block is executed in turn.
 ##|
 addTest = (label, fnCall, code) ->
+
+	test_id = GlobalValueManager.NextGlobalID()
 
 	if !code? or not code
 		code = fnCall.toString()
@@ -85,25 +74,30 @@ addTest = (label, fnCall, code) ->
 	label = label.replace " (", "<br>("
 
 	html = "
-		<tr><td class='test_label'> #{label} </td>
-			<td class='test_result'> <div id='result#{counter}'></div> </td>
-			<td class='test_code'> <pre><code class='language-javascript'>#{code}</code></pre> </td>
-		</tr>
+		<div class='test_case' id='case_#{test_id}'>
+			<div class='test_label' id='test_#{test_id}'> #{label} </div>
+			<div class='test_result' id='result_#{test_id}'> </div>
+		</div>
 	"
 
-	if !window.elTestTable? or not 	window.elTestTable
-		window.elTestTable = $("#testTable")
+	el = $("#testCases").append($(html))
 
-	window.elTestTable.append html
-
-	test =
-		label:    label
+	allTestData[test_id] =
+		label   : label
 		callback: fnCall
-		tag:      $("#result" + counter)
+		code    : code
+		tag     : $("#result_" + test_id)
 
-	allTests.push test
+	elTestCase = el.find("#case_#{test_id}")
+	elTestCase.attr "data-id", test_id
+	elTestCase.bind "click", (e)=>
+		id = $(e.currentTarget).attr("data-id")
+		viewTestCode.setCode allTestData[id].code
+		console.log "CLICK=", id, e
+		true
 
-	counter++
+	allTests.push allTestData[test_id]
+	true
 
 addTestButton = (label, buttonText, fnCall) ->
 
@@ -121,6 +115,7 @@ addTestButton = (label, buttonText, fnCall) ->
 		.bind 'click', (e) ->
 			e.preventDefault()
 			e.stopPropagation()
+			viewTestCode.setCode code
 			fnCall(e)
 	, code
 
@@ -135,7 +130,6 @@ go = () ->
 
 	if allTests.length == 0
 
-		window.elTestCase.append $ "<br><p> Complete. </p>"
 		return
 
 	else
@@ -176,8 +170,24 @@ go = () ->
 
 			$(allTests[0].tag).html "<div class='exception'>Exception: " + e + "</div>"
 
+##|
+##|  Setup the main widget that holds everything
+onResizeWindow = ()->
+
+	winw = $(window).width()
+	winh = $(window).height()
+	offset = wgtMain.offset()
+
+	##|
+	##|  Remove space on the left for that left side menu
+	##|  todo: use css to measure
+	offset_left = 250
+	wgtMain.move offset_left, 0, winw-offset_left, winh
+	true
 
 $ ->
+
+	console.log "TestCommon 1.0"
 
 	globalTableEvents.on "set_custom", (tableName, source, field, newValue)=>
 		console.log "globalTableEvents: table=#{tableName} source=#{source} field=#{field} new=", newValue
@@ -187,28 +197,57 @@ $ ->
 		console.log "globalTableEvents: rowSelected tableName=#{tableName}, id=#{id}, status=#{status}"
 		true
 
+	el = $("#mainTestArea")
+	wgtMain = new WidgetTag(el)
+	wgtMain.setAbsolute()
+	onResizeWindow()
+
+	##|
+	##|  Add a splitter
+	wgtMain.setView "Splittable", (splitter1)->
+
+		splitter1.getFirst().setView "TestExecute", (view)->
+			viewTestExecute = view
+
+		splitter1.setPercent 80
+		splitter1.getSecond().setMinWidth 500
+		splitter1.getSecond().setView "Splittable", (splitter2)->
+			splitter2.setHorizontal()
+			splitter2.setPercent 50
+			splitter2.getFirst().setView "TestCases", (view)->
+				viewTestCases = view
+				view.setScrollable()
+				onResizeWindow()
+
+			splitter2.getSecond().setView "TestCode", (view)->
+				viewTestCode = view
+
+		wgtMain.resetSize()
+		splitter1.resetSize()
+
+	, 80
+
+	##|
+	##|  Watch for browser changes
+	$(window).on "resize", onResizeWindow
+
+
 	# DataMap.getDataMap().on "table_change", (tableName, config)->
 	# 	console.log "DataMap.table_change tableName=#{tableName} config=", config
 	# 	true
 
 	##|
 	##|  Add a table to hold the results
-	window.elTestCase = $("#testCase")
+	# window.elTestCase = $("#testCase")
 	## -xg
-	responsiveTable = new WidgetTag "div", "table-responsive"
-	responsiveTable.appendTo "#testCase"
-	responsiveTable.add "table", "testTable table", "testTable"
+	# responsiveTable = new WidgetTag "div", "table-responsive"
+	# responsiveTable.appendTo "#testCase"
+	# responsiveTable.add "table", "testTable table", "testTable"
 	#window.elTestCase.html "<div class='table-responsive'><table id='testTable' class='testTable table'></table></div>"
 
 	##|  save a reference to the results table
-	window.elTestTable = $("#testTable")
+	# window.elTestTable = $("#testTable")
 
-	##|
-	##|  Check for a hash value and load a test page
-	if document.location.search?
-		m = document.location.search.match /page=(.*)/
-		if m? and m[1]
-			page = m[1]
-			$("body").append "<script src='/js/" + page + ".js' /></script>"
+
 
 

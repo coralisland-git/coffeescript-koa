@@ -273,6 +273,9 @@ class TableView
 		if config.callback?
 			@on "click_#{button.getSource()}", config.callback
 
+		@resetCachedFromSize()
+		@updateVisibleText()			
+
 		true
 
 	## -------------------------------------------------------------------------------------------------------------
@@ -294,21 +297,6 @@ class TableView
 		# @allowSelectCell = false
 		@fixedHeader     = true
 
-		# $(window).on 'resize', () =>
-			# @elTableHolder.find('.table-header .tableview').width(@elTableHolder.find('.table-body .tableview').width())
-
-	setFixedSize: (w, h)=>
-
-		@fixedWidth  = w
-		@fixedHeight = h
-		@showFilters = false
-		@fixedHeight = true
-		@showHeaders = true
-		@elTableHolder.width(w)
-		@elTableHolder.height(h)
-		@elTableHolder.find('.table-header .tableview').width(@elTableHolder.find('.table-body .tableview').width())
-		@resetCachedFromSize()
-
 	## -------------------------------------------------------------------------------------------------------------
 	## make the table with fixed header and scrollable
 	##
@@ -317,7 +305,8 @@ class TableView
 	setFixedHeaderAndScrollable: (@fixedHeader = true) =>
 
 		$(window).on 'resize', () =>
-			@elTableHolder.find('.table-header .tableview').width(@elTableHolder.find('.table-body .tableview').width())
+			console.log "TableVIew window on resize"
+			# @elTableHolder.find('.table-header .tableview').width(@elTableHolder.find('.table-body .tableview').width())
 			@cachedVisibleWidth  = null
 			@cachedVisibleHeight = null
 
@@ -728,7 +717,6 @@ class TableView
 		true
 
 	onResize: (w, h)=>
-		if !@isVisible() then return
 
 		@cachedVisibleWidth        = null
 		@cachedVisibleHeight       = null
@@ -737,17 +725,15 @@ class TableView
 		@cachedMaxTotalVisibleCol  = null
 		@cachedMaxTotalVisibleRows = null
 
-		# -xg
-		if @parentView
-			@elTableHolder.width @parentView.width()
-			@elTableHolder.height @parentView.height()
-		else
-			if @fixedWidth? and @fixedHeight?
-				@elTableHolder.width(@fixedWidth)
-				@elTableHolder.height(@fixedHeight);
-			else if @elTableHolder.width() > 0
-				@updateFixedPosition()
+		if !@isVisible() then return
 
+		if globalDebugResize
+			console.log "ViewTable tableView onResize(#{w}, #{h}) fixed=#{@fixedWidth}, #{@fixedHeight}"
+
+		console.log "TableView onResize Event size was ", @elTableHolder.width(), ",", @elTableHolder.height(), " vs new ", w, ",", h
+		@elTableHolder.width(w)
+		@elTableHolder.height(h)
+		@resetCachedFromSize()
 		@updateRowData()
 		true
 
@@ -1020,6 +1006,9 @@ class TableView
 
 		if @overallReduceFunction? and typeof @overallReduceFunction == "string"
 			strJavascript += "try {\n" + @overallReduceFunction + ";\n} catch (e) { console.log(\"eee=\",e); }\n";
+		else if @overallReduceFunction? and typeof @overallReduceFunction == "function"
+			window["overallReduceFunction#{@gid}"] = @overallReduceFunction
+			strJavascript += "if (window['overallReduceFunction#{@gid}'](row) == false) return false;\n"
 
 		filters = []
 		for tableName, fieldList of @currentFilters
@@ -1129,12 +1118,15 @@ class TableView
 	##
 	updateRowData: () =>
 
-		if !@isVisible() then return
-
-
 		@applyFilters()
 		@rowDataRaw = []
 		allData     = DataMap.getValuesFromTable @primaryTableName, @reduceFunction
+
+		if !@isVisible()
+			if allData.length > 0
+				@totalAvailableRows = allData.length
+				globalTableEvents.emitEvent "row_count", [ @primaryTableName, allData.length ]
+			return
 
 		##|
 		##|  Path 1 - There are no groups defined so just quickly sort and filter
@@ -1240,58 +1232,6 @@ class TableView
 			return false
 
 		return true
-
-	## -------------------------------------------------------------------------------------------------------------
-	## set the holder element to go to the bottom of the screen
-	##
-	setHolderToBottom: () =>
-
-		if @renderRequired then @real_render();
-		@isFixedBottom = true
-		@updateFixedPosition()
-
-	##|
-	##|  Move to the bottom location fully
-	updateFixedPosition: (attemptCounter = 0)=>
-
-		if !@isFixedBottom? or @isFixedBottom != true
-			return
-
-		height = $(window).height()
-
-		pos = @elTableHolder.position()
-		offset = @elTableHolder.offset()
-
-		tableWidth = @elTableHolder.outerWidth()
-		tableHeight = @elTableHolder.outerHeight()
-
-		if !pos? or !offset? or pos.top == 0 and pos.left == 0 and tableWidth == 0
-			if attemptCounter? and attemptCounter == 3 then return
-			setTimeout ()=>
-				if !attemptCounter? then attemptCounter = 0
-				@updateFixedPosition(attemptCounter+1)
-			, 10
-			return
-
-		# console.log "setHolderToBottom #{@primaryTableName} winHeight=#{height}, pos=", pos, " offset=", offset, "table=#{tableWidth} x #{tableHeight} v=", @elTableHolder[0].style.visibility
-
-		newHeight = height - pos.top
-		newHeight = Math.floor(newHeight)
-		## if newHeight is too short, table content might not be shown
-		if newHeight < minHeightOfTable then newHeight = minHeightOfTable
-		@elTableHolder.height(newHeight)
-
-		##|
-		##|  If the width of the table scrolls, this fixes it
-		newWidth = @elTableHolder.outerWidth()
-
-		@resetCachedFromSize()
-		#@updateVisibleText()
-
-		@lastNewHeight = newHeight
-		@lastNewWidth  = newWidth
-		true
-
 
 	## -------------------------------------------------------------------------------------------------------------
 	## function to make column customizable in the popup
@@ -2368,6 +2308,10 @@ class TableView
 		@updateVisibleText()
 		return
 
+	setEnableCheckboxes: (@showCheckboxes)=>
+		@updateRowData()
+		@updateVisibleText()
+		return
 
 	## -----------------------------------------------------------------------------------------------ƒmove--------------
 	## intenal event key press in a filter field, that executes during the filter text box keypress event
@@ -2714,6 +2658,3 @@ class TableView
 				return true
 
 		return false
-
-	setParentView: (@parentView) =>
-		true

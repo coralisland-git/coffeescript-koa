@@ -62,6 +62,7 @@ class FloatingSelect extends FloatingWindow
             @table.showHeaders = true
             # @table.showFilters = true
 
+        console.log "TODO:  Fix this using a view because tableView doesn't support setFixedSize anymore.  Instead we need a container with .move to get the size"
         @table.setFixedSize(@width, @height)
         @table.render()
         @table.onResize()

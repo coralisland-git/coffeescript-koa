@@ -1,159 +1,114 @@
 .ViewImageStrip
-	background transparent
-	border solid 1px grey
-	height 100%
-	.imageHolder
-		float:left
-		width:80%
-		padding-top 5%
-		padding-bottom 5%
-		//height 720px
-		height 100%
 
-		.image
-			height 90%
-			.image-wrapper 
-				background-color white
-				width 90%
-				height 100%
-				border solid 1px grey
-				padding 0
-				img
-					margin: 0 auto
-					display: block
-					max-width 100%
-					height 100%
-					object-fit	contain
-					
-		.controls
-			text-align center
-			//margin-top 1em
-			height 10%
-			
-			span
-				font-size 2em
-				line-height 2.2em
-			i
-				height 90%
-				max-height 6vmin
-				margin-top 3%
-				background-size 100% 100%	
-				width 10%
-				max-width 10vmin
-			#left-arrow
-				width: 50%
-				text-align: right
-				float: left
-				padding-right: 15px
+	controlButton()
+		height     : 40px
+		width      : 40px
+		cursor     : pointer
+		position   : absolute
+		border     : 0px
+		padding    : 0px
+		margin     : 0px
+		top        : calc(50% - 20px)
+		color      : #ffffff
+		text-shadow: 2px 2px #202020
 
-			#right-arrow
-				width: 50%
-				text-align: left
-				float: right
-				padding-left: 15px
-			.hidden-arrow
-				color grey
-				.fa:hover
-					color grey
-					text-shadow none
-.fa:hover
-	text-shadow: 0 0 6px rgba(0, 0, 0, 1)
-	color black
-	
-.scroll_wrapper 
-	position: relative
-	z-index: 1
-	overflow: hidden
-	height: 100%
-	width: 20%
-	padding 10px
-	
-	.scroll_list_body
+	.left-arrow
+		controlButton()
+		left      : 10px
+
+	.right-arrow
+		controlButton()
+		right   : 10px
+
+	.scroll_wrapper
+		position: relative
 		z-index: 1
-		-webkit-tap-highlight-color: rgba(0,0,0,0)
-		width: 100%
-		-webkit-transform: translateZ(0)
-		-moz-transform: translateZ(0)
-		-ms-transform: translateZ(0)
-		-o-transform: translateZ(0)
-		transform: translateZ(0)
-		-webkit-touch-callout: none
-		-webkit-user-select: none
-		-moz-user-select: none
-		-ms-user-select: none
-		user-select: none
-		-webkit-text-size-adjust: none
-		-moz-text-size-adjust: none
-		-ms-text-size-adjust: none
-		-o-text-size-adjust: none
-		text-size-adjust: none
+		overflow: hidden
+		height: 100%
+		width: 20%
+		padding 10px
 
-		ul
-			list-style: none
-			padding: 0
-			margin: 0
-			background-color transparent
+		.scroll_list_body
+			// z-index: 1
+			-webkit-tap-highlight-color: rgba(0,0,0,0)
+			width: 100%
+			-webkit-transform: translateZ(0)
+			-moz-transform: translateZ(0)
+			-ms-transform: translateZ(0)
+			-o-transform: translateZ(0)
+			transform: translateZ(0)
+			-webkit-touch-callout: none
+			-webkit-user-select: none
+			-moz-user-select: none
+			-ms-user-select: none
+			user-select: none
+			-webkit-text-size-adjust: none
+			-moz-text-size-adjust: none
+			-ms-text-size-adjust: none
+			-o-text-size-adjust: none
+			text-size-adjust: none
 
-			li
+			ul
+				list-style: none
 				padding: 0
-				width 100%
-				border: 1px solid #ccc
-				font-size: 14px
-				background-color white
-				margin-bottom 2%
-				max-width 100%
+				margin: 0
+				background-color transparent
+				-webkit-scrollbar: hidden
 
-				.image-wrapper
-					height 100%
-					padding 0
-/*					padding-left 10%
-					padding-right 10%*/
-					
+				li
+					padding: 0
+					margin-left: 4px
+					margin-right: 4px
+					width 100%
+					font-size: 14px
+					background-color white
+					max-width 100%
+					padding-top: 8px
+					padding-bottom: 8px
+
 					img
 						padding: 0px
 						width 100%
 						height 100%
 						margin: 0 auto
 						display: block
-						object-fit	contain
-						
-.number_body
-	position relative
-	.numberCircle
-		position absolute
-		right 0px
-		margin-right 4%
-		margin-top -2%
-		border-radius: 41px  
-		min-width 49px
-		padding: 4px    
-		background: #fff
-		border: 2px solid #666
-		color: #666
-		text-align: center
-		font: 32px Arial, sans-serif
-	.numberCircle_Small
-		position absolute
-		right 0px
-		margin-right 4%
-		margin-top -2%
-		border-radius: 15px  
-		padding: 2px    
-		background: #fff
-		border: 1px solid #666
-		color: #666
-		text-align: center
-		font: 12px Arial, sans-serif
-		min-width 20px
-	
-.active_scroll_element
-	background : green
-.thumbnail
-	text-align right 
-	background-size 90% 100%
-	background-position center
-	background-repeat no-repeat
-	height 110px
-	
-.scrollcontent
-	//height 100%
+
+	.imagethumb
+		border-left  : 1px solid #202020
+		border-right : 1px solid #202020
+		border-top   : 1px solid #202020
+		margin-left  : 4px
+		margin-right : 4px
+		margin-top   : 8px
+		margin-bottom: 4px
+
+		.number_body
+			width        : 100%
+			padding      : 4px
+			background   : #fff
+			border-bottom: 1px solid #101010
+			color        : #666
+			text-align   : center
+			font         : 14px Arial, sans-serif
+
+	.imagethumb.selected
+		border-left : 1px solid #ff0000
+		border-right: 1px solid #ff0000
+		border-top  : 1px solid #ff0000
+
+		.number_body
+			border-bottom: 1px solid #ff0000
+			color: #ff0000
+
+	.imagethumb img
+		width: 100%
+
+	.active_scroll_element
+		background : green
+
+	.thumbnail
+		text-align right
+		background-size 90% 100%
+		background-position center
+		background-repeat no-repeat
+		height 110px

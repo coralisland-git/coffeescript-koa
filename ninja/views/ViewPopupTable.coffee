@@ -23,7 +23,9 @@ class ViewPopupTable extends View
             if @table? then @table.hide()
             return
 
-        # console.log "ViewTable onResize(#{w}, #{h})"
+        if globalDebugResize
+            console.log "ViewTable ViewPopupTable onResize(#{w}, #{h})"
+
         @setSize w, h
         if @table
             @table.show()
@@ -43,8 +45,6 @@ class ViewPopupTable extends View
         @table.addTable @tableName
         @table.setFixedHeaderAndScrollable()
         @table.setStatusBarEnabled()
-        @table.setHolderToBottom()
-        @table.setParentView this
         @table.render()
 
         @table.updateRowData()

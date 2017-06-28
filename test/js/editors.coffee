@@ -118,8 +118,4 @@ $ ->
 
     # html += "<p><textarea id='edit123' style='width:600px; height: 400px;'></textarea>"
 
-    addHolder "editors"
-    $("#editors").html html
-
-
-    # $("#edit123").trumbowyg()
+    addHolder().el.html html

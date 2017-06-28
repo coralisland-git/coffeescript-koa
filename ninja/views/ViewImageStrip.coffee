@@ -1,6 +1,8 @@
 ##|
 ##|  To help with automated testing
 globalImageCounter = 0
+imageStripButtonSize = 42
+imageStripButtonOffset = 10
 
 class ViewImageStrip extends View
     ## ------------------------------------------------------------------------------------------
@@ -19,78 +21,176 @@ class ViewImageStrip extends View
     ##    
     setTitle: (title)=>
 
+    ##|
+    ##|  Loop through all thumbnails and give them a valid height
+    resizeThumbnails: ()=>
+        ##|
+        ##|  Nothing needed here, all done in CSS
+        @resizeSelectedImage()
+        true
+
+    resizeSelectedImage: ()=>
+
+        totalHeight = @height()
+        currentTop  = @splitter1.getSecond().scrollTop()
+
+        for idx, data of @imageData
+            if "#{idx}" == "#{@selectedImgNumber}"
+                data.li.addClass "selected"
+                ##|
+                ##|  scroll into view only if not already in view
+                if (totalHeight - data.li.offsetTop() + currentTop < 0)
+                    data.li.element.scrollIntoView({behavior: "smooth"})
+            else
+                data.li.removeClass "selected"
+
+        if @selectedImgNumber? and @imageData[@selectedImgNumber]?
+
+            @imageViewHolder.el.attr("src", @imageData[@selectedImgNumber].src)
+            width = @splitter1.getFirst().width()
+            height = @splitter1.getFirst().height()
+            ratio1 = width / @imageData[@selectedImgNumber].w
+            ratio2 = height / @imageData[@selectedImgNumber].h
+            if ratio1 < ratio2
+                newWidth = ratio1 * @imageData[@selectedImgNumber].w
+                newHeight = ratio1 * @imageData[@selectedImgNumber].h
+            else
+                newWidth = ratio2 * @imageData[@selectedImgNumber].w
+                newHeight = ratio2 * @imageData[@selectedImgNumber].h
+
+            newWidth = Math.floor(newWidth)
+            newHeight = Math.floor(newHeight)
+
+            offsetX = (width - newWidth) / 2
+            offsetY = (height - newHeight) / 2
+
+            # @imageViewHolder.setWidth(Math.floor(newWidth))
+            # @imageViewHolder.setHeight(Math.floor(newHeight))
+            @imageViewHolder.move offsetX, offsetY, newWidth, newHeight
+
+            if @selectedImgNumber >= @imageData.length
+                @btnRight.hide()
+            else
+                @btnRight.show()
+                # @btnRight.move imageStripButtonOffset, (height/2)-(imageStripButtonSize/2), imageStripButtonSize, imageStripButtonSize
+
+            if @selectedImgNumber <= 0
+                @btnLeft.hide()
+            else
+                @btnLeft.show()
+                # @btnLeft.move w-imageStripButtonOffset-imageStripButtonSize, (height/2)-(imageStripButtonSize/2), imageStripButtonSize, imageStripButtonSize
+
+            true
+
+
     ## ------------------------------------------------------------------------------------------
     ## function to add an image source data
     ##    
     addImage: (image)=>
         unless image? then return
-        if !@imageData? then @imageData = []
-        if image.tagName is "IMG"
-            @imageData.push image
-        else
-            newImg = new Image()
-            newImg.src = image
-            @imageData.push(newImg)
 
-        return image
+        if !@thumbsList?
+            setTimeout @addImage, 100, image
+            return
+
+        if !@imageData? then @imageData = []
+
+        if typeof image == "object" and image.src?
+            image = image.src
+
+        ##|
+        ##|  Load a new image
+        img = new Image()
+        img.onload = (o)=>
+
+            imageDataOne =
+                src: img.src
+                w  : img.naturalWidth
+                h  : img.naturalHeight
+
+            ##|
+            ##|  Create thumbnail holder
+            ##|
+            imageDataOne.li = @thumbsList.add "li", "imagethumb"
+            imageDataOne.elImage = imageDataOne.li.add "img"
+            imageDataOne.elImage.el.attr("src", img.src)
+
+            imageDataOne.li.css "cursor", "pointer"
+            imageDataOne.li.el.attr "data-id", @imageData.length
+
+            imageDataOne.li.bind "click", (e)=>
+                @setSelectedImgNumber $(e.currentTarget).attr("data-id")
+
+            elNumber = imageDataOne.li.addDiv "number_body"
+            elNumber.html @imageData.length+1
+
+            @imageData.push imageDataOne
+            @resizeThumbnails()
+
+        img.onerror = (o)=>
+            console.log "ViewImageStrip addImage error:", image, o
+
+        img.src = image
+        return true
+
+    ##|
+    ##|  Create the HTML Controls that make this work
+    createControls: ()=>
+
+        if @thumbsList? then return
+
+        @setView "Splittable", (splitter1)=>
+
+            @splitter1 = splitter1
+            @splitter1.setPercent 90
+            @splitter1.getSecond().setMinWidth 140
+            @splitter1.getSecond().css "backgroundColor", "#bbbbbb"
+
+            @thumbsList = splitter1.getSecond().add "ul", "scroll_list"
+            @splitter1.getSecond().setScrollable()
+
+            @imageViewHolder = @splitter1.getFirst().add "img"
+            @splitter1.getSecond().onResize = @resizeThumbnails
+
+            @selectedImgNumber = 0
+
+            @btnLeft = @splitter1.getFirst().addDiv "left-arrow"
+            @btnLeft.html "<i class='fa fa-arrow-circle-left fa-3x imagestripbutton' aria-hidden='true'></i>"
+            # @btnLeft.css "zIndex", "+1"
+            @btnLeft.bind "click", ()=>
+                @prevImg()
+            # @btnLeft.move 0, 0, 36, 36
+
+            @btnRight = @splitter1.getFirst().addDiv "right-arrow"
+            # @btnRight.css "zIndex", "auto"
+            @btnRight.html "<i class='fa fa-arrow-circle-right fa-3x imagestripbutton' aria-hidden='true'></i>"
+            @btnRight.bind "click", ()=>
+                @nextImg()
+            # @btnRight.move 0, 0, 36, 36
+
+            @splitter1.resetSize()
+
+
     ##
     ## function to change width and height of the view when it is resized
     ##
-    #onResizeViewImageStrip : (w, h)=>
     onResize: (w, h) =>
-        if w < 400 or h < 400
-            @setThumbSize 100, 75
-        else if w < 600 or h < 600
-            @setThumbSize 150, 100
-        else if w < 900 or h < 900
-            @setThumbSize 200, 150
+        super(w,h)
+        true
+
+    setData: (data)=>
+        ##|
+        ##|  Data is called upon initialize of the View, data values can be added optionally is setView call
+
+        @createControls()
+        # @renderThumbList()
+
+        if data? and Array.isArray(data)
+            @setImgData data
         else
-            @setThumbSize 300, 200
-        true
+            @setImgData []
 
-    ##
-    ## function to set width and height of View
-    ##
-    setSize: (w, h)=>
-        if w > 0
-            @elHolder.width w
-        if h > 0
-            @elHolder.height h
-        true
-
-    ## ------------------------------------------------------------------------------------------
-    ## function to render entire ImageStrip including imageviewer, thumbnail list, control buttons
-    ##    
-    render: ()=>        
-        @renderThumbList()
-        @renderControls()
-        @onResize()
-        if !@setSelectedImgNumber(0)?
-            return false
-        true
-
-    ## ------------------------------------------------------------------------------------------
-    ## function to initialize class, creates ImageViewer    
-    ##
-    init: ()=>
-        @elHolder.find(".imageHolder").html("<div class='image' id='image#{@gid}'/><div class='controls' id='controls#{@gid}'/>")
-        @elHolder.find(".scroll_wrapper").attr("id", "scroll_wrapper#{@gid}")
-        @imageViewer = new ImageViewer @elHolder.find("#image#{@gid}")
         @selectedImgNumber = 0
-        @setImgData []
-        #@on "resize", @onResizeViewImageStrip
-        true
-
-    ## 
-    ## function to send data to imageviewer, then imageviewer renders the data
-    ##
-    setElementsImageData: ()=>
-        if !@imageData?
-            return false
-        @imageViewer.setData {
-                image: @imageData[@selectedImgNumber]
-                number: @selectedImgNumber
-            }
         true
 
     ##
@@ -99,8 +199,7 @@ class ViewImageStrip extends View
     setSelectedImgNumber: (number)=>
         if number? and 0 <= number and number < @getImageCount()
             @selectedImgNumber = number
-            @hideOrShowControls()
-            return @setElementsImageData()
+            @resizeSelectedImage()
         else
             return false
     
@@ -128,65 +227,4 @@ class ViewImageStrip extends View
     ##    
     nextImg: ()=>
         @setSelectedImgNumber @selectedImgNumber+1
-        true
-
-    ##
-    ## function to show right and left arrow controls
-    ##    
-    renderControls: ()=>
-        html = "<div id='left-arrow'><i class='fa fa-arrow-left fa-3x' aria-hidden='true'></i></div><div id='right-arrow'><i class='fa fa-arrow-right fa-3x' aria-hidden='true'></i></div>"
-        $("#controls#{@gid}").html html
-        $("#controls#{@gid} #left-arrow").bind "click", =>
-            @prevImg()
-            
-        $("#controls#{@gid} #right-arrow").bind "click", =>
-            @nextImg()
-
-    ##
-    ## Function to enable/disable arrow buttons as there is any previous/next images
-    ##
-    hideOrShowControls: ()=>
-        if @selectedImgNumber <= 0
-                $("#controls#{@gid} #left-arrow").addClass "hidden-arrow"
-            else
-                $("#controls#{@gid} #left-arrow").removeClass "hidden-arrow"
-        if @selectedImgNumber >= @getImageCount() - 1
-                $("#controls#{@gid} #right-arrow").addClass "hidden-arrow"
-            else
-                $("#controls#{@gid} #right-arrow").removeClass "hidden-arrow"
-
-    ##
-    ## function to finally load IScroll for thumbnail list
-    ##        
-    loadScroll: ()=>
-        @iScroll = new IScroll document.getElementById("scroll_wrapper#{@gid}"), { mouseWheel: true, click: true, tap: true, resizeScrollbars: true }
-
-    ##
-    ## function to render thumbnail list(list of imageviewers that are smaller than main one)
-    ##
-    renderThumbList: ()=>
-        @scrollListBody = new WidgetTag "div", "scroll_list_body", "scroller#{@gid}"
-        @element_ul = @scrollListBody.add "ul"
-        @imageData.forEach((image, index)=>
-            element_li = @element_ul.add "li"
-            element_li.el.on('click, tap', (e)=>
-                e.preventDefault()
-                @setSelectedImgNumber index
-            )
-            imageviewer = new ImageViewer element_li.el, image, index
-            imageviewer.render()
-            imageviewer.setSize "200px", "150px"
-        )        
-        $("#scroll_wrapper#{@gid}").append @scrollListBody.el
-        @loadScroll()
-
-    ##
-    ## Function to set size of thumbnails in IScroll
-    ##
-    setThumbSize: (w, h) =>
-        thumbList = @element_ul.getChildren()
-        for thumb in thumbList
-            thumb.el.width w
-            thumb.el.height h
-        @iScroll.refresh()
         true

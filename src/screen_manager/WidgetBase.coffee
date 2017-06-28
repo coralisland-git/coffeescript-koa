@@ -1,8 +1,7 @@
 globalTagData = {}
 globalTagPath = {}
-globalTagID   = 0
 
-class WidgetTag
+class WidgetTag extends NinjaContainer
 
     ##|
     ##|  Properties
@@ -49,11 +48,19 @@ class WidgetTag
 
     constructor: (tagName, classes, id, attributes)->
 
+        super()
+
         ##|
-        ##|  Store a reference to the jQuery version and the raw html5 element
-        @el      = $(document.createElement tagName)
-        @element = @el[0]
-        @gid     = globalTagID++
+        ##|  If "tagName" is actually a jQuery element then take over the element
+        if tagName? and typeof tagName == "object" and tagName.width? and tagName.position? and tagName.css?
+            console.log "WidgetTag from jQuery:", tagName
+            @setHolder(tagName)
+            classes = @el.attr "class"
+            if classes? and classes.length > 0 then @classes = classes.split ' '
+            return true
+
+        newTag = $(document.createElement tagName)
+        @setHolder(newTag)
 
         if id?
             @el.attr "id", id
@@ -66,18 +73,6 @@ class WidgetTag
             @classes = classes.split ' '
         else
             @classes = []
-
-        ##|
-        ##|  A reference to the children added to this element
-        @children = []
-
-        ##|
-        ##|  Already showing by default
-        @visible = true
-
-        ##|
-        ##|  Absolute positioned element @see setAbsolute()
-        @isAbsolute = false
 
         ##|
         ##|  All tags have an id number referenced into the globalTagData
@@ -95,23 +90,7 @@ class WidgetTag
     getTag: () =>
         return @el
 
-    ##|
-    ##|  Adds a new child tag under this one of a given type
-    ##|  with a default class, id, and attributes
-    ##|
-    add: (tagName, classes, id, attributes) =>
-        tag = new WidgetTag tagName, classes, id, attributes
-        tag.parent = this
-        @el.append tag.el
-        @children.push tag
-        return tag
 
-    getChildren: () =>
-        return @children
-    ##|
-    ##|  Shortcut to add a div
-    addDiv: (classes, id, attributes) =>
-        return @add "div", classes, id
 
     resetDataValues: ()=>
         if globalTagData[@gid]?
@@ -148,32 +127,6 @@ class WidgetTag
 
         return globalTagData[@gid][name]
 
-    ##|
-    ##|  Give the element a new zindex value
-    ##|  Can be any of number, auto, initial, inherit
-    ##|  see http://www.w3schools.com/jsref/prop_style_zindex.asp
-    setZ: (newZIndex = "auto")=>
-        if !@isAbsolute? or @isAbsolute != true
-            console.log "Warning: WidgetBase setting z index without absolute position"
-
-        @element.style.zIndex = newZIndex
-
-    getZ: ()=>
-        return @element.style.zIndex
-
-    ##|
-    ##|  Add the "absolute" style to an element
-    ##|  you can also specify something else such as inline, relative, etc
-    ##|
-    setAbsolute: (newIsAbsolute = true)=>
-        if newIsAbsolute == @isAbsolute then return
-        if newIsAbsolute
-            @element.style.position = "absolute"
-        else
-            @element.style.position = newIsAbsolute
-
-        @isAbsolute = newIsAbsolute
-        true
 
     ##|
     ##|  Set an attribute
@@ -258,34 +211,7 @@ class WidgetTag
 
         return true
 
-    height: (h)=>
-        if h? and h > 0
-            @el.height h
-            @cachedHeight = h
-            return h
 
-        # if @cachedHeight? then return @cachedHeight
-        @cachedHeight = @el.height()
-        return @cachedHeight
-
-    width: (w)=>
-        if w? and w > 0
-            @el.width w
-            @cachedWidth = w
-        else if !w?
-            if @cachedWidth? then return @cachedWidth
-
-        @cachedWidth = @el.width()        
-        return @cachedWidth
-
-    outerWidth: ()=>
-        return @el.outerWidth()
-
-    outerHeight: ()=>
-        return @el.outerHeight()
-
-    offset: ()=>
-        return @el.offset()
 
     ##|
     ##|  Append this widget element to a jquery element
@@ -297,32 +223,6 @@ class WidgetTag
         ##|  Shouldn't really be used, add should be used instead
         console.log "Warning: WidgetTag append called adding ", html
         @el.append $(html)
-
-    ##|
-    ##|  Called when a parent widget resizes
-    ##|  w / h - The size of the parent!
-    onParentResize: (w, h)=>
-        return true
-
-    ##|
-    ##|  Call this function if the outside container changes size
-    onResize: (w, h)=>
-        # console.log @el, "WidgetBase received onResize(#{w}, #{h})"
-        delete @cachedWidth
-        delete @cachedHeight
-
-        if w < 0 then w = 0
-        if h < 0 then h = 0
-
-        if @view?
-            # console.log @el, "Resizing self.view to ", w, h
-            @view.onResize(w, h)
-
-        for c in @children
-            # console.log @el, "WidgetBase sending to child resize #{w},#{h} vs #{@width()}, #{@height()} to ", c.el
-            c.onResize(w, h)
-
-        return { width: @width(), height: @height() }
 
     ##|
     ##|   Set the text value or get the text value if nothing passed in
@@ -372,72 +272,11 @@ class WidgetTag
             return @el.css attr
         return @el.css attr, value
 
-    show: ()=>
-        if @visible != true then @el.show()
-        @visible = true
-        this
-
-    hide: ()=>
-        if @visible == true then @el.hide()
-        @visible = false
-        this
-
-    ##|
-    ##|  Reposition aboslute elements
-    move: (x, y, w, h)=>
-
-        # console.log "WidgetBase move (#{x}, #{y}, #{w}, #{h})", @isOrigin
-
-        if x != @x
-            @x = x
-            @element.style.left   = @x + "px"
-
-        if y != @y
-            @y = y
-            @element.style.top    = @y + "px"
-
-        if w != @w
-            @w = w
-            delete @cachedWidth
-            @element.style.width  = @w + "px"
-
-        if h != @h
-            @h = h
-            delete @cachedHeight
-            @element.style.height = @h + "px"
-
-        return this
-
-    position: ()=>
-        pos = @el.position()
-        return pos
-
     find: (str)=>
         return @el.find(str)
 
     on: (eventName, callback)=>
         @bind(eventName, callback)
-
-    ##|
-    ##|  Set the HTML to a given view name
-    ##|  Execute the callback with the view before returning if
-    ##|  a callback is specified
-    setView: (viewName, viewCallback)=>
-
-        new Promise (resolve, reject)=>
-
-            doAppendView viewName, @el
-            .then (view)=>
-                if viewCallback?
-                    viewCallback(view)
-
-                @view = view
-                setTimeout ()=>
-                    console.log @el, "2 WidgetBase setView name=#{viewName}, calling resize", @width(), @height(), @el.height()
-                    view.onResize @width(), @height()
-                    resolve(view)
-                , 50
-
 
 
     ##|
@@ -475,11 +314,6 @@ class WidgetTag
         path = "/#{tableName}/#{idValue}/#{fieldName}"
         currentValue = DataMap.getDataFieldFormatted tableName, idValue, fieldName
 
-        ## -gao
-        ## set width of element to the value its data-formatter has
-        if (inputWidth = dm.types[tableName]?.col[fieldName]?.getFormatter()?.input_width)?
-            @element.style.maxWidth = "#{inputWidth}px"
-        
         ## Add class `data` as a default one for widget binded to a table field    
         classes = ["data"]
 
@@ -510,11 +344,13 @@ class WidgetTag
                     #console.log("Event emitted by DataMap: #{table}/#{id}")
                     @renderField tableName, idValue, fieldName
             )
+
         globalKeyboardEvents.on( "change"
             , (pathChanged, newValue) =>
                 if pathChanged is path
                     @renderField tableName, idValue, fieldName
             )
+
         true
 
 

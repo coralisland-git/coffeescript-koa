@@ -1,4 +1,4 @@
-@import "../theme.styl"
+@import "../../src/theme.styl"
 
 .ninja-tabs
     themeNoTap()
@@ -16,7 +16,7 @@
         border-bottom:   1px solid $colorItemInactiveHighlight
         background-color: #ffffff
 
-    li
+    li.ninja-nav-tab
         height:         32px
         font-size:      11px
         cursor:         pointer
@@ -73,8 +73,10 @@
             height:           20px
             padding-top:      4px
             text-align:       center
+            padding-left:     4px
+            padding-right:    4px
 
-    li.active
+    li.ninja-nav-tab.active
 
         border-bottom: 2px solid $colorItemActiveHighlight
         color:         $colorItemActiveText
@@ -84,6 +86,27 @@
             border: 1px solid darker($colorItemActiveHighlight, 30)
             background-color: $colorItemActiveHighlight
             color: #ffffff
+
+        &.badge-warning
+        	background-color: #f0ad4e
+        	color: #fff
+
+        &.badge-primary
+        	background-color: #337ab7
+        	color: #fff
+
+        &.badge-success
+        	background-color: #5cb85c
+        	color: #fff
+
+        &.badge-danger
+        	background-color: #d9534f
+        	color: #fff
+
+        &.badge-info
+        	background-color: #5bc0de
+        	color: #fff
+
 
 .ninja-nav-body
     padding: 0

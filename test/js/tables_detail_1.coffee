@@ -5,47 +5,74 @@ Example / Demo using 2 tables, one in each direction
 
 $ ->
 
-    new Promise (resolve, reject) ->
-        ds = new DataSet "zipcode"
-        ds.setAjaxSource "/js/test_data/zipcodes.json", "data", "code"
-        ds.doLoadData()
-        .then (dsObject)->
-            resolve(true)
-        .catch (e) ->
-            console.log "Error loading zipcode data: ", e
-            resolve(false)
+    addTest "Loading Zipcodes", ()->
+        loadZipcodes()
 
-    .then ()->
+	addTest "Add a single row in geoset table", () ->
+        ## add the sample data to geoset table
+        DataMap.addDataUpdateTable "geoset", "1",
+            id: 1
+            lastModified: '2016-04-20 10:10:00'
+            title: 'sample Title'
+            county: 'BERKSHIRE'
+            dataset_type: 'Parcel'
+            description: 'sample description'
+            metro_area: 'Charlotte'
+            source_url: 'http://maps.co.mecklenburg.nc.us/opendata/Parcel_TaxData.zip'
+            total_points: 382725
+            bbox: [
+                '1449197.0931383073'
+                '390084.8933570981'
+                '1617626.7021882534'
+                '533989.131004706'
+            ]
 
-        addHolder("renderTest1");
-        $("#renderTest1").css
-            width: 1000
-            height: 500
-            padding: 0
-            margin: 0
-            "background" : "blue"
-            "border": "1px solid green"
+    addTestButton "Simple Detailed Table", "Open", () ->
+        addHolder()
+        .setView "Table", (view)->
+            view.setDetailed()
+            view.addTable "zipcode"
 
-        table = new TableView $("#renderTest1")
-        table.addTable "zipcode"
-        table.setFixedHeaderAndScrollable()
-        table.render()
-        table.updateRowData()
+    addTestButton "Simple Detailed Table GeoSet", "Open", () ->
+        addHolder()
+        .setView "Table", (view)->
+            view.setDetailed()
+            view.addTable "geoset"
 
-        addHolder("renderTestSpace");
-        $("#renderTestSpace").css
-            width: "100%"
-            height: 20
+    addTestButton "Table Detail View in popup", "Open", ()->
 
-        addHolder("renderTest2");
-        $("#renderTest2").css
-            width: 1000
-            height: 500
-            padding: 0
-            margin: 0
-            "background" : "blue"
-            "border": "1px solid green"
+        doPopupView "Table", "Detailed Table Example", null, 400, 800, (view)->
+            view.setDetailed()
+            view.addTable "geoset"
 
-        table = new TableViewDetailed $("#renderTest2")
-        table.addTable "zipcode"
-        table.render()
+    addTestButton "Dual Normal and Detailed with filter", "Open", ()->
+
+        console.log "Creating a splitter with a normal table on the left and a detail view on the right."
+        console.log "Right has minimum size of 300px"
+
+        addHolder()
+        .setView "Splittable", (splitter)->
+
+            splitter.setPercent(60)
+            splitter.getSecond().setMinWidth 300
+
+            splitter.getFirst().setView "Table", (table)->
+                table.addTable "zipcode", null, (row)->
+                    row.id == '00544'
+
+                table.setShowFilter(false)
+
+                table.on "click_city", (row, e)=>
+                    console.log "Table 1 - Click city:", row, " e=", e
+                    return true
+
+            splitter.getSecond().setView "Table", (table)->
+                table.setDetailed()
+                table.addTable "zipcode", null, (row)->
+                    row.id == '00544'
+
+                table.on "click_city", (row, e)=>
+                    console.log "Table 2 - Click city:", row, " e=", e
+                    return true
+
+    go()

@@ -82,16 +82,10 @@ doLoadView = (viewName) ->
 
     # -gao
     #if Views[viewName]? then return Views[viewName]
-    if Views[viewName]?
+    if Views[viewName]? and window[className]?
         return new Promise (resolve, reject) ->
-
-            if window[className]?
-                view = new window[className]
-
-                resolve(view)
-
-            else
-                console.log "Unable to find view: ", className
+            view = new window[className]
+            resolve(view)
 
     Views[viewName] = new Promise (resolve, reject) ->
 
@@ -103,68 +97,38 @@ doLoadView = (viewName) ->
             if window[className]?
                 view = new window[className]
 
+                if window[className].prototype.css?
+                    registerStyleSheet "View#{viewName}", window[className].prototype.css
+
                 depList = view.getDependencyList()
                 doLoadDependencies(depList)
                 .then ()->
                     resolve(view)
 
             else
-                console.log "Unable to find view: ", className
-
-doAppendView = (viewName, holderElement) ->
-
-    appendView = (className, resolve)->
-        view = new window[className]()
-        view.AddToElement(holderElement)
-        view.once "view_ready", ()->
-            resolve(view)
-
-    new Promise (resolve, reject) ->
-
-        className = "View" + viewName
-        # console.log "Loading class #{className}"
-
-        ##|
-        ##|  See if the class is already loaded
-        if window[className]?
-            appendView(className, resolve)
-            return
-
-        if !window.busyLoadingView?
-            window.busyLoadingView = {}
-
-        if window.busyLoadingView[viewName]?
-
-            ##|
-            ##|  Already loading the existing view
-            ##|
-            new Promise (resolve, reject)=>
-                window.busyLoadingView[viewName].push(resolve)
-            .then ()=>
-                appendView(className, resolve)
-
-        else
-
-            window.busyLoadingView[viewName] = []
-            doLoadView(viewName)
-            .then (view)->
-                r() for r in window.busyLoadingView[viewName]
-                delete window.busyLoadingView[viewName]
-                appendView(className, resolve)
+                console.log "Unable to find view2: ", className
 
 ##|
 ##|  Popup a view and then return control to the caller
-doPopupView = (viewName, title, settingsName, w, h) ->
+##|  Returns a promise that resolves to the PopupWindow object
+##|  Callback with view if passed in.
+##|
+doPopupView = (viewName, title, settingsName, w, h, callbackWithView) ->
 
     new Promise (resolve, reject) ->
 
-        doLoadView(viewName)
-        .then (view)->
-            view.windowTitle = title
-            view.showPopup settingsName, w, h
-            view.once "view_ready", ()->
-                view.onSetupButtons()
-                resolve(view)
+        win = new PopupWindow title, 0, 0,
+            w: w
+            h: h
+            scrollable: false
+            table_name: settingsName
+
+        win.getBody().setView viewName, (view)->
+            win.view = view
+            if callbackWithView? and typeof callbackWithView == "function"
+                callbackWithView(view)
+
+            resolve(win)
 
 doPopupTableView = (data, title, settingsName, w, h) ->
 
@@ -178,8 +142,7 @@ doPopupTableView = (data, title, settingsName, w, h) ->
             vertical = true
             
 
-        doPopupView 'PopupTable', title, settingsName, w, h
-        .then (view) ->
+        doPopupView 'PopupTable', title, settingsName, w, h, (view)->
             if vertical == true
                 DataMap.removeTableData table_name
                 DataMap.importDataFromObjects table_name, data    
@@ -195,39 +158,21 @@ doPopupTableView = (data, title, settingsName, w, h) ->
 ## - Popup a view with DynamicTabls, only once
 doPopupViewOnce = (viewName, title, settingsName, w, h, tabName, callbackWithView) ->
 
-    createPopup = ()->
+    newPromise ()->
 
-        new Promise (resolve, reject) ->
+        if !PopupViews[title]?
+            PopupViews[title] = yield doPopupView "DynamicTabs", title, settingsName, w, h
+            PopupViews[title].tabNames = []
 
-            doLoadView("DynamicTabs")
-            .then (view)->
-                view.windowTitle = title
-                view.showPopupwithConfig settingsName, w, h,
-                    keyValue: title
+        if !PopupViews[title].isVisible
+            PopupViews[title].open()
 
-                view.once "view_ready", ()->
-                    # view.onShowScreen()
-                    view.tabNames = []
-                    resolve(view)
+        if !PopupViews[title].tabNames.includes(tabName)
+            PopupViews[title].tabNames.push tabName
+            v = yield PopupViews[title].view.doAddViewTab viewName, tabName, callbackWithView
 
-    if !PopupViews[title]?
-        PopupViews[title] = createPopup()
-
-    PopupViews[title].then (view) ->
-
-        # if !view.popup.popupWindowHolder?
-        #     createPopup()
-
-        if !view.popup.isVisible
-            view.popup.open()
-
-        if view.tabNames.includes(tabName)
-            view.tabs.show "tab#{view.tabNames.indexOf(tabName)}"
-        else
-            view.tabNames.push tabName
-            view.tabs.doAddViewTab viewName, tabName, callbackWithView
-            .then (v)=>
-                view.tabs.show "tab#{view.tabNames.indexOf(tabName)}"
+        PopupViews[title].view.show "tab#{PopupViews[title].tabNames.indexOf(tabName)}"
+        true
 
 doLoadScreen = (screenName, optionalArgs) ->
 
@@ -247,38 +192,6 @@ doLoadScreen = (screenName, optionalArgs) ->
 
         head.appendChild(oScript)
         oScript.src = "/screens/" + screenName + ".js"
-
-##|
-##|  Similar to showScreen except that it loads a view as full screen.
-##|
-showViewAsScreen = (viewName, optionalArgs) ->
-
-    new Promise (resolve, reject)=>
-
-        ##|
-        ##|  If the view holder screen isn't loaded yet, load it and then
-        ##|  call this function again which will skip this part.
-        if not Screens["ViewHolder"] and typeof window["ScreenViewHolder"] isnt "function"
-            doLoadScreen "ViewHolder", null
-            .then ()->
-                resolve(showViewAsScreen(viewName, optionalArgs))
-                return true
-            return true
-
-        ##|
-        ##|  Screen must already be loaded
-        doLoadView(viewName)
-        .then (view)=>
-            showScreen "ViewHolder",
-                view: view
-                viewName: viewName
-                args: optionalArgs
-
-            view.once "view_ready", ()->
-                view.popup = Screens["ViewHolder"]
-                resolve(view)
-
-            view.showInDiv "ViewHolderContent"
 
 showScreen = (screenName, optionalArgs) ->
 

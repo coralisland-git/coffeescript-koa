@@ -107,7 +107,7 @@ compileScreen = (screenName, appName)->
         console.log "compileScreen Screen=#{screenName}, appName=#{appName}"
 
         pathList = [ "../ninja/screens/" ]
-        if appName? then pathList = [ "../test/#{appName}/screens/", "../ninja/screens/"]
+        # if appName? then pathList = [ "../test/#{appName}/screens/", "../ninja/screens/"]
 
         filenameStylus = yield WebServerHelper.doFindFileInPath "screen_#{screenName.toLowerCase()}.styl", pathList
         filenamePug   = yield WebServerHelper.doFindFileInPath "screen_#{screenName.toLowerCase()}.pug", pathList
@@ -139,8 +139,8 @@ compileView = (viewName, appName)->
 
     co ()->
 
-        pathList = [ "../ninja/views/" ]
-        if appName? then pathList = [ "../test/#{appName}/views/", "../ninja/views/" ]
+        pathList = [ "../ninja/views/", "../test/views/" ]
+        # if appName? then pathList = [ "../test/#{appName}/views/", "../ninja/views/" ]
 
         filenameCss  = yield WebServerHelper.doFindFileInPath "#{viewName}.styl", pathList
         filenameHtml = yield WebServerHelper.doFindFileInPath "#{viewName}.pug", pathList

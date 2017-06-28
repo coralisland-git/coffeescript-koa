@@ -13,11 +13,10 @@ class ViewForm extends View
 	## Initialization function
 	## Create instance of FormWrapper which would present form
 	## 
-        
+
 	init: (@optionsData)=>    	
 		@elHolder.find(".form-container").html("<div id='formView#{@gid}'/>")
 		@form = new FormWrapper @elHolder.find("#formView#{@gid}"), true
-		@on "resize", @onResizeFormView
 		true
 
 	## -----------------------------------------------------------------
@@ -36,18 +35,19 @@ class ViewForm extends View
 	## ---------------------------------------------------------------------
 	## Function to set size of form view
 	## yet meaningless
-	##		
+	##
 	setSize: (w, h)=>
-		@onResizeFormView w, h
+		super(w, h)
 		@elHolder.width(w)
 		@elHolder.height(h)
+		@onResizeFormView w, h
 
     ## ---------------------------------------------------------------------
     ## Function that creates/returns reference to formwrapper
     ## @return [FormWrapper]
     ##
 	getForm: () =>
-    	if @form? 
+    	if @form?
     		return @form
     	return new FormWrapper(@elHolder.find("#formView#{@gid}"), true)
 
@@ -57,5 +57,4 @@ class ViewForm extends View
     ##
 	show: (name)=>
         @form.show()
-        @onResizeFormView @elHolder.width(), @elHolder.height()
         true
