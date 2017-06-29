@@ -296,7 +296,7 @@ class DataMap
 		for keyName, value of newData
 			if keyName == "_id" then continue
 			if keyName == "loc" then continue
-			if keyName == "id" then continue
+			# if keyName == "id" then continue
 			if keyName.charAt(0) == '_' then continue
 			if keyName == "hash" then continue
 

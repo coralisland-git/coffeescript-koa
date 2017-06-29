@@ -523,7 +523,6 @@ class TableView
 
 				if row? and row[col]?
 					result = c.renderTooltip(row, row[col], @tooltipWindow)
-					console.log "RESULT=", result, c
 					if result == true
 						@tooltipWindow.moveTo(coords.x - (@tooltipWindow.width/2), coords.y - 10 - @tooltipWindow.height)
 						@tooltipWindow.show()
@@ -834,11 +833,7 @@ class TableView
 							#for col in @colList
 							for index, col of @colByNum
 								if col.getSource() == source
-									console.log "Emitting open_editor"
-									# globalTableEvents.emitEvent "open_editor", [ col.tableName ]
-
-									doPopupView "ShowTableEditor", "Editing table: #{@primaryTableName}", "#{@primaryTableName}", 1300, 800
-									.then (view)=>
+									doPopupView "ShowTableEditor", "Editing table: #{@primaryTableName}", "tableEditor", 1300, 800, (view)=>
 										view.showTableEditor @primaryTableName
 
 						, source

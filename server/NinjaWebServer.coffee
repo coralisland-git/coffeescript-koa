@@ -27,7 +27,7 @@ saveNinjaFileAndExit = (strCSS, strJS) =>
     console.log "Writing ../ninja/ninja.js"
     fs.writeFile "../ninja/ninja.js", strJS, (err, done) ->
         if err? then return console.log "Error writing Ninja.js:", err
-    if argv.gen then process.exit(0)
+        if argv.gen then process.exit(0)
 
 bundle = browserify
   extensions: ['.coffee']
