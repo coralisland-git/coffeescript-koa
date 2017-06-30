@@ -68163,9 +68163,11 @@ FloatingWindow = (function() {
     }
     this.floatingWin = new WidgetTag("div", "floatingWindow");
     this.floatingWin.move(this.left, this.top, this.width, this.height);
-    this.floatingWin.appendTo(this.parent);
+    this.floatingWin.appendTo($("body"));
     this.floatingWin.hide();
     this.elHolder = this.floatingWin.addDiv("floatingWinBody");
+    this.elHolder.setAbsolute();
+    this.elHolder.move(0, 0, this.width, this.height);
     return true;
   };
 

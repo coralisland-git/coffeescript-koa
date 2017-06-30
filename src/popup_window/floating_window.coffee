@@ -37,10 +37,14 @@ class FloatingWindow
 
 		@floatingWin = new WidgetTag "div", "floatingWindow"
 		@floatingWin.move(@left, @top, @width, @height)
-		@floatingWin.appendTo @parent
+		# @floatingWin.appendTo @parent
+		@floatingWin.appendTo $("body")
 		@floatingWin.hide()
 
 		@elHolder = @floatingWin.addDiv "floatingWinBody"
+		@elHolder.setAbsolute()
+		@elHolder.move(0, 0, @width, @height)
+
 		true
 
 	getBodyWidget: ()=>
