@@ -405,11 +405,22 @@ class DataMap
 		path = "/#{tableName}/#{keyValue}"
 		dm = DataMap.getDataMap()
 		doc = dm.engine.set path, newData
+
 		##|
 		##|  Remove any cached values that happen to exist
 		for varName, value of newData
 			delete dm.cachedFormat["/#{tableName}/#{keyValue}/#{varName}"]
-		dm.emitEvent "new_data", [ tableName, keyValue ]
+
+		if dm.types[tableName].evWaiting?
+			clearTimeout dm.types[tableName].evWaiting
+
+		##|
+		##|  Set a timer to let everyone know there is new data
+		dm.types[tableName].evWaiting = setTimeout ()=>
+			ev = new CustomEvent("new_data", { detail: { tablename: tableName, id: keyValue }})
+			window.dispatchEvent ev
+			delete dm.types[tableName].evWaiting
+		, 10
 
 		return doc
 
@@ -444,7 +455,6 @@ class DataMap
 		if ignoreEvents? and ignoreEvents == true or !globalTableEvents?
 			return true
 
-		##|doGetCursor
 		##| Send chagne event
 		# console.log "changeColumnAttribute #{tableName}, #{sourceName}, #{field}, #{newValue}"
 		globalTableEvents.emitEvent "table_change", [ tableName, sourceName, field, newValue ]

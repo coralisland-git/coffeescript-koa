@@ -20,6 +20,7 @@ class TableViewDetailed extends TableView
         @showResize       = false
 
     getTableTotalRows: ()=>
+        if !@colByNum? then return 0
         count = Object.keys(@colByNum).length
 
     getTableTotalCols: ()=>

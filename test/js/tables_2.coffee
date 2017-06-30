@@ -160,25 +160,6 @@ $ ->
 		addHolder().setView "Table", (table)->
 			table.addTable "zipcode"
 
-	addTestButton "dynamic add/remove row test case", "Open", ()->
-
-		addHolder()
-		.setView "Splittable", (splitter)->
-
-			splitter.getFirst().setMinHeight(100)
-			splitter.setPercent 0
-			splitter.setHorizontal()
-
-			splitter.getSecond().setView "Table", (table)->
-				table.addTable "zipcode"
-
-			button = splitter.getFirst().add "input", "btn btn-danger", "btn1", { type: "button", value: "Delete first row" }
-			button.bind "click", (data)->
-				console.log "Click button"
-
-
-		true
-
 	addTestButton "Locked Column Sorting", "Open", ()->		
 		theTable = "mlsactive"
 		for id, newData of Data

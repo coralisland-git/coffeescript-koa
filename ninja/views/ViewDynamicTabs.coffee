@@ -230,15 +230,12 @@ class ViewDynamicTabs extends View
         return @tags[@activeTab]
 
     show: (id)=>
-        console.log "DynamicTabs show(#{id})"
         if !id? then return false
         if typeof id == "object" and id.id? then id = id.id
         if @tags[id]?
             @emitEvent "showtab", [ id, @tags[id] ]
             @activeTab = id
             @updateTabs()
-        # else
-            # console.log "Warning: DynamicTabs show(#{id}) invalid tab"
 
         return true
 

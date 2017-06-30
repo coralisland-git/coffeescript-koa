@@ -514,7 +514,6 @@ class NinjaContainer
         count = 0
         for child in @children
             if position == count
-                console.log "insertBefore ", child.el
                 tag.el.insertBefore(child.el)
                 @children.splice count, 0, tag
                 return tag

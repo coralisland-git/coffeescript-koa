@@ -37,6 +37,13 @@ class ViewDataChart extends View
     ##|
     ##|  Add a DataSeries object
     setData: (dataSeries)=>
+
+        if !dataSeries?
+            return
+
+        if !@chartOptions?
+            return
+
         if !@chartOptions.data?
             @chartOptions.data = []
 
@@ -47,19 +54,10 @@ class ViewDataChart extends View
         return @chartOptions
 
     onResize : (w, h)=>
+        super(w, h)
         if @chart?
             return @onRender()
         return
-
-    setSize: (w, h)=>
-        @elHolder.width(w)
-        @elHolder.height(h)
-        @elHolder.find("#chart#{@gid}").width(w).height(h);
-
-        if @chart?
-            return @onRender()
-
-        true
 
     onRender: ()=>
         @chart.render()
