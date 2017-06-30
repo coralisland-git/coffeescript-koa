@@ -74621,14 +74621,10 @@ FloatingSelect = (function(superClass) {
   FloatingSelect.prototype.show = function() {
     FloatingSelect.__super__.show.apply(this, arguments).show();
     this.showTable();
-    setTimeout(this.table.onResize, 10);
     return true;
   };
 
   FloatingSelect.prototype.onResize = function() {
-    if (this.table != null) {
-      this.table.onResize();
-    }
     return true;
   };
 
@@ -74642,46 +74638,39 @@ FloatingSelect = (function(superClass) {
     if (this.table != null) {
       return this.table;
     }
-    this.table = new TableView(this.elHolder.el, false);
-    this.table.showGroupPadding = false;
-    this.table.showResize = false;
-    this.table.setAutoFillWidth();
-    this.table.addTable(this.tableName, (function(_this) {
-      return function(colName) {
-        var i, len, opt, ref;
-        if (_this.columns == null) {
-          return true;
-        }
-        ref = _this.columns;
-        for (i = 0, len = ref.length; i < len; i++) {
-          opt = ref[i];
-          if (opt === colName.getSource()) {
+    this.elHolder.setView("Table", (function(_this) {
+      return function(view) {
+        _this.table = view.addTable(_this.tableName, function(colName) {
+          var i, len, opt, ref;
+          if (_this.columns == null) {
             return true;
           }
+          ref = _this.columns;
+          for (i = 0, len = ref.length; i < len; i++) {
+            opt = ref[i];
+            if (opt === colName.getSource()) {
+              return true;
+            }
+          }
+          return false;
+        });
+        _this.table.showGroupPadding = false;
+        _this.table.showResize = false;
+        _this.table.setAutoFillWidth();
+        _this.table.on("click_row", function(row, e) {
+          _this.emitEvent("select", [row]);
+          return true;
+        });
+        _this.table.on("focus_cell", function(path, item) {
+          console.log("on focus cell:", path, item);
+          _this.emitEvent("preselect", [item.id, item]);
+          return true;
+        });
+        if ((typeof config !== "undefined" && config !== null) && config.showHeaders) {
+          return _this.table.showHeaders = true;
         }
-        return false;
       };
     })(this));
-    this.table.on("click_row", (function(_this) {
-      return function(row, e) {
-        _this.emitEvent("select", [row]);
-        return true;
-      };
-    })(this));
-    this.table.on("focus_cell", (function(_this) {
-      return function(path, item) {
-        console.log("on focus cell:", path, item);
-        _this.emitEvent("preselect", [item.id, item]);
-        return true;
-      };
-    })(this));
-    if ((typeof config !== "undefined" && config !== null) && config.showHeaders) {
-      this.table.showHeaders = true;
-    }
-    console.log("TODO:  Fix this using a view because tableView doesn't support setFixedSize anymore.  Instead we need a container with .move to get the size");
-    this.table.setFixedSize(this.width, this.height);
-    this.table.render();
-    this.table.onResize();
     return true;
   };
 
