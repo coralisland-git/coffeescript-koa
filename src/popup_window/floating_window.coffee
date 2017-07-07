@@ -42,10 +42,16 @@ class FloatingWindow
 		@floatingWin.hide()
 
 		@elHolder = @floatingWin.addDiv "floatingWinBody"
-		@elHolder.setAbsolute()
-		@elHolder.move(0, 0, @width, @height)
+		#@elHolder.setAbsolute()
+		#@elHolder.move(0, 0, @width, @height)
 
 		true
+
+	getWidth: () =>
+		@width = @floatingWin.outerWidth()
+
+	getHeight: () =>
+		@height = @floatingWin.outerHeight()
 
 	getBodyWidget: ()=>
 		@internalCreateElement()
@@ -63,6 +69,22 @@ class FloatingWindow
 			@floatingWin.hide()
 
 	moveTo: (x, y)=>
+
+		winWidth  = $(window).width()
+		winHeight = $(window).height()
+
+		if x < 0
+			x = 0
+
+		if y < 0
+			y = 0
+
+		if @width > winWidth - 40
+			@width = winWidth - 40
+
+		if x + @width + 20 > winWidth
+			x = winWidth - @width - 20
+	
 		@top  = y
 		@left = x
 		if @floatingWin?

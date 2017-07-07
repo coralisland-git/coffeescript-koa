@@ -520,7 +520,7 @@ class TableView
                 if row? and row[col]?
                     result = c.renderTooltip(row, row[col], @tooltipWindow)
                     if result == true
-                        @tooltipWindow.moveTo(coords.x - (@tooltipWindow.width/2), coords.y - 10 - @tooltipWindow.height)
+                        @tooltipWindow.moveTo(coords.x - (@tooltipWindow.getWidth() / 2), coords.y - 10 - @tooltipWindow.getHeight())
                         @tooltipWindow.show()
                         @tooltipShowing = true
 
@@ -559,7 +559,7 @@ class TableView
         @mouseHoverTimer = setTimeout @onMouseHover, 1000, e
         if @tooltipShowing? and @tooltipShowing == true
             coords = GlobalValueManager.GetCoordsFromEvent(e)
-            @tooltipWindow.moveTo(coords.x - (@tooltipWindow.width/2), coords.y - 10 - @tooltipWindow.height)
+            @tooltipWindow.moveTo(coords.x - (@tooltipWindow.getWidth() / 2), coords.y - 10 - @tooltipWindow.getHeight())
 
     ## -------------------------------------------------------------------------------------------------------------
     ## to setup event internally for the table
