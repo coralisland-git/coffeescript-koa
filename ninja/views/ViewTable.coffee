@@ -100,3 +100,8 @@ class ViewTable extends View
     loadTable: (@tableName, colFilterFunction, rowFilterFunction)=>
         @addTable @tableName, colFilterFunction, rowFilterFunction
 
+    ## gao
+    groupBy: (columnName)=>
+        @table.groupBy(columnName)
+        @resetSize()
+        true
