@@ -145,8 +145,10 @@ $ ->
 
 		##| set the address as object in data map, to manipulate address field as simple object
 		for key,obj of DataMap.getDataMap().engine.export("zipcode")
-			obj.address = {city:obj.city,state:obj.state,county:obj.county}
+			obj.address = {"#{key}": {city:obj.city,state:obj.state,county:obj.county}}
 
+		## -gao
+		## is "options.compile" needed or used?
 		DataMap.setDataTypes "zipcode", [
 			name    : "Address"
 			source  : "address"
