@@ -28,9 +28,9 @@ class ViewForm extends View
 	onResizeFormView : (w, h)=>
 		if w == 0 or h == 0 then return
 		if w < @boundaryValueToFullWidth
-			@form.putElementsFullWidth()
+			@getForm().putElementsFullWidth()
 		else
-			@form.backElementsFullWidth()
+			@getForm().backElementsFullWidth()
 
 	## ---------------------------------------------------------------------
 	## Function to set size of form view
