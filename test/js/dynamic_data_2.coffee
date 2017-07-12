@@ -151,70 +151,61 @@ $ ->
         false
     
     addTestButton "Bind to Path(Only One Data Field)", "Open", () =>
-        addHolder "renderTest"
-        wdt = new WidgetTag("div", null, "wdt_div")
-        $("#renderTest").append($ "<br><span>Simple Data Field, you can edit it</span>")
-        $("#renderTest").append wdt.getTag()
-        wdt.bindToPath "zipcode", "03105", "city"
+        viewExe = addHolder()
+        wdt1 = viewExe.add("div", "", "wdt_div1")
+        wdt1.html("<br><span>Simple Data Field, you can edit it</span>")
+        wdt2 = viewExe.add("div", "", "wdt_div2")
+        wdt2.bindToPath "zipcode", "03105", "city"
         true
 
     addTestButton "Bind to Path(Several Widgets with same Path)", "Open", () =>
-        addHolder "renderTest"
-        wdt_1 = new WidgetTag("div", null, "wdt_1")
-        wdt_2 = new WidgetTag("div", null, "wdt_2")
-        wdt_3 = new WidgetTag("div", null, "wdt_3")
+        viewExe = addHolder()
+        wdt_1 = viewExe.add("div", "", "wdt_1")
+        wdt_2 = viewExe.add("div", "", "wdt_2")
+        wdt_3 = viewExe.add("div", "", "wdt_3")
         wdt_1.bindToPath "zipcode", "03105", "city"
         wdt_2.bindToPath "zipcode", "03105", "city"
         wdt_3.bindToPath "zipcode", "03105", "city"
-        $("#renderTest").append $ "<p>Three WidgetTags with same DataPath, if one changes, others are updated automatically. </p>"
-        $("#renderTest").append wdt_1.getTag()
-        $("#renderTest").append wdt_2.getTag()
-        $("#renderTest").append wdt_3.getTag()
         true
 
     addTestButton "Bind to Path(Editable and Uneditable fields)", "Open", () =>
-        addHolder "renderTest"
-        wdt_editable = new WidgetTag("div", null, "wdt_editable")
-        wdt_uneditable = new WidgetTag("div", null, "wdt_uneditable")
+        viewExe = addHolder()
+        wdt_lblEdit = viewExe.addDiv("", "wdt_lblEdit")
+        wdt_lblEdit.html "<br><span>Editable Field</span>"
+        wdt_editable = viewExe.add("div", "", "wdt_editable")
+        wdt_lblNoEdit = viewExe.addDiv("", "wdt_lblNoEdit")
+        wdt_lblNoEdit.html "<br><span>Uneditable Field</span>"
+        wdt_uneditable = viewExe.add("div", "", "wdt_uneditable")
         wdt_editable.bindToPath "zipcode", "03105", "city"
         wdt_uneditable.bindToPath "zipcode", "03105", "county"
-        $("#renderTest").append($ "<br><span>Editable Field</span>")
-        $("#renderTest").append wdt_editable.getTag()
-        $("#renderTest").append($ "<br><span>Uneditable Field</span>")
-        $("#renderTest").append wdt_uneditable.getTag()
         return true
 
     addTestButton "Bind to Path(Several Data types)", "Open", () =>
-        addHolder "renderTest"
-        wdt_id = new WidgetTag("td", null, "wdt_td_id")
+        viewExe = addHolder()
+        wdt_table = viewExe.add("table", "test_table", "wdt_table")
+        wdt_table.html "<caption>There are many data types you can bind to data fields.(Here, except first 2 columns, all are editable.)</caption>"
+        wdt_id = wdt_table.add("td", null, "wdt_td_id")
         wdt_id.bindToPath "testData", "0011", "id"
 
-        wdt_initPrice = new WidgetTag("td", null, "wdt_td_initPrice")
+        wdt_initPrice = wdt_table.add("td", null, "wdt_td_initPrice")
         wdt_initPrice.bindToPath "testData", "0011", "initialPrice"
 
-        wdt_curPrice = new WidgetTag("td", null, "wdt_td_curPrice")
+        wdt_curPrice = wdt_table.add("td", null, "wdt_td_curPrice")
         wdt_curPrice.bindToPath "testData", "0011", "currentPrice"
 
-        wdt_date = new WidgetTag("td", null, "wdt_td_date")
+        wdt_date = wdt_table.add("td", null, "wdt_td_date")
         wdt_date.bindToPath "testData", "0011", "date"
 
-        wdt_distance = new WidgetTag("td", null, "wdt_td_distance")
+        wdt_distance = wdt_table.add("td", null, "wdt_td_distance")
         wdt_distance.bindToPath "testData", "0011", "distance"
 
-        wdt_isNew = new WidgetTag("td", null, "wdt_td_isNew")
+        wdt_isNew = wdt_table.add("td", null, "wdt_td_isNew")
         wdt_isNew.bindToPath "testData", "0011", "isNew"
 
-        wdt_imagelist = new WidgetTag("td", null, "wdt_td_imagelist")
+        wdt_imagelist = wdt_table.add("td", null, "wdt_td_imagelist")
         wdt_imagelist.bindToPath "testData", "0011", "imagelist"
        
-        $("#renderTest").append($ "<br><table class='test_table_2'><caption>There are many data types you can bind to data fields.(Here, except first 2 columns, all are editable.)</caption></table>")
-        $(".test_table_2").append wdt_id.getTag()
-        $(".test_table_2").append wdt_initPrice.getTag()
-        $(".test_table_2").append wdt_curPrice.getTag()
-        $(".test_table_2").append wdt_date.getTag()
-        $(".test_table_2").append wdt_distance.getTag()
-        $(".test_table_2").append wdt_isNew.getTag()
-        $(".test_table_2").append wdt_imagelist.getTag()
+        #$("#renderTest").append($ "<br><table class='test_table_2'><caption>There are many data types you can bind to data fields.(Here, except first 2 columns, all are editable.)</caption></table>")
         true
 
     addTestButton "Add data(to zipcode)", "Open", () =>
