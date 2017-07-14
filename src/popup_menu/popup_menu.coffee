@@ -106,13 +106,19 @@ class PopupMenu
 	##
 	resize: (@popupWidth) =>
 
+		## append all the popupMenuItems to the holder
+		for linkObject in @linkObjects
+			window.popupMenuHolder.append linkObject.getRenderedElement()
+
 		@popupHeight = window.popupMenuHolder.height()
+		@popupWidth = window.popupMenuHolder.width()
 
 		width  = $(window).width()
 		height = $(window).height()
 
-		if @x < 0
-			@x = 0
+		x = @x - @popupWidth / 2
+		if x < 0
+			 x = 0
 
 		if @y < 0
 			@y = 0
@@ -120,21 +126,18 @@ class PopupMenu
 		if @popupWidth > width - 40
 			@popupWidth = width - 40
 
-		if @x + @popupWidth + 10> width
-			@x = width - @popupWidth - 10
+		if x + @popupWidth + 10> width
+			x = width - @popupWidth - 10
 
 		##| because of table context menu popup had to comment
 		# if @y + @popupHeight + 10 > height
 		# 	@y = height - @popupHeight - 10
 
-		window.popupMenuHolder.css
-			left:  @x
-			top:   @y
-			width: @popupWidth
 
-		## append all the popupMenuItems to the holder
-		for linkObject in @linkObjects
-			window.popupMenuHolder.append linkObject.getRenderedElement()
+		window.popupMenuHolder.css
+			left:  x
+			top:   @y
+			#width: @popupWidth
 
 		window.popupMenuHolder.show()
 
@@ -158,7 +161,7 @@ class PopupMenu
 			values = GlobalValueManager.GetCoordsFromEvent @x
 			@x.stopPropagation()
 			@x.preventDefault()
-			@x = values.x - 150
+			@x = values.x
 			@y = values.y - 10
 
 		if @x < 0 then @x = 0

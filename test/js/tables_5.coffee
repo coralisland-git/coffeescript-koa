@@ -43,32 +43,11 @@ $ ->
         # DataMap.changeColumnAttribute "zipcode", "id", "visible", false
 
         addTest "Sorting, Fixed Header, Group By", ()->
-            addHolder("renderTest1")
-            $('#renderTest1').height(400); ##| to add scroll the height is fix
-            table = new TableView $("#renderTest1"), true
-            table.addTable "zipcode"
-            table.setAutoFillWidth()
-            table.setStatusBarEnabled(true)
-            table.setFixedHeaderAndScrollable()
-            table.groupBy("county")
-
-            # table.groupBy("city")
-            # table.addActionColumn
-            #     name: "Run"
-            #     source: "id"
-            #     callback: (row)=>
-            #         console.log "Zipcode action column selected row:", row
-            #     # render: (currentValue, tableName, colName, id)=>
-            #     #     console.log "c=", currentValue, "t=", tableName, "c=", colName
-            #     #     return "[" + id + "]"
-            #     width: 80
-
-            # DataMap.changeColumnAttribute "zipcode", "city", "render", (val, row)=>
-            #     console.log "Render city val=", val, "row=", row
-            #     return "City"
-
-            timerTest()
-
-            table.render()
+            addHolder().setView "Table", (table)->
+                table.addTable "zipcode"
+                table.setAutoFillWidth()
+                table.groupBy("county")
+                timerTest()
+                table.render()
             true
         go()

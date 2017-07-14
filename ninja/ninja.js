@@ -7323,7 +7323,7 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
     };
 
     DataFormatMemo.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-      var codeMode, cx, cy, h, w;
+      var code, codeEditor, codeMode, cx, cy, h, navButtonCancel, navButtonSave, popup, tag, w;
       cx = left + (width / 2);
       cy = top - 10;
       w = $(window).width();
@@ -7344,17 +7344,47 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
       } else {
         h = 400;
       }
+      popup = new PopupWindow("Text Editor");
+      popup.resize(w, h);
+      popup.centerToPoint(cx, cy - (popup.popupHeight / 2));
+      navButtonSave = new NavButton("Save", "toolbar-btn navbar-btn btn-primary");
+      navButtonSave.onClick = (function(_this) {
+        return function(e) {
+          _this.saveValue(codeEditor.getContent());
+          return popup.destroy();
+        };
+      })(this);
+      navButtonCancel = new NavButton("Cancel", "toolbar-btn navbar-btn btn-danger cancel-btn");
+      navButtonCancel.onClick = (function(_this) {
+        return function(e) {
+          return popup.destroy();
+        };
+      })(this);
+      popup.addToolbar([navButtonSave, navButtonCancel]);
+      tag = $("<div />", {
+        id: "editor_" + GlobalValueManager.NextGlobalID(),
+        height: popup.windowWrapper.height()
+      });
+      popup.on("resize", (function(_this) {
+        return function(ww, hh) {
+          return tag.css("height", popup.windowWrapper.height());
+        };
+      })(this));
+      popup.windowScroll.append(tag);
       codeMode = "markdown";
       if (typeof this.options === "string") {
         codeMode = this.options;
       }
-      doPopupView("Editor", "MemoEditor", "memoeditor", w, h, (function(_this) {
-        return function(view) {
-          view.showEditor();
-          view.applyCodeEditorSettings(codeMode, currentValue, null, true);
-          return view.setSaveFunc(_this.saveValue);
-        };
-      })(this));
+      codeEditor = new CodeEditor(tag);
+      if (!currentValue) {
+        code = '';
+      } else if (typeof currentValue !== 'string') {
+        code = currentValue.toString();
+      } else {
+        code = currentValue;
+      }
+      codeEditor.setContent(code);
+      popup.update();
       return true;
     };
 
@@ -7375,7 +7405,7 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
     DataFormatSourceCode.prototype.align = "left";
 
     DataFormatSourceCode.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-      var codeMode, h, w;
+      var code, codeEditor, codeMode, h, navButtonCancel, navButtonSave, popup, tag, w;
       w = $(window).width();
       h = $(window).height();
       width = 800;
@@ -7388,19 +7418,43 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
       }
       top = (h - height) / 2;
       left = (w - width) / 2;
+      popup = new PopupWindow("Source Code");
+      popup.resize(w, h);
+      navButtonSave = new NavButton("Save", "toolbar-btn navbar-btn btn-primary");
+      navButtonSave.onClick = (function(_this) {
+        return function(e) {
+          _this.saveValue(codeEditor.getContent());
+          return popup.destroy();
+        };
+      })(this);
+      navButtonCancel = new NavButton("Cancel", "toolbar-btn navbar-btn btn-danger cancel-btn");
+      navButtonCancel.onClick = (function(_this) {
+        return function(e) {
+          return popup.destroy();
+        };
+      })(this);
+      popup.addToolbar([navButtonSave, navButtonCancel]);
+      tag = $("<div />", {
+        id: "editor_" + GlobalValueManager.NextGlobalID(),
+        height: popup.windowWrapper.height()
+      });
+      popup.windowScroll.append(tag);
       codeMode = "javascript";
       if (typeof this.options === "string") {
         codeMode = this.options;
       }
-      doPopupView("Editor", "SourceCodeEditor", "codeeditor", w, h, (function(_this) {
-        return function(view) {
-          view.showEditor();
-          view.setEditorPopupMode();
-          view.setEditorMode(codeMode);
-          view.setEditorContent(currentValue);
-          return view.setSaveFunc(_this.saveValue);
-        };
-      })(this));
+      codeEditor = new CodeEditor(tag);
+      codeEditor.popupMode().setTheme("tomorrow_night_eighties").setMode(codeMode);
+      console.log("CURRENT=", currentValue);
+      if (!currentValue) {
+        code = '';
+      } else if (typeof currentValue !== 'string') {
+        code = currentValue.toString();
+      } else {
+        code = currentValue;
+      }
+      codeEditor.setContent(code);
+      popup.update();
       return true;
     };
 
@@ -70422,7 +70476,6 @@ doPopupView = function(viewName, title, settingsName, w, h, callbackWithView) {
     });
     return win.getBody().setView(viewName, function(view) {
       win.view = view;
-      view.popup = win;
       if ((callbackWithView != null) && typeof callbackWithView === "function") {
         callbackWithView(view);
       }
@@ -74430,7 +74483,7 @@ WidgetTag = (function(superClass) {
     dm = DataMap.getDataMap();
     this.renderField(tableName, idValue, fieldName);
     path = "/" + tableName + "/" + idValue + "/" + fieldName;
-    dm.on("new_data", (function(_this) {
+    window.addEventListener("new_data", (function(_this) {
       return function(table, id) {
         if (table === tableName && id === idValue) {
           return _this.renderField(tableName, idValue, fieldName);
