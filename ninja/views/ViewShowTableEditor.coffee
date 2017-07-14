@@ -38,7 +38,7 @@ class ViewShowTableEditor extends View
                 DataMap.changeColumnAttribute @editedTableKey, form.source, "type", "text"
                 DataMap.changeColumnAttribute @editedTableKey, form.source, "autosize", true
                 @updateData()
-                @closePopup()
+                m.hide()
 
                 true
 
