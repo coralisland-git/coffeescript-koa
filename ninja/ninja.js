@@ -7323,7 +7323,7 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
     };
 
     DataFormatMemo.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-      var code, codeEditor, codeMode, cx, cy, h, navButtonCancel, navButtonSave, popup, tag, w;
+      var codeMode, cx, cy, h, w;
       cx = left + (width / 2);
       cy = top - 10;
       w = $(window).width();
@@ -7344,47 +7344,17 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
       } else {
         h = 400;
       }
-      popup = new PopupWindow("Text Editor");
-      popup.resize(w, h);
-      popup.centerToPoint(cx, cy - (popup.popupHeight / 2));
-      navButtonSave = new NavButton("Save", "toolbar-btn navbar-btn btn-primary");
-      navButtonSave.onClick = (function(_this) {
-        return function(e) {
-          _this.saveValue(codeEditor.getContent());
-          return popup.destroy();
-        };
-      })(this);
-      navButtonCancel = new NavButton("Cancel", "toolbar-btn navbar-btn btn-danger cancel-btn");
-      navButtonCancel.onClick = (function(_this) {
-        return function(e) {
-          return popup.destroy();
-        };
-      })(this);
-      popup.addToolbar([navButtonSave, navButtonCancel]);
-      tag = $("<div />", {
-        id: "editor_" + GlobalValueManager.NextGlobalID(),
-        height: popup.windowWrapper.height()
-      });
-      popup.on("resize", (function(_this) {
-        return function(ww, hh) {
-          return tag.css("height", popup.windowWrapper.height());
-        };
-      })(this));
-      popup.windowScroll.append(tag);
       codeMode = "markdown";
       if (typeof this.options === "string") {
         codeMode = this.options;
       }
-      codeEditor = new CodeEditor(tag);
-      if (!currentValue) {
-        code = '';
-      } else if (typeof currentValue !== 'string') {
-        code = currentValue.toString();
-      } else {
-        code = currentValue;
-      }
-      codeEditor.setContent(code);
-      popup.update();
+      doPopupView("Editor", "MemoEditor", "memoeditor", w, h, (function(_this) {
+        return function(view) {
+          view.showEditor();
+          view.applyCodeEditorSettings(codeMode, currentValue, null, true);
+          return view.setSaveFunc(_this.saveValue);
+        };
+      })(this));
       return true;
     };
 
@@ -7405,7 +7375,7 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
     DataFormatSourceCode.prototype.align = "left";
 
     DataFormatSourceCode.prototype.openEditor = function(elParent, left, top, width, height, currentValue, path) {
-      var code, codeEditor, codeMode, h, navButtonCancel, navButtonSave, popup, tag, w;
+      var codeMode, h, w;
       w = $(window).width();
       h = $(window).height();
       width = 800;
@@ -7418,43 +7388,19 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
       }
       top = (h - height) / 2;
       left = (w - width) / 2;
-      popup = new PopupWindow("Source Code");
-      popup.resize(w, h);
-      navButtonSave = new NavButton("Save", "toolbar-btn navbar-btn btn-primary");
-      navButtonSave.onClick = (function(_this) {
-        return function(e) {
-          _this.saveValue(codeEditor.getContent());
-          return popup.destroy();
-        };
-      })(this);
-      navButtonCancel = new NavButton("Cancel", "toolbar-btn navbar-btn btn-danger cancel-btn");
-      navButtonCancel.onClick = (function(_this) {
-        return function(e) {
-          return popup.destroy();
-        };
-      })(this);
-      popup.addToolbar([navButtonSave, navButtonCancel]);
-      tag = $("<div />", {
-        id: "editor_" + GlobalValueManager.NextGlobalID(),
-        height: popup.windowWrapper.height()
-      });
-      popup.windowScroll.append(tag);
       codeMode = "javascript";
       if (typeof this.options === "string") {
         codeMode = this.options;
       }
-      codeEditor = new CodeEditor(tag);
-      codeEditor.popupMode().setTheme("tomorrow_night_eighties").setMode(codeMode);
-      console.log("CURRENT=", currentValue);
-      if (!currentValue) {
-        code = '';
-      } else if (typeof currentValue !== 'string') {
-        code = currentValue.toString();
-      } else {
-        code = currentValue;
-      }
-      codeEditor.setContent(code);
-      popup.update();
+      doPopupView("Editor", "SourceCodeEditor", "codeeditor", w, h, (function(_this) {
+        return function(view) {
+          view.showEditor();
+          view.setEditorPopupMode();
+          view.setEditorMode(codeMode);
+          view.setEditorContent(currentValue);
+          return view.setSaveFunc(_this.saveValue);
+        };
+      })(this));
       return true;
     };
 
@@ -67687,6 +67633,8 @@ substringMatcher = function(strs) {
 FormField = (function() {
   FormField.prototype.submit = "Submit";
 
+  FormField.prototype.focused = false;
+
   function FormField(fieldName, label, value, type, attrs) {
     this.fieldName = fieldName;
     this.label = label;
@@ -67696,6 +67644,7 @@ FormField = (function() {
     this.onAfterShow = bind(this.onAfterShow, this);
     this.onPressEscape = bind(this.onPressEscape, this);
     this.onPressEnter = bind(this.onPressEnter, this);
+    this.setFocus = bind(this.setFocus, this);
     this.makeTypeahead = bind(this.makeTypeahead, this);
     this.getHtml = bind(this.getHtml, this);
     this.html = this.getHtml();
@@ -67709,11 +67658,18 @@ FormField = (function() {
     return this.typeaheadOptions = options;
   };
 
+  FormField.prototype.setFocus = function() {
+    return this.focused = true;
+  };
+
   FormField.prototype.onPressEnter = function() {};
 
   FormField.prototype.onPressEscape = function() {};
 
   FormField.prototype.onAfterShow = function() {
+    if (!this.el) {
+      return false;
+    }
     if (this.typeaheadOptions != null) {
       this.el.addClass(".typeahead");
       this.el.typeahead({
@@ -67729,6 +67685,9 @@ FormField = (function() {
           return console.log("DID CHANGE:", suggestion);
         };
       })(this));
+    }
+    if (this.focused) {
+      this.el.focus();
     }
     return this.el.bind("keypress", (function(_this) {
       return function(e) {
@@ -68616,13 +68575,20 @@ PopupMenu = (function() {
   PopupMenu.prototype.popupHeight = 0;
 
   PopupMenu.prototype.resize = function(popupWidth) {
-    var height, i, len, linkObject, ref, width;
+    var height, i, len, linkObject, ref, width, x;
     this.popupWidth = popupWidth;
+    ref = this.linkObjects;
+    for (i = 0, len = ref.length; i < len; i++) {
+      linkObject = ref[i];
+      window.popupMenuHolder.append(linkObject.getRenderedElement());
+    }
     this.popupHeight = window.popupMenuHolder.height();
+    this.popupWidth = window.popupMenuHolder.width();
     width = $(window).width();
     height = $(window).height();
-    if (this.x < 0) {
-      this.x = 0;
+    x = this.x - this.popupWidth / 2;
+    if (x < 0) {
+      x = 0;
     }
     if (this.y < 0) {
       this.y = 0;
@@ -68630,27 +68596,21 @@ PopupMenu = (function() {
     if (this.popupWidth > width - 40) {
       this.popupWidth = width - 40;
     }
-    if (this.x + this.popupWidth + 10 > width) {
-      this.x = width - this.popupWidth - 10;
+    if (x + this.popupWidth + 10 > width) {
+      x = width - this.popupWidth - 10;
     }
     window.popupMenuHolder.css({
-      left: this.x,
-      top: this.y,
-      width: this.popupWidth
+      left: x,
+      top: this.y
     });
-    ref = this.linkObjects;
-    for (i = 0, len = ref.length; i < len; i++) {
-      linkObject = ref[i];
-      window.popupMenuHolder.append(linkObject.getRenderedElement());
-    }
     window.popupMenuHolder.show();
     return true;
   };
 
-  function PopupMenu(title, x, y) {
+  function PopupMenu(title, x1, y) {
     var html, id, values;
     this.title = title;
-    this.x = x;
+    this.x = x1;
     this.y = y;
     this.onGlobalMouseDown = bind(this.onGlobalMouseDown, this);
     this.onGlobalEscKey = bind(this.onGlobalEscKey, this);
@@ -68663,7 +68623,7 @@ PopupMenu = (function() {
       values = GlobalValueManager.GetCoordsFromEvent(this.x);
       this.x.stopPropagation();
       this.x.preventDefault();
-      this.x = values.x - 150;
+      this.x = values.x;
       this.y = values.y - 10;
     }
     if (this.x < 0) {
@@ -68904,6 +68864,8 @@ FloatingWindow = (function() {
     this.show = bind(this.show, this);
     this.html = bind(this.html, this);
     this.getBodyWidget = bind(this.getBodyWidget, this);
+    this.getHeight = bind(this.getHeight, this);
+    this.getWidth = bind(this.getWidth, this);
     this.internalCreateElement = bind(this.internalCreateElement, this);
     if (options != null) {
       $.extend(this, options);
@@ -68937,9 +68899,15 @@ FloatingWindow = (function() {
     this.floatingWin.appendTo($("body"));
     this.floatingWin.hide();
     this.elHolder = this.floatingWin.addDiv("floatingWinBody");
-    this.elHolder.setAbsolute();
-    this.elHolder.move(0, 0, this.width, this.height);
     return true;
+  };
+
+  FloatingWindow.prototype.getWidth = function() {
+    return this.width = this.floatingWin.outerWidth();
+  };
+
+  FloatingWindow.prototype.getHeight = function() {
+    return this.height = this.floatingWin.outerHeight();
   };
 
   FloatingWindow.prototype.getBodyWidget = function() {
@@ -68963,6 +68931,21 @@ FloatingWindow = (function() {
   };
 
   FloatingWindow.prototype.moveTo = function(x, y) {
+    var winHeight, winWidth;
+    winWidth = $(window).width();
+    winHeight = $(window).height();
+    if (x < 0) {
+      x = 0;
+    }
+    if (y < 0) {
+      y = 0;
+    }
+    if (this.width > winWidth - 40) {
+      this.width = winWidth - 40;
+    }
+    if (x + this.width + 20 > winWidth) {
+      x = winWidth - this.width - 20;
+    }
     this.top = y;
     this.left = x;
     if (this.floatingWin != null) {
@@ -70476,6 +70459,7 @@ doPopupView = function(viewName, title, settingsName, w, h, callbackWithView) {
     });
     return win.getBody().setView(viewName, function(view) {
       win.view = view;
+      view.popup = win;
       if ((callbackWithView != null) && typeof callbackWithView === "function") {
         callbackWithView(view);
       }
@@ -71259,7 +71243,7 @@ TableView = (function() {
         if ((row != null) && (row[col] != null)) {
           result = c.renderTooltip(row, row[col], this.tooltipWindow);
           if (result === true) {
-            this.tooltipWindow.moveTo(coords.x - (this.tooltipWindow.width / 2), coords.y - 10 - this.tooltipWindow.height);
+            this.tooltipWindow.moveTo(coords.x - (this.tooltipWindow.getWidth() / 2), coords.y - 10 - this.tooltipWindow.getHeight());
             this.tooltipWindow.show();
             results.push(this.tooltipShowing = true);
           } else {
@@ -71307,7 +71291,7 @@ TableView = (function() {
     this.mouseHoverTimer = setTimeout(this.onMouseHover, 1000, e);
     if ((this.tooltipShowing != null) && this.tooltipShowing === true) {
       coords = GlobalValueManager.GetCoordsFromEvent(e);
-      return this.tooltipWindow.moveTo(coords.x - (this.tooltipWindow.width / 2), coords.y - 10 - this.tooltipWindow.height);
+      return this.tooltipWindow.moveTo(coords.x - (this.tooltipWindow.getWidth() / 2), coords.y - 10 - this.tooltipWindow.getHeight());
     }
   };
 
@@ -74483,7 +74467,7 @@ WidgetTag = (function(superClass) {
     dm = DataMap.getDataMap();
     this.renderField(tableName, idValue, fieldName);
     path = "/" + tableName + "/" + idValue + "/" + fieldName;
-    window.addEventListener("new_data", (function(_this) {
+    dm.on("new_data", (function(_this) {
       return function(table, id) {
         if (table === tableName && id === idValue) {
           return _this.renderField(tableName, idValue, fieldName);
