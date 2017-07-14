@@ -114,6 +114,16 @@ $ ->
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
 			view.show()
 
+	addTestButton "Form View Set Focus", "Open", () ->
+		addHolder().setView "Form", (view) ->
+			view.init()
+			view.getForm().addTextInput "input1", "Example Input 1"
+			view.getForm().addTextInput("input2", "Example Input 2").setFocus()
+			view.getForm().addSubmit "submit", "Click this button to submit", "Submit"
+			view.getForm().onSubmit = (form) =>
+				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
+			view.show()
+
 	addTestButton "Form on Popup", "Open", () ->
 		doPopupView "Form", "Form on Popup", "form-popup1", 399, 300, (view) ->
 			view.init()
