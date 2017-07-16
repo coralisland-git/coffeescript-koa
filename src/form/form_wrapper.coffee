@@ -62,7 +62,7 @@ class FormWrapper
         '''
 
         @templateFormSubmitButton = Handlebars.compile '''
-            <div class="form-group centered">
+            <div class="form-group centered-with-padding">
                 <label for="{{fieldName}}" class='control-label padding-right-label'> {{label}} </label>
                 <button class="btn btn-sm btn-primary" type="submit" data-dismiss="modal"
                     {{#each attrs}}
