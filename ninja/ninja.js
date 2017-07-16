@@ -7395,9 +7395,7 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
       doPopupView("Editor", "SourceCodeEditor", "codeeditor", w, h, (function(_this) {
         return function(view) {
           view.showEditor();
-          view.setEditorPopupMode();
-          view.setEditorMode(codeMode);
-          view.setEditorContent(currentValue);
+          view.applyCodeEditorSettings(codeMode, currentValue, "tomorrow_night_eighties", true);
           return view.setSaveFunc(_this.saveValue);
         };
       })(this));
@@ -67748,7 +67746,7 @@ FormWrapper = (function() {
     });
     this.templateFormFieldText = Handlebars.compile('<div class="form-group">\n    <label for="{{fieldName}}" class=\'control-label col-sm-2\'> {{label}} </label>\n    <div class=\'col-sm-10\'>\n            <input class="form-control" type="{{type}}" id="{{fieldName}}" value="{{value}}" name="{{fieldName}}"\n                {{#each attrs}}\n                {{@key}}="{{this}}"\n                {{/each}}\n            />\n        <div id="{{fieldName}}error" class="text-danger"></div>\n    </div>\n</div>');
     this.templateSelectFieldText = Handlebars.compile('<div class="form-group">\n    <label for="{{fieldName}}" class=\'control-label col-sm-2\'> {{label}} </label>\n    <div class=\'col-sm-10\'>\n            <select class="form-control" id="{{fieldName}}" name="{{fieldName}}"\n                {{#each attrs}}\n                {{@key}}="{{this}}"\n                {{/each}}\n            >\n                {{#each options}}\n                    <option value="{{this}}">{{this}}</option>\n                {{/each}}\n            </select>\n        <div id="{{fieldName}}error" class="text-danger"></div>\n    </div>\n</div>');
-    this.templateFormSubmitButton = Handlebars.compile('<div class="form-group">\n    <label for="{{fieldName}}" class=\'control-label col-sm-5\'> {{label}} </label>\n    <div class=\'col-sm-7\'>\n           <button class="btn btn-sm btn-primary btn2" type="submit" data-dismiss="modal"\n                {{#each attrs}}\n                {{@key}}="{{this}}"\n                {{/each}}\n            ><i class="fa fa-check"></i> {{submit}}</button>\n    </div>\n</div>');
+    this.templateFormSubmitButton = Handlebars.compile('<div class="form-group centered">\n    <label for="{{fieldName}}" class=\'control-label padding-right-label\'> {{label}} </label>\n    <button class="btn btn-sm btn-primary" type="submit" data-dismiss="modal"\n        {{#each attrs}}\n        {{@key}}="{{this}}"\n        {{/each}}\n    ><i class="fa fa-check"></i> {{submit}}</button>\n</div>');
     this.templatePathField = Handlebars.compile('<div class="form-group">\n    <label for="{{fieldName}}" class=\'control-label col-sm-2 label-pathfield\'> {{label}} </label>\n    <div class=\'col-sm-10 pathfield\' id=\'pathfield-widget-{{getNumber attrs}}\'>\n        <!--\n        Here, path-field input will be put on\n        -->\n    </div>\n</div>');
     if (typeof options === "object") {
       for (name in options) {

@@ -106,49 +106,46 @@ $ ->
 
 	addTestButton "Simple Form View", "Open", () ->
 		addHolder().setView "Form", (view) ->
-			view.init()
-			view.getForm().addTextInput "input1", "Example Input 1"
-			view.getForm().addTextInput "input2", "Example Input 2"
-			view.getForm().addSubmit "submit", "Click this button to submit", "Submit"
-			view.getForm().onSubmit = (form) =>
+
+			view.addTextInput "input1", "Example Input 1"
+			view.addTextInput "input2", "Example Input 2"
+			view.addSubmit "submit", "Click this button to submit", "Submit"
+			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
 			view.show()
 
 	addTestButton "Form View Set Focus", "Open", () ->
 		addHolder().setView "Form", (view) ->
-			view.init()
-			view.getForm().addTextInput "input1", "Example Input 1"
-			view.getForm().addTextInput("input2", "Example Input 2").setFocus()
-			view.getForm().addSubmit "submit", "Click this button to submit", "Submit"
-			view.getForm().onSubmit = (form) =>
+			view.addTextInput "input1", "Example Input 1"
+			view.addTextInput("input2", "Example Input 2").setFocus()
+			view.addSubmit "submit", "Click this button to submit", "Submit"
+			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
 			view.show()
 
 	addTestButton "Form on Popup", "Open", () ->
 		doPopupView "Form", "Form on Popup", "form-popup1", 399, 300, (view) ->
-			view.init()
-			view.getForm().addTextInput "input1", "Example Input 1"
-			view.getForm().addTextInput "input2", "Example Input 2"
-			view.getForm().addSubmit "submit", "Click this button to submit", "Submit"
-			view.getForm().onSubmit = (form) =>
+			view.addTextInput "input1", "Example Input 1"
+			view.addTextInput "input2", "Example Input 2"
+			view.addSubmit "submit", "Click this button to submit", "Submit"
+			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
 			view.show()
 		true
 	
 	addTestButton "Form on Popup with Many Fields", "Open", () ->
 		doPopupView "Form", "Form on Popup with Many Fields", "form-popup2", 399, 300, (view) ->
-			view.init()
-			view.getForm().addTextInput "input1", "Example Input 1"
-			view.getForm().addTextInput "input2", "Example Input 2"
-			view.getForm().addTextInput "input3", "Example Input 3"
-			view.getForm().addTextInput "input4", "Example Input 4"
-			view.getForm().addTextInput "input5", "Example Input 5"
-			view.getForm().addTextInput "input6", "Example Input 6"
-			view.getForm().addTextInput "input7", "Example Input 7"
-			view.getForm().addTextInput "input8", "Example Input 8"
+			view.addTextInput "input1", "Example Input 1"
+			view.addTextInput "input2", "Example Input 2"
+			view.addTextInput "input3", "Example Input 3"
+			view.addTextInput "input4", "Example Input 4"
+			view.addTextInput "input5", "Example Input 5"
+			view.addTextInput "input6", "Example Input 6"
+			view.addTextInput "input7", "Example Input 7"
+			view.addTextInput "input8", "Example Input 8"
 
-			view.getForm().addSubmit "submit", "Click this button to submit", "Submit"
-			view.getForm().onSubmit = (form) =>
+			view.addSubmit "submit", "Click this button to submit", "Submit"
+			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
 			view.show()
 		true
@@ -156,11 +153,10 @@ $ ->
 	addTestButton "Form in Tab", "Open", () ->
 		addHolder().setView "DynamicTabs", (tabs)->
 			tabs.doAddViewTab("Form", "FormViewTab", (view)->
-				view.init()
-				view.getForm().addTextInput "input1", "Example Input 1"
-				view.getForm().addTextInput "input2", "Example Input 2"
-				view.getForm().addSubmit "submit", "Click this button to submit", "Submit"
-				view.getForm().onSubmit = (form) =>
+				view.addTextInput "input1", "Example Input 1"
+				view.addTextInput "input2", "Example Input 2"
+				view.addSubmit "submit", "Click this button to submit", "Submit"
+				view.setSubmitFunction (form) =>
 					alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
 				view.show()
 			)
@@ -169,34 +165,32 @@ $ ->
 
 	addTestButton "Form with Pathfield - zipcode", "Open", ()=>
 		addHolder().setView "Form", (view)->
-			view.init()
-			view.getForm().addTextInput "input1", "Text Input"
-			view.getForm().addPathField "data-city", "zipcode", "city"
-			view.getForm().addPathField "data-state", "zipcode", "state"
-			view.getForm().addPathField "data-longitude", "zipcode", "lon"
-			view.getForm().addSubmit "submit", "Click this button to submit", "Submit"
-			view.getForm().onSubmit = (form) =>
+			view.addTextInput "input1", "Text Input"
+			view.addPathField "data-city", "zipcode", "city"
+			view.addPathField "data-state", "zipcode", "state"
+			view.addPathField "data-longitude", "zipcode", "lon"
+			view.addSubmit "submit", "Click this button to submit", "Submit"
+			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1}"
 			view.show()
-			view.getForm().setPath "zipcode", "03105"
+			view.setPath "zipcode", "03105"
 		true
 
 	addTestButton "Form with Datafield - testData", "Open", ()=>
 		addHolder().setView "Form", (view)->
-			view.init()
-			view.getForm().addTextInput "input1", "Text Input"
-			view.getForm().addPathField "data-initialprice", "testData", "initialPrice", {"type": "calculation"}
-			view.getForm().addPathField "data-currentprice", "testData", "currentPrice"
-			view.getForm().addPathField "data-date", "testData", "date"
-			view.getForm().addPathField "data-distance", "testData", "distance"
-			view.getForm().addPathField "data-isnew", "testData", "isNew", {"type": "custom"}
-			view.getForm().addPathField "data-sourcecode", "testData", "sourcecode"
-			view.getForm().addPathField "data-memo", "testData", "memo"
-			view.getForm().addSubmit "submit", "Click this button to submit", "Submit"
-			view.getForm().onSubmit = (form) =>
+			view.addTextInput "input1", "Text Input"
+			view.addPathField "data-initialprice", "testData", "initialPrice", {"type": "calculation"}
+			view.addPathField "data-currentprice", "testData", "currentPrice"
+			view.addPathField "data-date", "testData", "date"
+			view.addPathField "data-distance", "testData", "distance"
+			view.addPathField "data-isnew", "testData", "isNew", {"type": "custom"}
+			view.addPathField "data-sourcecode", "testData", "sourcecode"
+			view.addPathField "data-memo", "testData", "memo"
+			view.addSubmit "submit", "Click this button to submit", "Submit"
+			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1}"
 			view.show()
-			view.getForm().setPath "testData", "0011"
+			view.setPath "testData", "0011"
 		true
 
 	addTestButton "Change Data of Path - zipcode", "Change Data Fields", () =>
@@ -209,16 +203,15 @@ $ ->
 	addTestButton "Form and Table with Pathfield - zipcode", "Open", ()=>
 		viewExe = addHolder()
 		viewExe.addDiv("form-container", "wdt_form_container").setView "Form", (view)->
-			view.init()
-			view.getForm().addTextInput "input1", "Text Input"
-			view.getForm().addPathField "data-city", "zipcode", "city"
-			view.getForm().addPathField "data-state", "zipcode", "state"
-			view.getForm().addPathField "data-longitude", "zipcode", "lon"
-			view.getForm().addSubmit "submit", "Click this button to submit", "Submit"
-			view.getForm().onSubmit = (form) =>
+			view.addTextInput "input1", "Text Input"
+			view.addPathField "data-city", "zipcode", "city"
+			view.addPathField "data-state", "zipcode", "state"
+			view.addPathField "data-longitude", "zipcode", "lon"
+			view.addSubmit "submit", "Click this button to submit", "Submit"
+			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1}"
 			view.show()
-			view.getForm().setPath "zipcode", "03105"
+			view.setPath "zipcode", "03105"
 
 		wdt_table = viewExe.add "table", "test_table", "wdt_table"
 		wdt_table.html "<caption>This is table of data fields same as in form above</caption>"
