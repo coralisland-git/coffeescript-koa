@@ -9,7 +9,7 @@ class ViewMiller extends View
     onSetupButtons: () ->
 
     onShowScreen: ()=>
-        
+
 
     ##|
     ##|  Add a Data as object to miller columns
