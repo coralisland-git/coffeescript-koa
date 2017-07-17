@@ -14,7 +14,7 @@ class ViewForm extends View
 	## Create instance of FormWrapper which would present form
 	## 
 
-	init: ()=>    	
+	setData: ()=>    	
 		@elHolder.find(".form-container").html("<div id='formView#{@gid}'/>")
 		@form = new FormWrapper @elHolder.find("#formView#{@gid}"), true
 
@@ -48,7 +48,7 @@ class ViewForm extends View
 	getForm: () =>
 		if @form?
 			return @form
-		@init()
+		@setData()
 
 	## ----------------------------------------------------------------------
 	## Function to show rendered form view

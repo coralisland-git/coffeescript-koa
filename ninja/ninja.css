@@ -139,6 +139,14 @@
 .calculation {
   background-color: rgba(209,238,242,0.4);
 }
+.centered-with-padding {
+  text-align: center;
+  padding-right: 15px;
+  padding-left: 15px;
+}
+.padding-right-label {
+  padding-right: 20px;
+}
 .material-icons {
   font: normal normal normal 14px/1 FontAwesome;
 }
