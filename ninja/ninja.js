@@ -65823,6 +65823,1316 @@ module.exports = E;
 
 
 },{"./column/column":3,"./column/column_base":4,"./data_formatter/DataFormatter":7,"./table/table":8}]},{},[]);
+var root;
+
+root = typeof exports !== "undefined" && exports !== null ? exports : this;
+
+root.setupCustomBlockly = {};
+
+root.setupCustomBlockly.setupBlocks = function(Blockly, callbackContext) {
+  Blockly.Blocks['filter_text'] = {
+    init: function() {
+      this.setColour(12);
+      this.itemCount_ = 30;
+      this.updateShape_();
+      return this.setOutput(true, 'Array');
+    },
+    mutationToDom: function() {
+      var container;
+      container = document.createElement('mutation');
+      container.setAttribute('items', this.itemCount_);
+      this.updateShape_();
+      return container;
+    },
+    domToMutation: function(xmlElement) {
+      return this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
+    },
+    saveConnections: function(containerBlock) {
+      var i, input, itemBlock;
+      itemBlock = containerBlock.getInputTargetBlock('STACK');
+      i = 0;
+      while (itemBlock) {
+        input = this.getInput('ADD' + i);
+        itemBlock.valueConnection_ = input && input.connection.targetConnection;
+        i++;
+        itemBlock = itemBlock.nextConnection && itemBlock.nextConnection.targetBlock();
+      }
+      return true;
+    },
+    onchange: function(e) {
+      if (e.type === Blockly.Events.MOVE) {
+        if (this.eventTimer != null) {
+          clearTimeout(this.eventTimer);
+        }
+        this.eventTimer = setTimeout((function(_this) {
+          return function() {
+            return _this.updateShape_(true);
+          };
+        })(this), 50);
+      }
+      return true;
+    },
+    updateShape_: function(doRecount) {
+      var i, input, j, k, l, n, ref, ref1, totalCount;
+      if ((doRecount != null) && doRecount) {
+        delete this.eventTimer;
+        totalCount = 0;
+        for (n = j = 0, ref = this.itemCount_; 0 <= ref ? j <= ref : j >= ref; n = 0 <= ref ? ++j : --j) {
+          input = this.getInput("ADD" + n);
+          if ((input != null) && (input.connection.targetConnection != null)) {
+            totalCount++;
+          }
+        }
+        if (totalCount < 1) {
+          totalCount = 1;
+        }
+        this.itemCount_ = totalCount + 1;
+      }
+      if (this.itemCount_ && this.getInput('EMPTY')) {
+        this.removeInput('EMPTY');
+      } else if (!this.itemCount_ && !this.getInput('EMPTY')) {
+        this.appendDummyInput('EMPTY').appendField("Filter list is empty");
+      }
+      for (i = k = 0, ref1 = this.itemCount_; 0 <= ref1 ? k < ref1 : k > ref1; i = 0 <= ref1 ? ++k : --k) {
+        if (!this.getInput("ADD" + i)) {
+          input = this.appendValueInput("ADD" + i);
+          if (i === 0) {
+            input.appendField("Use first match");
+          }
+        }
+      }
+      if ((doRecount != null) && doRecount) {
+        for (i = l = 0; l <= 30; i = ++l) {
+          n = i + this.itemCount_;
+          if (this.getInput("ADD" + n)) {
+            this.removeInput("ADD" + n);
+          }
+        }
+      }
+      return true;
+    }
+  };
+  Blockly.Blocks['days_from_today'] = {
+    init: function() {
+      this.appendValueInput("NAME").setCheck(null).appendField("Extract Value");
+      this.appendValueInput("WITH").setCheck(null).appendField("With").appendField(new Blockly.FieldTextInput("prop"), "name");
+      this.setOutput(true, null);
+      this.setColour(40);
+      return true;
+    }
+  };
+  Blockly.Blocks['extract'] = {
+    init: function() {
+      this.appendValueInput("NAME").setCheck(null).appendField("Extract Value").appendField(new Blockly.FieldDropdown([["Decimal", "parseFloat"], ["Number", "parseInt"], ["Currency", "this.parseCurrency"]]), "TYPE");
+      this.setOutput(true, null);
+      this.setColour(40);
+      return true;
+    }
+  };
+  Blockly.Blocks['output_to'] = {
+    init: function() {
+      this.setColour(23);
+      this.appendDummyInput().appendField("output to").appendField(new Blockly.FieldTextInput("Property"), "name");
+      this.setOutput(true);
+      return true;
+    }
+  };
+  Blockly.Blocks['search_replace'] = {
+    init: function() {
+      this.setColour(90);
+      this.setOutput(true, null);
+      this.appendValueInput("NEXT").setCheck(null).appendField("match /").appendField(new Blockly.FieldTextInput(""), "Pattern").appendField("/ return").appendField(new Blockly.FieldTextInput(""), "Result");
+      return true;
+    },
+    validator_: function(newVar) {
+      return newVar;
+    }
+  };
+  Blockly.Blocks['variables_get'] = {
+    init: function() {
+      this.setColour(238);
+      this.appendDummyInput().appendField(new Blockly.FieldVariable(Blockly.Msg.VARIABLES_DEFAULT_NAME), "VAR");
+      this.setOutput(true);
+      this.setTooltip(Blockly.Msg.VARIABLES_GET_TOOLTIP);
+      this.contextMenuMsg_ = Blockly.Msg.VARIABLES_GET_CREATE_SET;
+      return true;
+    },
+    customContextMenu: function(options) {
+      var name;
+      if (callbackContext != null) {
+        name = this.getFieldValue('VAR');
+        options.push({
+          text: "Generate Filter",
+          enabled: true,
+          callback: function(e) {
+            callbackContext.emitEvent("GenerateFilter", [name]);
+            return true;
+          }
+        });
+        options.push({
+          text: "Ignore Variable",
+          enabled: true,
+          callback: function(e) {
+            callbackContext.emitEvent("IgnoreVariable", [name, e]);
+            return true;
+          }
+        });
+        options.push({
+          text: "Create Assignment",
+          enabled: true,
+          callback: function(e) {
+            callbackContext.emitEvent("CreateAssignment", [name]);
+            return true;
+          }
+        });
+      }
+      return true;
+    }
+  };
+  Blockly.Blocks['code_comment'] = {
+    init: function() {
+      this.setColour(120);
+      this.setPreviousStatement(true, null);
+      this.setNextStatement(true, null);
+      return this.appendValueInput("CodeComment").setCheck(null).appendField("Comment ").appendField(new Blockly.FieldTextInput("Comment Text"), "comment_text");
+    }
+  };
+  Blockly.Blocks['with'] = {
+    init: function() {
+      this.setColour(100);
+      this.setPreviousStatement(true, null);
+      this.setNextStatement(true, null);
+      this.appendValueInput("WITH").setCheck(null).appendField("With").appendField(new Blockly.FieldTextInput("prop"), "name");
+      this.appendStatementInput("COMMANDS").setCheck(null);
+      return this.setTooltip("Using a document within the object");
+    },
+    validator_: function(newVar) {
+      console.log("Validate:", newVar);
+      return newVar;
+    }
+  };
+  Blockly.Blocks['concat'] = {
+    init: function() {
+      this.appendDummyInput().appendField("concat");
+      this.appendValueInput("VAR1").setCheck(null);
+      this.appendDummyInput().appendField(new Blockly.FieldTextInput(" "), "middle");
+      this.appendValueInput("VAR2").setCheck(null);
+      this.setInputsInline(true);
+      this.setOutput(true, null);
+      this.setColour(15);
+      return this.setTooltip('Concat 2 variables together with text in the middle');
+    }
+  };
+  Blockly.Blocks['make_date'] = {
+    init: function() {
+      this.appendDummyInput().appendField("Date");
+      this.appendValueInput("YEAR").setCheck(null);
+      this.appendDummyInput().appendField("-");
+      this.appendValueInput("MONTH").setCheck(null);
+      this.appendDummyInput().appendField("-");
+      this.appendValueInput("DAY").setCheck(null);
+      this.setInputsInline(true);
+      this.setOutput(true, null);
+      this.setColour(15);
+      return this.setTooltip('Create a new date');
+    }
+  };
+  Blockly.JavaScript['make_date'] = (function(_this) {
+    return function(block) {
+      var code, day, month, year;
+      year = Blockly.JavaScript.valueToCode(block, 'YEAR', Blockly.JavaScript.ORDER_ATOMIC);
+      month = Blockly.JavaScript.valueToCode(block, 'MONTH', Blockly.JavaScript.ORDER_ATOMIC);
+      day = Blockly.JavaScript.valueToCode(block, 'MONTH', Blockly.JavaScript.ORDER_ATOMIC);
+      code = "new Date(" + year + " + '-' + " + month + " + '-' + " + day + " + ' 0:00:00')";
+      return [code, Blockly.JavaScript.ORDER_NONE];
+    };
+  })(this);
+  Blockly.JavaScript['concat'] = (function(_this) {
+    return function(block) {
+      var code, text_middle, value_var1, value_var2;
+      value_var1 = Blockly.JavaScript.valueToCode(block, 'VAR1', Blockly.JavaScript.ORDER_ATOMIC);
+      text_middle = block.getFieldValue('middle');
+      value_var2 = Blockly.JavaScript.valueToCode(block, 'VAR2', Blockly.JavaScript.ORDER_ATOMIC);
+      code = "(function(){ var _a = " + value_var1 + ";";
+      code += "var _b = " + value_var2 + ";";
+      code += "var _c = '';";
+      code += "if (_a != null) _c = _a + '" + text_middle + "';";
+      code += "if (_b != null) _c += _b; return _c;";
+      code += "})()";
+      return [code, Blockly.JavaScript.ORDER_NONE];
+    };
+  })(this);
+  Blockly.JavaScript['search_replace'] = (function(_this) {
+    return function(block) {
+      var code, text_pattern, text_result, value_with;
+      text_pattern = block.getFieldValue('Pattern');
+      text_result = block.getFieldValue('Result');
+      value_with = Blockly.JavaScript.valueToCode(block, 'NEXT', Blockly.JavaScript.ORDER_ATOMIC);
+      code = "obj.searchReplace('" + text_pattern + "', '" + text_result + "', " + value_with + ")";
+      return [code, Blockly.JavaScript.ORDER_ATOMIC];
+    };
+  })(this);
+  Blockly.JavaScript['with'] = (function(_this) {
+    return function(block) {
+      var arg, branch, code, varName;
+      varName = block.getFieldValue('name');
+      arg = Blockly.JavaScript.valueToCode(block, "WITH", Blockly.JavaScript.ORDER_ASSIGNMENT);
+      branch = Blockly.JavaScript.statementToCode(block, "COMMANDS");
+      code = ("if (obj.setWith('" + varName + "', " + arg + ")) {\n") + branch + "\n}\n";
+      code += "obj.resetBase();\n";
+      return code;
+    };
+  })(this);
+  Blockly.JavaScript['days_from_today'] = (function(_this) {
+    return function(block) {
+      var arg, branch, code, varName;
+      varName = block.getFieldValue('name');
+      arg = Blockly.JavaScript.valueToCode(block, "WITH", Blockly.JavaScript.ORDER_ASSIGNMENT);
+      branch = Blockly.JavaScript.statementToCode(block, "COMMANDS");
+      code = "obj.getDaysFromToday(" + arg + ");\n";
+      return code;
+    };
+  })(this);
+  Blockly.JavaScript['output_to'] = (function(_this) {
+    return function(block) {
+      var code, varName;
+      varName = block.getFieldValue('name');
+      if (!/^obj/.test(varName)) {
+        varName = "'" + varName + "'";
+      }
+      code = "obj.setOutputTo(" + varName + ")";
+      return [code, Blockly.JavaScript.ORDER_ATOMIC];
+    };
+  })(this);
+  Blockly.JavaScript['variables_set'] = (function(_this) {
+    return function(block) {
+      var arg, varName;
+      arg = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_ASSIGNMENT);
+      varName = block.getFieldValue('VAR');
+      if (arg) {
+        return "obj.set('" + varName + "', " + arg + ");\n";
+      } else {
+        return "";
+      }
+    };
+  })(this);
+  Blockly.JavaScript['variables_get'] = (function(_this) {
+    return function(block) {
+      var varName;
+      varName = block.getFieldValue('VAR');
+      varName = varName.replace("'", "");
+      return ["obj.get('" + varName + "')", Blockly.JavaScript.ORDER_ATOMIC];
+    };
+  })(this);
+  Blockly.JavaScript['code_comment'] = (function(_this) {
+    return function(block) {
+      var code;
+      code = '';
+      return code;
+    };
+  })(this);
+  Blockly.JavaScript['extract'] = (function(_this) {
+    return function(block) {
+      var code, dropName, valueName;
+      dropName = block.getFieldValue('TYPE');
+      valueName = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
+      code = '';
+      if (valueName != null) {
+        code = dropName + "(" + valueName + ")";
+      }
+      return [code, Blockly.JavaScript.ORDER_NONE];
+    };
+  })(this);
+  return Blockly.JavaScript['filter_text'] = function(block) {
+    var code, j, n, ref, tmpVal;
+    code = "(function(){\n";
+    for (n = j = 0, ref = block.itemCount_; 0 <= ref ? j < ref : j > ref; n = 0 <= ref ? ++j : --j) {
+      tmpVal = Blockly.JavaScript.valueToCode(block, 'ADD' + n, Blockly.JavaScript.ORDER_COMMA);
+      if (tmpVal) {
+        code += "tmpVal = " + tmpVal + ";\n";
+        code += "if (tmpVal) return tmpVal;\n";
+      }
+    }
+    code += "})()";
+    return [code, Blockly.JavaScript.ORDER_ATOMIC];
+  };
+};
+var BlocklyCodeBlock, BlockyHelper, globalYValues,
+  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+globalYValues = {};
+
+BlocklyCodeBlock = (function() {
+  function BlocklyCodeBlock(type, x1) {
+    var i, inp, j, len, len1, name, ref, ref1, row, text, value;
+    this.type = type;
+    this.x = x1;
+    this.getXml = bind(this.getXml, this);
+    this.getYValue = bind(this.getYValue, this);
+    this.setNextNode = bind(this.setNextNode, this);
+    this.addStatement = bind(this.addStatement, this);
+    this.addChild = bind(this.addChild, this);
+    this.addMutation = bind(this.addMutation, this);
+    this.addField = bind(this.addField, this);
+    this.y = null;
+    this.fields = {};
+    if ((this.x == null) || this.x === 0) {
+      this.x = 300;
+    }
+    if ((this.type != null) && typeof this.type === "object" && (this.type.init != null) && (this.type.id != null)) {
+      this.block = this.type;
+      this.x = this.block.xy_.x;
+      this.y = this.block.xy_.y;
+      ref = this.block.inputList;
+      for (i = 0, len = ref.length; i < len; i++) {
+        inp = ref[i];
+        ref1 = inp.fieldRow;
+        for (j = 0, len1 = ref1.length; j < len1; j++) {
+          row = ref1[j];
+          name = row.name;
+          text = row.text_;
+          value = row.value_;
+          this.fields[name] = value;
+        }
+      }
+      this.type = this.block.type;
+    }
+  }
+
+  BlocklyCodeBlock.prototype.addField = function(name, value) {
+    this.fields[name] = value;
+    return this;
+  };
+
+  BlocklyCodeBlock.prototype.addMutation = function(name, value) {
+    if (this.mutations == null) {
+      this.mutations = {};
+    }
+    this.mutations[name] = value;
+    return this;
+  };
+
+  BlocklyCodeBlock.prototype.addChild = function(valueName, childBlock) {
+    if (this.children == null) {
+      this.children = {};
+    }
+    if (this.children[valueName] == null) {
+      this.children[valueName] = [];
+    }
+    this.children[valueName].push(childBlock);
+    childBlock.parentBlock = this;
+    return this;
+  };
+
+  BlocklyCodeBlock.prototype.addStatement = function(valueName, childBlock) {
+    if (this.statement == null) {
+      this.statement = {};
+    }
+    if (this.statement[valueName] == null) {
+      this.statement[valueName] = [];
+    }
+    this.statement[valueName].push(childBlock);
+    childBlock.parentBlock = this;
+    return this;
+  };
+
+  BlocklyCodeBlock.prototype.setNextNode = function(newNode) {
+    this.nextNode = newNode;
+    return newNode;
+  };
+
+  BlocklyCodeBlock.prototype.getYValue = function() {
+    var y;
+    if ((this.y != null) && this.y > 0) {
+      return this.y;
+    }
+    if (this.parentBlock != null) {
+      return 0;
+    }
+    if (!globalYValues[this.type]) {
+      globalYValues[this.type] = 40;
+    }
+    y = globalYValues[this.type];
+    globalYValues[this.type] += 30;
+    return y;
+  };
+
+  BlocklyCodeBlock.prototype.getXml = function(flags) {
+    var child, childrenList, i, j, keyName, keyVal, len, len1, ref, ref1, ref2, ref3, valueName, xml, y;
+    if ((this.parentBlock != null) && ((flags == null) || flags !== "child")) {
+      return "";
+    }
+    y = this.getYValue();
+    xml = "";
+    xml += "<block type='" + this.type + "' x='" + this.x + "' y='" + y + "'>";
+    if (this.mutations != null) {
+      ref = this.mutations;
+      for (keyName in ref) {
+        keyVal = ref[keyName];
+        xml += "<mutation " + keyName + "='" + keyVal + "'></mutation>";
+      }
+    }
+    ref1 = this.fields;
+    for (keyName in ref1) {
+      keyVal = ref1[keyName];
+      xml += "<field name='" + keyName + "'>" + keyVal + "</field>";
+    }
+    if (this.children != null) {
+      ref2 = this.children;
+      for (valueName in ref2) {
+        childrenList = ref2[valueName];
+        for (i = 0, len = childrenList.length; i < len; i++) {
+          child = childrenList[i];
+          xml += "<value name='" + valueName + "'>";
+          xml += child.getXml("child");
+          xml += "</value>";
+        }
+      }
+    }
+    if (this.statement != null) {
+      ref3 = this.statement;
+      for (valueName in ref3) {
+        childrenList = ref3[valueName];
+        for (j = 0, len1 = childrenList.length; j < len1; j++) {
+          child = childrenList[j];
+          xml += "<statement name='" + valueName + "'>";
+          xml += child.getXml("child");
+          xml += "</statement>";
+        }
+      }
+    }
+    if (this.nextNode != null) {
+      xml += "<next>";
+      xml += this.nextNode.getXml("child");
+      xml += "</next>";
+    }
+    xml += "</block>";
+    return xml;
+  };
+
+  return BlocklyCodeBlock;
+
+})();
+
+BlockyHelper = (function() {
+  function BlockyHelper(scriptName) {
+    this.scriptName = scriptName;
+    this.toolboxText = bind(this.toolboxText, this);
+    this.createOutputTo = bind(this.createOutputTo, this);
+    this.createIfCondition = bind(this.createIfCondition, this);
+    this.createLogicalLessthan = bind(this.createLogicalLessthan, this);
+    this.createLogicalEquals = bind(this.createLogicalEquals, this);
+    this.createComment = bind(this.createComment, this);
+    this.createMathNumber = bind(this.createMathNumber, this);
+    this.createWithCondition = bind(this.createWithCondition, this);
+    this.createText = bind(this.createText, this);
+    this.createVariableSetToVariable = bind(this.createVariableSetToVariable, this);
+    this.createVariableSetToText = bind(this.createVariableSetToText, this);
+    this.createVariableSet = bind(this.createVariableSet, this);
+    this.createVariableGet = bind(this.createVariableGet, this);
+    this.createFilterList = bind(this.createFilterList, this);
+    this.placeNode = bind(this.placeNode, this);
+    this.getSlug = bind(this.getSlug, this);
+    this.setStandardOptions = bind(this.setStandardOptions, this);
+    this.addSampleDataRecord = bind(this.addSampleDataRecord, this);
+    this.addAssignRule = bind(this.addAssignRule, this);
+    this.autoAssignFromRules = bind(this.autoAssignFromRules, this);
+    this.onShowAssignmentDialog = bind(this.onShowAssignmentDialog, this);
+    this.onShowIgnorePaths = bind(this.onShowIgnorePaths, this);
+    this.loadBlocksToWorkspace = bind(this.loadBlocksToWorkspace, this);
+    this.doSaveWorkspace = bind(this.doSaveWorkspace, this);
+    this.doAppendBlock = bind(this.doAppendBlock, this);
+    this.doRemove = bind(this.doRemove, this);
+    this.doFindVariables = bind(this.doFindVariables, this);
+    this.regroupItemsActual = bind(this.regroupItemsActual, this);
+    this.regroupItems = bind(this.regroupItems, this);
+    this.setIgnore = bind(this.setIgnore, this);
+    this.onResizeEditor = bind(this.onResizeEditor, this);
+    this.render = bind(this.render, this);
+    this.showSamples = bind(this.showSamples, this);
+    this.onIgnoreVariable = bind(this.onIgnoreVariable, this);
+    this.buildToolbox = bind(this.buildToolbox, this);
+    this.showCurrentXML = bind(this.showCurrentXML, this);
+    this.getXmlText = bind(this.getXmlText, this);
+    this.setXmlText = bind(this.setXmlText, this);
+    this.onBlocklyEvent = bind(this.onBlocklyEvent, this);
+    this.onSelected = bind(this.onSelected, this);
+    this.onLoadInitialBlocks = bind(this.onLoadInitialBlocks, this);
+    this.onSaveWorkspace = bind(this.onSaveWorkspace, this);
+    this.onBeforeShowSamples = bind(this.onBeforeShowSamples, this);
+    this.blocks = [];
+    this.knownBlocks = {};
+    this.knownVariablesGet = {};
+    this.knownVariablesSet = {};
+    this.sampleData = [];
+    this.ignoreList = [];
+    this.toolboxWidth = 160;
+    this.toolboxFlyoutWidth = 400;
+    this.blocklyZindex = 4000;
+    this.blocklyMaxScrollHeight = 5000;
+    GlobalClassTools.addEventManager(this);
+    this.x2js = new X2JS({
+      attributePrefix: "",
+      stripWhitespaces: true
+    });
+  }
+
+  BlockyHelper.prototype.onBeforeShowSamples = function(variableName) {
+    return "";
+  };
+
+  BlockyHelper.prototype.onSaveWorkspace = function(xmlText) {
+    return true;
+  };
+
+  BlockyHelper.prototype.onLoadInitialBlocks = function() {
+    return true;
+  };
+
+  BlockyHelper.prototype.onSelected = function(block) {
+    var codeBlock;
+    if (block != null) {
+      codeBlock = new BlocklyCodeBlock(block);
+      if (block.type === "variables_get") {
+        this.showSamples(codeBlock.fields["VAR"]);
+      }
+      this.emitEvent("selected", [codeBlock]);
+    } else {
+      this.emitEvent("selected", [null]);
+    }
+    return true;
+  };
+
+  BlockyHelper.prototype.onBlocklyEvent = function(e) {
+    var selectedBlock;
+    if (e.type === Blockly.Events.MOVE) {
+      return;
+    }
+    if (e.type === Blockly.Events.CHANGE) {
+      console.log("Change event: ", e.toJson());
+      setTimeout(this.doSaveWorkspace, 10);
+    }
+    if (e.type === Blockly.Events.UI) {
+      if (e.element === "selected") {
+        selectedBlock = this.workspace.getBlockById(e.newValue);
+        this.onSelected(selectedBlock);
+      }
+      return;
+    }
+    if (e.type === Blockly.Events.CREATE) {
+
+    }
+  };
+
+  BlockyHelper.prototype.setXmlText = function(xmlText) {
+    var custom, scrollX, scrollY, xmlDom;
+    this.workspace.clear();
+    xmlDom = Blockly.Xml.textToDom(xmlText);
+    custom = xmlDom.getElementsByTagName("custom")[0];
+    if ((custom != null) && custom) {
+      scrollX = parseInt(custom.getAttribute("scrollx"));
+      scrollY = parseInt(custom.getAttribute("scrolly"));
+      console.log("RESTORING SCROLL: " + scrollX + " x " + scrollY);
+      if (!isNaN(scrollX)) {
+        this.workspace.scrollX = scrollX;
+      }
+      if (!isNaN(scrollY)) {
+        this.workspace.scrollY = scrollY;
+      }
+      this.ignoreList = custom.getAttribute("ignore").split(",");
+      console.log("RESTORING LIST:", this.ignoreList);
+    }
+    Blockly.Xml.domToWorkspace(xmlDom, this.workspace);
+    return true;
+  };
+
+  BlockyHelper.prototype.getXmlText = function() {
+    var custom, xml, xmlText;
+    xml = Blockly.Xml.workspaceToDom(this.workspace);
+    custom = $.parseXML("<custom />").firstChild;
+    custom.setAttribute("scrollx", this.workspace.scrollX);
+    custom.setAttribute("scrolly", this.workspace.scrollY);
+    custom.setAttribute("ignore", this.ignoreList.join(","));
+    xml.insertBefore(custom, xml.firstChild);
+    xmlText = Blockly.Xml.domToText(xml);
+    return xmlText;
+  };
+
+  BlockyHelper.prototype.showCurrentXML = function() {
+    var content, m, xmlText;
+    Prism.languages.xml = Prism.languages.markup;
+    content = "Current Blockly XML:<br><pre style='width: 860px; height: 600px;'><code class='language-xml'>";
+    xmlText = this.getXmlText();
+    xmlText = CodeHighlighter.utilFormatXML(xmlText);
+    xmlText = xmlText.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    content += xmlText;
+    content += "</code></pre>";
+    m = new ModalMessageBox(content);
+    Prism.highlightAll();
+    return true;
+  };
+
+  BlockyHelper.prototype.buildToolbox = function() {
+    var getFieldList, i, n;
+    getFieldList = (function(_this) {
+      return function() {
+        var options;
+        options = [];
+        options.push(["City", "city"]);
+        options.push(["State", "state"]);
+        options.push(["Zipcode", "zip"]);
+        return options;
+      };
+    })(this);
+    for (n = i = 0; i < 1000; n = ++i) {
+      if (Blockly.Css.CONTENT[n] != null) {
+        Blockly.Css.CONTENT[n] = Blockly.Css.CONTENT[n].replace(": 999;", ": 2999;");
+      }
+    }
+    setupCustomBlockly.setupBlocks(Blockly, this);
+    this.divToolbox = $(this.toolboxText());
+    $("body").append(this.divToolbox);
+    return true;
+  };
+
+  BlockyHelper.prototype.onIgnoreVariable = function(name, e) {
+    this.ignoreList.push(name);
+    this.regroupItems();
+    return true;
+  };
+
+  BlockyHelper.prototype.showSamples = function(name, html) {
+    var bottom, h, left, odd, ref, right, sampleCount, sampleVal, top, w;
+    html = this.onBeforeShowSamples(name);
+    if (html == null) {
+      html = "";
+    }
+    html = "<div class='blocklyShowSamples'>" + html;
+    html += "<div class='itemTitle'> <b>" + name + "</b> Samples </div>";
+    odd = "odd";
+    ref = this.sampleData[name];
+    for (sampleVal in ref) {
+      sampleCount = ref[sampleVal];
+      if ((sampleVal == null) || sampleVal.length < 1) {
+        sampleVal = "[Empty]";
+      }
+      sampleCount = numeral(sampleCount).format("#,###");
+      html += "<div class='sampleText " + odd + "'> " + sampleVal + " <div class='pull-right text-right'> " + sampleCount + " </div> </div>";
+      if (odd === "odd") {
+        odd = "even";
+      } else {
+        odd = "odd";
+      }
+    }
+    if (this.divSamples == null) {
+      w = $(window).width();
+      h = $(window).height();
+      top = $(window).scrollTop() + 10;
+      bottom = top + h - 20;
+      left = w - 460;
+      right = w - 10;
+      console.log("Show popup at x=" + left + ", y=" + top + " (w=" + w + ",h=" + h + ",r=" + right + ",b=" + bottom + ")");
+      this.divSamples = new PopupWindow("Samples", left, top, {
+        w: right - left,
+        h: bottom - top
+      });
+    }
+    html += "</div>";
+    this.divSamples.html(html);
+    this.divSamples.setBackgroundColor("#F8F6EB");
+    this.divSamples.open();
+    return true;
+  };
+
+  BlockyHelper.prototype.render = function(divBlocklyArea) {
+    var w;
+    this.divBlocklyArea = divBlocklyArea;
+    this.buildToolbox();
+    w = $(window).width - 40;
+    this.elBlocklyDiv = $("<div id='blocklyDiv' style='width: " + w + "px; height: 5000px;'/>");
+    this.elBlocklyDiv.css("position", "absolute");
+    this.divBlocklyArea.html("");
+    this.divBlocklyArea.append(this.elBlocklyDiv);
+    this.workspace = Blockly.inject(this.elBlocklyDiv[0], {
+      toolbox: this.divToolbox[0],
+      grid: {
+        spacing: 20,
+        length: 3,
+        snap: true,
+        colour: '#ccc'
+      },
+      collapse: true,
+      comments: true
+    });
+    this.workspace.addChangeListener(this.onBlocklyEvent);
+    this.onResizeEditor();
+    this.onLoadInitialBlocks();
+    this.loadBlocksToWorkspace();
+    this.on("ShowSamples", this.showSamples);
+    this.on("CreateAssignment", this.onShowAssignmentDialog);
+    return this.on("IgnoreVariable", this.onIgnoreVariable);
+  };
+
+  BlockyHelper.prototype.onResizeEditor = function() {
+    var element, x, y;
+    $(".PopupWindow").css("zIndex", 1100);
+    if (this.elBlocklyDiv != null) {
+      x = 0;
+      y = 0;
+      element = this.divBlocklyArea[0];
+      while (true) {
+        x += element.offsetLeft;
+        y += element.offsetTop;
+        element = element.offsetParent;
+        if (!element) {
+          break;
+        }
+        break;
+      }
+      x += this.toolboxWidth;
+      window.dba = this.divBlocklyArea[0];
+      console.log("BlocklyHelper onResizeEditor, Offset Width=", this.divBlocklyArea[0].offsetWidth, " x=" + x + ", y=" + y);
+      this.elBlocklyDiv.css({
+        position: "absolute",
+        left: x,
+        top: y,
+        width: this.divBlocklyArea[0].offsetWidth - this.toolboxWidth,
+        height: this.blocklyMaxScrollHeight
+      });
+      if (!this.toolboxDiv) {
+        this.toolboxDiv = $(".blocklyToolboxDiv").detach();
+        this.toolboxDiv.appendTo(this.divBlocklyArea);
+        Blockly.Toolbox.prototype.position = function() {
+          if (this.flyout_ != null) {
+            return this.flyout_.position();
+          }
+          return null;
+        };
+        Blockly.Flyout.prototype.position = function() {
+          var targetWorkspaceMetrics;
+          if (!this.isVisible()) {
+            return;
+          }
+          targetWorkspaceMetrics = this.targetWorkspace_.getMetrics();
+          if (typeof toolboxFlyoutWidth === "undefined" || toolboxFlyoutWidth === null) {
+            this.toolboxFlyoutWidth = 400;
+          }
+          console.log("calling ", this.setBackgroundPath_, " with ", this.toolboxFlyoutWidth, targetWorkspaceMetrics.viewHeight);
+          return this.setBackgroundPath_(this.toolboxFlyoutWidth, targetWorkspaceMetrics.viewHeight);
+        };
+      }
+      this.toolboxDiv.css({
+        width: this.toolboxWidth,
+        left: 0,
+        top: 0
+      });
+      this.workspace.markFocused();
+      Blockly.svgResize(this.workspace);
+    }
+    return true;
+  };
+
+  BlockyHelper.prototype.setIgnore = function(ignoreList) {
+    this.ignoreList = ignoreList;
+    console.log("Setting ignore: ", this.ignoreList);
+    this.regroupItems();
+    this.workspace.render();
+    return true;
+  };
+
+  BlockyHelper.prototype.regroupItems = function() {
+    return window.globalBusyDialog.exec("Updating layout", (function(_this) {
+      return function() {
+        return _this.regroupItemsActual();
+      };
+    })(this));
+  };
+
+  BlockyHelper.prototype.regroupItemsActual = function() {
+    var assignedY, block, count, elements, found, half, i, ignoreRegex, ignoreText, ignoredNames, j, k, l, len, len1, len2, len3, len4, name, names, nodeName, o, offset, ref, skipText, skipped, thisBlockType, top, unassigned, unassignedNames, unassignedY, varName, xloc, xml;
+    xml = Blockly.Xml.workspaceToDom(this.workspace);
+    elements = xml.getElementsByTagName("block");
+    offset = this.elBlocklyDiv.offset();
+    top = 40 - (offset.top - 109);
+    console.log("OFFSET=", offset, this.workspace.scrollY);
+    globalYValues = {};
+    unassignedY = top;
+    assignedY = 40;
+    unassigned = {};
+    unassignedNames = [];
+    ignoredNames = [];
+    ignoreRegex = [];
+    ref = this.ignoreList;
+    for (i = 0, len = ref.length; i < len; i++) {
+      ignoreText = ref[i];
+      if ((ignoreText != null) && ignoreText.length > 1) {
+        ignoreRegex.push(new RegExp(ignoreText, "i"));
+      }
+    }
+    for (j = 0, len1 = elements.length; j < len1; j++) {
+      block = elements[j];
+      found = false;
+      thisBlockType = block.getAttribute("type").toString();
+      if (thisBlockType === "variables_get") {
+        nodeName = block.parentNode.nodeName.toString();
+        if (nodeName === "XML") {
+          varName = block.children[0].innerText;
+          skipped = false;
+          for (k = 0, len2 = ignoreRegex.length; k < len2; k++) {
+            skipText = ignoreRegex[k];
+            if (skipText.test(varName)) {
+              skipped = true;
+            }
+          }
+          if (skipped) {
+            ignoredNames.push(varName);
+          } else {
+            unassignedNames.push(varName);
+          }
+          unassigned[varName] = block;
+          found = true;
+        }
+      }
+      if (!found) {
+        nodeName = block.parentNode.nodeName.toString();
+        if (nodeName === "XML") {
+          block.setAttribute("x", -40);
+          block.setAttribute("y", assignedY);
+          assignedY += 400;
+          found = true;
+        }
+      }
+    }
+    console.log("ua=", unassignedY);
+    names = unassignedNames.sort();
+    half = Math.floor(names.length / 2) + 1;
+    count = 0;
+    xloc = 700;
+    for (l = 0, len3 = names.length; l < len3; l++) {
+      name = names[l];
+      block = unassigned[name];
+      block.setAttribute("x", xloc);
+      block.setAttribute("y", unassignedY);
+      unassignedY += 30;
+      if (unassignedY + 80 > this.blocklyMaxScrollHeight) {
+        xloc = xloc + 360;
+        unassignedY = top;
+      }
+    }
+    names = ignoredNames.sort();
+    xloc += 360 + 500;
+    unassignedY = 40;
+    for (o = 0, len4 = names.length; o < len4; o++) {
+      name = names[o];
+      block = unassigned[name];
+      block.setAttribute("x", xloc);
+      block.setAttribute("y", unassignedY);
+      unassignedY += 30;
+      if (unassignedY + 80 > this.blocklyMaxScrollHeight) {
+        xloc = xloc + 360;
+        unassignedY = top;
+      }
+    }
+    this.workspace.clear();
+    Blockly.Xml.domToWorkspace(xml, this.workspace);
+    return true;
+  };
+
+  BlockyHelper.prototype.doFindVariables = function() {
+    var block, elements, i, len, list, nextUp, nodeName, parent, targetName, thisBlockType, varName, xml;
+    list = {};
+    xml = Blockly.Xml.workspaceToDom(this.workspace);
+    elements = xml.getElementsByTagName("block");
+    for (i = 0, len = elements.length; i < len; i++) {
+      block = elements[i];
+      thisBlockType = block.getAttribute("type").toString();
+      if (thisBlockType === "variables_get") {
+        varName = block.children[0].innerText;
+        parent = block.parentNode;
+        nodeName = parent.nodeName.toString();
+        if (nodeName === "XML") {
+          list[varName] = {
+            xml: block
+          };
+        } else if (nodeName === "VALUE") {
+          if (parent.getAttribute("name").toString() === "VALUE") {
+            nextUp = parent.parentNode;
+            if (nextUp.getAttribute("type").toString() === "variables_set") {
+              targetName = nextUp.children[0].innerText;
+              list[varName] = {
+                xml: block,
+                target: targetName
+              };
+            } else {
+              console.log(varName + " assigned to unknown:", nextUp);
+            }
+          } else if (parent.getAttribute("name").toString() === "A") {
+
+          } else {
+            console.log("Unknown usage " + varName);
+          }
+        } else {
+          console.log("Var=" + varName + " Name=" + nodeName, parent);
+        }
+      }
+    }
+    return list;
+  };
+
+  BlockyHelper.prototype.doRemove = function(blockType, fieldName, fieldValue) {
+    var block, elements, i, len, nodeName, nodeValue, thisBlockType, x, xml, y;
+    xml = Blockly.Xml.workspaceToDom(this.workspace);
+    elements = xml.getElementsByTagName("block");
+    for (i = 0, len = elements.length; i < len; i++) {
+      block = elements[i];
+      thisBlockType = block.getAttribute("type").toString();
+      if (thisBlockType === blockType && (block.children[0] != null)) {
+        nodeName = block.children[0].getAttribute("name").toString();
+        nodeValue = block.children[0].innerText;
+        if (nodeName === fieldName && nodeValue === fieldValue) {
+          x = parseFloat(block.getAttribute("x").toString());
+          y = parseFloat(block.getAttribute("y").toString());
+          block.remove();
+          this.workspace.clear();
+          Blockly.Xml.domToWorkspace(xml, this.workspace);
+          console.log("(" + x + ", " + y + ") REMOVE BLOCK:", block.children[0], nodeName, nodeValue);
+          return [x, y];
+        }
+      }
+    }
+    return null;
+  };
+
+  BlockyHelper.prototype.doAppendBlock = function(jsBlock) {
+    var xmlDom, xmlText;
+    globalYValues = {};
+    xmlText = this.getXmlText();
+    xmlText = xmlText.replace("</xml>", jsBlock.getXml() + "</xml>");
+    xmlDom = Blockly.Xml.textToDom(xmlText);
+    this.workspace.clear();
+    Blockly.Xml.domToWorkspace(xmlDom, this.workspace);
+    return true;
+  };
+
+  BlockyHelper.prototype.doSaveWorkspace = function() {
+    var xmlText;
+    xmlText = this.getXmlText();
+    this.onSaveWorkspace(xmlText);
+    return true;
+  };
+
+  BlockyHelper.prototype.loadBlocksToWorkspace = function() {
+    var block, i, len, ref, xml;
+    Blockly.Events.recordUndo = false;
+    if (this.xmlText) {
+      console.log("Loading XML Instead");
+      xml = this.xmlText;
+      delete this.xmlText;
+    } else {
+      xml = '<xml xmlns="http://www.w3.org/1999/xhtml">';
+      ref = this.blocks;
+      for (i = 0, len = ref.length; i < len; i++) {
+        block = ref[i];
+        xml += block.getXml();
+      }
+      xml += "</xml>";
+    }
+    this.workspace.scrollX = -150;
+    this.workspace.scrollY = -10;
+    this.setXmlText(xml);
+    setTimeout((function(_this) {
+      return function() {
+        return Blockly.Events.recordUndo = true;
+      };
+    })(this), 1000);
+    return true;
+  };
+
+  BlockyHelper.prototype.onShowIgnorePaths = function(e) {
+    var m;
+    m = new ModalDialog({
+      showOnCreate: false,
+      title: "Ignore Paths",
+      content: "Enter a list of patterns to hide specific variables",
+      position: "center",
+      ok: "Go"
+    });
+    console.log("Existing:", this.ignoreList);
+    m.getForm().addTagsInput("tags1", "Ignore Patterns", this.ignoreList.join(","));
+    m.getForm().onSubmit = (function(_this) {
+      return function(form) {
+        _this.setIgnore(form.tags1.split(","));
+        m.hide();
+        return true;
+      };
+    })(this);
+    m.show();
+    return true;
+  };
+
+  BlockyHelper.prototype.onShowAssignmentDialog = function(targetField) {
+    var m;
+    m = new ModalDialog({
+      showOnCreate: false,
+      content: "Enter a variable name to create a new assignment.",
+      position: "center",
+      title: "Create Assignment",
+      ok: "Go"
+    });
+    m.getForm().addTextInput("input1", "Name");
+    m.getForm().addTextInput("inputTarget", "Target Variable", targetField);
+    m.getForm().onSubmit = (function(_this) {
+      return function(form) {
+        window.globalBusyDialog.exec("Creating assignment", function() {
+          var node, result;
+          result = _this.doRemove("variables_get", "VAR", form.inputTarget);
+          node = _this.createVariableSetToVariable(form.input1, form.inputTarget);
+          if (result != null) {
+            node.x = result[0];
+            node.y = result[1];
+          }
+          console.log("NODE=", node);
+          _this.doAppendBlock(node);
+          return true;
+        });
+        return m.hide();
+      };
+    })(this);
+    m.show();
+    return true;
+  };
+
+  BlockyHelper.prototype.autoAssignFromRules = function(rules) {
+    var a, b, i, len, ref, rule;
+    ref = this.knownVariablesSet;
+    for (a in ref) {
+      b = ref[a];
+      if (this.knownVariablesGet[a] != null) {
+        this.addAssignRule(a, a);
+      }
+    }
+    for (i = 0, len = rules.length; i < len; i++) {
+      rule = rules[i];
+      if ((this.knownVariablesSet[rule[0]] != null) && (this.knownVariablesGet[rule[1]] != null)) {
+        console.log("Matched:", rule);
+        this.addAssignRule(rule[1], rule[0]);
+      }
+    }
+    return true;
+  };
+
+  BlockyHelper.prototype.addAssignRule = function(sourceFieldName, targetFieldName) {
+    var dst, src;
+    src = null;
+    dst = null;
+    if (this.knownVariablesSet[targetFieldName] != null) {
+      dst = this.knownVariablesSet[targetFieldName];
+    }
+    if (this.knownVariablesGet[sourceFieldName] != null) {
+      src = this.knownVariablesGet[sourceFieldName];
+    }
+    if ((src != null) && (dst != null)) {
+      console.log("Assign " + sourceFieldName + " to " + targetFieldName + ": ", src, dst);
+      dst.addChild("VALUE", src);
+      delete this.knownVariablesGet[sourceFieldName];
+    } else {
+      console.log("Not found src=" + src + ", dst=" + dst);
+    }
+    return true;
+  };
+
+  BlockyHelper.prototype.addSampleDataRecord = function(obj) {
+    var keyVal, keyVar;
+    for (keyVar in obj) {
+      keyVal = obj[keyVar];
+      if (this.sampleData[keyVar] == null) {
+        this.sampleData[keyVar] = {};
+      }
+      if (this.sampleData[keyVar][keyVal] == null) {
+        this.sampleData[keyVar][keyVal] = 0;
+      }
+      this.sampleData[keyVar][keyVal]++;
+    }
+    return true;
+  };
+
+  BlockyHelper.prototype.setStandardOptions = function(subDocumentSource, subDocumentTarget, configText, checkVariable, checkValue) {
+    var commentText, i, keyVal, keyVar, lastNode, len, line, logicBlock, mainBlock, node, ref, ref1, varSetId, varTheSet, withBlock;
+    configText = configText.replace(/^[^a-zA-Z]*/g, "");
+    configText = configText.replace(/[^a-zA-Z]*$/g, "");
+    lastNode = null;
+    ref = this.sampleData;
+    for (keyVar in ref) {
+      keyVal = ref[keyVar];
+      node = this.createVariableGet(keyVar);
+      this.placeNode(node, 600);
+    }
+    withBlock = this.createWithCondition(subDocumentSource);
+    withBlock.addChild("WITH", this.createOutputTo(subDocumentTarget));
+    ref1 = configText.split(/\n/);
+    for (i = 0, len = ref1.length; i < len; i++) {
+      line = ref1[i];
+      if (line) {
+        if (/\#/.test(line)) {
+          commentText = line.replace(/^.*#/, "");
+          node = this.createComment(commentText);
+        } else {
+          node = this.createVariableSet(line);
+        }
+        if (lastNode != null) {
+          lastNode.nextNode = node;
+        } else {
+          withBlock.addStatement("COMMANDS", node);
+        }
+        lastNode = node;
+      }
+    }
+    varSetId = this.createVariableGet(checkVariable);
+    varTheSet = this.createText(checkValue);
+    logicBlock = this.createLogicalEquals(varSetId, varTheSet);
+    mainBlock = this.createIfCondition(logicBlock, withBlock);
+    this.placeNode(mainBlock, 40);
+    return true;
+  };
+
+  BlockyHelper.prototype.getSlug = function(line) {
+    var str;
+    str = line.toLowerCase();
+    str = str.replace(/[^a-zA-Z0-9]/g, "_");
+    return str;
+  };
+
+  BlockyHelper.prototype.placeNode = function(node, xValue) {
+    node.x = xValue;
+    return this.blocks.push(node);
+  };
+
+  BlockyHelper.prototype.createFilterList = function(optionsList) {
+    var endNode, i, item, len, n, node, subNode;
+    node = new BlocklyCodeBlock("filter_text", 590);
+    n = 0;
+    for (i = 0, len = optionsList.length; i < len; i++) {
+      item = optionsList[i];
+      console.log("Adding node for ", item["var"]);
+      endNode = new BlocklyCodeBlock("variables_get");
+      endNode.addField("VAR", item["var"]);
+      subNode = new BlocklyCodeBlock("search_replace");
+      subNode.addField("Pattern", item.match);
+      subNode.addField("Result", item.replace);
+      subNode.addChild("NEXT", endNode);
+      node.addChild("ADD" + n, subNode);
+      n++;
+    }
+    node.addMutation("items", n);
+    return node;
+  };
+
+  BlockyHelper.prototype.createVariableGet = function(varName) {
+    var node;
+    node = new BlocklyCodeBlock("variables_get", 0);
+    node.addField("VAR", varName);
+    this.knownVariablesGet[varName] = node;
+    return node;
+  };
+
+  BlockyHelper.prototype.createVariableSet = function(varName) {
+    var node;
+    node = new BlocklyCodeBlock("variables_set", 0);
+    node.addField("VAR", varName);
+    this.knownVariablesSet[varName] = node;
+    this.knownVariablesSet[this.getSlug(varName)] = node;
+    return node;
+  };
+
+  BlockyHelper.prototype.createVariableSetToText = function(varName, textValue) {
+    var node, textNode;
+    node = this.createVariableSet(varName);
+    textNode = new BlocklyCodeBlock("text");
+    textNode.addField("TEXT", textValue);
+    node.addChild("VALUE", textNode);
+    return node;
+  };
+
+  BlockyHelper.prototype.createVariableSetToVariable = function(varName, targetVariable) {
+    var node, target;
+    node = this.createVariableSet(varName);
+    if (!this.knownVariablesGet[targetVariable]) {
+      target = this.createVariableGet(targetVariable);
+    } else {
+      target = this.knownVariablesGet[targetVariable];
+    }
+    node.addChild("VALUE", target);
+    return node;
+  };
+
+  BlockyHelper.prototype.createText = function(text) {
+    var node;
+    node = new BlocklyCodeBlock("text", 0);
+    node.addField("TEXT", text);
+    return node;
+  };
+
+  BlockyHelper.prototype.createWithCondition = function(varName) {
+    var node;
+    node = new BlocklyCodeBlock("with", 0);
+    node.addField("name", varName);
+    return node;
+  };
+
+  BlockyHelper.prototype.createMathNumber = function(numValue) {
+    var node;
+    node = new BlocklyCodeBlock("math_number");
+    node.addField("NUM", numValue);
+    return node;
+  };
+
+  BlockyHelper.prototype.createComment = function(text) {
+    var node;
+    node = new BlocklyCodeBlock("code_comment");
+    node.addField("comment_text", text);
+    return node;
+  };
+
+  BlockyHelper.prototype.createLogicalEquals = function(leftSide, rightSide) {
+    var node;
+    node = new BlocklyCodeBlock("logic_compare");
+    node.addField("OP", "EQ");
+    node.addChild("A", leftSide);
+    node.addChild("B", rightSide);
+    return node;
+  };
+
+  BlockyHelper.prototype.createLogicalLessthan = function(leftSide, rightSide) {
+    var node;
+    node = new BlocklyCodeBlock("logic_compare");
+    node.addField("OP", "LT");
+    node.addChild("A", leftSide);
+    node.addChild("B", rightSide);
+    return node;
+  };
+
+  BlockyHelper.prototype.createIfCondition = function(blockTestValue, statementBlock) {
+    var node;
+    node = new BlocklyCodeBlock("controls_if");
+    node.addChild("IF0", blockTestValue);
+    node.addStatement("DO0", statementBlock);
+    return node;
+  };
+
+  BlockyHelper.prototype.createOutputTo = function(varName) {
+    var node;
+    node = new BlocklyCodeBlock("output_to");
+    node.addField("name", varName);
+    return node;
+  };
+
+  BlockyHelper.prototype.toolboxText = function() {
+    return '<xml id=\'toolbox\' style=\'display: none;\'>\n    <category name="Loops" colour="120">\n        <block type="controls_whileUntil" ></block>\n        <block type="controls_for"></block>\n        <block type="controls_flow_statements"></block>\n        <block type="controls_forEach"></block>\n        <block type="controls_repeat_ext">\n            <value name="TIMES">\n                <shadow type="math_number">\n                    <field name="NUM">10</field>\n                </shadow>\n            </value>\n        </block>\n        <block type="controls_for">\n            <value name="FROM">\n                <shadow type="math_number">\n                    <field name="NUM">1</field>\n                </shadow>\n            </value>\n            <value name="TO">\n                <shadow type="math_number">\n                    <field name="NUM">10</field>\n                </shadow>\n            </value>\n            <value name="BY">\n                <shadow type="math_number">\n                    <field name="NUM">1</field>\n                </shadow>\n            </value>\n        </block>\n    </category>\n\n    <category name="Logic" colour="210">\n        <block type="controls_if"> </block>\n        <block type="logic_compare"> </block>\n        <block type="logic_operation"> </block>\n        <block type="logic_boolean"> </block>\n        <block type="logic_negate"> </block>\n        <block type="logic_ternary"> </block>\n        <block type="logic_null"> </block>\n    </category>\n\n    <category id="catMath" colour="230" name="Math">\n        <block type="math_number"></block>\n        <block type="math_arithmetic">\n            <value name="A">\n                <shadow type="math_number">\n                    <field name="NUM">1</field>\n                </shadow>\n            </value>\n            <value name="B">\n                <shadow type="math_number">\n                    <field name="NUM">1</field>\n                </shadow>\n            </value>\n        </block>\n        <block type="math_single">\n            <value name="NUM">\n                <shadow type="math_number">\n                    <field name="NUM">9</field>\n                </shadow>\n            </value>\n        </block>\n        <block type="math_trig">\n            <value name="NUM">\n                <shadow type="math_number">\n                    <field name="NUM">45</field>\n                </shadow>\n            </value>\n        </block>\n        <block type="math_constant"></block>\n        <block type="math_number_property">\n            <value name="NUMBER_TO_CHECK">\n                <shadow type="math_number">\n                    <field name="NUM">0</field>\n                </shadow>\n            </value>\n        </block>\n        <block type="math_change">\n            <value name="DELTA">\n                <shadow type="math_number">\n                    <field name="NUM">1</field>\n                </shadow>\n            </value>\n        </block>\n        <block type="math_round">\n            <value name="NUM">\n                <shadow type="math_number">\n                    <field name="NUM">3.1</field>\n                </shadow>\n            </value>\n        </block>\n        <block type="math_on_list"></block>\n        <block type="math_modulo">\n            <value name="DIVIDEND">\n                <shadow type="math_number">\n                    <field name="NUM">64</field>\n                </shadow>\n            </value>\n            <value name="DIVISOR">\n                <shadow type="math_number">\n                    <field name="NUM">10</field>\n                </shadow>\n            </value>\n        </block>\n        <block type="math_constrain">\n            <value name="VALUE">\n                <shadow type="math_number">\n                    <field name="NUM">50</field>\n                </shadow>\n            </value>\n            <value name="LOW">\n                <shadow type="math_number">\n                    <field name="NUM">1</field>\n                </shadow>\n            </value>\n            <value name="HIGH">\n                <shadow type="math_number">\n                    <field name="NUM">100</field>\n                </shadow>\n            </value>\n        </block>\n    </category>\n    <category id="catText" colour="160" name="Text">\n        <block type="text"></block>\n        <block type="text_join"></block>\n        <block type="text_append">\n            <value name="TEXT">\n                <shadow type="text"></shadow>\n            </value>\n        </block>\n        <block type="text_length">\n            <value name="VALUE">\n                <shadow type="text">\n                    <field name="TEXT">abc</field>\n                </shadow>\n            </value>\n        </block>\n        <block type="text_isEmpty">\n            <value name="VALUE">\n                <shadow type="text">\n                    <field name="TEXT"></field>\n                </shadow>\n            </value>\n        </block>\n        <block type="text_indexOf">\n            <value name="VALUE">\n                <block type="variables_get">\n                    <field name="VAR">text</field>\n                </block>\n            </value>\n            <value name="FIND">\n                <shadow type="text">\n                    <field name="TEXT">abc</field>\n                </shadow>\n            </value>\n        </block>\n        <block type="text_charAt">\n            <value name="VALUE">\n                <block type="variables_get">\n                    <field name="VAR">text</field>\n                </block>\n            </value>\n        </block>\n        <block type="text_getSubstring">\n            <value name="STRING">\n                <block type="variables_get">\n                    <field name="VAR">text</field>\n                </block>\n            </value>\n        </block>\n        <block type="text_changeCase">\n            <value name="TEXT">\n                <shadow type="text">\n                    <field name="TEXT">abc</field>\n                </shadow>\n            </value>\n        </block>\n        <block type="text_trim">\n            <value name="TEXT">\n                <shadow type="text">\n                    <field name="TEXT">abc</field>\n                </shadow>\n            </value>\n        </block>\n        <block type="text_print">\n            <value name="TEXT">\n                <shadow type="text">\n                    <field name="TEXT">abc</field>\n                </shadow>\n            </value>\n        </block>\n        <block type="text_prompt_ext">\n            <value name="TEXT">\n                <shadow type="text">\n                    <field name="TEXT">abc</field>\n                </shadow>\n            </value>\n        </block>\n    </category>\n    <category id="catLists" colour="260" name="Lists">\n        <block type="lists_create_with">\n            <mutation items="0"></mutation>\n        </block>\n        <block type="lists_create_with"></block>\n        <block type="lists_repeat">\n            <value name="NUM">\n                <shadow type="math_number">\n                    <field name="NUM">5</field>\n                </shadow>\n            </value>\n        </block>\n        <block type="lists_length"></block>\n        <block type="lists_isEmpty"></block>\n        <block type="lists_indexOf">\n            <value name="VALUE">\n                <block type="variables_get">\n                    <field name="VAR">list</field>\n                </block>\n            </value>\n        </block>\n        <block type="lists_getIndex">\n            <value name="VALUE">\n                <block type="variables_get">\n                    <field name="VAR">list</field>\n                </block>\n            </value>\n        </block>\n        <block type="lists_setIndex">\n            <value name="LIST">\n                <block type="variables_get">\n                    <field name="VAR">list</field>\n                </block>\n            </value>\n        </block>\n        <block type="lists_getSublist">\n            <value name="LIST">\n                <block type="variables_get">\n                    <field name="VAR">list</field>\n                </block>\n            </value>\n        </block>\n        <block type="lists_split">\n            <value name="DELIM">\n                <shadow type="text">\n                    <field name="TEXT">,</field>\n                </shadow>\n            </value>\n        </block>\n        <block type="lists_sort"></block>\n    </category>\n\n    <sep></sep>\n    <category id="catFunctions" colour="290" custom="PROCEDURE" name="Functions"></category>\n    <sep></sep>\n\n    <category id="customer1" colour="310" name="Portal Custom">\n        <block type="code_comment"></block>\n        <block type="with"></block>\n        <block type="concat"></block>\n        <block type="make_date"></block>\n        <block type="output_to"></block>\n        <block type="extract"></block>\n        <block type="search_replace"></block>\n        <block type="days_from_today"></block>\n        <block type="filter_text"></block>\n    </category>\n\n</xml>';
+  };
+
+  return BlockyHelper;
+
+})();
 var DataAxis,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 

@@ -42,6 +42,7 @@ class FloatingSelect extends FloatingWindow
                         return true
 
                 return false
+
             @table.showGroupPadding = false
             @table.showResize       = false
             @table.setAutoFillWidth()
