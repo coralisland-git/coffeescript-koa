@@ -62,6 +62,14 @@ $ ->
 			splitter.getFirst().html "Left side should be 50%"
 			splitter.getSecond().html "Right side should be 50%"
 
+	addTestButton "Use LocalStrage by setting configName", "Open", () ->
+		addHolder("")
+		.setView "Splittable", (splitter)->
+			splitter.setPercent 50
+			splitter.setConfigName "test1"
+			splitter.getFirst().setView "TestShowSize"
+			splitter.getSecond().setView "TestShowSize"
+
 	addTestButton "Simple Vertical 50/50 - Left Min Size", "Open", () ->
 		addHolder("")
 		.setView "Splittable", (splitter)->

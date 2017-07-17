@@ -56,7 +56,8 @@ class ViewSplittable extends View
     ##|  Set's the split percent which is p1 and 100-p1 assumed
     setPercent: (p1)=>
         if p1 <= 1.0 and p1 >= 0 then p1 *= 100
-        @optionData.size = p1
+        #@optionData.size = p1
+        @setSizeAndLocalStorage p1
         @resetSize()
         true
 
@@ -89,7 +90,8 @@ class ViewSplittable extends View
             @size1 = space - @size2
 
             @gutter.move @size1, 0, @optionData.gutterSize, h
-            @optionData.size = 100*(@size1/w)
+            #@optionData.size = 100*(@size1/w)
+            @setSizeAndLocalStorage 100*(@size1/space)
 
         else
 
@@ -108,7 +110,8 @@ class ViewSplittable extends View
                 @size1 = space - @size2
 
             @gutter.move 0, @size1, w, @optionData.gutterSize
-            @optionData.size = 100*(@size1/h)
+            #@optionData.size = 100*(@size1/h)
+            @setSizeAndLocalStorage 100*(@size1/space)
 
         # console.log "calculateSizes w=#{w}, h=#{h} size1=#{@size1}, size2=#{@size2}"
 
@@ -156,10 +159,10 @@ class ViewSplittable extends View
 
         if @optionData.direction == "vertical"
             newSize1 = @startingSize1 + deltaX
-            @optionData.size = 100*(newSize1/@width())
+            @optionData.size = 100*(newSize1/(@width()-@optionData.gutterSize))
         else
             newSize1 = @startingSize1 + deltaY
-            @optionData.size = 100*(newSize1/@height())
+            @optionData.size = 100*(newSize1/(@height()-@optionData.gutterSize))
 
         @calculateSizes()
         true
@@ -171,10 +174,12 @@ class ViewSplittable extends View
         ##| Figure out the new percentages
         if @optionData.direction == "vertical"
             newSize1 = @startingSize1 + deltaX
-            @optionData.size = 100*(newSize1/@width())
+            @optionData.size = 100 * (newSize1 / (@width() - @optionData.gutterSize))
+            #@setSizeAndLocalStorage 100*(newSize1/(@width()-@optionData.gutterSize))
         else
             newSize1 = @startingSize1 + deltaY
-            @optionData.size = 100*(newSize1/@height())
+            @optionData.size = 100 * (newSize1 / (@height() - @optionData.gutterSize))
+            #@setSizeAndLocalStorage 100*(newSize1/(@height()-@optionData.gutterSize))
 
         if globalDebugResize
             console.log "ViewSplittable onDragGutterComplete new percent=", @optionData.size, " newSize=", newSize1
@@ -217,6 +222,7 @@ class ViewSplittable extends View
             $.extend @optionData, options, true
 
         @setupSplitter()
+
         true
 
     show: (name, size) =>
@@ -254,4 +260,21 @@ class ViewSplittable extends View
 
     getWidget: () =>
         return @gutter
+
+    ## -gao
+    ## set ConfigName to save/restore sizes to localStorage
+    setConfigName: (strName) =>
+        if !strName or strName.length < 1
+            return false
+        @optionData.configName = "splitter_#{strName}"
+        if configPercent = localStorage.getItem @optionData.configName
+            @optionData.size = configPercent
+            @resetSize configPercent
+
+    ## -gao
+    ## function to set size of view as well as value in localStorage
+    setSizeAndLocalStorage: (val) =>
+        @optionData.size = val
+        if @optionData.configName
+            localStorage.setItem @optionData.configName, val
 
