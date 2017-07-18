@@ -270,6 +270,6 @@ class ViewSplittable extends View
     ## function to set size of view as well as value in localStorage
     setSizeAndLocalStorage: (val) =>
         @optionData.size = val
-        if @optionData.configName
+        if @optionData.configName?
             localStorage.setItem @optionData.configName, val
 

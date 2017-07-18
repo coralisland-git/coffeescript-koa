@@ -67042,9 +67042,10 @@ DataMapEngine = (function() {
   DataMapEngine.prototype.setFastDocument = function(tableName, keyValue, newData) {
     var c;
     c = this.internalGetCollection(tableName);
-    if (keyValue != null) {
-      newData.id = keyValue;
+    if (keyValue == null) {
+      return false;
     }
+    newData.id = keyValue;
     c.upsert(newData);
     return true;
   };
