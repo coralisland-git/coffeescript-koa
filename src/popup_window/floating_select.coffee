@@ -13,13 +13,16 @@ class FloatingSelect extends FloatingWindow
         return true
 
     hide: ()=>
+        console.log "FloatingSelect hide()", this
         if @table? then @table.hide()
         super()
         return true
 
     show: ()=>
+        console.log "FloatingSelect show()", this
         super.show()
         @showTable()
+        @elHolder.move 0, 0, @width, @height
         true
 
     onResize: ()=>
@@ -32,6 +35,7 @@ class FloatingSelect extends FloatingWindow
         if @table? then return @table
 
         @elHolder.setView "Table", (view)=>
+
             @table = view.addTable @tableName, (colName)=>
                 ##|
                 ##|  Column filter function only shows specific columns

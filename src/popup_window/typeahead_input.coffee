@@ -68,6 +68,7 @@ class TypeaheadInput
         @elInputField = $(InputField)
 
         ##| add clear text input icon
+        console.log "Adding dropdown to ", @elInputField
         @elInputField.after $('<i />',
             'class': 'fa fa-times floatingDropdownIcon'
             style: 'margin-left: -20px; float:right; display:none')
@@ -126,7 +127,6 @@ class TypeaheadInput
 
         if !@win?
 
-            # console.log "posTop=", posTop, " height=", height
             @win = new FloatingSelect(posLeft, posTop + height, width, @config.rowHeight*@config.numRows, @elInputField.parent())
             @win.setTable @tableName, @columns
 

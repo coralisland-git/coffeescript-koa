@@ -591,8 +591,6 @@ column-rule-color: #707070 li.title {
   overflow: hidden;
   display: none;
   border: 1px solid #00f;
-  width: auto !important;
-  height: auto !important;
   position: absolute;
   z-index: 1503400;
 }

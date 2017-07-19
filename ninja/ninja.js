@@ -69997,6 +69997,7 @@ TypeaheadInput = (function() {
     };
     $.extend(this.config, options);
     this.elInputField = $(InputField);
+    console.log("Adding dropdown to ", this.elInputField);
     this.elInputField.after($('<i />', {
       'class': 'fa fa-times floatingDropdownIcon',
       style: 'margin-left: -20px; float:right; display:none'
@@ -75773,6 +75774,7 @@ FloatingSelect = (function(superClass) {
   };
 
   FloatingSelect.prototype.hide = function() {
+    console.log("FloatingSelect hide()", this);
     if (this.table != null) {
       this.table.hide();
     }
@@ -75781,8 +75783,10 @@ FloatingSelect = (function(superClass) {
   };
 
   FloatingSelect.prototype.show = function() {
+    console.log("FloatingSelect show()", this);
     FloatingSelect.__super__.show.apply(this, arguments).show();
     this.showTable();
+    this.elHolder.move(0, 0, this.width, this.height);
     return true;
   };
 
