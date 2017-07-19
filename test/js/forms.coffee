@@ -123,6 +123,16 @@ $ ->
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
 			view.show()
 
+	addTestButton "Form View Validation", "Open", () ->
+		addHolder().setView "Form", (view) ->
+			view.addTextInput "input1", "Example Input 1", "Input Value1", {}, ()->
+				console.log "Validation function"
+			view.addTextInput "input2", "Example Input 2"
+			view.addSubmit "submit", "Click this button to submit", "Submit"
+			view.setSubmitFunction (form) =>
+				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
+			view.show()
+
 	addTestButton "Form on Popup", "Open", () ->
 		doPopupView "Form", "Form on Popup", "form-popup1", 399, 300, (view) ->
 			view.addTextInput "input1", "Example Input 1"

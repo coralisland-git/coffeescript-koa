@@ -168,7 +168,7 @@ class FormWrapper
         if type is "checkbox" and value is 1
             attrs.checked = "checked"
         value = if type is "checkbox" then 1 else value
-        field = new FormField(fieldName, label, value, type, attrs)
+        field = new FormField(fieldName, label, value, type, attrs, fnValidate)
         @fields.push(field)
         return field
     ## -------------------------------------------------------------------------------------------------------------

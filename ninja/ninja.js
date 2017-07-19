@@ -68040,19 +68040,19 @@ FormField = (function() {
 
   FormField.prototype.focused = false;
 
-  function FormField(fieldName, label, value, type, attrs) {
+  function FormField(fieldName, label, value, type, attrs, fnValidate) {
     this.fieldName = fieldName;
     this.label = label;
     this.value = value;
     this.type = type;
     this.attrs = attrs != null ? attrs : {};
+    this.fnValidate = fnValidate;
     this.onAfterShow = bind(this.onAfterShow, this);
     this.onPressEscape = bind(this.onPressEscape, this);
     this.onPressEnter = bind(this.onPressEnter, this);
     this.setFocus = bind(this.setFocus, this);
     this.makeTypeahead = bind(this.makeTypeahead, this);
     this.getHtml = bind(this.getHtml, this);
-    this.html = this.getHtml();
   }
 
   FormField.prototype.getHtml = function() {
@@ -68094,7 +68094,7 @@ FormField = (function() {
     if (this.focused) {
       this.el.focus();
     }
-    return this.el.bind("keypress", (function(_this) {
+    this.el.bind("keypress", (function(_this) {
       return function(e) {
         if (e.keyCode === 13) {
           _this.onPressEnter(e);
@@ -68107,6 +68107,9 @@ FormField = (function() {
         return true;
       };
     })(this));
+    if ((this.fnValidate != null) && typeof this.fnValidate === "function") {
+      return this.el.bind("blur", this.fnValidate);
+    }
   };
 
   return FormField;
@@ -68220,7 +68223,7 @@ FormWrapper = (function() {
       attrs.checked = "checked";
     }
     value = type === "checkbox" ? 1 : value;
-    field = new FormField(fieldName, label, value, type, attrs);
+    field = new FormField(fieldName, label, value, type, attrs, fnValidate);
     this.fields.push(field);
     return field;
   };

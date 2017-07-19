@@ -30,8 +30,8 @@ class FormField
     ## @param [String] type the value of the parameter can be any valid type attribute value for ex. text|radio|checkbox etc.
     ## @param [Object] attrs additional attributes to render during the render
     ##
-    constructor: (@fieldName, @label, @value, @type, @attrs = {}) ->
-        @html = @getHtml()
+    constructor: (@fieldName, @label, @value, @type, @attrs = {}, @fnValidate) ->
+        #@html = @getHtml()
 
     ## -------------------------------------------------------------------------------------------------------------
     ## returns the compiled html of the current form field
@@ -98,3 +98,6 @@ class FormField
                 return false
 
             return true
+
+        if @fnValidate? and typeof @fnValidate is "function"
+            @el.bind "blur", @fnValidate
