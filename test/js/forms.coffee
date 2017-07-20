@@ -125,8 +125,13 @@ $ ->
 
 	addTestButton "Form View Validation", "Open", () ->
 		addHolder().setView "Form", (view) ->
-			view.addTextInput "input1", "Example Input 1", "Input Value1", {}, ()->
+			view.addTextInput "input1", "Example Input 1", "Input Value1", {}, (val)->
 				console.log "Validation function"
+				if val is "123"
+					return true
+				else
+					@setError "Value should be '123'.."
+
 			view.addTextInput "input2", "Example Input 2"
 			view.addSubmit "submit", "Click this button to submit", "Submit"
 			view.setSubmitFunction (form) =>
@@ -176,31 +181,31 @@ $ ->
 	addTestButton "Form with Pathfield - zipcode", "Open", ()=>
 		addHolder().setView "Form", (view)->
 			view.addTextInput "input1", "Text Input"
-			view.addPathField "data-city", "zipcode", "city"
-			view.addPathField "data-state", "zipcode", "state"
-			view.addPathField "data-longitude", "zipcode", "lon"
+			view.addPathField "data-city", "zipcode", "03105", "city"
+			view.addPathField "data-state", "zipcode", "03105", "state"
+			view.addPathField "data-longitude", "zipcode", "03105", "lon"
 			view.addSubmit "submit", "Click this button to submit", "Submit"
 			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1}"
 			view.show()
-			view.setPath "zipcode", "03105"
+			#view.setPath "zipcode", "03105"
 		true
 
 	addTestButton "Form with Datafield - testData", "Open", ()=>
 		addHolder().setView "Form", (view)->
 			view.addTextInput "input1", "Text Input"
-			view.addPathField "data-initialprice", "testData", "initialPrice", {"type": "calculation"}
-			view.addPathField "data-currentprice", "testData", "currentPrice"
-			view.addPathField "data-date", "testData", "date"
-			view.addPathField "data-distance", "testData", "distance"
-			view.addPathField "data-isnew", "testData", "isNew", {"type": "custom"}
-			view.addPathField "data-sourcecode", "testData", "sourcecode"
-			view.addPathField "data-memo", "testData", "memo"
+			view.addPathField "data-initialprice", "testData", "0011", "initialPrice", {"type": "calculation"}
+			view.addPathField "data-currentprice", "testData", "0011", "currentPrice"
+			view.addPathField "data-date", "testData", "0011", "date"
+			view.addPathField "data-distance", "testData", "0011", "distance"
+			view.addPathField "data-isnew", "testData", "isNew", "0011", {"type": "custom"}
+			view.addPathField "data-sourcecode", "testData", "0011", "sourcecode"
+			view.addPathField "data-memo", "testData", "0011", "memo"
 			view.addSubmit "submit", "Click this button to submit", "Submit"
 			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1}"
 			view.show()
-			view.setPath "testData", "0011"
+			#view.setPath "testData", "0011"
 		true
 
 	addTestButton "Change Data of Path - zipcode", "Change Data Fields", () =>

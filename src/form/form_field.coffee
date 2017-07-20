@@ -98,6 +98,18 @@ class FormField
                 return false
 
             return true
+        @el.bind "keyup", (e)=>
+            @value = @el.val()
 
         if @fnValidate? and typeof @fnValidate is "function"
-            @el.bind "blur", @fnValidate
+            @el.bind "blur", (e)=>
+                validate = @fnValidate(@value)
+                if validate
+                    @hasError = false
+                    return true
+                else
+                    @hasError = true
+                    return false
+
+    setError: (@errorMsg)=>
+

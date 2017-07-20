@@ -68047,6 +68047,7 @@ FormField = (function() {
     this.type = type;
     this.attrs = attrs != null ? attrs : {};
     this.fnValidate = fnValidate;
+    this.setError = bind(this.setError, this);
     this.onAfterShow = bind(this.onAfterShow, this);
     this.onPressEscape = bind(this.onPressEscape, this);
     this.onPressEnter = bind(this.onPressEnter, this);
@@ -68107,9 +68108,30 @@ FormField = (function() {
         return true;
       };
     })(this));
+    this.el.bind("keyup", (function(_this) {
+      return function(e) {
+        return _this.value = _this.el.val();
+      };
+    })(this));
     if ((this.fnValidate != null) && typeof this.fnValidate === "function") {
-      return this.el.bind("blur", this.fnValidate);
+      return this.el.bind("blur", (function(_this) {
+        return function(e) {
+          var validate;
+          validate = _this.fnValidate(_this.value);
+          if (validate) {
+            _this.hasError = false;
+            return true;
+          } else {
+            _this.hasError = true;
+            return false;
+          }
+        };
+      })(this));
     }
+  };
+
+  FormField.prototype.setError = function(errorMsg) {
+    this.errorMsg = errorMsg;
   };
 
   return FormField;
@@ -68142,6 +68164,7 @@ FormWrapper = (function() {
       holderElement = "<form id='" + this.gid + "' class='form-horizontal' role='form'/>";
     }
     this.elementHolder = $(holderElement);
+    this.wgt_Form = new WidgetTag("form", "form-horizontal", "" + this.gid);
     this.fields = [];
     this.isFullWidth = false;
     Handlebars.registerHelper("getNumber", function(data) {
@@ -68154,7 +68177,7 @@ FormWrapper = (function() {
       }
       return null;
     });
-    this.templateFormFieldText = Handlebars.compile('<div class="form-group">\n    <label for="{{fieldName}}" class=\'control-label col-sm-2\'> {{label}} </label>\n    <div class=\'col-sm-10\'>\n            <input class="form-control" type="{{type}}" id="{{fieldName}}" value="{{value}}" name="{{fieldName}}"\n                {{#each attrs}}\n                {{@key}}="{{this}}"\n                {{/each}}\n            />\n        <div id="{{fieldName}}error" class="text-danger"></div>\n    </div>\n</div>');
+    this.templateFormFieldText = Handlebars.compile('<div class="form-group\n    {{#if hasError}}\n     has-error"\n    {{else}}\n    "\n    {{/if}}\n>\n    <label for="{{fieldName}}" class=\'control-label col-sm-2\'> {{label}} </label>\n    <div class=\'col-sm-10\'>\n            <input class="form-control" type="{{type}}" id="{{fieldName}}" value="{{value}}" name="{{fieldName}}"\n                {{#each attrs}}\n                {{@key}}="{{this}}"\n                {{/each}}\n            />\n        <div id="{{fieldName}}error" class="text-danger"></div>\n    </div>\n</div>');
     this.templateSelectFieldText = Handlebars.compile('<div class="form-group">\n    <label for="{{fieldName}}" class=\'control-label col-sm-2\'> {{label}} </label>\n    <div class=\'col-sm-10\'>\n            <select class="form-control" id="{{fieldName}}" name="{{fieldName}}"\n                {{#each attrs}}\n                {{@key}}="{{this}}"\n                {{/each}}\n            >\n                {{#each options}}\n                    <option value="{{this}}">{{this}}</option>\n                {{/each}}\n            </select>\n        <div id="{{fieldName}}error" class="text-danger"></div>\n    </div>\n</div>');
     this.templateFormSubmitButton = Handlebars.compile('<div class="form-group centered-with-padding">\n    <label for="{{fieldName}}" class=\'control-label padding-right-label\'> {{label}} </label>\n    <button class="btn btn-sm btn-primary" type="submit" data-dismiss="modal"\n        {{#each attrs}}\n        {{@key}}="{{this}}"\n        {{/each}}\n    ><i class="fa fa-check"></i> {{submit}}</button>\n</div>');
     this.templatePathField = Handlebars.compile('<div class="form-group">\n    <label for="{{fieldName}}" class=\'control-label col-sm-2 label-pathfield\'> {{label}} </label>\n    <div class=\'col-sm-10 pathfield\' id=\'pathfield-widget-{{getNumber attrs}}\'>\n        <!--\n        Here, path-field input will be put on\n        -->\n    </div>\n</div>');
@@ -68167,6 +68190,14 @@ FormWrapper = (function() {
   }
 
   FormWrapper.prototype.addTextInput = function(fieldName, label, value, attrs, fnValidate) {
+    var divCol10Widget, divFormGroupWidget, inputWidget, labelWidget;
+    divFormGroupWidget = this.wgt_Form.addDiv("form-group");
+    labelWidget = divFormGroupWidget.add("label", "control-label col-sm-2", "");
+    labelWidget.text(label);
+    divCol10Widget = divFormGroupWidget.add("div", "col-sm-10");
+    inputWidget = divCol10Widget.add("input", "form-control", fieldName, {
+      type: "text"
+    });
     return this.addInput(fieldName, label, value, "text", attrs, fnValidate);
   };
 
@@ -68229,34 +68260,49 @@ FormWrapper = (function() {
   };
 
   FormWrapper.prototype.addSubmit = function(fieldName, label, value, attrs) {
-    var field;
+    var buttonWidget, divFormGroupWidget, field, iconWidget, labelWidget, spanWidget;
     if (attrs == null) {
       attrs = {};
     }
     field = new FormField(fieldName, label, value, "submit", attrs);
     this.fields.push(field);
+    divFormGroupWidget = this.wgt_Form.addDiv("form-group centered-with-padding");
+    labelWidget = divFormGroupWidget.add("label", "control-label col-sm-2", "", {
+      "for": "" + fieldName
+    });
+    labelWidget.text(label);
+    buttonWidget = divFormGroupWidget.add("button", "btn btn-sm btn-primary", "", attrs);
+    iconWidget = buttonWidget.add("i", "fa fa-check");
+    spanWidget = buttonWidget.add("span");
+    spanWidget.text(" " + field.submit);
     return field;
   };
 
-  FormWrapper.prototype.addPathField = function(fieldName, tableName, columnName, attrs) {
-    var field, widget;
+  FormWrapper.prototype.addPathField = function(name, tableName, fieldName, columnName, attrs) {
+    var divCol10Widget, divFormGroupWidget, divPathWidget, field, labelWidget;
     if (attrs == null) {
       attrs = {};
     }
-    widget = new WidgetTag("div", "form-pathfield form-control", "form-widget-" + this.fields.length);
-    if (attrs.type === "custom") {
-      widget.removeClass("form-control");
-      widget.addClass("custom");
-    } else if (attrs.type === "calculation") {
-      widget.addClass("calculation");
-    }
+
+    /*widget = new WidgetTag "div", "form-pathfield form-control", "form-widget-#{@fields.length}"
+    if attrs.type is "custom"
+        widget.removeClass "form-control"
+        widget.addClass "custom"
+    else if attrs.type is "calculation"
+        widget.addClass "calculation"
+     */
     field = new FormField(fieldName, columnName, "", "pathfield", {
       "table": tableName,
       "column": columnName,
-      "pathfield-widget": widget,
       "number": this.fields.length
     });
     this.fields.push(field);
+    divFormGroupWidget = this.wgt_Form.addDiv("form-group");
+    labelWidget = divFormGroupWidget.add("label", "control-label col-sm-2 label-pathfield", "");
+    labelWidget.text(columnName);
+    divCol10Widget = divFormGroupWidget.add("div", "col-sm-10 pathfield", "pathfield-widget");
+    divPathWidget = divCol10Widget.add("div", "form-pathfield form-control", "form-widget-" + this.fields.length);
+    divPathWidget.bindToPath(tableName, fieldName, columnName);
     return field;
   };
 
@@ -68322,6 +68368,10 @@ FormWrapper = (function() {
     for (i = 0, len = ref.length; i < len; i++) {
       field = ref[i];
       this[field.fieldName] = field.el.val();
+      if (field.hasError) {
+        this.show();
+        return false;
+      }
     }
     this.onSubmit(this);
     if (e != null) {
@@ -68356,14 +68406,16 @@ FormWrapper = (function() {
   };
 
   FormWrapper.prototype.show = function() {
-    this.elementHolder.append(this.getHtml());
-    this.appendPathFieldWidgets();
-    setTimeout((function(_this) {
-      return function() {
-        return _this.onAfterShow();
-      };
-    })(this), 10);
-    return true;
+    return this.elementHolder.append(this.wgt_Form.getTag());
+
+    /*@elementHolder.empty()
+    @elementHolder.append @getHtml()
+    @appendPathFieldWidgets()
+    setTimeout ()=>
+            @onAfterShow()
+        , 10
+    true
+     */
   };
 
   FormWrapper.prototype.getContent = function() {

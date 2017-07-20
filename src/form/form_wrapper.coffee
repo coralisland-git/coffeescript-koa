@@ -16,6 +16,8 @@ class FormWrapper
 
         @elementHolder = $ holderElement
 
+        @wgt_Form = new WidgetTag "form", "form-horizontal", "#{@gid}"
+
         # @property [Array] fields fields currently included in the formWrapper
         @fields = []
 
@@ -30,7 +32,13 @@ class FormWrapper
 
         # @property [String] templateFormFieldText template to use in the render of form
         @templateFormFieldText = Handlebars.compile '''
-            <div class="form-group">
+            <div class="form-group
+                {{#if hasError}}
+                 has-error"
+                {{else}}
+                "
+                {{/if}}
+            >
                 <label for="{{fieldName}}" class='control-label col-sm-2'> {{label}} </label>
                 <div class='col-sm-10'>
                         <input class="form-control" type="{{type}}" id="{{fieldName}}" value="{{value}}" name="{{fieldName}}"
@@ -99,6 +107,14 @@ class FormWrapper
     ## @param [Function] fnValidate a validation function can be passed if it returns true value will be valid else invalid
     ##
     addTextInput: (fieldName, label, value, attrs, fnValidate) =>
+
+        divFormGroupWidget = @wgt_Form.addDiv "form-group"
+        labelWidget = divFormGroupWidget.add "label", "control-label col-sm-2", "", 
+            for: "#{fieldName}"
+        labelWidget.text label
+        divCol10Widget = divFormGroupWidget.add "div", "col-sm-10"
+        inputWidget = divCol10Widget.add "input", "form-control", "#{fieldName}", 
+            type: "text"
         @addInput(fieldName,label,value,"text",attrs,fnValidate)
 
     ## -------------------------------------------------------------------------------------------------------------
@@ -112,7 +128,7 @@ class FormWrapper
     ##
     addTagsInput: (fieldName, label, value, attrs, fnValidate) =>
 
-        field = @addInput(fieldName, label, value, "text", attrs, fnValidate)
+        field = @addTextInput(fieldName, label, value, "text", attrs, fnValidate)
 
         field.superAfterShow = field.onAfterShow
         field.onAfterShow = ()->
@@ -138,7 +154,7 @@ class FormWrapper
     ## @param [Object] attrs object as attributes that will be included in the html
     ## @param [Function] fnValidate a validation function can be passed if it returns true value will be valid else invalid
     ##
-    addMultiselect: (fieldName, label, value, attrs, fnValidate) =>
+    addMultiselect: (fieldName, label, value, attrs, options = [], fnValidate) =>
         attrs = $.extend attrs,
             multiple: 'multiple'
 
@@ -151,6 +167,18 @@ class FormWrapper
             @el.multiSelect()
             @el.multiSelect('select', value);
             @superAfterShow()
+
+        divFormGroupWidget = @wgt_Form.addDiv "form-group"
+        labelWidget = divFormGroupWidget.add "label", "control-label col-sm-2", "", 
+            for: "#{fieldName}"
+        labelWidget.text label
+        divCol10Widget = divFormGroupWidget.add "div", "col-sm-10"
+        selectWidget = divCol10Widget.add "select", "form-control", "#{fieldName}", attrs
+
+        for option in options
+            selectWidget.add "option", "", "", 
+                value: "#{option}"
+        @addInput(fieldName,label,value,"select",attrs,fnValidate)
         field
 
     ## -------------------------------------------------------------------------------------------------------------
@@ -182,28 +210,43 @@ class FormWrapper
     addSubmit: (fieldName, label, value, attrs = {}) =>
         field = new FormField fieldName, label, value, "submit", attrs
         @fields.push field
-        return field
+        
+        divFormGroupWidget = @wgt_Form.addDiv "form-group centered-with-padding"
+        labelWidget = divFormGroupWidget.add "label", "control-label col-sm-2", "", 
+            for: "#{fieldName}"
+        labelWidget.text label
+        buttonWidget = divFormGroupWidget.add "button", "btn btn-sm btn-primary", "", attrs
 
+        iconWidget = buttonWidget.add "i", "fa fa-check"
+        spanWidget = buttonWidget.add "span"
+        spanWidget.text " #{field.submit}"
+        return field
     ## -------------------------------------------------------------------------------------------------------------
     ## Add an input with path of table
     ##
-    addPathField: (fieldName, tableName, columnName, attrs = {}) =>
-        widget = new WidgetTag "div", "form-pathfield form-control", "form-widget-#{@fields.length}"
+    addPathField: (name, tableName, fieldName, columnName, attrs = {}) =>
+        ###widget = new WidgetTag "div", "form-pathfield form-control", "form-widget-#{@fields.length}"
         if attrs.type is "custom"
             widget.removeClass "form-control"
             widget.addClass "custom"
         else if attrs.type is "calculation"
             widget.addClass "calculation"
-        
+        ###
         field = new FormField fieldName, columnName, "", "pathfield", {
             "table" : tableName
             "column" : columnName
-            "pathfield-widget" : widget
+            #"pathfield-widget" : widget
             "number" : @fields.length
         }
         @fields.push field       
+        
+        divFormGroupWidget = @wgt_Form.addDiv "form-group"
+        labelWidget = divFormGroupWidget.add "label", "control-label col-sm-2 label-pathfield", ""
+        labelWidget.text columnName
+        divCol10Widget = divFormGroupWidget.add "div", "col-sm-10 pathfield", "pathfield-widget"
+        divPathWidget = divCol10Widget.add "div", "form-pathfield form-control", "form-widget-#{@fields.length}"
+        divPathWidget.bindToPath tableName, fieldName, columnName
         return field
-
     ## -------------------------------------------------------------------------------------------------------------
     ## Append element of each path-field widget tag to form
     ##
@@ -264,6 +307,9 @@ class FormWrapper
     onSubmitAction: (e) =>
         for field in @fields
             this[field.fieldName] = field.el.val()
+            if field.hasError
+                @show()
+                return false
         @onSubmit(this)
         if e?
             e.preventDefault()
@@ -292,6 +338,7 @@ class FormWrapper
                 @onSubmitAction(e)
 
         elForm.submit @onSubmitAction
+
         true
 
     ## ----------------------------------------------------------------------------------------------------------------
@@ -299,12 +346,14 @@ class FormWrapper
     ## @return [Boolean]      
 
     show: () =>
+        @elementHolder.append @wgt_Form.getTag()
+        ###@elementHolder.empty()
         @elementHolder.append @getHtml()
         @appendPathFieldWidgets()
         setTimeout ()=>
                 @onAfterShow()
             , 10
-        true
+        true###
 
     getContent: () =>
         #@elementHolder.append @getHtml()
