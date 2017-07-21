@@ -103,15 +103,32 @@ class FormField
 
         if @fnValidate? and typeof @fnValidate is "function"
             @el.bind "blur", (e)=>
-                validate = @fnValidate(@value)
-                if validate
-                    @hasError = false
-                    return true
-                else
-                    @hasError = true
-                    return false
+                @checkError()
 
-    setError: (@errorMsg)=>
+    setErrorMsg: (@errorMsg)=>
+
+    checkError: ()=>
+        unless @fnValidate? and typeof @fnValidate is "function"
+            return false
+        if @fnValidate(@value)
+            @hasError = false
+            @hideError()
+            return false
+        else
+            @hasError = true
+            @showError()
+            return true
+
+    showError: ()=>
+        @formGroupWidget.addClass "has-error"
+        if !@divError
+            @divError = @divInputWidget.addDiv "text-danger", "#{@fieldName}-error"
+        @divError.text @errorMsg
+
+    hideError: ()=>
+        @formGroupWidget.removeClass "has-error"
+        if @divError
+            @divError.text ''
 
     renderText: () =>
         @formGroupWidget = @holderWidget.addDiv "form-group"
@@ -121,6 +138,9 @@ class FormField
         @divInputWidget = @formGroupWidget.add "div", "col-sm-10"
         @inputWidget = @divInputWidget.add "input", "form-control", "#{@fieldName}", 
             type: "text"
+        @inputWidget.val @value
+
+        @el = @inputWidget.el
 
     renderSelect: () =>
         @formGroupWidget = @holderWidget.addDiv "form-group"
@@ -133,6 +153,8 @@ class FormField
         for option in @attrs.options
             @selectWidget.add "option", "", "", 
                 value: "#{option}"
+
+        @el = @selectWidget.el
 
     renderSubmit: ()=>
         @formGroupWidget = @holderWidget.addDiv "form-group centered-with-padding"
@@ -151,12 +173,14 @@ class FormField
         @labelWidget = @formGroupWidget.add "label", "control-label col-sm-2 label-pathfield", ""
         @labelWidget.text @attrs.columnName
         @divInputWidget = @formGroupWidget.add "div", "col-sm-10 pathfield", "pathfield-widget"
-        @divPathWidget = @divInputWidget.add "div", "form-pathfield form-control", "form-widget-#{@attrs.number}"
-        @divPathWidget.bindToPath @attrs.tableName, @fieldName, @attrs.columnName                    
+        @divPathWidget = @divInputWidget.add "div", "form-pathfield form-control", "#{@fieldName}"
+        @divPathWidget.bindToPath @attrs.tableName, @fieldName, @attrs.columnName               
+
+        @el = @divPathWidget.el     
 
     render: ()=>
         switch @type
-            when "text" then @renderText()
             when "select" then @renderSelect()
             when "submit" then @renderSubmit()
             when "pathfield" then @renderPathField()
+            else @renderText()
