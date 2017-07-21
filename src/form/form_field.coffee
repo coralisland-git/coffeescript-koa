@@ -21,6 +21,10 @@ class FormField
     submit: "Submit"
     focused: false
 
+    @WARNING: -1
+    @ERROR: 0
+    @SUCCESS: 1
+
     ## -------------------------------------------------------------------------------------------------------------
     ## constructor
     ##
@@ -107,28 +111,64 @@ class FormField
 
     setErrorMsg: (@errorMsg)=>
 
+    setWarningMsg: (@warningMsg)=>
+
     checkError: ()=>
         unless @fnValidate? and typeof @fnValidate is "function"
             return false
-        if @fnValidate(@value)
-            @hasError = false
-            @hideError()
-            return false
-        else
-            @hasError = true
-            @showError()
-            return true
+        switch @fnValidate(@value)
+            when FormField.SUCCESS
+                @hasError = false
+                @hasWarning = false
+                @hideError()
+                return false
+            when FormField.WARNING
+                @hasError = false
+                @hasWarning = true
+                @showWarning()
+                return true
+            when FormField.ERROR
+                @hasError = true
+                @hasWarning = false
+                @showError()
+                return true
 
     showError: ()=>
+        @resetErrorFields()
         @formGroupWidget.addClass "has-error"
+        @inputWidget.addClass "form-control-danger"
         if !@divError
             @divError = @divInputWidget.addDiv "text-danger", "#{@fieldName}-error"
         @divError.text @errorMsg
 
+    showWarning: ()=>
+        @resetErrorFields()
+        @formGroupWidget.addClass "has-warning"
+        @inputWidget.addClass "form-control-warning"
+        if !@divWarning
+            @divWarning = @divInputWidget.addDiv "text-warning", "#{@fieldName}-warning"
+        @divWarning.text @warningMsg
+
     hideError: ()=>
-        @formGroupWidget.removeClass "has-error"
+        @resetErrorFields()
+        @formGroupWidget.addClass "has-success"
+        @inputWidget.addClass "form-control-success"
         if @divError
             @divError.text ''
+        if @divWarning
+            @divWarning.text ''
+
+    resetErrorFields: () =>
+        @formGroupWidget.removeClass "has-error"
+        @formGroupWidget.removeClass "has-warning"
+        @formGroupWidget.removeClass "has-success"
+        @inputWidget.removeClass "form-control-warning"
+        @inputWidget.removeClass "form-control-danger"
+        @inputWidget.removeClass "form-control-success"
+        if @divError
+            @divError.text ''
+        if @divWarning
+            @divWarning.text ''
 
     renderText: () =>
         @formGroupWidget = @holderWidget.addDiv "form-group"

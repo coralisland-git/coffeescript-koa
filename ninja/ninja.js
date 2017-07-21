@@ -68040,6 +68040,12 @@ FormField = (function() {
 
   FormField.prototype.focused = false;
 
+  FormField.WARNING = -1;
+
+  FormField.ERROR = 0;
+
+  FormField.SUCCESS = 1;
+
   function FormField(holderWidget, fieldName, label, value, type, attrs, fnValidate) {
     this.holderWidget = holderWidget;
     this.fieldName = fieldName;
@@ -68053,9 +68059,12 @@ FormField = (function() {
     this.renderSubmit = bind(this.renderSubmit, this);
     this.renderSelect = bind(this.renderSelect, this);
     this.renderText = bind(this.renderText, this);
+    this.resetErrorFields = bind(this.resetErrorFields, this);
     this.hideError = bind(this.hideError, this);
+    this.showWarning = bind(this.showWarning, this);
     this.showError = bind(this.showError, this);
     this.checkError = bind(this.checkError, this);
+    this.setWarningMsg = bind(this.setWarningMsg, this);
     this.setErrorMsg = bind(this.setErrorMsg, this);
     this.onAfterShow = bind(this.onAfterShow, this);
     this.onPressEscape = bind(this.onPressEscape, this);
@@ -68135,33 +68144,77 @@ FormField = (function() {
     this.errorMsg = errorMsg;
   };
 
+  FormField.prototype.setWarningMsg = function(warningMsg) {
+    this.warningMsg = warningMsg;
+  };
+
   FormField.prototype.checkError = function() {
     if (!((this.fnValidate != null) && typeof this.fnValidate === "function")) {
       return false;
     }
-    if (this.fnValidate(this.value)) {
-      this.hasError = false;
-      this.hideError();
-      return false;
-    } else {
-      this.hasError = true;
-      this.showError();
-      return true;
+    switch (this.fnValidate(this.value)) {
+      case FormField.SUCCESS:
+        this.hasError = false;
+        this.hasWarning = false;
+        this.hideError();
+        return false;
+      case FormField.WARNING:
+        this.hasError = false;
+        this.hasWarning = true;
+        this.showWarning();
+        return true;
+      case FormField.ERROR:
+        this.hasError = true;
+        this.hasWarning = false;
+        this.showError();
+        return true;
     }
   };
 
   FormField.prototype.showError = function() {
+    this.resetErrorFields();
     this.formGroupWidget.addClass("has-error");
+    this.inputWidget.addClass("form-control-danger");
     if (!this.divError) {
       this.divError = this.divInputWidget.addDiv("text-danger", this.fieldName + "-error");
     }
     return this.divError.text(this.errorMsg);
   };
 
+  FormField.prototype.showWarning = function() {
+    this.resetErrorFields();
+    this.formGroupWidget.addClass("has-warning");
+    this.inputWidget.addClass("form-control-warning");
+    if (!this.divWarning) {
+      this.divWarning = this.divInputWidget.addDiv("text-warning", this.fieldName + "-warning");
+    }
+    return this.divWarning.text(this.warningMsg);
+  };
+
   FormField.prototype.hideError = function() {
-    this.formGroupWidget.removeClass("has-error");
+    this.resetErrorFields();
+    this.formGroupWidget.addClass("has-success");
+    this.inputWidget.addClass("form-control-success");
     if (this.divError) {
-      return this.divError.text('');
+      this.divError.text('');
+    }
+    if (this.divWarning) {
+      return this.divWarning.text('');
+    }
+  };
+
+  FormField.prototype.resetErrorFields = function() {
+    this.formGroupWidget.removeClass("has-error");
+    this.formGroupWidget.removeClass("has-warning");
+    this.formGroupWidget.removeClass("has-success");
+    this.inputWidget.removeClass("form-control-warning");
+    this.inputWidget.removeClass("form-control-danger");
+    this.inputWidget.removeClass("form-control-success");
+    if (this.divError) {
+      this.divError.text('');
+    }
+    if (this.divWarning) {
+      return this.divWarning.text('');
     }
   };
 

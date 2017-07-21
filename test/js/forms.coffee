@@ -137,9 +137,13 @@ $ ->
 			view.addTextInput "input1", "Example Input 1", "Input Value1", {}, (val)->
 				console.log "Validation function"
 				if val is "123"
-					return true
+					return FormField.SUCCESS
+				else if isNaN(val)
+					@setWarningMsg "This value is not numeric..."
+					return FormField.WARNING
 				else
-					@setErrorMsg "Value should be '123'.."
+					@setErrorMsg "Value should be '123'..."
+					return FormField.ERROR
 
 			view.addTextInput "input2", "Example Input 2"
 			view.addSubmit "submit", "Click this button to submit", "Submit"
