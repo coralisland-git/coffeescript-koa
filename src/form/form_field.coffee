@@ -30,7 +30,7 @@ class FormField
     ## @param [String] type the value of the parameter can be any valid type attribute value for ex. text|radio|checkbox etc.
     ## @param [Object] attrs additional attributes to render during the render
     ##
-    constructor: (@fieldName, @label, @value, @type, @attrs = {}, @fnValidate) ->
+    constructor: (@holderWidget, @fieldName, @label, @value, @type, @attrs = {}, @fnValidate) ->
         #@html = @getHtml()
 
     ## -------------------------------------------------------------------------------------------------------------
@@ -113,3 +113,50 @@ class FormField
 
     setError: (@errorMsg)=>
 
+    renderText: () =>
+        @formGroupWidget = @holderWidget.addDiv "form-group"
+        @labelWidget = @formGroupWidget.add "label", "control-label col-sm-2", "", 
+            for: "#{@fieldName}"
+        @labelWidget.text @label
+        @divInputWidget = @formGroupWidget.add "div", "col-sm-10"
+        @inputWidget = @divInputWidget.add "input", "form-control", "#{@fieldName}", 
+            type: "text"
+
+    renderSelect: () =>
+        @formGroupWidget = @holderWidget.addDiv "form-group"
+        @labelWidget = @formGroupWidget.add "label", "control-label col-sm-2", "", 
+            for: "#{@fieldName}"
+        @labelWidget.text @label
+        @divInputWidget = @formGroupWidget.add "div", "col-sm-10"
+        @selectWidget = @divInputWidget.add "select", "form-control", "#{@fieldName}", @attrs
+
+        for option in @attrs.options
+            @selectWidget.add "option", "", "", 
+                value: "#{option}"
+
+    renderSubmit: ()=>
+        @formGroupWidget = @holderWidget.addDiv "form-group centered-with-padding"
+        @labelWidget = @formGroupWidget.add "label", "control-label padding-right-label", "", 
+            for: "#{@fieldName}"
+        @labelWidget.text @label
+        @attrs["data-dismiss"] = "modal"
+        @buttonWidget = @formGroupWidget.add "button", "btn btn-sm btn-primary", "", @attrs
+
+        @iconWidget = @buttonWidget.add "i", "fa fa-check"
+        @spanWidget = @buttonWidget.add "span"
+        @spanWidget.text " #{@submit}"
+
+    renderPathField: ()=>
+        @formGroupWidget = @holderWidget.addDiv "form-group"
+        @labelWidget = @formGroupWidget.add "label", "control-label col-sm-2 label-pathfield", ""
+        @labelWidget.text @attrs.columnName
+        @divInputWidget = @formGroupWidget.add "div", "col-sm-10 pathfield", "pathfield-widget"
+        @divPathWidget = @divInputWidget.add "div", "form-pathfield form-control", "form-widget-#{@attrs.number}"
+        @divPathWidget.bindToPath @attrs.tableName, @fieldName, @attrs.columnName                    
+
+    render: ()=>
+        switch @type
+            when "text" then @renderText()
+            when "select" then @renderSelect()
+            when "submit" then @renderSubmit()
+            when "pathfield" then @renderPathField()

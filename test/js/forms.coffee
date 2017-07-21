@@ -217,29 +217,18 @@ $ ->
 
 	addTestButton "Form and Table with Pathfield - zipcode", "Open", ()=>
 		viewExe = addHolder()
+
+
 		viewExe.addDiv("form-container", "wdt_form_container").setView "Form", (view)->
 			view.addTextInput "input1", "Text Input"
-			view.addPathField "data-city", "zipcode", "city"
-			view.addPathField "data-state", "zipcode", "state"
-			view.addPathField "data-longitude", "zipcode", "lon"
+			view.addPathField "data-city", "zipcode", "03105", "city"
+			view.addPathField "data-state", "zipcode", "03105", "state"
+			view.addPathField "data-longitude", "zipcode", "03105", "lon"
 			view.addSubmit "submit", "Click this button to submit", "Submit"
 			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1}"
 			view.show()
-			view.setPath "zipcode", "03105"
 
-		wdt_table = viewExe.add "table", "test_table", "wdt_table"
-		wdt_table.html "<caption>This is table of data fields same as in form above</caption>"
-
-		wdt_id = wdt_table.add "td", null, "wdt_td_id"
-		wdt_city = wdt_table.add "td", null, "wdt_td_city"
-		wdt_state = wdt_table.add "td", null, "wdt_td_state"
-		wdt_lon = wdt_table.add "td", null,"wdt_td_lon"
-
-		wdt_id.bindToPath "zipcode", "03105", "id"
-		wdt_city.bindToPath "zipcode", "03105", "city"
-		wdt_state.bindToPath "zipcode", "03105", "state"
-		wdt_lon.bindToPath "zipcode", "03105", "lon"
 		true
 
 	go()
