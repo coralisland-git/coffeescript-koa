@@ -135,12 +135,12 @@ class FormField
                 value: "#{option}"
 
     renderSubmit: ()=>
-        @formGroupWidget = @holderWidget.addDiv "form-group centered-with-padding"
-        @labelWidget = @formGroupWidget.add "label", "control-label padding-right-label", "", 
+        @formGroupWidget = @holderWidget.addDiv "form-group form-group-rightalign-padding"
+        @labelWidget = @formGroupWidget.add "label", "control-label padding-bottom-10", "", 
             for: "#{@fieldName}"
         @labelWidget.text @label
         @attrs["data-dismiss"] = "modal"
-        @buttonWidget = @formGroupWidget.add "button", "btn btn-sm btn-primary", "", @attrs
+        @buttonWidget = @formGroupWidget.add "button", "btn btn-sm btn-primary margin-left-20", "", @attrs
 
         @iconWidget = @buttonWidget.add "i", "fa fa-check"
         @spanWidget = @buttonWidget.add "span"

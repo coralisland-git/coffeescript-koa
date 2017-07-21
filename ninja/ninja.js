@@ -68173,13 +68173,13 @@ FormField = (function() {
   };
 
   FormField.prototype.renderSubmit = function() {
-    this.formGroupWidget = this.holderWidget.addDiv("form-group centered-with-padding");
-    this.labelWidget = this.formGroupWidget.add("label", "control-label padding-right-label", "", {
+    this.formGroupWidget = this.holderWidget.addDiv("form-group form-group-rightalign-padding");
+    this.labelWidget = this.formGroupWidget.add("label", "control-label padding-bottom-10", "", {
       "for": "" + this.fieldName
     });
     this.labelWidget.text(this.label);
     this.attrs["data-dismiss"] = "modal";
-    this.buttonWidget = this.formGroupWidget.add("button", "btn btn-sm btn-primary", "", this.attrs);
+    this.buttonWidget = this.formGroupWidget.add("button", "btn btn-sm btn-primary margin-left-20", "", this.attrs);
     this.iconWidget = this.buttonWidget.add("i", "fa fa-check");
     this.spanWidget = this.buttonWidget.add("span");
     return this.spanWidget.text(" " + this.submit);

@@ -131,6 +131,9 @@
 .form-input-autowidth-custom {
   width: auto !important;
 }
+.form-minwidth-half {
+  min-width: 50%;
+}
 .form-pathfield {
   padding: 6px 12px;
 }
@@ -158,13 +161,16 @@
 .calculation {
   background-color: rgba(209,238,242,0.4);
 }
-.form-group.centered-with-padding {
-  text-align: center;
-  padding-right: 15px;
-  padding-left: 15px;
+.margin-left-20 {
+  margin-left: 20px;
 }
-.padding-right-label {
-  padding-right: 20px;
+.padding-bottom-10 {
+  padding-bottom: 10px;
+}
+.form-group-rightalign-padding {
+  text-align: right;
+  padding-right: 25px;
+  padding-left: 15px;
 }
 .material-icons {
   font: normal normal normal 14px/1 FontAwesome;
