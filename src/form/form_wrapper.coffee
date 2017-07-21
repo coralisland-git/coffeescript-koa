@@ -225,8 +225,9 @@ class FormWrapper
 
         for field in @fields
             field.divInputWidget?.addClass "form-input-fullwidth-custom"
-            field.labelWidget?.addClass "form-label-fullwidth-custom"
-            field.buttonWidget?.addClass "form-button-fullwidth-custom"
+            unless field.type is "submit"
+                field.labelWidget?.addClass "form-label-fullwidth-custom"
+
         @isFullWidth = true
 
     ## ------------------------------------------------------------------------------------------------------------------
@@ -241,7 +242,7 @@ class FormWrapper
         for field in @fields
             field.divInputWidget?.removeClass "form-input-fullwidth-custom"
             field.labelWidget?.removeClass "form-label-fullwidth-custom"
-            field.buttonWidget?.removeClass "form-button-fullwidth-custom"
+
         @isFullWidth = false
 
     ## -gao

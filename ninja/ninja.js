@@ -68412,7 +68412,7 @@ FormWrapper = (function() {
   };
 
   FormWrapper.prototype.putElementsFullWidth = function() {
-    var field, i, len, ref, ref1, ref2, ref3;
+    var field, i, len, ref, ref1, ref2;
     if (this.isFullWidth) {
       return;
     }
@@ -68423,18 +68423,17 @@ FormWrapper = (function() {
       if ((ref1 = field.divInputWidget) != null) {
         ref1.addClass("form-input-fullwidth-custom");
       }
-      if ((ref2 = field.labelWidget) != null) {
-        ref2.addClass("form-label-fullwidth-custom");
-      }
-      if ((ref3 = field.buttonWidget) != null) {
-        ref3.addClass("form-button-fullwidth-custom");
+      if (field.type !== "submit") {
+        if ((ref2 = field.labelWidget) != null) {
+          ref2.addClass("form-label-fullwidth-custom");
+        }
       }
     }
     return this.isFullWidth = true;
   };
 
   FormWrapper.prototype.backElementsFullWidth = function() {
-    var field, i, len, ref, ref1, ref2, ref3;
+    var field, i, len, ref, ref1, ref2;
     if (!this.isFullWidth) {
       return;
     }
@@ -68447,9 +68446,6 @@ FormWrapper = (function() {
       }
       if ((ref2 = field.labelWidget) != null) {
         ref2.removeClass("form-label-fullwidth-custom");
-      }
-      if ((ref3 = field.buttonWidget) != null) {
-        ref3.removeClass("form-button-fullwidth-custom");
       }
     }
     return this.isFullWidth = false;
