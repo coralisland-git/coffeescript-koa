@@ -106,13 +106,22 @@ $ ->
 
 	addTestButton "Simple Form View", "Open", () ->
 		addHolder().setView "Form", (view) ->
-
 			view.addTextInput "input1", "Example Input 1"
 			view.addTextInput "input2", "Example Input 2"
 			view.addSubmit "submit", "Click this button to submit", "Submit"
 			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
 			view.show()
+
+	addTestButton "Inline Form View", "Open", () ->
+		addHolder().setView "Form", (view) ->
+			view.addTextInput "input1", "Example Input 1"
+			view.addTextInput "input2", "Example Input 2"
+			view.addSubmit "submit", "Click this button to submit", "Submit"
+			view.setSubmitFunction (form) =>
+				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
+			view.show()
+			view.setSize 1000, 99
 
 	addTestButton "Form View Set Focus", "Open", () ->
 		addHolder().setView "Form", (view) ->

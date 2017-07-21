@@ -23,73 +23,6 @@ class FormWrapper
 
         @isFullWidth = false
 
-        Handlebars.registerHelper("getNumber", (data)->
-            for key, value of data
-                if key is "number"
-                    return value
-            return null
-        )
-
-        # @property [String] templateFormFieldText template to use in the render of form
-        @templateFormFieldText = Handlebars.compile '''
-            <div class="form-group
-                {{#if hasError}}
-                 has-error"
-                {{else}}
-                "
-                {{/if}}
-            >
-                <label for="{{fieldName}}" class='control-label col-sm-2'> {{label}} </label>
-                <div class='col-sm-10'>
-                        <input class="form-control" type="{{type}}" id="{{fieldName}}" value="{{value}}" name="{{fieldName}}"
-                            {{#each attrs}}
-                            {{@key}}="{{this}}"
-                            {{/each}}
-                        />
-                    <div id="{{fieldName}}error" class="text-danger"></div>
-                </div>
-            </div>
-        '''
-
-        @templateSelectFieldText = Handlebars.compile '''
-            <div class="form-group">
-                <label for="{{fieldName}}" class='control-label col-sm-2'> {{label}} </label>
-                <div class='col-sm-10'>
-                        <select class="form-control" id="{{fieldName}}" name="{{fieldName}}"
-                            {{#each attrs}}
-                            {{@key}}="{{this}}"
-                            {{/each}}
-                        >
-                            {{#each options}}
-                                <option value="{{this}}">{{this}}</option>
-                            {{/each}}
-                        </select>
-                    <div id="{{fieldName}}error" class="text-danger"></div>
-                </div>
-            </div>
-        '''
-
-        @templateFormSubmitButton = Handlebars.compile '''
-            <div class="form-group centered-with-padding">
-                <label for="{{fieldName}}" class='control-label padding-right-label'> {{label}} </label>
-                <button class="btn btn-sm btn-primary" type="submit" data-dismiss="modal"
-                    {{#each attrs}}
-                    {{@key}}="{{this}}"
-                    {{/each}}
-                ><i class="fa fa-check"></i> {{submit}}</button>
-            </div>
-        '''
-
-        @templatePathField = Handlebars.compile '''
-            <div class="form-group">
-                <label for="{{fieldName}}" class='control-label col-sm-2 label-pathfield'> {{label}} </label>
-                <div class='col-sm-10 pathfield' id='pathfield-widget-{{getNumber attrs}}'>
-                    <!--
-                    Here, path-field input will be put on
-                    -->
-                </div>
-            </div>
-        '''
         ##
         ##  Possibly overwrite default options
         if typeof options == "object"
@@ -165,6 +98,7 @@ class FormWrapper
     ## -------------------------------------------------------------------------------------------------------------
     ## Add a general input field
     ##
+    ## @param [WidgetTag] WidgetTag which is to contain input field
     ## @param [String] fieldName name of the input field
     ## @param [String] label label to be displayed infornt of text input
     ## @param [String] value default value to be filled
@@ -207,54 +141,10 @@ class FormWrapper
         field = new FormField @wgt_Form, fieldName, columnName, "", "pathfield", {
             "tableName" : tableName
             "columnName" : columnName
-            #"pathfield-widget" : widget
             "number" : @fields.length
         }
         @fields.push field       
         field
-    ## -------------------------------------------------------------------------------------------------------------
-    ## Append element of each path-field widget tag to form
-    ##
-    appendPathFieldWidgets: () =>
-        for field in @fields
-            if field.type is "pathfield"
-                widget = field.attrs["pathfield-widget"]
-                @elementHolder.find("#pathfield-widget-#{field.attrs['number']}").empty()
-                @elementHolder.find("#pathfield-widget-#{field.attrs['number']}").append widget.getTag()
-
-    ## -------------------------------------------------------------------------------------------------------------
-    ## Set data path of fields in this form
-    ##
-    setPath: (tableName, idValue) =>
-        for field in @fields
-            if field.type is "pathfield"
-                widget = field.attrs["pathfield-widget"]
-                widget.bindToPath tableName, idValue, field.attrs["column"]
-        true
-            
-    ## -------------------------------------------------------------------------------------------------------------
-    ## Generate html for the formWrapper
-    ##
-    ## @return [String] content the html content after compilation under handlebar
-    ##
-    getHtml: () =>
-        content = "<form id='#{@gid}' class='form-horizontal' role='form'>"
-        for field in @fields
-            if field.type is 'select'
-                ##| parse given options and remove from attributes
-                field.options = field.attrs.options
-                delete field.attrs.options
-                content += @templateSelectFieldText(field)
-            else if field.type is 'submit'
-                content += @templateFormSubmitButton(field)
-            else if field.type is 'pathfield'
-                content += @templatePathField(field)
-            else
-                content += @templateFormFieldText(field)
-
-        content += "</form>"
-        return content
-
     ## -------------------------------------------------------------------------------------------------------------
     ## function that will be called when a form is submitted
     ##
@@ -314,18 +204,14 @@ class FormWrapper
         for field in @fields
             field.render()
         @elementHolder.append @wgt_Form.getTag()
-        ###@elementHolder.empty()
-        @elementHolder.append @getHtml()
-        @appendPathFieldWidgets()###
+
         setTimeout ()=>
                 @onAfterShow()
             , 10
         true
 
     getContent: () =>
-        #@elementHolder.append @getHtml()
-        #@appendPathFieldWidgets()
-        return @elementHolder#.html()
+        return @elementHolder
 
     ## ------------------------------------------------------------------------------------------------------------------
     ## Function to give responsive effect to form elements when
@@ -336,14 +222,11 @@ class FormWrapper
         if @isFullWidth
             return
         console.log "Make Full Width"
-        inputElements = @elementHolder.find "div[class^=col-sm-]"
-        inputElements.addClass "form-input-fullwidth-custom"
-        
-        labelElements = @elementHolder.find "label"
-        labelElements.addClass "form-label-fullwidth-custom"
 
-        buttonElements = @elementHolder.find "button"
-        buttonElements.addClass "form-button-fullwidth-custom"
+        for field in @fields
+            field.divInputWidget?.addClass "form-input-fullwidth-custom"
+            field.labelWidget?.addClass "form-label-fullwidth-custom"
+            field.buttonWidget?.addClass "form-button-fullwidth-custom"
         @isFullWidth = true
 
     ## ------------------------------------------------------------------------------------------------------------------
@@ -354,12 +237,31 @@ class FormWrapper
         if !@isFullWidth
             return
         console.log "Take off Full Width"
-        inputElements = @elementHolder.find "div[class^=col-sm-]"
-        inputElements.removeClass "form-input-fullwidth-custom"
-        
-        labelElements = @elementHolder.find "label"
-        labelElements.removeClass "form-label-fullwidth-custom"
 
-        buttonElements = @elementHolder.find "button"
-        buttonElements.removeClass "form-button-fullwidth-custom"
+        for field in @fields
+            field.divInputWidget?.removeClass "form-input-fullwidth-custom"
+            field.labelWidget?.removeClass "form-label-fullwidth-custom"
+            field.buttonWidget?.removeClass "form-button-fullwidth-custom"
         @isFullWidth = false
+
+    ## -gao
+    ## function to make form inline-style
+    ##
+    switch2InlineForm: ()=>
+        console.log "Switch to Inline mode"
+        @wgt_Form.removeClass "form-horizontal"
+        @wgt_Form.addClass "form-inline"
+        for field in @fields
+            field.labelWidget?.addClass "form-label-autowidth-custom"
+            field.divInputWidget?.addClass "form-input-autowidth-custom"
+
+    ##
+    ## function to make form horizontal-style
+    ##
+    switch2HorizontalForm: ()=>
+        console.log "Switch to Horizontal mode"
+        @wgt_Form.removeClass "form-inline"
+        @wgt_Form.addClass "form-horizontal"
+        for field in @fields
+            field.labelWidget?.removeClass "form-label-autowidth-custom"
+            field.divInputWidget?.removeClass "form-input-autowidth-custom"

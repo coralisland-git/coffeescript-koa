@@ -1,7 +1,9 @@
 
 class ViewForm extends View
 
-	boundaryValueToFullWidth: 400
+	boundaryValueToFullWidth: 768
+
+	boundaryValueToInlineForm: 100
 
 	getDependencyList: ()=>
 
@@ -24,8 +26,13 @@ class ViewForm extends View
 	## so that they have full width
 	## Also when width of form gets longer than boundary value, elements get narrower
 	##
-	onResizeFormView : (w, h)=>
+	onResize : (w, h)=>
 		if w == 0 or h == 0 then return
+		if h < @boundaryValueToInlineForm
+			return @getForm().switch2InlineForm()
+		else 
+			@getForm().switch2HorizontalForm()
+
 		if w < @boundaryValueToFullWidth
 			@getForm().putElementsFullWidth()
 		else
@@ -39,7 +46,6 @@ class ViewForm extends View
 		super(w, h)
 		@elHolder.width(w)
 		@elHolder.height(h)
-		@onResizeFormView w, h
 
 	## ---------------------------------------------------------------------
 	## Function that creates/returns reference to formwrapper
