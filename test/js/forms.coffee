@@ -105,107 +105,92 @@ $ ->
         return true
 
 	addTestButton "Simple Form View", "Open", () ->
-		addHolder "renderTest1"
-		div = new WidgetTag "div", "testWidget"
-		div.appendTo "#renderTest1"
-		div.setView "Form", (view) ->
-			view.init()
-			view.getForm().addTextInput "input1", "Example Input 1"
-			view.getForm().addTextInput "input2", "Example Input 2"
-			view.getForm().addSubmit "submit", "Click this button to submit", "Submit"
-			view.getForm().onSubmit = (form) =>
+		addHolder().setView "Form", (view) ->
+
+			view.addTextInput "input1", "Example Input 1"
+			view.addTextInput "input2", "Example Input 2"
+			view.addSubmit "submit", "Click this button to submit", "Submit"
+			view.setSubmitFunction (form) =>
+				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
+			view.show()
+
+	addTestButton "Form View Set Focus", "Open", () ->
+		addHolder().setView "Form", (view) ->
+			view.addTextInput "input1", "Example Input 1"
+			view.addTextInput("input2", "Example Input 2").setFocus()
+			view.addSubmit "submit", "Click this button to submit", "Submit"
+			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
 			view.show()
 
 	addTestButton "Form on Popup", "Open", () ->
-		doPopupView "Form", "Form-Popup", "form-popup1", 399, 300
-		.then (view) ->
-			view.init()
-			view.getForm().addTextInput "input1", "Example Input 1"
-			view.getForm().addTextInput "input2", "Example Input 2"
-			view.getForm().addSubmit "submit", "Click this button to submit", "Submit"
-			view.getForm().onSubmit = (form) =>
+		doPopupView "Form", "Form on Popup", "form-popup1", 399, 300, (view) ->
+			view.addTextInput "input1", "Example Input 1"
+			view.addTextInput "input2", "Example Input 2"
+			view.addSubmit "submit", "Click this button to submit", "Submit"
+			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
 			view.show()
 		true
 	
-	addTestButton "Form  on Popup with Many Fields", "Open", () ->
-		doPopupView "Form", "Form-Popup", "form-popup2", 399, 300
-		.then (view) ->
-			view.init()
-			view.getForm().addTextInput "input1", "Example Input 1"
-			view.getForm().addTextInput "input2", "Example Input 2"
-			view.getForm().addTextInput "input3", "Example Input 3"
-			view.getForm().addTextInput "input4", "Example Input 4"
-			view.getForm().addTextInput "input5", "Example Input 5"
-			view.getForm().addTextInput "input6", "Example Input 6"
-			view.getForm().addTextInput "input7", "Example Input 7"
-			view.getForm().addTextInput "input8", "Example Input 8"
-			view.getForm().addTextInput "input9", "Example Input 9"
-			view.getForm().addTextInput "input10", "Example Input 10"
-			view.getForm().addTextInput "input11", "Example Input 11"
-			view.getForm().addTextInput "input12", "Example Input 12"
-			view.getForm().addTextInput "input13", "Example Input 13"
-			view.getForm().addTextInput "input14", "Example Input 14"
-			view.getForm().addTextInput "input15", "Example Input 15"
-			view.getForm().addTextInput "input16", "Example Input 16"
-			view.getForm().addSubmit "submit", "Click this button to submit", "Submit"
-			view.getForm().onSubmit = (form) =>
+	addTestButton "Form on Popup with Many Fields", "Open", () ->
+		doPopupView "Form", "Form on Popup with Many Fields", "form-popup2", 399, 300, (view) ->
+			view.addTextInput "input1", "Example Input 1"
+			view.addTextInput "input2", "Example Input 2"
+			view.addTextInput "input3", "Example Input 3"
+			view.addTextInput "input4", "Example Input 4"
+			view.addTextInput "input5", "Example Input 5"
+			view.addTextInput "input6", "Example Input 6"
+			view.addTextInput "input7", "Example Input 7"
+			view.addTextInput "input8", "Example Input 8"
+
+			view.addSubmit "submit", "Click this button to submit", "Submit"
+			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
 			view.show()
 		true
 
 	addTestButton "Form in Tab", "Open", () ->
-		addHolder "renderTest1"
-		tabs = new DynamicTabs "#renderTest1"
-		tabs.doAddViewTab("Form", "FormViewTab", (view)->
-			view.init()
-			view.getForm().addTextInput "input1", "Example Input 1"
-			view.getForm().addTextInput "input2", "Example Input 2"
-			view.getForm().addSubmit "submit", "Click this button to submit", "Submit"
-			view.getForm().onSubmit = (form) =>
-				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
-			view.show()
-		)
-		tabs.addTab "EmptyTab", 'Another tab'	
+		addHolder().setView "DynamicTabs", (tabs)->
+			tabs.doAddViewTab("Form", "FormViewTab", (view)->
+				view.addTextInput "input1", "Example Input 1"
+				view.addTextInput "input2", "Example Input 2"
+				view.addSubmit "submit", "Click this button to submit", "Submit"
+				view.setSubmitFunction (form) =>
+					alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
+				view.show()
+			)
+			tabs.addTab "EmptyTab", 'Another tab'	
 		true
 
 	addTestButton "Form with Pathfield - zipcode", "Open", ()=>
-		addHolder "renderTest1"
-		div = new WidgetTag "div", "testWidget"
-		div.appendTo "#renderTest1"
-		div.setView "Form", (view)->
-			view.init()
-			view.getForm().addTextInput "input1", "Text Input"
-			view.getForm().addPathField "data-city", "zipcode", "city"
-			view.getForm().addPathField "data-state", "zipcode", "state"
-			view.getForm().addPathField "data-longitude", "zipcode", "lon"
-			view.getForm().addSubmit "submit", "Click this button to submit", "Submit"
-			view.getForm().onSubmit = (form) =>
+		addHolder().setView "Form", (view)->
+			view.addTextInput "input1", "Text Input"
+			view.addPathField "data-city", "zipcode", "city"
+			view.addPathField "data-state", "zipcode", "state"
+			view.addPathField "data-longitude", "zipcode", "lon"
+			view.addSubmit "submit", "Click this button to submit", "Submit"
+			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1}"
 			view.show()
-			view.getForm().setPath "zipcode", "03105"
+			view.setPath "zipcode", "03105"
 		true
 
 	addTestButton "Form with Datafield - testData", "Open", ()=>
-		addHolder "renderTest1"
-		div = new WidgetTag "div", "testWidget"
-		div.appendTo "#renderTest1"
-		div.setView "Form", (view)->
-			view.init()
-			view.getForm().addTextInput "input1", "Text Input"
-			view.getForm().addPathField "data-initialprice", "testData", "initialPrice", {"type": "calculation"}
-			view.getForm().addPathField "data-currentprice", "testData", "currentPrice"
-			view.getForm().addPathField "data-date", "testData", "date"
-			view.getForm().addPathField "data-distance", "testData", "distance"
-			view.getForm().addPathField "data-isnew", "testData", "isNew", {"type": "custom"}
-			view.getForm().addPathField "data-sourcecode", "testData", "sourcecode"
-			view.getForm().addPathField "data-memo", "testData", "memo"
-			view.getForm().addSubmit "submit", "Click this button to submit", "Submit"
-			view.getForm().onSubmit = (form) =>
+		addHolder().setView "Form", (view)->
+			view.addTextInput "input1", "Text Input"
+			view.addPathField "data-initialprice", "testData", "initialPrice", {"type": "calculation"}
+			view.addPathField "data-currentprice", "testData", "currentPrice"
+			view.addPathField "data-date", "testData", "date"
+			view.addPathField "data-distance", "testData", "distance"
+			view.addPathField "data-isnew", "testData", "isNew", {"type": "custom"}
+			view.addPathField "data-sourcecode", "testData", "sourcecode"
+			view.addPathField "data-memo", "testData", "memo"
+			view.addSubmit "submit", "Click this button to submit", "Submit"
+			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1}"
 			view.show()
-			view.getForm().setPath "testData", "0011"
+			view.setPath "testData", "0011"
 		true
 
 	addTestButton "Change Data of Path - zipcode", "Change Data Fields", () =>
@@ -216,32 +201,25 @@ $ ->
 		}
 
 	addTestButton "Form and Table with Pathfield - zipcode", "Open", ()=>
-		addHolder "renderTest1"
-		div = new WidgetTag "div", "testWidget"
-		div.appendTo "#renderTest1"
-		div.setView "Form", (view)->
-			view.init()
-			view.getForm().addTextInput "input1", "Text Input"
-			view.getForm().addPathField "data-city", "zipcode", "city"
-			view.getForm().addPathField "data-state", "zipcode", "state"
-			view.getForm().addPathField "data-longitude", "zipcode", "lon"
-			view.getForm().addSubmit "submit", "Click this button to submit", "Submit"
-			view.getForm().onSubmit = (form) =>
+		viewExe = addHolder()
+		viewExe.addDiv("form-container", "wdt_form_container").setView "Form", (view)->
+			view.addTextInput "input1", "Text Input"
+			view.addPathField "data-city", "zipcode", "city"
+			view.addPathField "data-state", "zipcode", "state"
+			view.addPathField "data-longitude", "zipcode", "lon"
+			view.addSubmit "submit", "Click this button to submit", "Submit"
+			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1}"
 			view.show()
-			view.getForm().setPath "zipcode", "03105"
+			view.setPath "zipcode", "03105"
 
-		addHolder "renderTest2"
-		wdt_id = new WidgetTag "td", null, "wdt_td_id"
-		wdt_city = new WidgetTag "td", null, "wdt_td_city"
-		wdt_state = new WidgetTag "td", null, "wdt_td_state"
-		wdt_lon = new WidgetTag "td", null,"wdt_td_lon"
+		wdt_table = viewExe.add "table", "test_table", "wdt_table"
+		wdt_table.html "<caption>This is table of data fields same as in form above</caption>"
 
-		$("#renderTest2").append($ "<br><table class='test_table'><caption>This is table of data fields same as in form above</caption></table>")
-		$(".test_table").append wdt_id.getTag()
-		$(".test_table").append wdt_city.getTag()
-		$(".test_table").append wdt_state.getTag()
-		$(".test_table").append wdt_lon.getTag()
+		wdt_id = wdt_table.add "td", null, "wdt_td_id"
+		wdt_city = wdt_table.add "td", null, "wdt_td_city"
+		wdt_state = wdt_table.add "td", null, "wdt_td_state"
+		wdt_lon = wdt_table.add "td", null,"wdt_td_lon"
 
 		wdt_id.bindToPath "zipcode", "03105", "id"
 		wdt_city.bindToPath "zipcode", "03105", "city"
@@ -250,4 +228,3 @@ $ ->
 		true
 
 	go()
-	

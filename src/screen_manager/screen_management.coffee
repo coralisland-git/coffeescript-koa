@@ -125,6 +125,7 @@ doPopupView = (viewName, title, settingsName, w, h, callbackWithView) ->
 
         win.getBody().setView viewName, (view)->
             win.view = view
+            view.popup = win
             if callbackWithView? and typeof callbackWithView == "function"
                 callbackWithView(view)
 

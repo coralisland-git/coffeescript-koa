@@ -62,15 +62,13 @@ class FormWrapper
         '''
 
         @templateFormSubmitButton = Handlebars.compile '''
-            <div class="form-group">
-                <label for="{{fieldName}}" class='control-label col-sm-5'> {{label}} </label>
-                <div class='col-sm-7'>
-                       <button class="btn btn-sm btn-primary btn2" type="submit" data-dismiss="modal"
-                            {{#each attrs}}
-                            {{@key}}="{{this}}"
-                            {{/each}}
-                        ><i class="fa fa-check"></i> {{submit}}</button>
-                </div>
+            <div class="form-group centered-with-padding">
+                <label for="{{fieldName}}" class='control-label padding-right-label'> {{label}} </label>
+                <button class="btn btn-sm btn-primary" type="submit" data-dismiss="modal"
+                    {{#each attrs}}
+                    {{@key}}="{{this}}"
+                    {{/each}}
+                ><i class="fa fa-check"></i> {{submit}}</button>
             </div>
         '''
 

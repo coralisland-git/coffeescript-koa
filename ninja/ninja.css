@@ -139,6 +139,14 @@
 .calculation {
   background-color: rgba(209,238,242,0.4);
 }
+.centered-with-padding {
+  text-align: center;
+  padding-right: 15px;
+  padding-left: 15px;
+}
+.padding-right-label {
+  padding-right: 20px;
+}
 .material-icons {
   font: normal normal normal 14px/1 FontAwesome;
 }
@@ -513,6 +521,7 @@ viewHolder {
   top: 0px;
   left: 0px;
   z-index: 55000;
+  max-width: 600px;
 }
 .PopupMenu li {
   width: 100%;
@@ -582,8 +591,6 @@ column-rule-color: #707070 li.title {
   overflow: hidden;
   display: none;
   border: 1px solid #00f;
-  width: 300px;
-  height: 300px;
   position: absolute;
   z-index: 1503400;
 }

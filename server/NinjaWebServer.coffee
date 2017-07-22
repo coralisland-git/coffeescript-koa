@@ -466,6 +466,7 @@ class NinjaWebServer
         staticPathMiddleware @app, "../ninja/vendor/closure/", "/closure-library/closure"
         staticPathMiddleware @app, "../ninja/vendor/blockly/", "/blockly"
 
+
         ##|
         ##| Local static files
         staticPathMiddleware @app, ["../ninja/fonts/",  "../test/fonts/" ], "/fonts"
