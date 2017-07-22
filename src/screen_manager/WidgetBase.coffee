@@ -338,10 +338,10 @@ class WidgetTag extends NinjaContainer
         @renderField tableName, idValue, fieldName
         path = "/#{tableName}/#{idValue}/#{fieldName}"
         
-        dm.on( "new_data"
-            , (table, id) =>
-                if table is tableName and id is idValue
-                    #console.log("Event emitted by DataMap: #{table}/#{id}")
+        window.addEventListener( "new_data"
+            , (ev) =>
+                detail = ev.detail
+                if  detail.tablename is tableName and detail.id is idValue
                     @renderField tableName, idValue, fieldName
             )
 

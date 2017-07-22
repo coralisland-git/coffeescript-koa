@@ -74873,9 +74873,11 @@ WidgetTag = (function(superClass) {
     dm = DataMap.getDataMap();
     this.renderField(tableName, idValue, fieldName);
     path = "/" + tableName + "/" + idValue + "/" + fieldName;
-    dm.on("new_data", (function(_this) {
-      return function(table, id) {
-        if (table === tableName && id === idValue) {
+    window.addEventListener("new_data", (function(_this) {
+      return function(ev) {
+        var detail;
+        detail = ev.detail;
+        if (detail.tablename === tableName && detail.id === idValue) {
           return _this.renderField(tableName, idValue, fieldName);
         }
       };
