@@ -70861,7 +70861,8 @@ doPopupView = function(viewName, title, settingsName, w, h, callbackWithView) {
       w: w,
       h: h,
       scrollable: false,
-      table_name: settingsName
+      table_name: settingsName,
+      keyValue: title
     });
     return win.getBody().setView(viewName, function(view) {
       win.view = view;
