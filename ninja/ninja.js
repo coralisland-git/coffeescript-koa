@@ -68146,8 +68146,8 @@ FormField = (function() {
       "for": "" + this.fieldName
     });
     this.labelWidget.text(this.label);
-    this.divInputWidget = this.formGroupWidget.add("div", "col-sm-10");
-    return this.inputWidget = this.divInputWidget.add("input", "form-control", "" + this.fieldName, {
+    this.divWidget = this.formGroupWidget.add("div", "col-sm-10");
+    return this.inputWidget = this.divWidget.add("input", "form-control", "" + this.fieldName, {
       type: "text"
     });
   };
@@ -68159,8 +68159,8 @@ FormField = (function() {
       "for": "" + this.fieldName
     });
     this.labelWidget.text(this.label);
-    this.divInputWidget = this.formGroupWidget.add("div", "col-sm-10");
-    this.selectWidget = this.divInputWidget.add("select", "form-control", "" + this.fieldName, this.attrs);
+    this.divWidget = this.formGroupWidget.add("div", "col-sm-10");
+    this.selectWidget = this.divWidget.add("select", "form-control", "" + this.fieldName, this.attrs);
     ref = this.attrs.options;
     results = [];
     for (i = 0, len = ref.length; i < len; i++) {
@@ -68173,13 +68173,14 @@ FormField = (function() {
   };
 
   FormField.prototype.renderSubmit = function() {
-    this.formGroupWidget = this.holderWidget.addDiv("form-group form-group-rightalign-padding");
-    this.labelWidget = this.formGroupWidget.add("label", "control-label padding-bottom-10", "", {
+    this.formGroupWidget = this.holderWidget.addDiv("form-group");
+    this.labelWidget = this.formGroupWidget.add("label", "control-label col-sm-6", "", {
       "for": "" + this.fieldName
     });
     this.labelWidget.text(this.label);
     this.attrs["data-dismiss"] = "modal";
-    this.buttonWidget = this.formGroupWidget.add("button", "btn btn-sm btn-primary margin-left-20", "", this.attrs);
+    this.divWidget = this.formGroupWidget.addDiv("padding-x-15 col-sm-6");
+    this.buttonWidget = this.divWidget.add("button", "btn btn-sm btn-primary", "", this.attrs);
     this.iconWidget = this.buttonWidget.add("i", "fa fa-check");
     this.spanWidget = this.buttonWidget.add("span");
     return this.spanWidget.text(" " + this.submit);
@@ -68189,8 +68190,8 @@ FormField = (function() {
     this.formGroupWidget = this.holderWidget.addDiv("form-group");
     this.labelWidget = this.formGroupWidget.add("label", "control-label col-sm-2 label-pathfield", "");
     this.labelWidget.text(this.attrs.columnName);
-    this.divInputWidget = this.formGroupWidget.add("div", "col-sm-10 pathfield", "pathfield-widget");
-    this.divPathWidget = this.divInputWidget.add("div", "form-pathfield form-control", "form-widget-" + this.attrs.number);
+    this.divWidget = this.formGroupWidget.add("div", "col-sm-10 pathfield", "pathfield-widget");
+    this.divPathWidget = this.divWidget.add("div", "form-pathfield form-control", "form-widget-" + this.attrs.number);
     return this.divPathWidget.bindToPath(this.attrs.tableName, this.fieldName, this.attrs.columnName);
   };
 
@@ -68412,7 +68413,7 @@ FormWrapper = (function() {
   };
 
   FormWrapper.prototype.putElementsFullWidth = function() {
-    var field, i, len, ref, ref1, ref2;
+    var field, i, len, ref, ref1, ref2, ref3;
     if (this.isFullWidth) {
       return;
     }
@@ -68420,20 +68421,21 @@ FormWrapper = (function() {
     ref = this.fields;
     for (i = 0, len = ref.length; i < len; i++) {
       field = ref[i];
-      if ((ref1 = field.divInputWidget) != null) {
+      if ((ref1 = field.divWidget) != null) {
         ref1.addClass("form-input-fullwidth-custom");
       }
-      if (field.type !== "submit") {
-        if ((ref2 = field.labelWidget) != null) {
-          ref2.addClass("form-label-fullwidth-custom");
-        }
+      if ((ref2 = field.labelWidget) != null) {
+        ref2.addClass("form-label-fullwidth-custom");
+      }
+      if ((ref3 = field.buttonWidget) != null) {
+        ref3.addClass("form-button-fullwidth-custom");
       }
     }
     return this.isFullWidth = true;
   };
 
   FormWrapper.prototype.backElementsFullWidth = function() {
-    var field, i, len, ref, ref1, ref2;
+    var field, i, len, ref, ref1, ref2, ref3;
     if (!this.isFullWidth) {
       return;
     }
@@ -68441,11 +68443,14 @@ FormWrapper = (function() {
     ref = this.fields;
     for (i = 0, len = ref.length; i < len; i++) {
       field = ref[i];
-      if ((ref1 = field.divInputWidget) != null) {
+      if ((ref1 = field.divWidget) != null) {
         ref1.removeClass("form-input-fullwidth-custom");
       }
       if ((ref2 = field.labelWidget) != null) {
         ref2.removeClass("form-label-fullwidth-custom");
+      }
+      if ((ref3 = field.buttonWidget) != null) {
+        ref3.removeClass("form-button-fullwidth-custom");
       }
     }
     return this.isFullWidth = false;
@@ -68463,7 +68468,7 @@ FormWrapper = (function() {
       if ((ref1 = field.labelWidget) != null) {
         ref1.addClass("form-label-autowidth-custom");
       }
-      results.push((ref2 = field.divInputWidget) != null ? ref2.addClass("form-input-autowidth-custom") : void 0);
+      results.push((ref2 = field.divWidget) != null ? ref2.addClass("form-input-autowidth-custom") : void 0);
     }
     return results;
   };
@@ -68480,7 +68485,7 @@ FormWrapper = (function() {
       if ((ref1 = field.labelWidget) != null) {
         ref1.removeClass("form-label-autowidth-custom");
       }
-      results.push((ref2 = field.divInputWidget) != null ? ref2.removeClass("form-input-autowidth-custom") : void 0);
+      results.push((ref2 = field.divWidget) != null ? ref2.removeClass("form-input-autowidth-custom") : void 0);
     }
     return results;
   };

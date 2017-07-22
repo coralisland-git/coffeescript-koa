@@ -1,7 +1,7 @@
 
 class ViewForm extends View
 
-	boundaryValueToFullWidth: 768
+	boundaryValueToFullWidth: 600
 
 	boundaryValueToInlineForm: 100
 

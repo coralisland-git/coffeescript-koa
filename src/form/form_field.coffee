@@ -118,8 +118,8 @@ class FormField
         @labelWidget = @formGroupWidget.add "label", "control-label col-sm-2", "", 
             for: "#{@fieldName}"
         @labelWidget.text @label
-        @divInputWidget = @formGroupWidget.add "div", "col-sm-10"
-        @inputWidget = @divInputWidget.add "input", "form-control", "#{@fieldName}", 
+        @divWidget = @formGroupWidget.add "div", "col-sm-10"
+        @inputWidget = @divWidget.add "input", "form-control", "#{@fieldName}", 
             type: "text"
 
     renderSelect: () =>
@@ -127,20 +127,21 @@ class FormField
         @labelWidget = @formGroupWidget.add "label", "control-label col-sm-2", "", 
             for: "#{@fieldName}"
         @labelWidget.text @label
-        @divInputWidget = @formGroupWidget.add "div", "col-sm-10"
-        @selectWidget = @divInputWidget.add "select", "form-control", "#{@fieldName}", @attrs
+        @divWidget = @formGroupWidget.add "div", "col-sm-10"
+        @selectWidget = @divWidget.add "select", "form-control", "#{@fieldName}", @attrs
 
         for option in @attrs.options
             @selectWidget.add "option", "", "", 
                 value: "#{option}"
 
     renderSubmit: ()=>
-        @formGroupWidget = @holderWidget.addDiv "form-group form-group-rightalign-padding"
-        @labelWidget = @formGroupWidget.add "label", "control-label padding-bottom-10", "", 
+        @formGroupWidget = @holderWidget.addDiv "form-group"
+        @labelWidget = @formGroupWidget.add "label", "control-label col-sm-6", "", 
             for: "#{@fieldName}"
         @labelWidget.text @label
         @attrs["data-dismiss"] = "modal"
-        @buttonWidget = @formGroupWidget.add "button", "btn btn-sm btn-primary margin-left-20", "", @attrs
+        @divWidget = @formGroupWidget.addDiv "padding-x-15 col-sm-6"
+        @buttonWidget = @divWidget.add "button", "btn btn-sm btn-primary", "", @attrs
 
         @iconWidget = @buttonWidget.add "i", "fa fa-check"
         @spanWidget = @buttonWidget.add "span"
@@ -150,8 +151,8 @@ class FormField
         @formGroupWidget = @holderWidget.addDiv "form-group"
         @labelWidget = @formGroupWidget.add "label", "control-label col-sm-2 label-pathfield", ""
         @labelWidget.text @attrs.columnName
-        @divInputWidget = @formGroupWidget.add "div", "col-sm-10 pathfield", "pathfield-widget"
-        @divPathWidget = @divInputWidget.add "div", "form-pathfield form-control", "form-widget-#{@attrs.number}"
+        @divWidget = @formGroupWidget.add "div", "col-sm-10 pathfield", "pathfield-widget"
+        @divPathWidget = @divWidget.add "div", "form-pathfield form-control", "form-widget-#{@attrs.number}"
         @divPathWidget.bindToPath @attrs.tableName, @fieldName, @attrs.columnName                    
 
     render: ()=>
