@@ -22,6 +22,7 @@ class FormWrapper
         @fields = []
 
         @isFullWidth = false
+        @isInlineMode = false
 
         ##
         ##  Possibly overwrite default options
@@ -81,7 +82,8 @@ class FormWrapper
     ##
     addMultiselect: (fieldName, label, value, attrs, options = [], fnValidate) =>
         attrs = $.extend attrs,
-            multiple: 'multiple'
+            'multiple': 'multiple'
+            'options': options
 
         field = @addInput(@wgt_Form, fieldName, label, value, "select", attrs, fnValidate)
 
@@ -161,9 +163,8 @@ class FormWrapper
     ##
     onSubmitAction: (e) =>
         for field in @fields
-            this[field.fieldName] = field.el.val()
-            if field.hasError
-                @show()
+            if field.checkError()
+                console.log "Form is not submitted due to validation error..."
                 return false
         @onSubmit(this)
         if e?
@@ -182,7 +183,6 @@ class FormWrapper
         firstField = null
         elForm = $ "##{@gid}"
         for field in @fields
-            field.el = elForm.find("##{field.fieldName}")
             field.onAfterShow()
             if !firstField
                 firstField = field
@@ -193,7 +193,6 @@ class FormWrapper
                 @onSubmitAction(e)
 
         elForm.submit @onSubmitAction
-
         true
 
     ## ----------------------------------------------------------------------------------------------------------------
@@ -203,6 +202,7 @@ class FormWrapper
     show: () =>
         for field in @fields
             field.render()
+            this[field.fieldName] = field
         @elementHolder.append @wgt_Form.getTag()
 
         setTimeout ()=>
@@ -251,20 +251,26 @@ class FormWrapper
     ## function to make form inline-style
     ##
     switch2InlineForm: ()=>
+        if @isInlineMode 
+            return
         console.log "Switch to Inline mode"
         @wgt_Form.removeClass "form-horizontal"
         @wgt_Form.addClass "form-inline"
         for field in @fields
             field.labelWidget?.addClass "form-label-autowidth-custom"
             field.divWidget?.addClass "form-input-autowidth-custom"
+        @isInlineMode = true
 
     ##
     ## function to make form horizontal-style
     ##
     switch2HorizontalForm: ()=>
+        if !@isInlineMode
+            return
         console.log "Switch to Horizontal mode"
         @wgt_Form.removeClass "form-inline"
         @wgt_Form.addClass "form-horizontal"
         for field in @fields
             field.labelWidget?.removeClass "form-label-autowidth-custom"
             field.divWidget?.removeClass "form-input-autowidth-custom"
+        @isInlineMode = false

@@ -68040,6 +68040,12 @@ FormField = (function() {
 
   FormField.prototype.focused = false;
 
+  FormField.WARNING = -1;
+
+  FormField.ERROR = 0;
+
+  FormField.SUCCESS = 1;
+
   function FormField(holderWidget, fieldName, label, value, type, attrs, fnValidate) {
     this.holderWidget = holderWidget;
     this.fieldName = fieldName;
@@ -68053,7 +68059,13 @@ FormField = (function() {
     this.renderSubmit = bind(this.renderSubmit, this);
     this.renderSelect = bind(this.renderSelect, this);
     this.renderText = bind(this.renderText, this);
-    this.setError = bind(this.setError, this);
+    this.resetErrorFields = bind(this.resetErrorFields, this);
+    this.hideError = bind(this.hideError, this);
+    this.showWarning = bind(this.showWarning, this);
+    this.showError = bind(this.showError, this);
+    this.checkError = bind(this.checkError, this);
+    this.setWarningMsg = bind(this.setWarningMsg, this);
+    this.setErrorMsg = bind(this.setErrorMsg, this);
     this.onAfterShow = bind(this.onAfterShow, this);
     this.onPressEscape = bind(this.onPressEscape, this);
     this.onPressEnter = bind(this.onPressEnter, this);
@@ -68122,22 +68134,88 @@ FormField = (function() {
     if ((this.fnValidate != null) && typeof this.fnValidate === "function") {
       return this.el.bind("blur", (function(_this) {
         return function(e) {
-          var validate;
-          validate = _this.fnValidate(_this.value);
-          if (validate) {
-            _this.hasError = false;
-            return true;
-          } else {
-            _this.hasError = true;
-            return false;
-          }
+          return _this.checkError();
         };
       })(this));
     }
   };
 
-  FormField.prototype.setError = function(errorMsg) {
+  FormField.prototype.setErrorMsg = function(errorMsg) {
     this.errorMsg = errorMsg;
+  };
+
+  FormField.prototype.setWarningMsg = function(warningMsg) {
+    this.warningMsg = warningMsg;
+  };
+
+  FormField.prototype.checkError = function() {
+    if (!((this.fnValidate != null) && typeof this.fnValidate === "function")) {
+      return false;
+    }
+    switch (this.fnValidate(this.value)) {
+      case FormField.SUCCESS:
+        this.hasError = false;
+        this.hasWarning = false;
+        this.hideError();
+        return false;
+      case FormField.WARNING:
+        this.hasError = false;
+        this.hasWarning = true;
+        this.showWarning();
+        return true;
+      case FormField.ERROR:
+        this.hasError = true;
+        this.hasWarning = false;
+        this.showError();
+        return true;
+    }
+  };
+
+  FormField.prototype.showError = function() {
+    this.resetErrorFields();
+    this.formGroupWidget.addClass("has-error");
+    this.inputWidget.addClass("form-control-danger");
+    if (!this.divError) {
+      this.divError = this.divWidget.addDiv("text-danger", this.fieldName + "-error");
+    }
+    return this.divError.text(this.errorMsg);
+  };
+
+  FormField.prototype.showWarning = function() {
+    this.resetErrorFields();
+    this.formGroupWidget.addClass("has-warning");
+    this.inputWidget.addClass("form-control-warning");
+    if (!this.divWarning) {
+      this.divWarning = this.divWidget.addDiv("text-warning", this.fieldName + "-warning");
+    }
+    return this.divWarning.text(this.warningMsg);
+  };
+
+  FormField.prototype.hideError = function() {
+    this.resetErrorFields();
+    this.formGroupWidget.addClass("has-success");
+    this.inputWidget.addClass("form-control-success");
+    if (this.divError) {
+      this.divError.text('');
+    }
+    if (this.divWarning) {
+      return this.divWarning.text('');
+    }
+  };
+
+  FormField.prototype.resetErrorFields = function() {
+    this.formGroupWidget.removeClass("has-error");
+    this.formGroupWidget.removeClass("has-warning");
+    this.formGroupWidget.removeClass("has-success");
+    this.inputWidget.removeClass("form-control-warning");
+    this.inputWidget.removeClass("form-control-danger");
+    this.inputWidget.removeClass("form-control-success");
+    if (this.divError) {
+      this.divError.text('');
+    }
+    if (this.divWarning) {
+      return this.divWarning.text('');
+    }
   };
 
   FormField.prototype.renderText = function() {
@@ -68147,13 +68225,15 @@ FormField = (function() {
     });
     this.labelWidget.text(this.label);
     this.divWidget = this.formGroupWidget.add("div", "col-sm-10");
-    return this.inputWidget = this.divWidget.add("input", "form-control", "" + this.fieldName, {
+    this.inputWidget = this.divWidget.add("input", "form-control", "" + this.fieldName, {
       type: "text"
     });
+    this.inputWidget.val(this.value);
+    return this.el = this.inputWidget.el;
   };
 
   FormField.prototype.renderSelect = function() {
-    var i, len, option, ref, results;
+    var i, len, option, ref;
     this.formGroupWidget = this.holderWidget.addDiv("form-group");
     this.labelWidget = this.formGroupWidget.add("label", "control-label col-sm-2", "", {
       "for": "" + this.fieldName
@@ -68162,14 +68242,13 @@ FormField = (function() {
     this.divWidget = this.formGroupWidget.add("div", "col-sm-10");
     this.selectWidget = this.divWidget.add("select", "form-control", "" + this.fieldName, this.attrs);
     ref = this.attrs.options;
-    results = [];
     for (i = 0, len = ref.length; i < len; i++) {
       option = ref[i];
-      results.push(this.selectWidget.add("option", "", "", {
+      this.selectWidget.add("option", "", "", {
         value: "" + option
-      }));
+      });
     }
-    return results;
+    return this.el = this.selectWidget.el;
   };
 
   FormField.prototype.renderSubmit = function() {
@@ -68192,19 +68271,20 @@ FormField = (function() {
     this.labelWidget.text(this.attrs.columnName);
     this.divWidget = this.formGroupWidget.add("div", "col-sm-10 pathfield", "pathfield-widget");
     this.divPathWidget = this.divWidget.add("div", "form-pathfield form-control", "form-widget-" + this.attrs.number);
-    return this.divPathWidget.bindToPath(this.attrs.tableName, this.fieldName, this.attrs.columnName);
+    this.divPathWidget.bindToPath(this.attrs.tableName, this.fieldName, this.attrs.columnName);
+    return this.el = this.divPathWidget.el;
   };
 
   FormField.prototype.render = function() {
     switch (this.type) {
-      case "text":
-        return this.renderText();
       case "select":
         return this.renderSelect();
       case "submit":
         return this.renderSubmit();
       case "pathfield":
         return this.renderPathField();
+      default:
+        return this.renderText();
     }
   };
 
@@ -68240,6 +68320,7 @@ FormWrapper = (function() {
     this.wgt_Form = new WidgetTag("form", "form-horizontal", "" + this.gid);
     this.fields = [];
     this.isFullWidth = false;
+    this.isInlineMode = false;
     if (typeof options === "object") {
       for (name in options) {
         val = options[name];
@@ -68280,7 +68361,8 @@ FormWrapper = (function() {
       options = [];
     }
     attrs = $.extend(attrs, {
-      multiple: 'multiple'
+      'multiple': 'multiple',
+      'options': options
     });
     field = this.addInput(this.wgt_Form, fieldName, label, value, "select", attrs, fnValidate);
     field.superAfterShow = field.onAfterShow;
@@ -68354,9 +68436,8 @@ FormWrapper = (function() {
     ref = this.fields;
     for (i = 0, len = ref.length; i < len; i++) {
       field = ref[i];
-      this[field.fieldName] = field.el.val();
-      if (field.hasError) {
-        this.show();
+      if (field.checkError()) {
+        console.log("Form is not submitted due to validation error...");
         return false;
       }
     }
@@ -68375,7 +68456,6 @@ FormWrapper = (function() {
     ref = this.fields;
     for (i = 0, len = ref.length; i < len; i++) {
       field = ref[i];
-      field.el = elForm.find("#" + field.fieldName);
       field.onAfterShow();
       if (!firstField) {
         firstField = field;
@@ -68398,6 +68478,7 @@ FormWrapper = (function() {
     for (i = 0, len = ref.length; i < len; i++) {
       field = ref[i];
       field.render();
+      this[field.fieldName] = field;
     }
     this.elementHolder.append(this.wgt_Form.getTag());
     setTimeout((function(_this) {
@@ -68457,37 +68538,45 @@ FormWrapper = (function() {
   };
 
   FormWrapper.prototype.switch2InlineForm = function() {
-    var field, i, len, ref, ref1, ref2, results;
+    var field, i, len, ref, ref1, ref2;
+    if (this.isInlineMode) {
+      return;
+    }
     console.log("Switch to Inline mode");
     this.wgt_Form.removeClass("form-horizontal");
     this.wgt_Form.addClass("form-inline");
     ref = this.fields;
-    results = [];
     for (i = 0, len = ref.length; i < len; i++) {
       field = ref[i];
       if ((ref1 = field.labelWidget) != null) {
         ref1.addClass("form-label-autowidth-custom");
       }
-      results.push((ref2 = field.divWidget) != null ? ref2.addClass("form-input-autowidth-custom") : void 0);
+      if ((ref2 = field.divWidget) != null) {
+        ref2.addClass("form-input-autowidth-custom");
+      }
     }
-    return results;
+    return this.isInlineMode = true;
   };
 
   FormWrapper.prototype.switch2HorizontalForm = function() {
-    var field, i, len, ref, ref1, ref2, results;
+    var field, i, len, ref, ref1, ref2;
+    if (!this.isInlineMode) {
+      return;
+    }
     console.log("Switch to Horizontal mode");
     this.wgt_Form.removeClass("form-inline");
     this.wgt_Form.addClass("form-horizontal");
     ref = this.fields;
-    results = [];
     for (i = 0, len = ref.length; i < len; i++) {
       field = ref[i];
       if ((ref1 = field.labelWidget) != null) {
         ref1.removeClass("form-label-autowidth-custom");
       }
-      results.push((ref2 = field.divWidget) != null ? ref2.removeClass("form-input-autowidth-custom") : void 0);
+      if ((ref2 = field.divWidget) != null) {
+        ref2.removeClass("form-input-autowidth-custom");
+      }
     }
-    return results;
+    return this.isInlineMode = false;
   };
 
   return FormWrapper;

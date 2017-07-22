@@ -21,6 +21,10 @@ class FormField
     submit: "Submit"
     focused: false
 
+    @WARNING: -1
+    @ERROR: 0
+    @SUCCESS: 1
+
     ## -------------------------------------------------------------------------------------------------------------
     ## constructor
     ##
@@ -103,15 +107,68 @@ class FormField
 
         if @fnValidate? and typeof @fnValidate is "function"
             @el.bind "blur", (e)=>
-                validate = @fnValidate(@value)
-                if validate
-                    @hasError = false
-                    return true
-                else
-                    @hasError = true
-                    return false
+                @checkError()
 
-    setError: (@errorMsg)=>
+    setErrorMsg: (@errorMsg)=>
+
+    setWarningMsg: (@warningMsg)=>
+
+    checkError: ()=>
+        unless @fnValidate? and typeof @fnValidate is "function"
+            return false
+        switch @fnValidate(@value)
+            when FormField.SUCCESS
+                @hasError = false
+                @hasWarning = false
+                @hideError()
+                return false
+            when FormField.WARNING
+                @hasError = false
+                @hasWarning = true
+                @showWarning()
+                return true
+            when FormField.ERROR
+                @hasError = true
+                @hasWarning = false
+                @showError()
+                return true
+
+    showError: ()=>
+        @resetErrorFields()
+        @formGroupWidget.addClass "has-error"
+        @inputWidget.addClass "form-control-danger"
+        if !@divError
+            @divError = @divWidget.addDiv "text-danger", "#{@fieldName}-error"
+        @divError.text @errorMsg
+
+    showWarning: ()=>
+        @resetErrorFields()
+        @formGroupWidget.addClass "has-warning"
+        @inputWidget.addClass "form-control-warning"
+        if !@divWarning
+            @divWarning = @divWidget.addDiv "text-warning", "#{@fieldName}-warning"
+        @divWarning.text @warningMsg
+
+    hideError: ()=>
+        @resetErrorFields()
+        @formGroupWidget.addClass "has-success"
+        @inputWidget.addClass "form-control-success"
+        if @divError
+            @divError.text ''
+        if @divWarning
+            @divWarning.text ''
+
+    resetErrorFields: () =>
+        @formGroupWidget.removeClass "has-error"
+        @formGroupWidget.removeClass "has-warning"
+        @formGroupWidget.removeClass "has-success"
+        @inputWidget.removeClass "form-control-warning"
+        @inputWidget.removeClass "form-control-danger"
+        @inputWidget.removeClass "form-control-success"
+        if @divError
+            @divError.text ''
+        if @divWarning
+            @divWarning.text ''
 
     renderText: () =>
         @formGroupWidget = @holderWidget.addDiv "form-group"
@@ -121,6 +178,9 @@ class FormField
         @divWidget = @formGroupWidget.add "div", "col-sm-10"
         @inputWidget = @divWidget.add "input", "form-control", "#{@fieldName}", 
             type: "text"
+        @inputWidget.val @value
+
+        @el = @inputWidget.el
 
     renderSelect: () =>
         @formGroupWidget = @holderWidget.addDiv "form-group"
@@ -133,6 +193,8 @@ class FormField
         for option in @attrs.options
             @selectWidget.add "option", "", "", 
                 value: "#{option}"
+
+        @el = @selectWidget.el
 
     renderSubmit: ()=>
         @formGroupWidget = @holderWidget.addDiv "form-group"
@@ -154,10 +216,11 @@ class FormField
         @divWidget = @formGroupWidget.add "div", "col-sm-10 pathfield", "pathfield-widget"
         @divPathWidget = @divWidget.add "div", "form-pathfield form-control", "form-widget-#{@attrs.number}"
         @divPathWidget.bindToPath @attrs.tableName, @fieldName, @attrs.columnName                    
+        @el = @divPathWidget.el     
 
     render: ()=>
         switch @type
-            when "text" then @renderText()
             when "select" then @renderSelect()
             when "submit" then @renderSubmit()
             when "pathfield" then @renderPathField()
+            else @renderText()
