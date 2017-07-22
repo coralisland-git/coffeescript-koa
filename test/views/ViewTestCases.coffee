@@ -12,5 +12,5 @@ class ViewTestCases extends View
 
         window.elTestCase = $("#testCases")
 
-        if page?
+        if page? and page.length
             $("body").append "<script src='/js/" + page + ".js' /></script>"

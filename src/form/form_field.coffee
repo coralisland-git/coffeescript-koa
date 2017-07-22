@@ -19,6 +19,7 @@ substringMatcher = (strs) ->
 class FormField
 
     submit: "Submit"
+    focused: false
 
     ## -------------------------------------------------------------------------------------------------------------
     ## constructor
@@ -48,6 +49,11 @@ class FormField
     makeTypeahead: (options) =>
         @typeaheadOptions = options
 
+    ## -gao
+    ## function to set focus automatically
+    setFocus: ()=>
+        @focused = true
+
     ## -------------------------------------------------------------------------------------------------------------
     ## callback function to be called when enter is pressed
     ##
@@ -64,7 +70,7 @@ class FormField
     ## function to be called after the element is visible on the screen
     ##
     onAfterShow: () =>
-
+        if !@el then return false
         if @typeaheadOptions?
             @el.addClass ".typeahead"
             @el.typeahead
@@ -77,6 +83,10 @@ class FormField
 
             @el.bind "typeahead:select", (ev, suggestion) =>
                 console.log "DID CHANGE:", suggestion
+
+        ## -gao
+        ## set focus to this element after created
+        if @focused then @el.focus()
 
         @el.bind "keypress", (e) =>
             if e.keyCode == 13

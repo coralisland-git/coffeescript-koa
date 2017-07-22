@@ -306,7 +306,8 @@ class DataMapEngine
     setFastDocument: (tableName, keyValue, newData)=>
 
         c = @internalGetCollection tableName
-        if keyValue? then newData.id = keyValue
+        if !keyValue? then return false
+        newData.id = keyValue
         c.upsert newData
         true
 
