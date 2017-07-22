@@ -68176,7 +68176,7 @@ FormField = (function() {
     this.formGroupWidget.addClass("has-error");
     this.inputWidget.addClass("form-control-danger");
     if (!this.divError) {
-      this.divError = this.divInputWidget.addDiv("text-danger", this.fieldName + "-error");
+      this.divError = this.divWidget.addDiv("text-danger", this.fieldName + "-error");
     }
     return this.divError.text(this.errorMsg);
   };
@@ -68186,7 +68186,7 @@ FormField = (function() {
     this.formGroupWidget.addClass("has-warning");
     this.inputWidget.addClass("form-control-warning");
     if (!this.divWarning) {
-      this.divWarning = this.divInputWidget.addDiv("text-warning", this.fieldName + "-warning");
+      this.divWarning = this.divWidget.addDiv("text-warning", this.fieldName + "-warning");
     }
     return this.divWarning.text(this.warningMsg);
   };
@@ -68224,8 +68224,8 @@ FormField = (function() {
       "for": "" + this.fieldName
     });
     this.labelWidget.text(this.label);
-    this.divInputWidget = this.formGroupWidget.add("div", "col-sm-10");
-    this.inputWidget = this.divInputWidget.add("input", "form-control", "" + this.fieldName, {
+    this.divWidget = this.formGroupWidget.add("div", "col-sm-10");
+    this.inputWidget = this.divWidget.add("input", "form-control", "" + this.fieldName, {
       type: "text"
     });
     this.inputWidget.val(this.value);
@@ -68239,8 +68239,8 @@ FormField = (function() {
       "for": "" + this.fieldName
     });
     this.labelWidget.text(this.label);
-    this.divInputWidget = this.formGroupWidget.add("div", "col-sm-10");
-    this.selectWidget = this.divInputWidget.add("select", "form-control", "" + this.fieldName, this.attrs);
+    this.divWidget = this.formGroupWidget.add("div", "col-sm-10");
+    this.selectWidget = this.divWidget.add("select", "form-control", "" + this.fieldName, this.attrs);
     ref = this.attrs.options;
     for (i = 0, len = ref.length; i < len; i++) {
       option = ref[i];
@@ -68252,13 +68252,14 @@ FormField = (function() {
   };
 
   FormField.prototype.renderSubmit = function() {
-    this.formGroupWidget = this.holderWidget.addDiv("form-group centered-with-padding");
-    this.labelWidget = this.formGroupWidget.add("label", "control-label padding-right-label", "", {
+    this.formGroupWidget = this.holderWidget.addDiv("form-group");
+    this.labelWidget = this.formGroupWidget.add("label", "control-label col-sm-6", "", {
       "for": "" + this.fieldName
     });
     this.labelWidget.text(this.label);
     this.attrs["data-dismiss"] = "modal";
-    this.buttonWidget = this.formGroupWidget.add("button", "btn btn-sm btn-primary", "", this.attrs);
+    this.divWidget = this.formGroupWidget.addDiv("padding-x-15 col-sm-6");
+    this.buttonWidget = this.divWidget.add("button", "btn btn-sm btn-primary", "", this.attrs);
     this.iconWidget = this.buttonWidget.add("i", "fa fa-check");
     this.spanWidget = this.buttonWidget.add("span");
     return this.spanWidget.text(" " + this.submit);
@@ -68268,8 +68269,8 @@ FormField = (function() {
     this.formGroupWidget = this.holderWidget.addDiv("form-group");
     this.labelWidget = this.formGroupWidget.add("label", "control-label col-sm-2 label-pathfield", "");
     this.labelWidget.text(this.attrs.columnName);
-    this.divInputWidget = this.formGroupWidget.add("div", "col-sm-10 pathfield", "pathfield-widget");
-    this.divPathWidget = this.divInputWidget.add("div", "form-pathfield form-control", "" + this.fieldName);
+    this.divWidget = this.formGroupWidget.add("div", "col-sm-10 pathfield", "pathfield-widget");
+    this.divPathWidget = this.divWidget.add("div", "form-pathfield form-control", "form-widget-" + this.attrs.number);
     this.divPathWidget.bindToPath(this.attrs.tableName, this.fieldName, this.attrs.columnName);
     return this.el = this.divPathWidget.el;
   };
@@ -68501,7 +68502,7 @@ FormWrapper = (function() {
     ref = this.fields;
     for (i = 0, len = ref.length; i < len; i++) {
       field = ref[i];
-      if ((ref1 = field.divInputWidget) != null) {
+      if ((ref1 = field.divWidget) != null) {
         ref1.addClass("form-input-fullwidth-custom");
       }
       if ((ref2 = field.labelWidget) != null) {
@@ -68523,7 +68524,7 @@ FormWrapper = (function() {
     ref = this.fields;
     for (i = 0, len = ref.length; i < len; i++) {
       field = ref[i];
-      if ((ref1 = field.divInputWidget) != null) {
+      if ((ref1 = field.divWidget) != null) {
         ref1.removeClass("form-input-fullwidth-custom");
       }
       if ((ref2 = field.labelWidget) != null) {
@@ -68550,7 +68551,7 @@ FormWrapper = (function() {
       if ((ref1 = field.labelWidget) != null) {
         ref1.addClass("form-label-autowidth-custom");
       }
-      if ((ref2 = field.divInputWidget) != null) {
+      if ((ref2 = field.divWidget) != null) {
         ref2.addClass("form-input-autowidth-custom");
       }
     }
@@ -68571,7 +68572,7 @@ FormWrapper = (function() {
       if ((ref1 = field.labelWidget) != null) {
         ref1.removeClass("form-label-autowidth-custom");
       }
-      if ((ref2 = field.divInputWidget) != null) {
+      if ((ref2 = field.divWidget) != null) {
         ref2.removeClass("form-input-autowidth-custom");
       }
     }
@@ -71042,7 +71043,8 @@ doPopupView = function(viewName, title, settingsName, w, h, callbackWithView) {
       w: w,
       h: h,
       scrollable: false,
-      table_name: settingsName
+      table_name: settingsName,
+      keyValue: title
     });
     return win.getBody().setView(viewName, function(view) {
       win.view = view;
@@ -75054,9 +75056,11 @@ WidgetTag = (function(superClass) {
     dm = DataMap.getDataMap();
     this.renderField(tableName, idValue, fieldName);
     path = "/" + tableName + "/" + idValue + "/" + fieldName;
-    dm.on("new_data", (function(_this) {
-      return function(table, id) {
-        if (table === tableName && id === idValue) {
+    window.addEventListener("new_data", (function(_this) {
+      return function(ev) {
+        var detail;
+        detail = ev.detail;
+        if (detail.tablename === tableName && detail.id === idValue) {
           return _this.renderField(tableName, idValue, fieldName);
         }
       };

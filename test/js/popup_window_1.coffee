@@ -95,13 +95,10 @@ $ ->
 					console.log "Selected e=",e, "info=", info
 				, name
 
-		popup.addToolbar [ navButton, navButton2 ]
 
-		str = ""
-		for x in [0..100]
-			str += "Testing #{x}<br>"
+		popup.getBody().doSetViewWithNavbar "TestShowSize", (view, viewNavbar) ->
+			viewNavbar.addToolbar [ navButton, navButton2 ]
 
-		popup.windowScroll.html str
 		return 1
 
 	addTestButton "Saved Location and size Test", "Open", (e) ->

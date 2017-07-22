@@ -122,6 +122,7 @@ doPopupView = (viewName, title, settingsName, w, h, callbackWithView) ->
             h: h
             scrollable: false
             table_name: settingsName
+            keyValue: title
 
         win.getBody().setView viewName, (view)->
             win.view = view
@@ -156,7 +157,7 @@ doPopupTableView = (data, title, settingsName, w, h) ->
             resolve view
 
 ## - xg
-## - Popup a view with DynamicTabls, only once
+## - Popup a view with DynamicTabs, only once
 doPopupViewOnce = (viewName, title, settingsName, w, h, tabName, callbackWithView) ->
 
     newPromise ()->

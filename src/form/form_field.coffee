@@ -138,7 +138,7 @@ class FormField
         @formGroupWidget.addClass "has-error"
         @inputWidget.addClass "form-control-danger"
         if !@divError
-            @divError = @divInputWidget.addDiv "text-danger", "#{@fieldName}-error"
+            @divError = @divWidget.addDiv "text-danger", "#{@fieldName}-error"
         @divError.text @errorMsg
 
     showWarning: ()=>
@@ -146,7 +146,7 @@ class FormField
         @formGroupWidget.addClass "has-warning"
         @inputWidget.addClass "form-control-warning"
         if !@divWarning
-            @divWarning = @divInputWidget.addDiv "text-warning", "#{@fieldName}-warning"
+            @divWarning = @divWidget.addDiv "text-warning", "#{@fieldName}-warning"
         @divWarning.text @warningMsg
 
     hideError: ()=>
@@ -175,8 +175,8 @@ class FormField
         @labelWidget = @formGroupWidget.add "label", "control-label col-sm-2", "", 
             for: "#{@fieldName}"
         @labelWidget.text @label
-        @divInputWidget = @formGroupWidget.add "div", "col-sm-10"
-        @inputWidget = @divInputWidget.add "input", "form-control", "#{@fieldName}", 
+        @divWidget = @formGroupWidget.add "div", "col-sm-10"
+        @inputWidget = @divWidget.add "input", "form-control", "#{@fieldName}", 
             type: "text"
         @inputWidget.val @value
 
@@ -187,8 +187,8 @@ class FormField
         @labelWidget = @formGroupWidget.add "label", "control-label col-sm-2", "", 
             for: "#{@fieldName}"
         @labelWidget.text @label
-        @divInputWidget = @formGroupWidget.add "div", "col-sm-10"
-        @selectWidget = @divInputWidget.add "select", "form-control", "#{@fieldName}", @attrs
+        @divWidget = @formGroupWidget.add "div", "col-sm-10"
+        @selectWidget = @divWidget.add "select", "form-control", "#{@fieldName}", @attrs
 
         for option in @attrs.options
             @selectWidget.add "option", "", "", 
@@ -197,12 +197,13 @@ class FormField
         @el = @selectWidget.el
 
     renderSubmit: ()=>
-        @formGroupWidget = @holderWidget.addDiv "form-group centered-with-padding"
-        @labelWidget = @formGroupWidget.add "label", "control-label padding-right-label", "", 
+        @formGroupWidget = @holderWidget.addDiv "form-group"
+        @labelWidget = @formGroupWidget.add "label", "control-label col-sm-6", "", 
             for: "#{@fieldName}"
         @labelWidget.text @label
         @attrs["data-dismiss"] = "modal"
-        @buttonWidget = @formGroupWidget.add "button", "btn btn-sm btn-primary", "", @attrs
+        @divWidget = @formGroupWidget.addDiv "padding-x-15 col-sm-6"
+        @buttonWidget = @divWidget.add "button", "btn btn-sm btn-primary", "", @attrs
 
         @iconWidget = @buttonWidget.add "i", "fa fa-check"
         @spanWidget = @buttonWidget.add "span"
@@ -212,10 +213,9 @@ class FormField
         @formGroupWidget = @holderWidget.addDiv "form-group"
         @labelWidget = @formGroupWidget.add "label", "control-label col-sm-2 label-pathfield", ""
         @labelWidget.text @attrs.columnName
-        @divInputWidget = @formGroupWidget.add "div", "col-sm-10 pathfield", "pathfield-widget"
-        @divPathWidget = @divInputWidget.add "div", "form-pathfield form-control", "#{@fieldName}"
-        @divPathWidget.bindToPath @attrs.tableName, @fieldName, @attrs.columnName               
-
+        @divWidget = @formGroupWidget.add "div", "col-sm-10 pathfield", "pathfield-widget"
+        @divPathWidget = @divWidget.add "div", "form-pathfield form-control", "form-widget-#{@attrs.number}"
+        @divPathWidget.bindToPath @attrs.tableName, @fieldName, @attrs.columnName                    
         @el = @divPathWidget.el     
 
     render: ()=>

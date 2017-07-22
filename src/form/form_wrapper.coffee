@@ -224,9 +224,11 @@ class FormWrapper
         console.log "Make Full Width"
 
         for field in @fields
-            field.divInputWidget?.addClass "form-input-fullwidth-custom"
+            field.divWidget?.addClass "form-input-fullwidth-custom"
+            #unless field.type is "submit11"
             field.labelWidget?.addClass "form-label-fullwidth-custom"
             field.buttonWidget?.addClass "form-button-fullwidth-custom"
+
         @isFullWidth = true
 
     ## ------------------------------------------------------------------------------------------------------------------
@@ -239,9 +241,10 @@ class FormWrapper
         console.log "Take off Full Width"
 
         for field in @fields
-            field.divInputWidget?.removeClass "form-input-fullwidth-custom"
+            field.divWidget?.removeClass "form-input-fullwidth-custom"
             field.labelWidget?.removeClass "form-label-fullwidth-custom"
             field.buttonWidget?.removeClass "form-button-fullwidth-custom"
+
         @isFullWidth = false
 
     ## -gao
@@ -255,8 +258,9 @@ class FormWrapper
         @wgt_Form.addClass "form-inline"
         for field in @fields
             field.labelWidget?.addClass "form-label-autowidth-custom"
-            field.divInputWidget?.addClass "form-input-autowidth-custom"
+            field.divWidget?.addClass "form-input-autowidth-custom"
         @isInlineMode = true
+
     ##
     ## function to make form horizontal-style
     ##
@@ -268,5 +272,5 @@ class FormWrapper
         @wgt_Form.addClass "form-horizontal"
         for field in @fields
             field.labelWidget?.removeClass "form-label-autowidth-custom"
-            field.divInputWidget?.removeClass "form-input-autowidth-custom"
+            field.divWidget?.removeClass "form-input-autowidth-custom"
         @isInlineMode = false
