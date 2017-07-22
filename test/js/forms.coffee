@@ -106,7 +106,6 @@ $ ->
 
 	addTestButton "Simple Form View", "Open", () ->
 		addHolder().setView "Form", (view) ->
-
 			view.addTextInput "input1", "Example Input 1"
 			view.addTextInput "input2", "Example Input 2"
 			view.addSubmit "submit", "Click this button to submit", "Submit"
@@ -114,10 +113,35 @@ $ ->
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
 			view.show()
 
+	addTestButton "Inline Form View", "Open", () ->
+		addHolder().setView "Form", (view) ->
+			view.addTextInput "input1", "Example Input 1"
+			view.addTextInput "input2", "Example Input 2"
+			view.addSubmit "submit", "Click this button to submit", "Submit"
+			view.setSubmitFunction (form) =>
+				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
+			view.show()
+			view.setSize 1000, 99
+
 	addTestButton "Form View Set Focus", "Open", () ->
 		addHolder().setView "Form", (view) ->
 			view.addTextInput "input1", "Example Input 1"
 			view.addTextInput("input2", "Example Input 2").setFocus()
+			view.addSubmit "submit", "Click this button to submit", "Submit"
+			view.setSubmitFunction (form) =>
+				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
+			view.show()
+
+	addTestButton "Form View Validation", "Open", () ->
+		addHolder().setView "Form", (view) ->
+			view.addTextInput "input1", "Example Input 1", "Input Value1", {}, (val)->
+				console.log "Validation function"
+				if val is "123"
+					return true
+				else
+					@setError "Value should be '123'.."
+
+			view.addTextInput "input2", "Example Input 2"
 			view.addSubmit "submit", "Click this button to submit", "Submit"
 			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
@@ -166,31 +190,31 @@ $ ->
 	addTestButton "Form with Pathfield - zipcode", "Open", ()=>
 		addHolder().setView "Form", (view)->
 			view.addTextInput "input1", "Text Input"
-			view.addPathField "data-city", "zipcode", "city"
-			view.addPathField "data-state", "zipcode", "state"
-			view.addPathField "data-longitude", "zipcode", "lon"
+			view.addPathField "data-city", "zipcode", "03105", "city"
+			view.addPathField "data-state", "zipcode", "03105", "state"
+			view.addPathField "data-longitude", "zipcode", "03105", "lon"
 			view.addSubmit "submit", "Click this button to submit", "Submit"
 			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1}"
 			view.show()
-			view.setPath "zipcode", "03105"
+			#view.setPath "zipcode", "03105"
 		true
 
 	addTestButton "Form with Datafield - testData", "Open", ()=>
 		addHolder().setView "Form", (view)->
 			view.addTextInput "input1", "Text Input"
-			view.addPathField "data-initialprice", "testData", "initialPrice", {"type": "calculation"}
-			view.addPathField "data-currentprice", "testData", "currentPrice"
-			view.addPathField "data-date", "testData", "date"
-			view.addPathField "data-distance", "testData", "distance"
-			view.addPathField "data-isnew", "testData", "isNew", {"type": "custom"}
-			view.addPathField "data-sourcecode", "testData", "sourcecode"
-			view.addPathField "data-memo", "testData", "memo"
+			view.addPathField "data-initialprice", "testData", "0011", "initialPrice", {"type": "calculation"}
+			view.addPathField "data-currentprice", "testData", "0011", "currentPrice"
+			view.addPathField "data-date", "testData", "0011", "date"
+			view.addPathField "data-distance", "testData", "0011", "distance"
+			view.addPathField "data-isnew", "testData", "isNew", "0011", {"type": "custom"}
+			view.addPathField "data-sourcecode", "testData", "0011", "sourcecode"
+			view.addPathField "data-memo", "testData", "0011", "memo"
 			view.addSubmit "submit", "Click this button to submit", "Submit"
 			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1}"
 			view.show()
-			view.setPath "testData", "0011"
+			#view.setPath "testData", "0011"
 		true
 
 	addTestButton "Change Data of Path - zipcode", "Change Data Fields", () =>
@@ -202,29 +226,18 @@ $ ->
 
 	addTestButton "Form and Table with Pathfield - zipcode", "Open", ()=>
 		viewExe = addHolder()
+
+
 		viewExe.addDiv("form-container", "wdt_form_container").setView "Form", (view)->
 			view.addTextInput "input1", "Text Input"
-			view.addPathField "data-city", "zipcode", "city"
-			view.addPathField "data-state", "zipcode", "state"
-			view.addPathField "data-longitude", "zipcode", "lon"
+			view.addPathField "data-city", "zipcode", "03105", "city"
+			view.addPathField "data-state", "zipcode", "03105", "state"
+			view.addPathField "data-longitude", "zipcode", "03105", "lon"
 			view.addSubmit "submit", "Click this button to submit", "Submit"
 			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1}"
 			view.show()
-			view.setPath "zipcode", "03105"
 
-		wdt_table = viewExe.add "table", "test_table", "wdt_table"
-		wdt_table.html "<caption>This is table of data fields same as in form above</caption>"
-
-		wdt_id = wdt_table.add "td", null, "wdt_td_id"
-		wdt_city = wdt_table.add "td", null, "wdt_td_city"
-		wdt_state = wdt_table.add "td", null, "wdt_td_state"
-		wdt_lon = wdt_table.add "td", null,"wdt_td_lon"
-
-		wdt_id.bindToPath "zipcode", "03105", "id"
-		wdt_city.bindToPath "zipcode", "03105", "city"
-		wdt_state.bindToPath "zipcode", "03105", "state"
-		wdt_lon.bindToPath "zipcode", "03105", "lon"
 		true
 
 	go()

@@ -30,8 +30,8 @@ class FormField
     ## @param [String] type the value of the parameter can be any valid type attribute value for ex. text|radio|checkbox etc.
     ## @param [Object] attrs additional attributes to render during the render
     ##
-    constructor: (@fieldName, @label, @value, @type, @attrs = {}) ->
-        @html = @getHtml()
+    constructor: (@holderWidget, @fieldName, @label, @value, @type, @attrs = {}, @fnValidate) ->
+        #@html = @getHtml()
 
     ## -------------------------------------------------------------------------------------------------------------
     ## returns the compiled html of the current form field
@@ -98,3 +98,66 @@ class FormField
                 return false
 
             return true
+        @el.bind "keyup", (e)=>
+            @value = @el.val()
+
+        if @fnValidate? and typeof @fnValidate is "function"
+            @el.bind "blur", (e)=>
+                validate = @fnValidate(@value)
+                if validate
+                    @hasError = false
+                    return true
+                else
+                    @hasError = true
+                    return false
+
+    setError: (@errorMsg)=>
+
+    renderText: () =>
+        @formGroupWidget = @holderWidget.addDiv "form-group"
+        @labelWidget = @formGroupWidget.add "label", "control-label col-sm-2", "", 
+            for: "#{@fieldName}"
+        @labelWidget.text @label
+        @divWidget = @formGroupWidget.add "div", "col-sm-10"
+        @inputWidget = @divWidget.add "input", "form-control", "#{@fieldName}", 
+            type: "text"
+
+    renderSelect: () =>
+        @formGroupWidget = @holderWidget.addDiv "form-group"
+        @labelWidget = @formGroupWidget.add "label", "control-label col-sm-2", "", 
+            for: "#{@fieldName}"
+        @labelWidget.text @label
+        @divWidget = @formGroupWidget.add "div", "col-sm-10"
+        @selectWidget = @divWidget.add "select", "form-control", "#{@fieldName}", @attrs
+
+        for option in @attrs.options
+            @selectWidget.add "option", "", "", 
+                value: "#{option}"
+
+    renderSubmit: ()=>
+        @formGroupWidget = @holderWidget.addDiv "form-group"
+        @labelWidget = @formGroupWidget.add "label", "control-label col-sm-6", "", 
+            for: "#{@fieldName}"
+        @labelWidget.text @label
+        @attrs["data-dismiss"] = "modal"
+        @divWidget = @formGroupWidget.addDiv "padding-x-15 col-sm-6"
+        @buttonWidget = @divWidget.add "button", "btn btn-sm btn-primary", "", @attrs
+
+        @iconWidget = @buttonWidget.add "i", "fa fa-check"
+        @spanWidget = @buttonWidget.add "span"
+        @spanWidget.text " #{@submit}"
+
+    renderPathField: ()=>
+        @formGroupWidget = @holderWidget.addDiv "form-group"
+        @labelWidget = @formGroupWidget.add "label", "control-label col-sm-2 label-pathfield", ""
+        @labelWidget.text @attrs.columnName
+        @divWidget = @formGroupWidget.add "div", "col-sm-10 pathfield", "pathfield-widget"
+        @divPathWidget = @divWidget.add "div", "form-pathfield form-control", "form-widget-#{@attrs.number}"
+        @divPathWidget.bindToPath @attrs.tableName, @fieldName, @attrs.columnName                    
+
+    render: ()=>
+        switch @type
+            when "text" then @renderText()
+            when "select" then @renderSelect()
+            when "submit" then @renderSubmit()
+            when "pathfield" then @renderPathField()

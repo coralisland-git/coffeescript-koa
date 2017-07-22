@@ -68040,19 +68040,26 @@ FormField = (function() {
 
   FormField.prototype.focused = false;
 
-  function FormField(fieldName, label, value, type, attrs) {
+  function FormField(holderWidget, fieldName, label, value, type, attrs, fnValidate) {
+    this.holderWidget = holderWidget;
     this.fieldName = fieldName;
     this.label = label;
     this.value = value;
     this.type = type;
     this.attrs = attrs != null ? attrs : {};
+    this.fnValidate = fnValidate;
+    this.render = bind(this.render, this);
+    this.renderPathField = bind(this.renderPathField, this);
+    this.renderSubmit = bind(this.renderSubmit, this);
+    this.renderSelect = bind(this.renderSelect, this);
+    this.renderText = bind(this.renderText, this);
+    this.setError = bind(this.setError, this);
     this.onAfterShow = bind(this.onAfterShow, this);
     this.onPressEscape = bind(this.onPressEscape, this);
     this.onPressEnter = bind(this.onPressEnter, this);
     this.setFocus = bind(this.setFocus, this);
     this.makeTypeahead = bind(this.makeTypeahead, this);
     this.getHtml = bind(this.getHtml, this);
-    this.html = this.getHtml();
   }
 
   FormField.prototype.getHtml = function() {
@@ -68094,7 +68101,7 @@ FormField = (function() {
     if (this.focused) {
       this.el.focus();
     }
-    return this.el.bind("keypress", (function(_this) {
+    this.el.bind("keypress", (function(_this) {
       return function(e) {
         if (e.keyCode === 13) {
           _this.onPressEnter(e);
@@ -68107,6 +68114,98 @@ FormField = (function() {
         return true;
       };
     })(this));
+    this.el.bind("keyup", (function(_this) {
+      return function(e) {
+        return _this.value = _this.el.val();
+      };
+    })(this));
+    if ((this.fnValidate != null) && typeof this.fnValidate === "function") {
+      return this.el.bind("blur", (function(_this) {
+        return function(e) {
+          var validate;
+          validate = _this.fnValidate(_this.value);
+          if (validate) {
+            _this.hasError = false;
+            return true;
+          } else {
+            _this.hasError = true;
+            return false;
+          }
+        };
+      })(this));
+    }
+  };
+
+  FormField.prototype.setError = function(errorMsg) {
+    this.errorMsg = errorMsg;
+  };
+
+  FormField.prototype.renderText = function() {
+    this.formGroupWidget = this.holderWidget.addDiv("form-group");
+    this.labelWidget = this.formGroupWidget.add("label", "control-label col-sm-2", "", {
+      "for": "" + this.fieldName
+    });
+    this.labelWidget.text(this.label);
+    this.divWidget = this.formGroupWidget.add("div", "col-sm-10");
+    return this.inputWidget = this.divWidget.add("input", "form-control", "" + this.fieldName, {
+      type: "text"
+    });
+  };
+
+  FormField.prototype.renderSelect = function() {
+    var i, len, option, ref, results;
+    this.formGroupWidget = this.holderWidget.addDiv("form-group");
+    this.labelWidget = this.formGroupWidget.add("label", "control-label col-sm-2", "", {
+      "for": "" + this.fieldName
+    });
+    this.labelWidget.text(this.label);
+    this.divWidget = this.formGroupWidget.add("div", "col-sm-10");
+    this.selectWidget = this.divWidget.add("select", "form-control", "" + this.fieldName, this.attrs);
+    ref = this.attrs.options;
+    results = [];
+    for (i = 0, len = ref.length; i < len; i++) {
+      option = ref[i];
+      results.push(this.selectWidget.add("option", "", "", {
+        value: "" + option
+      }));
+    }
+    return results;
+  };
+
+  FormField.prototype.renderSubmit = function() {
+    this.formGroupWidget = this.holderWidget.addDiv("form-group");
+    this.labelWidget = this.formGroupWidget.add("label", "control-label col-sm-6", "", {
+      "for": "" + this.fieldName
+    });
+    this.labelWidget.text(this.label);
+    this.attrs["data-dismiss"] = "modal";
+    this.divWidget = this.formGroupWidget.addDiv("padding-x-15 col-sm-6");
+    this.buttonWidget = this.divWidget.add("button", "btn btn-sm btn-primary", "", this.attrs);
+    this.iconWidget = this.buttonWidget.add("i", "fa fa-check");
+    this.spanWidget = this.buttonWidget.add("span");
+    return this.spanWidget.text(" " + this.submit);
+  };
+
+  FormField.prototype.renderPathField = function() {
+    this.formGroupWidget = this.holderWidget.addDiv("form-group");
+    this.labelWidget = this.formGroupWidget.add("label", "control-label col-sm-2 label-pathfield", "");
+    this.labelWidget.text(this.attrs.columnName);
+    this.divWidget = this.formGroupWidget.add("div", "col-sm-10 pathfield", "pathfield-widget");
+    this.divPathWidget = this.divWidget.add("div", "form-pathfield form-control", "form-widget-" + this.attrs.number);
+    return this.divPathWidget.bindToPath(this.attrs.tableName, this.fieldName, this.attrs.columnName);
+  };
+
+  FormField.prototype.render = function() {
+    switch (this.type) {
+      case "text":
+        return this.renderText();
+      case "select":
+        return this.renderSelect();
+      case "submit":
+        return this.renderSubmit();
+      case "pathfield":
+        return this.renderPathField();
+    }
   };
 
   return FormField;
@@ -68117,6 +68216,8 @@ var FormWrapper,
 
 FormWrapper = (function() {
   function FormWrapper(holderElement, options) {
+    this.switch2HorizontalForm = bind(this.switch2HorizontalForm, this);
+    this.switch2InlineForm = bind(this.switch2InlineForm, this);
     this.backElementsFullWidth = bind(this.backElementsFullWidth, this);
     this.putElementsFullWidth = bind(this.putElementsFullWidth, this);
     this.getContent = bind(this.getContent, this);
@@ -68124,9 +68225,6 @@ FormWrapper = (function() {
     this.onAfterShow = bind(this.onAfterShow, this);
     this.onSubmitAction = bind(this.onSubmitAction, this);
     this.onSubmit = bind(this.onSubmit, this);
-    this.getHtml = bind(this.getHtml, this);
-    this.setPath = bind(this.setPath, this);
-    this.appendPathFieldWidgets = bind(this.appendPathFieldWidgets, this);
     this.addPathField = bind(this.addPathField, this);
     this.addSubmit = bind(this.addSubmit, this);
     this.addInput = bind(this.addInput, this);
@@ -68139,22 +68237,9 @@ FormWrapper = (function() {
       holderElement = "<form id='" + this.gid + "' class='form-horizontal' role='form'/>";
     }
     this.elementHolder = $(holderElement);
+    this.wgt_Form = new WidgetTag("form", "form-horizontal", "" + this.gid);
     this.fields = [];
     this.isFullWidth = false;
-    Handlebars.registerHelper("getNumber", function(data) {
-      var key, value;
-      for (key in data) {
-        value = data[key];
-        if (key === "number") {
-          return value;
-        }
-      }
-      return null;
-    });
-    this.templateFormFieldText = Handlebars.compile('<div class="form-group">\n    <label for="{{fieldName}}" class=\'control-label col-sm-2\'> {{label}} </label>\n    <div class=\'col-sm-10\'>\n            <input class="form-control" type="{{type}}" id="{{fieldName}}" value="{{value}}" name="{{fieldName}}"\n                {{#each attrs}}\n                {{@key}}="{{this}}"\n                {{/each}}\n            />\n        <div id="{{fieldName}}error" class="text-danger"></div>\n    </div>\n</div>');
-    this.templateSelectFieldText = Handlebars.compile('<div class="form-group">\n    <label for="{{fieldName}}" class=\'control-label col-sm-2\'> {{label}} </label>\n    <div class=\'col-sm-10\'>\n            <select class="form-control" id="{{fieldName}}" name="{{fieldName}}"\n                {{#each attrs}}\n                {{@key}}="{{this}}"\n                {{/each}}\n            >\n                {{#each options}}\n                    <option value="{{this}}">{{this}}</option>\n                {{/each}}\n            </select>\n        <div id="{{fieldName}}error" class="text-danger"></div>\n    </div>\n</div>');
-    this.templateFormSubmitButton = Handlebars.compile('<div class="form-group centered-with-padding">\n    <label for="{{fieldName}}" class=\'control-label padding-right-label\'> {{label}} </label>\n    <button class="btn btn-sm btn-primary" type="submit" data-dismiss="modal"\n        {{#each attrs}}\n        {{@key}}="{{this}}"\n        {{/each}}\n    ><i class="fa fa-check"></i> {{submit}}</button>\n</div>');
-    this.templatePathField = Handlebars.compile('<div class="form-group">\n    <label for="{{fieldName}}" class=\'control-label col-sm-2 label-pathfield\'> {{label}} </label>\n    <div class=\'col-sm-10 pathfield\' id=\'pathfield-widget-{{getNumber attrs}}\'>\n        <!--\n        Here, path-field input will be put on\n        -->\n    </div>\n</div>');
     if (typeof options === "object") {
       for (name in options) {
         val = options[name];
@@ -68164,12 +68249,12 @@ FormWrapper = (function() {
   }
 
   FormWrapper.prototype.addTextInput = function(fieldName, label, value, attrs, fnValidate) {
-    return this.addInput(fieldName, label, value, "text", attrs, fnValidate);
+    return this.addInput(this.wgt_Form, fieldName, label, value, "text", attrs, fnValidate);
   };
 
   FormWrapper.prototype.addTagsInput = function(fieldName, label, value, attrs, fnValidate) {
     var field;
-    field = this.addInput(fieldName, label, value, "text", attrs, fnValidate);
+    field = this.addInput(this.wgt_Form, fieldName, label, value, "text", attrs, fnValidate);
     field.superAfterShow = field.onAfterShow;
     field.onAfterShow = function() {
       this.el.selectize({
@@ -68189,12 +68274,15 @@ FormWrapper = (function() {
     return field;
   };
 
-  FormWrapper.prototype.addMultiselect = function(fieldName, label, value, attrs, fnValidate) {
+  FormWrapper.prototype.addMultiselect = function(fieldName, label, value, attrs, options, fnValidate) {
     var field;
+    if (options == null) {
+      options = [];
+    }
     attrs = $.extend(attrs, {
       multiple: 'multiple'
     });
-    field = this.addInput(fieldName, label, value, "select", attrs, fnValidate);
+    field = this.addInput(this.wgt_Form, fieldName, label, value, "select", attrs, fnValidate);
     field.superAfterShow = field.onAfterShow;
     field.onAfterShow = function() {
       if (!Array.isArray(value)) {
@@ -68207,7 +68295,7 @@ FormWrapper = (function() {
     return field;
   };
 
-  FormWrapper.prototype.addInput = function(fieldName, label, value, type, attrs, fnValidate) {
+  FormWrapper.prototype.addInput = function(holderWidget, fieldName, label, value, type, attrs, fnValidate) {
     var field;
     if (type == null) {
       type = "text";
@@ -68220,7 +68308,7 @@ FormWrapper = (function() {
       attrs.checked = "checked";
     }
     value = type === "checkbox" ? 1 : value;
-    field = new FormField(fieldName, label, value, type, attrs);
+    field = new FormField(holderWidget, fieldName, label, value, type, attrs, fnValidate);
     this.fields.push(field);
     return field;
   };
@@ -68230,83 +68318,31 @@ FormWrapper = (function() {
     if (attrs == null) {
       attrs = {};
     }
-    field = new FormField(fieldName, label, value, "submit", attrs);
+    field = new FormField(this.wgt_Form, fieldName, label, value, "submit", attrs);
     this.fields.push(field);
     return field;
   };
 
-  FormWrapper.prototype.addPathField = function(fieldName, tableName, columnName, attrs) {
-    var field, widget;
+  FormWrapper.prototype.addPathField = function(name, tableName, fieldName, columnName, attrs) {
+    var field;
     if (attrs == null) {
       attrs = {};
     }
-    widget = new WidgetTag("div", "form-pathfield form-control", "form-widget-" + this.fields.length);
-    if (attrs.type === "custom") {
-      widget.removeClass("form-control");
-      widget.addClass("custom");
-    } else if (attrs.type === "calculation") {
-      widget.addClass("calculation");
-    }
-    field = new FormField(fieldName, columnName, "", "pathfield", {
-      "table": tableName,
-      "column": columnName,
-      "pathfield-widget": widget,
+
+    /*widget = new WidgetTag "div", "form-pathfield form-control", "form-widget-#{@fields.length}"
+    if attrs.type is "custom"
+        widget.removeClass "form-control"
+        widget.addClass "custom"
+    else if attrs.type is "calculation"
+        widget.addClass "calculation"
+     */
+    field = new FormField(this.wgt_Form, fieldName, columnName, "", "pathfield", {
+      "tableName": tableName,
+      "columnName": columnName,
       "number": this.fields.length
     });
     this.fields.push(field);
     return field;
-  };
-
-  FormWrapper.prototype.appendPathFieldWidgets = function() {
-    var field, i, len, ref, results, widget;
-    ref = this.fields;
-    results = [];
-    for (i = 0, len = ref.length; i < len; i++) {
-      field = ref[i];
-      if (field.type === "pathfield") {
-        widget = field.attrs["pathfield-widget"];
-        this.elementHolder.find("#pathfield-widget-" + field.attrs['number']).empty();
-        results.push(this.elementHolder.find("#pathfield-widget-" + field.attrs['number']).append(widget.getTag()));
-      } else {
-        results.push(void 0);
-      }
-    }
-    return results;
-  };
-
-  FormWrapper.prototype.setPath = function(tableName, idValue) {
-    var field, i, len, ref, widget;
-    ref = this.fields;
-    for (i = 0, len = ref.length; i < len; i++) {
-      field = ref[i];
-      if (field.type === "pathfield") {
-        widget = field.attrs["pathfield-widget"];
-        widget.bindToPath(tableName, idValue, field.attrs["column"]);
-      }
-    }
-    return true;
-  };
-
-  FormWrapper.prototype.getHtml = function() {
-    var content, field, i, len, ref;
-    content = "<form id='" + this.gid + "' class='form-horizontal' role='form'>";
-    ref = this.fields;
-    for (i = 0, len = ref.length; i < len; i++) {
-      field = ref[i];
-      if (field.type === 'select') {
-        field.options = field.attrs.options;
-        delete field.attrs.options;
-        content += this.templateSelectFieldText(field);
-      } else if (field.type === 'submit') {
-        content += this.templateFormSubmitButton(field);
-      } else if (field.type === 'pathfield') {
-        content += this.templatePathField(field);
-      } else {
-        content += this.templateFormFieldText(field);
-      }
-    }
-    content += "</form>";
-    return content;
   };
 
   FormWrapper.prototype.onSubmit = function() {
@@ -68319,6 +68355,10 @@ FormWrapper = (function() {
     for (i = 0, len = ref.length; i < len; i++) {
       field = ref[i];
       this[field.fieldName] = field.el.val();
+      if (field.hasError) {
+        this.show();
+        return false;
+      }
     }
     this.onSubmit(this);
     if (e != null) {
@@ -68353,8 +68393,13 @@ FormWrapper = (function() {
   };
 
   FormWrapper.prototype.show = function() {
-    this.elementHolder.append(this.getHtml());
-    this.appendPathFieldWidgets();
+    var field, i, len, ref;
+    ref = this.fields;
+    for (i = 0, len = ref.length; i < len; i++) {
+      field = ref[i];
+      field.render();
+    }
+    this.elementHolder.append(this.wgt_Form.getTag());
     setTimeout((function(_this) {
       return function() {
         return _this.onAfterShow();
@@ -68368,33 +68413,81 @@ FormWrapper = (function() {
   };
 
   FormWrapper.prototype.putElementsFullWidth = function() {
-    var buttonElements, inputElements, labelElements;
+    var field, i, len, ref, ref1, ref2, ref3;
     if (this.isFullWidth) {
       return;
     }
     console.log("Make Full Width");
-    inputElements = this.elementHolder.find("div[class^=col-sm-]");
-    inputElements.addClass("form-input-fullwidth-custom");
-    labelElements = this.elementHolder.find("label");
-    labelElements.addClass("form-label-fullwidth-custom");
-    buttonElements = this.elementHolder.find("button");
-    buttonElements.addClass("form-button-fullwidth-custom");
+    ref = this.fields;
+    for (i = 0, len = ref.length; i < len; i++) {
+      field = ref[i];
+      if ((ref1 = field.divWidget) != null) {
+        ref1.addClass("form-input-fullwidth-custom");
+      }
+      if ((ref2 = field.labelWidget) != null) {
+        ref2.addClass("form-label-fullwidth-custom");
+      }
+      if ((ref3 = field.buttonWidget) != null) {
+        ref3.addClass("form-button-fullwidth-custom");
+      }
+    }
     return this.isFullWidth = true;
   };
 
   FormWrapper.prototype.backElementsFullWidth = function() {
-    var buttonElements, inputElements, labelElements;
+    var field, i, len, ref, ref1, ref2, ref3;
     if (!this.isFullWidth) {
       return;
     }
     console.log("Take off Full Width");
-    inputElements = this.elementHolder.find("div[class^=col-sm-]");
-    inputElements.removeClass("form-input-fullwidth-custom");
-    labelElements = this.elementHolder.find("label");
-    labelElements.removeClass("form-label-fullwidth-custom");
-    buttonElements = this.elementHolder.find("button");
-    buttonElements.removeClass("form-button-fullwidth-custom");
+    ref = this.fields;
+    for (i = 0, len = ref.length; i < len; i++) {
+      field = ref[i];
+      if ((ref1 = field.divWidget) != null) {
+        ref1.removeClass("form-input-fullwidth-custom");
+      }
+      if ((ref2 = field.labelWidget) != null) {
+        ref2.removeClass("form-label-fullwidth-custom");
+      }
+      if ((ref3 = field.buttonWidget) != null) {
+        ref3.removeClass("form-button-fullwidth-custom");
+      }
+    }
     return this.isFullWidth = false;
+  };
+
+  FormWrapper.prototype.switch2InlineForm = function() {
+    var field, i, len, ref, ref1, ref2, results;
+    console.log("Switch to Inline mode");
+    this.wgt_Form.removeClass("form-horizontal");
+    this.wgt_Form.addClass("form-inline");
+    ref = this.fields;
+    results = [];
+    for (i = 0, len = ref.length; i < len; i++) {
+      field = ref[i];
+      if ((ref1 = field.labelWidget) != null) {
+        ref1.addClass("form-label-autowidth-custom");
+      }
+      results.push((ref2 = field.divWidget) != null ? ref2.addClass("form-input-autowidth-custom") : void 0);
+    }
+    return results;
+  };
+
+  FormWrapper.prototype.switch2HorizontalForm = function() {
+    var field, i, len, ref, ref1, ref2, results;
+    console.log("Switch to Horizontal mode");
+    this.wgt_Form.removeClass("form-inline");
+    this.wgt_Form.addClass("form-horizontal");
+    ref = this.fields;
+    results = [];
+    for (i = 0, len = ref.length; i < len; i++) {
+      field = ref[i];
+      if ((ref1 = field.labelWidget) != null) {
+        ref1.removeClass("form-label-autowidth-custom");
+      }
+      results.push((ref2 = field.divWidget) != null ? ref2.removeClass("form-input-autowidth-custom") : void 0);
+    }
+    return results;
   };
 
   return FormWrapper;
