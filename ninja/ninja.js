@@ -67913,10 +67913,13 @@ ModalDialog = (function() {
 
   function ModalDialog(options) {
     this.show = bind(this.show, this);
+    this.getViewContainer = bind(this.getViewContainer, this);
+    this.getBody = bind(this.getBody, this);
     this.hide = bind(this.hide, this);
     this.onButton2 = bind(this.onButton2, this);
     this.onButton1 = bind(this.onButton1, this);
     this.onClose = bind(this.onClose, this);
+    this.createModal = bind(this.createModal, this);
     this.getForm = bind(this.getForm, this);
     this.makeFormDialog = bind(this.makeFormDialog, this);
     var name, val;
@@ -67928,10 +67931,50 @@ ModalDialog = (function() {
         this[name] = val;
       }
     }
+    this.createModal();
     if (this.showOnCreate) {
       this.show();
     }
   }
+
+  ModalDialog.prototype.createModal = function() {
+    this.modalContainer = new WidgetTag("div", "modal", "modal" + this.gid, {
+      "tabindex": "-1",
+      "role": "dialog",
+      "aria-hidden": "true"
+    });
+    this.modalContainer.css("display", "none");
+    this.modalWrapper = this.modalContainer.addDiv("modal-dialog").addDiv("modal-content");
+    this.header = this.modalWrapper.addDiv("modal-header bg-primary");
+    this.buttonInHeader = this.header.add("button", "close", "button-" + this.gid, {
+      "data-dismiss": "modal",
+      "aria-label": "Close"
+    });
+    this.spanInButton = this.buttonInHeader.add("span", "", "", {
+      "aria-hidden": "true"
+    }).getTag().html('&times;');
+    this.header.add("h4", "modal-title").text("" + this.title);
+    this.body = this.modalWrapper.addDiv("modal-body");
+    this.body.add("p").text("" + this.content);
+    this.viewContainer = this.getBody().addDiv("modalViewDialog", "modalViewDialog" + this.gid);
+    if (this.showFooter) {
+      this.footer = this.modalWrapper.addDiv("modal-footer");
+      if (this.close) {
+        this.button1 = this.footer.add("button", "btn btn-sm btn-default btn1", "button1-" + this.gid, {
+          "type": "button",
+          "data-dismiss": "modal"
+        }).text("" + this.close);
+      }
+      if (this.ok) {
+        this.button2 = this.footer.add("button", "btn btn-sm btn-default btn1", "button2-" + this.gid, {
+          "type": "button",
+          "data-dismiss": "modal"
+        });
+        this.button2.add("i", "fa fa-check");
+        return this.button2.add("span").text(" " + this.ok);
+      }
+    }
+  };
 
   ModalDialog.prototype.onClose = function() {
     return true;
@@ -67957,16 +68000,23 @@ ModalDialog = (function() {
     return this.modal.modal('hide');
   };
 
+  ModalDialog.prototype.getBody = function() {
+    return this.body;
+  };
+
+  ModalDialog.prototype.getViewContainer = function() {
+    return this.viewContainer;
+  };
+
   ModalDialog.prototype.show = function(options) {
-    var html;
-    html = this.template(this);
-    $("body").append(html);
+    $("body").append(this.modalContainer.getTag());
     this.modal = $("#modal" + this.gid);
     this.modal_body = this.modal.find(".modal-body");
-    if (this.formWrapper != null) {
-      this.modal_body.append(this.formWrapper.getContent());
-      this.formWrapper.show();
-    }
+
+    /*if @formWrapper?		
+    			@modal_body.append @formWrapper.getContent()
+    			@formWrapper.show()
+     */
     this.modal.modal(options);
     this.modal.on("hidden.bs.modal", (function(_this) {
       return function() {
@@ -68010,13 +68060,6 @@ ModalDialog = (function() {
   return ModalDialog;
 
 })();
-
-
-/*		if @formWrapper?
-			setTimeout ()=>
-				@formWrapper.onAfterShow()
-			, 10
- */
 var FormField, substringMatcher,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
@@ -71043,12 +71086,10 @@ doPopupView = function(viewName, title, settingsName, w, h, callbackWithView) {
       w: w,
       h: h,
       scrollable: false,
-      table_name: settingsName,
-      keyValue: title
+      table_name: settingsName
     });
     return win.getBody().setView(viewName, function(view) {
       win.view = view;
-      view.popup = win;
       if ((callbackWithView != null) && typeof callbackWithView === "function") {
         callbackWithView(view);
       }
@@ -76294,6 +76335,7 @@ ErrorMessageBox = (function(superClass) {
     this.ok = 'Close';
     this.close = '';
     this.content = message;
+    this.createModal();
     this.show();
   }
 
