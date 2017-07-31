@@ -145,7 +145,7 @@ $ ->
 
 		##| set the address as object in data map, to manipulate address field as simple object
 		for key,obj of DataMap.getDataMap().engine.export("zipcode")
-			obj.address = {"#{key}": {city:obj.city,state:obj.state,county:obj.county}}
+			obj.address = {city:obj.city,state:obj.state,county:obj.county}
 
 		## -gao
 		## is "options.compile" needed or used?
@@ -188,12 +188,10 @@ $ ->
 				width 	: 50
 				callback: (row) =>
 					doPopupView "Form", "Form-Popup", "form-popup", 500, 1000, (view)->
-						view.init()
 						for key, value of row
-							view.getForm().addPathField "data-#{key}", theTable, key
-						view.getForm().setPath theTable, row.id
-						view.getForm().addSubmit "submit", "Click this button to submit", "Submit"
-						view.getForm().onSubmit = (form) =>
+							view.addPathField "data-#{key}", theTable, row.id, key
+						view.addSubmit "submit", "Click this button to submit", "Submit"
+						view.setSubmitFunction (form) =>
 							alert "Form was submitted successfully."
 						view.show()
 
