@@ -8443,7 +8443,13 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
     };
 
     DataFormatSimpleObject.prototype.onFocus = function(e, col, data) {
-      return doPopupTableView(data[col], "Show " + col, "showTableClasses", 800, 400, function(view) {
+      var key, obj1;
+      key = data.id || e.path || e.rn;
+      return doPopupTableView((
+        obj1 = {},
+        obj1["" + key] = data[col],
+        obj1
+      ), "Show " + col, "showTableClasses", 800, 400, function(view) {
         return console.log("Popup table view created in DataFormatTypes?");
       });
     };
@@ -71086,10 +71092,12 @@ doPopupView = function(viewName, title, settingsName, w, h, callbackWithView) {
       w: w,
       h: h,
       scrollable: false,
-      table_name: settingsName
+      table_name: settingsName,
+      keyValue: title
     });
     return win.getBody().setView(viewName, function(view) {
       win.view = view;
+      view.popup = win;
       if ((callbackWithView != null) && typeof callbackWithView === "function") {
         callbackWithView(view);
       }

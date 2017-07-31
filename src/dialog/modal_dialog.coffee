@@ -112,7 +112,7 @@ class ModalDialog
 		@header.add("h4", "modal-title").text("#{@title}")
 		@body = @modalWrapper.addDiv "modal-body"
 		@body.add("p").text "#{@content}"
-		@viewContainer = @getBody().addDiv "modalViewDialog", "modalViewDialog#{@gid}"
+		@viewContainer = @getBody().addDiv "modal-view", "modal-view#{@gid}"
 		if @showFooter
 			@footer = @modalWrapper.addDiv "modal-footer"
 			if @close
