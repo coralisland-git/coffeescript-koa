@@ -90,13 +90,17 @@ $ ->
 			title:        "Form Title"
 			ok:           "Go"
 
-		m.getViewContainer().setView "Form", (view)->
+		viewContainer = m.getViewContainer()
+		viewContainer.setSize 600, 80
+		viewContainer.setAbsolute()
+		viewContainer.setView "Form", (view)->
 			view.addTextInput "input1", "Example Input 1"
 			view.setSubmitFunction (form) =>
 				console.log "Submitted form, test value=", form.input1
 				m.hide()
 			view.show()
-			view.setSize 400, 100
+			#view.setSize 400, 100
+			console.log "model-view size: ", view.width(), view.height()
 		m.show()
 
 	addTestButton "Simple Form 2", "Open", () ->

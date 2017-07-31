@@ -67962,7 +67962,7 @@ ModalDialog = (function() {
     this.header.add("h4", "modal-title").text("" + this.title);
     this.body = this.modalWrapper.addDiv("modal-body");
     this.body.add("p").text("" + this.content);
-    this.viewContainer = this.getBody().addDiv("modalViewDialog", "modalViewDialog" + this.gid);
+    this.viewContainer = this.getBody().addDiv("modal-view", "modal-view" + this.gid);
     if (this.showFooter) {
       this.footer = this.modalWrapper.addDiv("modal-footer");
       if (this.close) {
