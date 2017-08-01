@@ -71123,15 +71123,21 @@ doLoadScreen = function(screenName, optionalArgs) {
 };
 
 showScreen = function(screenName, optionalArgs) {
-  var className;
-  className = "Screen" + screenName;
-  if (!Screens[screenName] && typeof window[className] !== "function") {
-    return doLoadScreen(screenName, optionalArgs).then(function(loaded) {
-      return doShowScreen(screenName, optionalArgs);
-    });
-  } else {
-    return doShowScreen(screenName, optionalArgs);
-  }
+  return new Promise(function(resolve, reject) {
+    var className;
+    className = "Screen" + screenName;
+    if (!Screens[screenName] && typeof window[className] !== "function") {
+      return doLoadScreen(screenName, optionalArgs).then(function(loaded) {
+        return doShowScreen(screenName, optionalArgs);
+      }).then(function() {
+        return resolve(Screens[screenName]);
+      });
+    } else {
+      return doShowScreen(screenName, optionalArgs).then(function() {
+        return resolve(Screens[screenName]);
+      });
+    }
+  });
 };
 
 doShowScreen = function(screenName, optionalArgs) {
@@ -71171,37 +71177,42 @@ doShowScreen = function(screenName, optionalArgs) {
     $(Screens.current.classid).hide();
   }
   Screens.current = Screens[screenName];
-  activateCurrentScreen(optionalArgs, screenName);
+  return activateCurrentScreen(optionalArgs, screenName);
 };
 
 activateCurrentScreen = function(optionalArgs, screenName) {
-  var h, w;
-  if (!Screens.current.initialized) {
-    Screens.current.onSetupButtons();
-    Screens.current.initialized = true;
-  }
-  if (screenName !== "Login") {
-    document.location.hash = screenName;
-  }
-  doReplaceScreenContent(screenName);
-  Screens.current.onResetScreen();
-  w = $(window).width();
-  h = $(window).height();
-  globalTableEvents.emitEvent("resize", [w, h]);
-  window.scrollTo(0, 0);
-  Screens.current.optionalArgs = optionalArgs;
-  $("#MainTitle").html(Screens.current.windowTitle);
-  if (Screens.current.windowSubTitle.length > 0) {
-    $("#SubTitle").html(Screens.current.windowSubTitle);
-    $("#SubTitle").show();
-    $("#MainTitle").removeClass("alone");
-  } else {
-    $("#SubTitle").hide();
-    $("#MainTitle").addClass("alone");
-  }
-  $(Screens.current.classid).show();
-  Screens.current.getScreenSize();
-  Screens.current.onShowScreen();
+  return new Promise((function(_this) {
+    return function(resolve, reject) {
+      var h, w;
+      if (!Screens.current.initialized) {
+        Screens.current.onSetupButtons();
+        Screens.current.initialized = true;
+      }
+      if (screenName !== "Login") {
+        document.location.hash = screenName;
+      }
+      doReplaceScreenContent(screenName);
+      Screens.current.onResetScreen();
+      w = $(window).width();
+      h = $(window).height();
+      globalTableEvents.emitEvent("resize", [w, h]);
+      window.scrollTo(0, 0);
+      Screens.current.optionalArgs = optionalArgs;
+      $("#MainTitle").html(Screens.current.windowTitle);
+      if (Screens.current.windowSubTitle.length > 0) {
+        $("#SubTitle").html(Screens.current.windowSubTitle);
+        $("#SubTitle").show();
+        $("#MainTitle").removeClass("alone");
+      } else {
+        $("#SubTitle").hide();
+        $("#MainTitle").addClass("alone");
+      }
+      $(Screens.current.classid).show();
+      Screens.current.getScreenSize();
+      Screens.current.onShowScreen();
+      return resolve(true);
+    };
+  })(this));
 };
 var WindowManager,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
