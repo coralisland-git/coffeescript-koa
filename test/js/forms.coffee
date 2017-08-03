@@ -108,7 +108,16 @@ $ ->
 		addHolder().setView "Form", (view) ->
 			view.addTextInput "input1", "Example Input 1"
 			view.addTextInput "input2", "Example Input 2"
-			view.addSubmit "submit", "Click this button to submit", "Submit"
+			view.addSubmit "submit", "", "Submit"
+			view.setSubmitFunction (form) =>
+				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
+			view.show()
+
+	addTestButton "Simple Form View Submit Label", "Open", () ->
+		addHolder().setView "Form", (view) ->
+			view.addTextInput "input1", "Example Input 1"
+			view.addTextInput "input2", "Example Input 2"
+			view.addSubmit "submit", "Submit Label", "Submit"
 			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
 			view.show()
@@ -117,7 +126,7 @@ $ ->
 		addHolder().setView "Form", (view) ->
 			view.addTextInput "input1", "Example Input 1"
 			view.addTextInput "input2", "Example Input 2"
-			view.addSubmit "submit", "Click this button to submit", "Submit"
+			view.addSubmit "submit", "", "Submit"
 			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
 			view.show()
@@ -127,7 +136,7 @@ $ ->
 		addHolder().setView "Form", (view) ->
 			view.addTextInput "input1", "Example Input 1"
 			view.addTextInput("input2", "Example Input 2").setFocus()
-			view.addSubmit "submit", "Click this button to submit", "Submit"
+			view.addSubmit "submit", "", "Submit"
 			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
 			view.show()
@@ -142,7 +151,7 @@ $ ->
 					@setError "Value should be '123'.."
 
 			view.addTextInput "input2", "Example Input 2"
-			view.addSubmit "submit", "Click this button to submit", "Submit"
+			view.addSubmit "submit", "", "Submit"
 			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
 			view.show()
@@ -151,7 +160,7 @@ $ ->
 		doPopupView "Form", "Form on Popup", "form-popup1", 399, 300, (view) ->
 			view.addTextInput "input1", "Example Input 1"
 			view.addTextInput "input2", "Example Input 2"
-			view.addSubmit "submit", "Click this button to submit", "Submit"
+			view.addSubmit "submit", "", "Submit"
 			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
 			view.show()
@@ -168,7 +177,7 @@ $ ->
 			view.addTextInput "input7", "Example Input 7"
 			view.addTextInput "input8", "Example Input 8"
 
-			view.addSubmit "submit", "Click this button to submit", "Submit"
+			view.addSubmit "submit", "", "Submit"
 			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
 			view.show()
@@ -193,7 +202,7 @@ $ ->
 			view.addPathField "data-city", "zipcode", "03105", "city"
 			view.addPathField "data-state", "zipcode", "03105", "state"
 			view.addPathField "data-longitude", "zipcode", "03105", "lon"
-			view.addSubmit "submit", "Click this button to submit", "Submit"
+			view.addSubmit "submit", "", "Submit"
 			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1}"
 			view.show()
@@ -210,11 +219,10 @@ $ ->
 			view.addPathField "data-isnew", "testData", "isNew", "0011", {"type": "custom"}
 			view.addPathField "data-sourcecode", "testData", "0011", "sourcecode"
 			view.addPathField "data-memo", "testData", "0011", "memo"
-			view.addSubmit "submit", "Click this button to submit", "Submit"
+			view.addSubmit "submit", "", "Submit"
 			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1}"
 			view.show()
-			#view.setPath "testData", "0011"
 		true
 
 	addTestButton "Change Data of Path - zipcode", "Change Data Fields", () =>
@@ -233,11 +241,10 @@ $ ->
 			view.addPathField "data-city", "zipcode", "03105", "city"
 			view.addPathField "data-state", "zipcode", "03105", "state"
 			view.addPathField "data-longitude", "zipcode", "03105", "lon"
-			view.addSubmit "submit", "Click this button to submit", "Submit"
+			view.addSubmit "submit", "", "Submit"
 			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1}"
 			view.show()
-
 		true
 
 	go()

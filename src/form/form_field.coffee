@@ -136,11 +136,11 @@ class FormField
 
     renderSubmit: ()=>
         @formGroupWidget = @holderWidget.addDiv "form-group"
-        @labelWidget = @formGroupWidget.add "label", "control-label col-sm-6", "", 
+        @labelWidget = @formGroupWidget.add "label", "control-label col-sm-2", "", 
             for: "#{@fieldName}"
         @labelWidget.text @label
         @attrs["data-dismiss"] = "modal"
-        @divWidget = @formGroupWidget.addDiv "padding-x-15 col-sm-6"
+        @divWidget = @formGroupWidget.addDiv "padding-x-15 col-sm-10"
         @buttonWidget = @divWidget.add "button", "btn btn-sm btn-primary", "", @attrs
 
         @iconWidget = @buttonWidget.add "i", "fa fa-check"
