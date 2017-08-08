@@ -105,3 +105,10 @@ class ViewTable extends View
         @table.groupBy(columnName)
         @resetSize()
         true
+
+    setTitle: (title) =>
+        if @table
+            @table.setTitle title
+            return true
+        else
+            return false
