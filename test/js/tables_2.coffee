@@ -166,11 +166,11 @@ $ ->
 
 		##| set the address as object in data map, to manipulate address field as simple object
 		for key,obj of DataMap.getDataMap().engine.export("zipcode")
-			obj.address = [{city:obj.city,state:obj.state,county:obj.county}]
+			obj.addressArray = [{city:obj.city,state:obj.state,county:obj.county}]
 
 		DataMap.setDataTypes "zipcode", [
 			name    : "Address"
-			source  : "address"
+			source  : "addressArray"
 			visible : true
 			type    : "array"
 			width   : 200
