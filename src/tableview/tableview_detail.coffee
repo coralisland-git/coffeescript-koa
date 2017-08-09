@@ -56,6 +56,33 @@ class TableViewDetailed extends TableView
         @cachedTotalVisibleCols = visColCount
         return visColCount
 
+    getTableMaxVisibleCols: ()=>
+
+        if @cachedMaxTotalVisibleCol? then return @cachedMaxTotalVisibleCol
+
+        visColCount = 0
+        x           = 0
+        colNum      = @getTableTotalCols() - 1
+        maxWidth    = @getTableVisibleWidth()
+
+        #while x < maxWidth and colNum >= 0
+        cn = 0
+        while x < maxWidth and cn <= colNum
+            location =
+                colNum     : cn
+                visibleCol : cn
+
+            if (cn <= colNum) and @shouldSkipCol(location)
+                cn++
+                continue
+
+            x = x + @getColWidth(location)
+            visColCount++
+            cn++
+
+        if visColCount > 0 then @cachedMaxTotalVisibleCol = visColCount
+        return visColCount
+
     getColWidth: (location)=>
         if @showHeaders and location.visibleCol == 0 then return @leftWidth
         if @totalAvailableRows == location.visibleCol
