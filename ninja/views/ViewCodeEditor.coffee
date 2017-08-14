@@ -49,6 +49,10 @@ class ViewCodeEditor extends View
         if @codeEditor? and @popupMode? and typeof @popupMode is "boolean" then @codeEditor.popupMode @popupMode
         this
 
+    setOptions: (@_options)=>
+        if @codeEditor? and @_options then @codeEditor.setOptions @_options
+        this
+
     setContent: (val) =>
 
         if !val
