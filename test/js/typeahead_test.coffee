@@ -1,10 +1,4 @@
 $ ->
-	addTestButton "Loading Zipcodes", "Open", () ->
-		loadZipcodes()
-		.then ()->
-			console.log "Zipcodes data loaded"
-		.catch () ->
-			console.error "error in loading Zipcodes data"
 
 	addTestButton "Typeahead with Tables", "Open", ()->
 		template = '''
@@ -143,28 +137,40 @@ $ ->
 			#     console.log "TableDropdownMenu #2:", val
 
 	addTestButton "Typeahead US Address Autocomplete", "Open", () ->
-		divWrapper = addHolder().addDiv "", ""
+		divWrapper = addHolder().addDiv ""
+		divWrapper.css 'padding', '30px'
 		divWrapper.add "input", "autoAddress"
-		divWrapper.add "input", "lat", "geolat", {type:'text'}
-		divWrapper.add "input", "long", "geolong", {type:'text'}
+		divLat = divWrapper.addDiv "lat"
+		divLat.css 'margin', '15px 0px'
+		lblLat = divLat.add("label")
+		lblLat.text "Latitude"
+		lblLat.css 'width', '75px'
+		divLat.add "input", "lat", "geolat", {type:'text'}
+		divLong = divWrapper.addDiv "long"
+		lblLong = divLong.add("label")
+		lblLong.text "Longitude"
+		lblLong.css 'width', '75px'
+		divLong.add "input", "long", "geolong", {type:'text'}
 
 		# instantiate the bloodhound suggestion engine
 		locations = new Bloodhound({
-		    datumTokenizer: (d) ->
-		        return Bloodhound.tokenizers.whitespace(d.value)
-		    ,
-		    queryTokenizer: Bloodhound.tokenizers.whitespace,
-		    remote: {
-		        url: 'https://maps.googleapis.com/maps/api/geocode/json?address=%QUERY&components=country:GB&sensor=false&region=uk&key=AIzaSyAPOo6di3niunTz_huknmnW-PpTEc9vl_Q',
-		        filter: (locations) -> 
-		            return $.map(locations.results, (location) ->
-		                return {
-		                    value: location.formatted_address,
-		                    geolat: location.geometry.location.lat,
-		                    geolong: location.geometry.location.lng
-		                }
-		            )
-		    }
+			datumTokenizer: (d) ->
+				return Bloodhound.tokenizers.whitespace(d.value)
+			,
+			queryTokenizer: Bloodhound.tokenizers.whitespace,
+			remote: {
+				url: 'https://maps.googleapis.com/maps/api/geocode/json?address=%QUERY&components=country:US&sensor=false&key=AIzaSyAPOo6di3niunTz_huknmnW-PpTEc9vl_Q',
+				wildcard: '%QUERY',
+				filter: (locations) -> 
+					return $.map(locations.results, (location) ->
+						console.log location
+						return {
+							value: location.formatted_address,
+							geolat: location.geometry.location.lat,
+							geolong: location.geometry.location.lng
+						}
+					)
+			}
 		})
 
 		# initialize the bloodhound suggestion engine
@@ -177,19 +183,19 @@ $ ->
 
 		# Initialise typeahead 
 		searchboxTypeahead.typeahead({
-		    highlight: true,
-		    autoselect: true
+			highlight: true,
+			autoselect: true
 		}, {
-		    name: 'value',
-		    displayKey: 'value',
-		    source: locations.ttAdapter()
+			name: 'value',
+			displayKey: 'value',
+			source: locations.ttAdapter()
 		})
 
 		# Set-up event handlers so that the ID is auto-populated when select label 
 		searchboxItemSelectedHandler = (e, datum) ->
-		    geolatTypeahead.val(datum.geolat)
-		    geolongTypeahead.val(datum.geolong)
-		    #locationverifyTypeahead.val(datum.value);
+			geolatTypeahead.val(datum.geolat)
+			geolongTypeahead.val(datum.geolong)
+			#locationverifyTypeahead.val(datum.value);
 
 		searchboxTypeahead.on('typeahead:selected', searchboxItemSelectedHandler)
 		searchboxTypeahead.on('typeahead:autocompleted', searchboxItemSelectedHandler)
