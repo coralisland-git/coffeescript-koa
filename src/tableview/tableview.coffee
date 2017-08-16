@@ -1085,7 +1085,10 @@ class TableView
                     foundInGroup = true
                     break
 
-            if foundInGroup then continue
+            if foundInGroup
+            	continue
+            else
+            	col.isGrouped = false
 
             # console.log "colByNum[#{total}] = ", col.getName()
             @colByNum[total] = col
