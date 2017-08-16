@@ -228,8 +228,8 @@ $ ->
 				callback: (row) =>
 					doPopupView "Form", "Form-Popup", "form-popup", 500, 1000, (view)->
 						for key, value of row
-							view.getForm().addPathField "data-#{key}", theTable, row.id, key
-						view.getForm().addSubmit "submit", "Click this button to submit", "Submit"
+							view.addPathField "data-#{key}", theTable, row.id, key
+						view.addSubmit "submit", "Click this button to submit", "Submit"
 						view.setSubmitFunction (form) =>
 							alert "Form was submitted successfully."
 						view.show()
@@ -257,26 +257,24 @@ $ ->
 		true
 
 	addTestButton "editable popup on click with custom columns", "Open", ()->
-		addHolder("renderTest1");
-		table = new TableView $("#renderTest1")
-		table.addTable "zipcode"
-		table.render()
-		table.updateRowData()
-		_columns = []
-		_columns.push
-			name       : 'State'
-			source     : 'state'
-			type       : 'text'
-			required   : true
-		_columns.push
-			name       : 'County'
-			source     : 'county'
-			type       : 'text'
-			required   : true
-		table.rowCallback = (data,e) ->
-			if data.key
-				new PopupForm('zipcode', 'code', data.key, _columns)
-		true
+		addHolder().setView "Table", (table)->
+			table.addTable "zipcode"
+
+			_columns = []
+			_columns.push
+				name       : 'State'
+				source     : 'state'
+				type       : 'text'
+				required   : true
+			_columns.push
+				name       : 'County'
+				source     : 'county'
+				type       : 'text'
+				required   : true
+			table.rowCallback = (data,e) ->
+				if data.key
+					new PopupForm('zipcode', 'code', data.key, _columns)
+			true
 
 	addTestButton "popup table with array data", "Open", ()->
 		arrayData = [{ "code": "00501", "city": "Holtsville", "state": "NY", "county": "SUFFOLK", "area_code": "", "lat": "40.922326", "lon": "-72.637078" },
@@ -318,12 +316,9 @@ $ ->
 		true
 
 	addTestButton "table with fixed header and scrollable", "Open", ()->
-		addHolder("renderTest1")
-		$('#renderTest1').height(350); ##| to add scroll the height is fix
-		table = new TableView $("#renderTest1")
-		table.addTable "zipcode"
-		table.setFixedHeaderAndScrollable()
-		table.render()
-		table.updateRowData()
+		holder = addHolder()
+		holder.height(350) ##| to add scroll the height is fix
+		holder.setView "Table", (table)->
+			table.loadTable "zipcode"
 		true
 	go()

@@ -53,8 +53,8 @@ $ ->
     ##|  popup window chart test
     ##|
     addTestButton "Column Chart in popup", "Open", ()->
-        doPopupView 'DataChart','Column Chart', 'chart_popup', 1000, 450
-        .then (view) ->
+        doPopupView 'DataChart','Column Chart', 'chart_popup', 1000, 450, (view) ->
+            console.log view
             view.setTitle("Test Title").horizontalAlign = "center"
             view.chartOptions.animationEnabled = true
             view.chartOptions.zoomEnabled = true
