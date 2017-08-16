@@ -1091,7 +1091,10 @@ class TableView
 					foundInGroup = true
 					break
 
-			if foundInGroup then continue
+            if foundInGroup
+            	continue
+            else
+            	col.isGrouped = false
 
 			# console.log "colByNum[#{total}] = ", col.getName()
 			@colByNum[total] = col
@@ -1452,325 +1455,325 @@ class TableView
 		if !@rowDataRaw[location.rowNum]? then return null
 		return @rowDataRaw[location.rowNum].group
 
-	##|
-	##|  Return right/left/center - left is assumed by default
-	getCellAlign: (location)=>
-		if location.cellType == "group"
-			if location.visibleCol == 1 then return "left"
-			return "right"
+    ##|
+    ##|  Return right/left/center - left is assumed by default
+    getCellAlign: (location)=>
+        if location.cellType == "group"
+            if location.visibleCol == 1 then return "left"
+            return "right"
 
-		return @colByNum[location.colNum].getAlign()
+        return @colByNum[location.colNum].getAlign()
 
-	getCellTablename: (location)=>
-		if location.cellType != "data" then return @primaryTableName
-		return @colByNum[location.colNum].tableName
+    getCellTablename: (location)=>
+        if location.cellType != "data" then return @primaryTableName
+        return @colByNum[location.colNum].tableName
 
-	getCellCalculation: (location)->
-		if location.cellType == "invalid" then return null
-		if !@colByNum[location.colNum]? then return null
-		return @colByNum[location.colNum].getIsCalculation()
+    getCellCalculation: (location)->
+        if location.cellType == "invalid" then return null
+        if !@colByNum[location.colNum]? then return null
+        return @colByNum[location.colNum].getIsCalculation()
 
-	getCellSource: (location)=>
-		if location.cellType == "invalid" then return null
-		if !@colByNum[location.colNum]? then return null
-		# console.log "getCell #{location.colNum}", @colByNum[location.colNum].getSource()
-		return @colByNum[location.colNum].getSource()
+    getCellSource: (location)=>
+        if location.cellType == "invalid" then return null
+        if !@colByNum[location.colNum]? then return null
+        # console.log "getCell #{location.colNum}", @colByNum[location.colNum].getSource()
+        return @colByNum[location.colNum].getSource()
 
-	getCellRecordID: (location)=>
-		if !@rowDataRaw[location.rowNum]? then return 0
-		return @rowDataRaw[location.rowNum].id
+    getCellRecordID: (location)=>
+        if !@rowDataRaw[location.rowNum]? then return 0
+        return @rowDataRaw[location.rowNum].id
 
-	getCellFormatterName: (location)=>
-		return @colByNum[location.colNum].getFormatterName()
+    getCellFormatterName: (location)=>
+        return @colByNum[location.colNum].getFormatterName()
 
-	shouldAdvanceCol: (location)=>
-		return true
+    shouldAdvanceCol: (location)=>
+        return true
 
-	getCellDataPath: (location)=>
-		if location.cellType == "data"
-			return "/#{location.tableName}/#{location.recordId}/#{location.sourceName}"
+    getCellDataPath: (location)=>
+        if location.cellType == "data"
+            return "/#{location.tableName}/#{location.recordId}/#{location.sourceName}"
 
-		if location.cellType == "group"
-			return "/group/#{location.rowNum}"
+        if location.cellType == "group"
+            return "/group/#{location.rowNum}"
 
-		return "/unknown/" + location.celltype
-
-	setHeaderFilterField: (location)=>
-
-		if location.cell.children.length == 0
-			location.cell.addClass "dataFilterWrapper"
-			location.cell.add "input", "dataFilter"
-			location.cell.children[0].bind "keyup", @onFilterKeypress
-
-		location.cell.children[0].setDataPath "/#{location.tableName}/Filter/#{location.sourceName}"
-		true
-
-	setHeaderField: (location)=>
-
-		# console.log "Header children=", location.cell.children.length, "current=", location.cell.currentCol, " vs", location.colNum
-		# if location.cell.currentCol == location.colNum
-			# return
-
-		# console.log "Force Redraw Header:", location
-
-		location.cell.currentCol = location.colNum
-		location.cell.html ""
-		location.cell.removeClass "spacer"
-
-		if location.visibleRow == 0
-
-			@colByNum[location.colNum].sort = 0
-			for sort in @sortRules
-				if sort.source == @colByNum[location.colNum].getSource()
-					@colByNum[location.colNum].sort = sort.state
-
-			@colByNum[location.colNum].RenderHeader location.cell, location
-			location.cell.setDataPath "/#{location.tableName}/Header/#{location.sourceName}"
-
-		else
-
-			@setHeaderFilterField(location)
-
-
-		true
-
-	setHeaderGroupField: (location)=>
-		##|
-		##|  Setup the div that is in a header row along left where the group indicator color
-		##|  normally goes.  Headers don't have groups
-		if location.visibleRow == 0
-			location.cell.addClass "tableHeaderField"
-		else if location.visibleRow == 1
-			location.cell.addClass "dataFilterWrapper"
-
-		true
-
-	setDataField: (location)=>
-
-		if location.cellType == "invalid"
-			location.cell.hide()
-			return
-
-		if location.cellType == "group"
-			if location.visibleCol == 1
-				location.cell.html @rowDataRaw[location.rowNum].name
-			else if location.visibleCol == 3
-				location.cell.html ""
-			else if location.visibleCol == 2
-				if @rowDataRaw[location.rowNum].count == 1
-					location.cell.html "#{@rowDataRaw[location.rowNum].count} Record"
-				else
-					location.cell.html "#{@rowDataRaw[location.rowNum].count} Records"
-			return
-
-		col = @colByNum[location.colNum]
-		if col.getSource() == "row_selected"
-
-			if @getRowLocked(@rowDataRaw[location.rowNum].id)
-				location.cell.html "<i class='fa fa-lock'></i>"
-			else if @getRowSelected(@rowDataRaw[location.rowNum].id)
-				location.cell.html @imgChecked
-			else
-				location.cell.html @imgNotChecked
-
-		else
-			displayValue = DataMap.getDataFieldFormatted col.tableName, location.recordId, location.sourceName
-			location.cell.html displayValue
-			colorValue = DataMap.getCellColor col.tableName, location.recordId, location.sourceName
-			if !colorValue? or colorValue is null
-				location.cell.css 'color', ''
-			else
-				location.cell.css 'color', colorValue
-
-		if @lockList? and @lockList.length > 0
-
-
-			aValue = DataMap.getDataField col.tableName, location.recordId, location.sourceName
-			if typeof aValue == "number"
-				bValue = DataMap.getDataField col.tableName, @lockList[0], location.sourceName
-				if aValue > bValue
-					location.cell.addClass "valueHigher"
-					location.cell.removeClass "valueLower"
-				else if aValue < bValue
-					location.cell.addClass "valueLower"
-					location.cell.removeClass "valueHigher"
-				else
-					location.cell.removeClass "valueLower"
-					location.cell.removeClass "valueHigher"
-			else
-				location.cell.removeClass "valueLower"
-				location.cell.removeClass "valueHigher"
-
-		true
-
-	shouldSkipCol: (location)=>
-		if !@colByNum[location.colNum]? then return true
-		return false
-
-	##|
-	##|  Returns a state record for the current row
-	##|  data - Cells of data
-	##|  locked - Cells of header or locked content
-	##|  group - Starting a new group
-	##|  skip - Skip this row
-	##|  invalid - Invalid row
-	##|
-	getRowType: (location)=>
-		if @isHeaderCell(location) then return "locked"
-		if !@rowDataRaw[location.rowNum]? then return "invalid"
-		if @rowDataRaw[location.rowNum]? and @rowDataRaw[location.rowNum].type? then return "group"
-		return "data"
-
-	getCellType: (location)=>
-		if @isHeaderCell(location) then return "locked"
-		if not location.rowNum? or !@rowDataRaw[location.rowNum]? then return "invalid"
-		if !@rowDataRaw[location.rowNum]? then return "invalid"
-		if @rowDataRaw[location.rowNum].type? then return @rowDataRaw[location.rowNum].type
-		return "data"
-
-	isHeaderCell: (location)=>
-		if location.visibleRow == 1 and (@showHeaders and @showFilters) then return true
-		if location.visibleRow == 0 and (@showHeaders or @showFilters) then return true
-		return false
-
-	isResizable: (location)=>
-		if not @showResize then return false
-		if location.visibleRow > 0 then return false
-		if not location.isHeader then return false
-		if @showGroupPadding and location.visibleCol == 0 then return false
-		if location.sourceName == "row_selected" then return false
-		if location.colNum >= location.totalColCount then return false
-		return true
-
-	##|
-	##|  Setup the spacer cell for a location
-	initializeSpacerCell: (location, spacer)=>
-
-		if location.groupNum?
-			spacer.setClassOne "groupRowChart#{location.groupNum}", /^groupRowChart/
-		else
-			spacer.setClassOne null, /^groupRowChart/
-
-		spacer.setDataPath "grab"
-		spacer.setDataValue "rn", location.rowNum
-		spacer.setDataValue "cn", location.colNum
-		spacer.setDataValue "vr", 0
-		spacer.setDataValue "vc", 0
-		true
-
-	updateCellClasses: (location, div)=>
-
-		div.show()
-
-		##|
-		##|  Set the column / row data on the element
-		div.setDataValue "rn", location.rowNum
-		div.setDataValue "cn", location.colNum
-		div.setDataValue "vr", location.visibleRow
-		div.setDataValue "vc", location.visibleCol
-
-		if location.groupNum?
-			div.setClassOne "groupRowChart#{location.groupNum}", /^groupRowChart/
-		else
-			div.setClassOne null, /^groupRowChart/
-
-		##|
-		##|  Align right/center as left is the default
-		location.cell.setClass "even", @getCellStriped(location)
-		location.cell.setClass "first-action", false
-
-		##|
-		##|  Apply alignment to the cell
-		location.align = @getCellAlign(location)
-		location.cell.setClass "text-right", (location.align == "right")
-		location.cell.setClass "text-center", (location.align == "center")
-
-		##|
-		##|  Fixed calculation
-		location.cell.setClass "calculation", @getCellCalculation(location)
-
-		true
-
-	incrementColumn: (location, showSpacer)=>
-
-		if location.x + location.colWidth > location.maxWidth
-			location.colWidth = location.maxWidth - location.x
-
-		# if (location.cellType == "data" or location.cellType == "locked") and location.colNum + 1 == location.totalColCount
-		# 	location.colWidth = location.maxWidth - location.x
-
-		if location.spacer?
-
-			location.cell.move location.x, 0, location.colWidth-3, location.rowHeight
-			location.spacer.move location.colWidth+location.x-3, 0, 3, location.rowHeight
-			location.spacer.show()
-			location.spacer.addClass "spacer"
-			location.spacer.html ""
-			location.shadowVisibleCol++
-
-		else
-
-			location.cell.move location.x, 0, location.colWidth, location.rowHeight
-
-		location.x += location.colWidth
-		location.shadowVisibleCol++
-		location.visibleCol++
-
-		true
-
-	updateVisibleActionRowText: (location, acol, cell)=>
-
-		location.tableName = acol.tableName
-		location.sourceName = acol.getSource()
-
-		cell.setClass "clickable", acol.getClickable()
-		if acol.render?
-			try
-				# console.log "[#{location.tableName}][#{location.recordId}][#{location.sourceName}]"
-				currentValue = DataMap.getDataField location.tableName, location.recordId, location.sourceName
-				displayValue = acol.render(currentValue, location.tableName, location.sourceName, location.recordId)
-			catch e
-				console.log "updateVisibleActionRow locaiton=", location
-				console.log "Custom render error:", e
-				displayValue = ""
-
-			cell.html displayValue
-		else
-			displayValue = DataMap.getDataFieldFormatted acol.tableName, location.recordId, acol.getSource()
-			cell.html displayValue
-
-		true
-
-	updateVisibleActionRow: (location)=>
-
-		count = 0
-		for acol in @actionColList
-
-			if @shadowCells[location.visibleRow].children.length <= location.shadowVisibleCol
-				@shadowCells[location.visibleRow].addDiv "cell"
-				@shadowCells[location.visibleRow].children[location.shadowVisibleCol].setAbsolute()
-
-			cell = @shadowCells[location.visibleRow].children[location.shadowVisibleCol]
-			cell.show()
-
-			cell.move location.x, 0, acol.getWidth(), location.rowHeight
-
-			cell.setClass "text-right", acol.getAlign() == "right"
-			cell.setClass "text-center", acol.getAlign() == "center"
-			cell.setClass "first-action", count++ == 0
-
-			cell.removeClass "spacer"
-			cell.setClass "even", @getCellStriped(location)
-
-			cell.setDataValue "rn", location.rowNum
-			cell.setDataValue "cn", location.colNum
-			cell.setDataValue "vr", location.visibleRow
-			cell.setDataValue "vc", location.visibleCol
-			cell.setDataValue "action", acol.getSource()
-			if location.isHeader
-				cell.setDataPath "/#{@primaryTableName}/Header/#{acol.getSource()}"	
-			else
-				cell.setDataPath "/#{@primaryTableName}/#{location.recordId}/#{acol.getSource()}"
+        return "/unknown/" + location.celltype
+
+    setHeaderFilterField: (location)=>
+
+        if location.cell.children.length == 0
+            location.cell.addClass "dataFilterWrapper"
+            location.cell.add "input", "dataFilter"
+            location.cell.children[0].bind "keyup", @onFilterKeypress
+
+        location.cell.children[0].setDataPath "/#{location.tableName}/Filter/#{location.sourceName}"
+        true
+
+    setHeaderField: (location)=>
+
+        # console.log "Header children=", location.cell.children.length, "current=", location.cell.currentCol, " vs", location.colNum
+        # if location.cell.currentCol == location.colNum
+            # return
+
+        # console.log "Force Redraw Header:", location
+
+        location.cell.currentCol = location.colNum
+        location.cell.html ""
+        location.cell.removeClass "spacer"
+
+        if location.visibleRow == 0
+
+            @colByNum[location.colNum].sort = 0
+            for sort in @sortRules
+                if sort.source == @colByNum[location.colNum].getSource()
+                    @colByNum[location.colNum].sort = sort.state
+
+            @colByNum[location.colNum].RenderHeader location.cell, location
+            location.cell.setDataPath "/#{location.tableName}/Header/#{location.sourceName}"
+
+        else
+
+            @setHeaderFilterField(location)
+
+
+        true
+
+    setHeaderGroupField: (location)=>
+        ##|
+        ##|  Setup the div that is in a header row along left where the group indicator color
+        ##|  normally goes.  Headers don't have groups
+        if location.visibleRow == 0
+            location.cell.addClass "tableHeaderField"
+        else if location.visibleRow == 1
+            location.cell.addClass "dataFilterWrapper"
+
+        true
+
+    setDataField: (location)=>
+
+        if location.cellType == "invalid"
+            location.cell.hide()
+            return
+
+        if location.cellType == "group"
+            if location.visibleCol == 1
+                location.cell.html @rowDataRaw[location.rowNum].name
+            else if location.visibleCol == 3
+                location.cell.html ""
+            else if location.visibleCol == 2
+                if @rowDataRaw[location.rowNum].count == 1
+                    location.cell.html "#{@rowDataRaw[location.rowNum].count} Record"
+                else
+                    location.cell.html "#{@rowDataRaw[location.rowNum].count} Records"
+            return
+
+        col = @colByNum[location.colNum]
+        if col.getSource() == "row_selected"
+
+            if @getRowLocked(@rowDataRaw[location.rowNum].id)
+                location.cell.html "<i class='fa fa-lock'></i>"
+            else if @getRowSelected(@rowDataRaw[location.rowNum].id)
+                location.cell.html @imgChecked
+            else
+                location.cell.html @imgNotChecked
+
+        else
+            displayValue = DataMap.getDataFieldFormatted col.tableName, location.recordId, location.sourceName
+            location.cell.html displayValue
+            colorValue = DataMap.getCellColor col.tableName, location.recordId, location.sourceName
+            if !colorValue? or colorValue is null
+                location.cell.css 'color', ''
+            else
+                location.cell.css 'color', colorValue
+
+        if @lockList? and @lockList.length > 0
+
+
+            aValue = DataMap.getDataField col.tableName, location.recordId, location.sourceName
+            if typeof aValue == "number"
+                bValue = DataMap.getDataField col.tableName, @lockList[0], location.sourceName
+                if aValue > bValue
+                    location.cell.addClass "valueHigher"
+                    location.cell.removeClass "valueLower"
+                else if aValue < bValue
+                    location.cell.addClass "valueLower"
+                    location.cell.removeClass "valueHigher"
+                else
+                    location.cell.removeClass "valueLower"
+                    location.cell.removeClass "valueHigher"
+            else
+                location.cell.removeClass "valueLower"
+                location.cell.removeClass "valueHigher"
+
+        true
+
+    shouldSkipCol: (location)=>
+        if !@colByNum[location.colNum]? then return true
+        return false
+
+    ##|
+    ##|  Returns a state record for the current row
+    ##|  data - Cells of data
+    ##|  locked - Cells of header or locked content
+    ##|  group - Starting a new group
+    ##|  skip - Skip this row
+    ##|  invalid - Invalid row
+    ##|
+    getRowType: (location)=>
+        if @isHeaderCell(location) then return "locked"
+        if !@rowDataRaw[location.rowNum]? then return "invalid"
+        if @rowDataRaw[location.rowNum]? and @rowDataRaw[location.rowNum].type? then return "group"
+        return "data"
+
+    getCellType: (location)=>
+        if @isHeaderCell(location) then return "locked"
+        if not location.rowNum? or !@rowDataRaw[location.rowNum]? then return "invalid"
+        if !@rowDataRaw[location.rowNum]? then return "invalid"
+        if @rowDataRaw[location.rowNum].type? then return @rowDataRaw[location.rowNum].type
+        return "data"
+
+    isHeaderCell: (location)=>
+        if location.visibleRow == 1 and (@showHeaders and @showFilters) then return true
+        if location.visibleRow == 0 and (@showHeaders or @showFilters) then return true
+        return false
+
+    isResizable: (location)=>
+        if not @showResize then return false
+        if location.visibleRow > 0 then return false
+        if not location.isHeader then return false
+        if @showGroupPadding and location.visibleCol == 0 then return false
+        if location.sourceName == "row_selected" then return false
+        if location.colNum >= location.totalColCount then return false
+        return true
+
+    ##|
+    ##|  Setup the spacer cell for a location
+    initializeSpacerCell: (location, spacer)=>
+
+        if location.groupNum?
+            spacer.setClassOne "groupRowChart#{location.groupNum}", /^groupRowChart/
+        else
+            spacer.setClassOne null, /^groupRowChart/
+
+        spacer.setDataPath "grab"
+        spacer.setDataValue "rn", location.rowNum
+        spacer.setDataValue "cn", location.colNum
+        spacer.setDataValue "vr", 0
+        spacer.setDataValue "vc", 0
+        true
+
+    updateCellClasses: (location, div)=>
+
+        div.show()
+
+        ##|
+        ##|  Set the column / row data on the element
+        div.setDataValue "rn", location.rowNum
+        div.setDataValue "cn", location.colNum
+        div.setDataValue "vr", location.visibleRow
+        div.setDataValue "vc", location.visibleCol
+
+        if location.groupNum?
+            div.setClassOne "groupRowChart#{location.groupNum}", /^groupRowChart/
+        else
+            div.setClassOne null, /^groupRowChart/
+
+        ##|
+        ##|  Align right/center as left is the default
+        location.cell.setClass "even", @getCellStriped(location)
+        location.cell.setClass "first-action", false
+
+        ##|
+        ##|  Apply alignment to the cell
+        location.align = @getCellAlign(location)
+        location.cell.setClass "text-right", (location.align == "right")
+        location.cell.setClass "text-center", (location.align == "center")
+
+        ##|
+        ##|  Fixed calculation
+        location.cell.setClass "calculation", @getCellCalculation(location)
+
+        true
+
+    incrementColumn: (location, showSpacer)=>
+
+        if location.x + location.colWidth > location.maxWidth
+            location.colWidth = location.maxWidth - location.x
+
+        # if (location.cellType == "data" or location.cellType == "locked") and location.colNum + 1 == location.totalColCount
+        # 	location.colWidth = location.maxWidth - location.x
+
+        if location.spacer?
+
+            location.cell.move location.x, 0, location.colWidth-3, location.rowHeight
+            location.spacer.move location.colWidth+location.x-3, 0, 3, location.rowHeight
+            location.spacer.show()
+            location.spacer.addClass "spacer"
+            location.spacer.html ""
+            location.shadowVisibleCol++
+
+        else
+
+            location.cell.move location.x, 0, location.colWidth, location.rowHeight
+
+        location.x += location.colWidth
+        location.shadowVisibleCol++
+        location.visibleCol++
+
+        true
+
+    updateVisibleActionRowText: (location, acol, cell)=>
+
+        location.tableName = acol.tableName
+        location.sourceName = acol.getSource()
+
+        cell.setClass "clickable", acol.getClickable()
+        if acol.render?
+            try
+                # console.log "[#{location.tableName}][#{location.recordId}][#{location.sourceName}]"
+                currentValue = DataMap.getDataField location.tableName, location.recordId, location.sourceName
+                displayValue = acol.render(currentValue, location.tableName, location.sourceName, location.recordId)
+            catch e
+                console.log "updateVisibleActionRow locaiton=", location
+                console.log "Custom render error:", e
+                displayValue = ""
+
+            cell.html displayValue
+        else
+            displayValue = DataMap.getDataFieldFormatted acol.tableName, location.recordId, acol.getSource()
+            cell.html displayValue
+
+        true
+
+    updateVisibleActionRow: (location)=>
+
+        count = 0
+        for acol in @actionColList
+
+            if @shadowCells[location.visibleRow].children.length <= location.shadowVisibleCol
+                @shadowCells[location.visibleRow].addDiv "cell"
+                @shadowCells[location.visibleRow].children[location.shadowVisibleCol].setAbsolute()
+
+            cell = @shadowCells[location.visibleRow].children[location.shadowVisibleCol]
+            cell.show()
+
+            cell.move location.x, 0, acol.getWidth(), location.rowHeight
+
+            cell.setClass "text-right", acol.getAlign() == "right"
+            cell.setClass "text-center", acol.getAlign() == "center"
+            cell.setClass "first-action", count++ == 0
+
+            cell.removeClass "spacer"
+            cell.setClass "even", @getCellStriped(location)
+
+            cell.setDataValue "rn", location.rowNum
+            cell.setDataValue "cn", location.colNum
+            cell.setDataValue "vr", location.visibleRow
+            cell.setDataValue "vc", location.visibleCol
+            cell.setDataValue "action", acol.getSource()
+            if location.isHeader
+                cell.setDataPath "/#{@primaryTableName}/Header/#{acol.getSource()}"	
+            else
+                cell.setDataPath "/#{@primaryTableName}/#{location.recordId}/#{acol.getSource()}"
 
 			if location.groupNum?
 				cell.setClassOne "groupRowChart#{location.groupNum}", /^groupRowChart/
