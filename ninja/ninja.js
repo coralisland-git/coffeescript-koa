@@ -72447,6 +72447,8 @@ TableView = (function() {
       }
       if (foundInGroup) {
         continue;
+      } else {
+        col.isGrouped = false;
       }
       this.colByNum[total] = col;
       total++;
