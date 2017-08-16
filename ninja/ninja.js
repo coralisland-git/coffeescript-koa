@@ -67582,6 +67582,9 @@ DataMap = (function() {
     var dm, doc, path, value, varName;
     path = "/" + tableName + "/" + keyValue;
     dm = DataMap.getDataMap();
+    if (dm.types[tableName] == null) {
+      dm.types[tableName] = new DataSetConfig.Table(tableName);
+    }
     doc = dm.engine.set(path, newData);
     for (varName in newData) {
       value = newData[varName];
@@ -67635,7 +67638,9 @@ DataMap = (function() {
     if (dm.types[tableName] == null) {
       dm.types[tableName] = new DataSetConfig.Table(tableName);
     }
-    updated = dm.setDataTypesFromSingleObject(tableName, newData);
+    if (typeof newData === "object") {
+      updated = dm.setDataTypesFromSingleObject(tableName, newData);
+    }
     for (varName in newData) {
       value = newData[varName];
       delete dm.cachedFormat["/" + tableName + "/" + keyValue + "/" + varName];
@@ -67715,6 +67720,39 @@ DataMap = (function() {
     colorFunction = column.getColorFunction();
     colorValue = colorFunction(value, keyValue, rowData);
     return colorValue;
+  };
+
+  DataMap.refreshTempTable = function(tableName, data, isArray) {
+    var i, id, j, len, rec, tableUpdated;
+    tableUpdated = false;
+    i = 0;
+    if (!isArray) {
+      DataMap.removeTableData(tableName);
+      for (id in data) {
+        rec = data[id];
+        if (typeof rec !== "object") {
+          DataMap.addDataUpdateTable(tableName, data.id || i++, data);
+          tableUpdated = true;
+          break;
+        }
+      }
+      if (tableUpdated === false) {
+        return DataMap.importDataFromObjects(tableName, data);
+      }
+    } else {
+      DataMap.removeTableData(tableName);
+      for (id = j = 0, len = data.length; j < len; id = ++j) {
+        rec = data[id];
+        if (typeof rec !== "object") {
+          DataMap.addDataUpdateTable(tableName, i++, data);
+          tableUpdated = true;
+          break;
+        }
+      }
+      if (tableUpdated === false) {
+        return DataMap.importDataFromObjects(tableName, data);
+      }
+    }
   };
 
   return DataMap;
@@ -71053,7 +71091,7 @@ NinjaContainer = (function() {
   return NinjaContainer;
 
 })();
-var DataSetConfig, PopupViews, Screens, Scripts, StyleManager, Views, activateCurrentScreen, doLoadDependencies, doLoadScreen, doLoadView, doPopupTableView, doPopupView, doPopupViewOnce, doReplaceScreenContent, doShowScreen, globalDataFormatter, globalWindowManager, registerStyleSheet, showScreen;
+var DataSetConfig, PopupViews, Screens, Scripts, StyleManager, Views, activateCurrentScreen, doLoadDependencies, doLoadScreen, doLoadView, doPopupTableView, doPopupView, doPopupViewOnce, doReplaceScreenContent, doShowScreen, globalDataFormatter, globalWindowManager, registerStyleSheet, removePopupView, showScreen;
 
 DataSetConfig = require('edgecommondatasetconfig');
 
@@ -71183,19 +71221,12 @@ doPopupTableView = function(data, title, settingsName, w, h) {
     } else if (typeof data === 'object') {
       vertical = true;
     }
-    return doPopupView('PopupTable', title, settingsName, w, h, function(view) {
-      var id, rec;
+    return doPopupView('Table', title, settingsName, w, h, function(view) {
       if (vertical === true) {
-        DataMap.removeTableData(table_name);
-        DataMap.importDataFromObjects(table_name, data);
-        view.loadTable(table_name, vertical);
-      } else {
-        for (id in data) {
-          rec = data[id];
-          DataMap.addDataUpdateTable(table_name, id, rec);
-        }
-        view.loadTable(table_name, vertical);
+        view.setDetailed();
       }
+      DataMap.refreshTempTable(table_name, data, !vertical);
+      view.loadTable(table_name);
       return resolve(view);
     });
   });
@@ -71219,6 +71250,16 @@ doPopupViewOnce = function(viewName, title, settingsName, w, h, tabName, callbac
     return true;
   });
 };
+
+removePopupView = (function(_this) {
+  return function(popupViewName) {
+    var ref;
+    if ((ref = PopupViews[popupViewName]) != null) {
+      ref.destroy();
+    }
+    return PopupViews[popupViewName] = null;
+  };
+})(this);
 
 doLoadScreen = function(screenName, optionalArgs) {
   return new Promise(function(resolve, reject) {
