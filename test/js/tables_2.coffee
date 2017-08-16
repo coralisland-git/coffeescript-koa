@@ -162,6 +162,45 @@ $ ->
 		addHolder().setView "Table", (table)->
 			table.addTable "zipcode"
 
+	addTestButton "simple array data type test", "Open", ()->
+
+		##| set the address as object in data map, to manipulate address field as simple object
+		for key,obj of DataMap.getDataMap().engine.export("zipcode")
+			obj.addressArray = [{city:obj.city,state:obj.state,county:obj.county}]
+
+		DataMap.setDataTypes "zipcode", [
+			name    : "Address"
+			source  : "addressArray"
+			visible : true
+			type    : "array"
+			width   : 200
+		]
+
+		addHolder().setView "Table", (table)->
+			table.addTable "zipcode"
+
+	addTestButton "complicated array data type test", "Open", ()->
+
+		##| set the address as object in data map, to manipulate address field as simple object
+		for key,obj of DataMap.getDataMap().engine.export("zipcode")
+			obj.address = [{ "code": "00501", "city": "Holtsville", "state": "NY", "county": "SUFFOLK", "lat": "40.922326", "lon": "-72.637078", "arrayData": [1,2,3] },
+	        		{"code": "00544", "city": "Holtsville", "state": "NY", "county": "SUFFOLK", "lat": "40.922326", "lon": "-72.637078", "arrayData": [1,2,3] },
+	        		{"code": "01001", "city": "Agawam", "state": "MA", "county": "HAMPDEN", "lat": "42.140549", "lon": "-72.788661", "arrayData": [1,2,3] },
+			        {"code": "01002", "city": "Amherst", "state": "MA", "county": "HAMPSHIRE", "lat": "42.367092", "lon": "-72.464571", "arrayData": [1,2,3] },
+	        		{"code": "01003", "city": "Amherst", "state": "MA", "county": "HAMPSHIRE", "lat": "42.369562", "lon": "-72.63599", "arrayData": [1,2,3] },
+	        		{"code": "01004", "city": "Amherst", "state": "MA", "county": "HAMPSHIRE", "lat": "42.384494", "lon": "-72.513183", "arrayData": [1,2,3]}]
+
+		DataMap.setDataTypes "zipcode", [
+			name    : "Address"
+			source  : "address"
+			visible : true
+			type    : "array"
+			width   : 200
+		]
+
+		addHolder().setView "Table", (table)->
+			table.addTable "zipcode"
+
 	addTestButton "Locked Column Sorting", "Open", ()->		
 		theTable = "mlsactive"
 		for id, newData of Data
@@ -247,6 +286,21 @@ $ ->
 
 		doPopupTableView arrayData , "Show Table With Array", "showTableClasses", 800, 400
 		.then (view) ->
+			console.log "Table With Array data"
+
+		true
+
+	addTestButton "popup table with complicated array data", "Open", ()->
+		arrayData = [{ "code": "00501", "city": "Holtsville", "state": "NY", "county": "SUFFOLK", "lat": "40.922326", "lon": "-72.637078", "arrayData": [1,2,3] },
+	        		{"code": "00544", "city": "Holtsville", "state": "NY", "county": "SUFFOLK", "lat": "40.922326", "lon": "-72.637078", "arrayData": [1,2,3] },
+	        		{"code": "01001", "city": "Agawam", "state": "MA", "county": "HAMPDEN", "lat": "42.140549", "lon": "-72.788661", "arrayData": [1,2,3] },
+			        {"code": "01002", "city": "Amherst", "state": "MA", "county": "HAMPSHIRE", "lat": "42.367092", "lon": "-72.464571", "arrayData": [1,2,3] },
+	        		{"code": "01003", "city": "Amherst", "state": "MA", "county": "HAMPSHIRE", "lat": "42.369562", "lon": "-72.63599", "arrayData": [1,2,3] },
+	        		{"code": "01004", "city": "Amherst", "state": "MA", "county": "HAMPSHIRE", "lat": "42.384494", "lon": "-72.513183", "arrayData": [1,2,3]}]
+
+		doPopupTableView arrayData , "Show Table With Array", "showTableClasses", 800, 400
+		.then (view) ->
+			console.log "Table With Array data"
 
 		true
 
@@ -258,7 +312,7 @@ $ ->
 
 		doPopupTableView objectData , "Show Table With Object", "showTableClasses", 800, 400
 		.then (view) ->
-
+			console.log "Table with object data"
 		true
 
 	addTestButton "table with fixed header and scrollable", "Open", ()->
