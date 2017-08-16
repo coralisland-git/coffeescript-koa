@@ -1319,6 +1319,11 @@ span#ruler {
   color: #b74f39;
   background-color: #fbf0ee;
 }
+.tableview .table-title {
+  background-color: #d3d3d3;
+  border-top: 1px solid #d6d6d6;
+  border-bottom: 1px solid #d6d6d6;
+}
 input.dataFilter:focus {
   border: 0px;
   background-color: #f6fff6;
