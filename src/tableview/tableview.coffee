@@ -798,7 +798,7 @@ class TableView
 		for index, col of @colByNum
 			if col.getSource() == source
 
-				popupMenu = new PopupMenu "#{col.getName()}", coords.x-150, coords.y
+				popupMenu = new PopupMenu "#{col.getName()}", coords.x, coords.y
 				popupMenu.addItem "Hide column", (e, source)=>
 					DataMap.changeColumnAttribute @primaryTableName, source, "visible", false
 					# @setCustomVisible(source, false)
