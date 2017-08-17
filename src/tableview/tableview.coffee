@@ -753,7 +753,7 @@ class TableView
 
 				m.getForm().addTextInput "input1", "Name", col.getName()
 				m.getForm().onSubmit = (form) =>
-					DataMap.changeColumnAttribute @primaryTableName, source, "name", form.input1
+					DataMap.changeColumnAttribute @primaryTableName, source, "name", form.input1.value
 					@updateVisibleText()
 					m.hide()
 
