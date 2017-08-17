@@ -11,8 +11,8 @@ $ ->
         DataMap.setDataTypesFromObject "results", Data
         DataMap.importDataFromObjects "results", Data
 
-        addHolder().setView "Table", (table)->
-            table.addTable "results"
+        addHolder().setView "Table", (tableView)->
+            table = tableView.addTable "results"
             table.setColumnFilterAsPopup "T197_UNT_PAK_ID"
             table.setColumnFilterAsPopup "T026_VEL_ID"
             table.setColumnFilterAsPopup "T231_ITM_STS_CD"
