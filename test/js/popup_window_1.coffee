@@ -146,11 +146,10 @@ $ ->
 
 	addTestButton "PopupViewOnce 2 Form", "Open", (e) ->	
 		doPopupViewOnce "Form", "Test2", "test2_form-popup", 399, 300, "Tab1", (view, tabText) ->
-			view.init()
-			view.getForm().addTextInput "input1", "Example Input 1"
-			view.getForm().addTextInput "input2", "Example Input 2"
-			view.getForm().addSubmit "submit", "Click this button to submit", "Submit"
-			view.getForm().onSubmit = (form) =>
+			view.addTextInput "input1", "Example Input 1"
+			view.addTextInput "input2", "Example Input 2"
+			view.addSubmit "submit", "Click this button to submit", "Submit"
+			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
 			view.show()
 
