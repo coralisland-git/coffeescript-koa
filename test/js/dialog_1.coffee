@@ -90,15 +90,10 @@ $ ->
 			title:        "Form Title"
 			ok:           "Go"
 
-		viewContainer = m.getViewContainer()
-		viewContainer.setSize 600, 80
-		viewContainer.setAbsolute()
-		viewContainer.setView "Form", (view)->
-			view.addTextInput "input1", "Example Input 1"
-			view.setSubmitFunction (form) =>
-				console.log "Submitted form, test value=", form.input1
-				m.hide()
-			view.show()
+		m.getForm().addTextInput "input1", "Example Input 1"
+		m.getForm().onSubmit = (form) =>
+			console.log "Submitted form, test value=", form.input1
+			m.hide()
 			#view.setSize 400, 100
 			console.log "model-view size: ", view.width(), view.height()
 		m.show()
@@ -172,7 +167,7 @@ $ ->
 			title:        "Form Title"
 			ok:           "Go"
 
-		m.getBody().setView "Form", (view)->
+		m.setFormView (view)->
 			view.addTextInput "input1", "Example Input 1"
 			view.addTextInput "input2", "Example Input 2"
 			view.addTextInput "input3", "Example Input 3"
@@ -182,6 +177,8 @@ $ ->
 				console.log "Submitted form, test value 2=", form.input2
 				console.log "Submitted form, test value 3=", form.input3
 				m.hide()
+			console.log "FormView created"
+			view.show()
 
 		m.onButton2 = (e, fields) ->
 			console.log "FIELDS=", fields
