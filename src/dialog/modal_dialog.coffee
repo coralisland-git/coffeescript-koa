@@ -99,9 +99,9 @@ class ModalDialog
 	##
 	createModal: ()=>
 		@modalContainer = new WidgetTag "div", "modal", "modal#{@gid}", 
-			"tabindex" : 		"-1"
-			"role" : 			"dialog"
-			"aria-hidden" : 	"true"
+			"tabindex" 		: 	"-1"
+			"role" 			: 	"dialog"
+			"aria-hidden" 	: 	"true"
 		@modalContainer.css "display", "none"
 		@modalWrapper = @modalContainer.addDiv("modal-dialog").addDiv("modal-content")
 		@header = @modalWrapper.addDiv "modal-header bg-primary"
@@ -198,9 +198,9 @@ class ModalDialog
 		@modal = $("#modal#{@gid}")
 
 		@modal_body = @modal.find(".modal-body")
-		###if @formWrapper?		
-			@modal_body.append @formWrapper.getContent()
-			@formWrapper.show()###
+		if @formWrapper?		
+			@viewContainer.append @formWrapper.getContent()
+			@formWrapper.show()
 
 		@modal.modal(options)
 		@modal.on "hidden.bs.modal", () =>
