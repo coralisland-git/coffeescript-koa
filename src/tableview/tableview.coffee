@@ -839,7 +839,7 @@ class TableView
 						, source
 
 		if popupMenu == null
-			popupMenu = new PopupMenu "Unknown #{source}", coords.x-150, coords.y
+			popupMenu = new PopupMenu "Unknown #{source}", coords.x, coords.y
 
 		##|
 		##|  Make a list of hidden columns that we can offer to unhide
