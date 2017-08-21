@@ -84,14 +84,48 @@ class ModalDialog
 			</div>
 		'''
 
+
 		##
 		##  Possibly overwrite default options
 		if typeof options == "object"
 			for name, val of options
 				this[name] = val
-
+		@createModal()
 		if @showOnCreate
 			@show()
+
+	## --gao
+	## function to create Modal Dialog based on Widget
+	##
+	createModal: ()=>
+		@modalContainer = new WidgetTag "div", "modal", "modal#{@gid}", 
+			"tabindex" 		: 	"-1"
+			"role" 			: 	"dialog"
+			"aria-hidden" 	: 	"true"
+		@modalContainer.css "display", "none"
+		@modalWrapper = @modalContainer.addDiv("modal-dialog").addDiv("modal-content")
+		@header = @modalWrapper.addDiv "modal-header bg-primary"
+		@buttonInHeader = @header.add "button", "close", "button-#{@gid}", 
+			"data-dismiss" : 	"modal"
+			"aria-label"   :	"Close"
+		@spanInButton = @buttonInHeader.add("span", "", "", {"aria-hidden": "true"}).getTag().html '&times;'
+		@header.add("h4", "modal-title").text("#{@title}")
+		@body = @modalWrapper.addDiv "modal-body"
+		@body.add("p").text "#{@content}"
+		@viewContainer = @getBody().addDiv "modal-view", "modal-view#{@gid}"
+		if @showFooter
+			@footer = @modalWrapper.addDiv "modal-footer"
+			if @close
+				@button1 = @footer.add "button", "btn btn-sm btn-default btn1", "button1-#{@gid}", 
+					"type" 			:	"button"
+					"data-dismiss" 	: 	"modal"
+				.text "#{@close}"
+			if @ok
+				@button2 = @footer.add "button", "btn btn-sm btn-default btn1", "button2-#{@gid}", 
+					"type" 			:	"button"
+					"data-dismiss" 	: 	"modal"
+				@button2.add "i", "fa fa-check"
+				@button2.add("span").text " #{@ok}"
 
 	## -------------------------------------------------------------------------------------------------------------
 	## function to execute on the close of the modal
@@ -135,6 +169,17 @@ class ModalDialog
 	hide: () =>
 		@modal.modal('hide')
 
+	## --gao
+	## function to get modal body
+	##
+	getBody: ()=>
+		@body
+
+	## --gao
+	## functioin to get container for view
+	##
+	getViewContainer: ()=>
+		@viewContainer
 	## -------------------------------------------------------------------------------------------------------------
 	## function to show the modal
 	##
@@ -146,14 +191,15 @@ class ModalDialog
 #		if @formWrapper?
 #			@content += @formWrapper.getContent()
 
-		html = @template(this)
-		$("body").append html
+		#html = @template(this)
+
+		$("body").append @modalContainer.getTag()
 
 		@modal = $("#modal#{@gid}")
 
 		@modal_body = @modal.find(".modal-body")
 		if @formWrapper?		
-			@modal_body.append @formWrapper.getContent()
+			@viewContainer.append @formWrapper.getContent()
 			@formWrapper.show()
 
 		@modal.modal(options)
@@ -192,11 +238,3 @@ class ModalDialog
 			@modal.css
 				'margin-top' : () =>
 					Math.max(0, ($(window).scrollTop() + ($(window).height() - @modal.height()) / 2 ))
-
-###		if @formWrapper?
-			setTimeout ()=>
-				@formWrapper.onAfterShow()
-			, 10
-###
-
-

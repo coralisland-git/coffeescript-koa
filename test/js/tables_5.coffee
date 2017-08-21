@@ -11,17 +11,16 @@ $ ->
         , timeValue
 
     timerTest = ()->
-        return
-
+        #return
         counter = 0
         setInterval ()->
             counter++
 
-            displayValue = DataMap.getDataFieldFormatted "zipcode", 1001, "city"
-            value = DataMap.getDataField "zipcode", 1001, "city"
+            displayValue = DataMap.getDataFieldFormatted "zipcode", '01001', "city"
+            value = DataMap.getDataField "zipcode", '01001', "city"
             console.log "display=", displayValue, " actual=", value
 
-            DataMap.getDataMap().updatePathValueEvent "/zipcode/1001/city", "Test#{counter}"
+            DataMap.getDataMap().updatePathValueEvent "/zipcode/01001/city", "Test#{counter}"
             console.log "Setting /zipcode/01001/city", counter
 
         , 1000
@@ -48,6 +47,5 @@ $ ->
                 table.setAutoFillWidth()
                 table.groupBy("county")
                 timerTest()
-                table.render()
             true
         go()
