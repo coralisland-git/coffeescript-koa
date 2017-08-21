@@ -142,18 +142,12 @@ doPopupTableView = (data, title, settingsName, w, h) ->
             vertical = false
         else if typeof data == 'object'
             vertical = true
-            
 
-        doPopupView 'PopupTable', title, settingsName, w, h, (view)->
+        doPopupView 'Table', title, settingsName, w, h, (view)->
             if vertical == true
-                DataMap.removeTableData table_name
-                DataMap.importDataFromObjects table_name, data    
-                view.loadTable table_name, vertical
-            else
-                for id, rec of data
-                    DataMap.addDataUpdateTable table_name, id, rec
-                view.loadTable table_name, vertical
-
+                view.setDetailed()
+            DataMap.refreshTempTable table_name, data, !vertical
+            view.loadTable table_name
             resolve view
 
 ## - xg
@@ -176,6 +170,11 @@ doPopupViewOnce = (viewName, title, settingsName, w, h, tabName, callbackWithVie
         PopupViews[title].view.show "tab#{PopupViews[title].tabNames.indexOf(tabName)}"
         true
 
+removePopupView = (popupViewName) =>
+    PopupViews[popupViewName]?.destroy()
+    PopupViews[popupViewName] = null
+
+
 doLoadScreen = (screenName, optionalArgs) ->
 
     new Promise (resolve, reject) ->
@@ -197,16 +196,22 @@ doLoadScreen = (screenName, optionalArgs) ->
 
 showScreen = (screenName, optionalArgs) ->
 
-    className = "Screen#{screenName}"
-    if not Screens[screenName] and typeof window[className] isnt "function"
+    new Promise (resolve, reject)->
 
-        doLoadScreen screenName, optionalArgs
-        .then (loaded)->
+        className = "Screen#{screenName}"
+        if not Screens[screenName] and typeof window[className] isnt "function"
+
+            doLoadScreen screenName, optionalArgs
+            .then (loaded)->
+                doShowScreen(screenName, optionalArgs)
+            .then ()->
+                resolve(Screens[screenName])
+
+        else
+
             doShowScreen(screenName, optionalArgs)
-
-    else
-
-        doShowScreen(screenName, optionalArgs)
+            .then ()->
+                resolve(Screens[screenName])
 
 doShowScreen = (screenName, optionalArgs) ->
 
@@ -253,48 +258,48 @@ doShowScreen = (screenName, optionalArgs) ->
         $(Screens.current.classid).hide()
 
     Screens.current = Screens[screenName];
-    activateCurrentScreen(optionalArgs, screenName);
-    return
+    return activateCurrentScreen(optionalArgs, screenName);
 
 activateCurrentScreen = (optionalArgs, screenName) ->
 
-    ##
-    ## The screens are setup such that the buttons and other events are not
-    ## initialized until the screen is shown the first time.  This allows rarely used
-    ## screens to initialize later and makes the app startup faster.
-    if not Screens.current.initialized
-        Screens.current.onSetupButtons()
-        Screens.current.initialized = true
+    return new Promise (resolve, reject)=>
 
-    if screenName != "Login"
-        document.location.hash = screenName
+        ##
+        ## The screens are setup such that the buttons and other evonScreenReadyents are not
+        ## initialized until the screen is shown the first time.  This allows rarely used
+        ## screens to initialize later and makes the app startup faster.
+        if not Screens.current.initialized
+            Screens.current.onSetupButtons()
+            Screens.current.initialized = true
 
-    ##
-    ## Allow the screen to make any changes before goint live on the display
-    doReplaceScreenContent(screenName)
-    Screens.current.onResetScreen()
+        if screenName != "Login"
+            document.location.hash = screenName
 
-    w = $(window).width()
-    h = $(window).height()
-    globalTableEvents.emitEvent "resize", [w, h]
-    window.scrollTo 0, 0
-    Screens.current.optionalArgs = optionalArgs
+        ##
+        ## Allow the screen to make any changes before goint live on the display
+        doReplaceScreenContent(screenName)
+        Screens.current.onResetScreen()
 
-    ##
-    ## Update the window title
+        w = $(window).width()
+        h = $(window).height()
+        globalTableEvents.emitEvent "resize", [w, h]
+        window.scrollTo 0, 0
+        Screens.current.optionalArgs = optionalArgs
 
-    $("#MainTitle").html(Screens.current.windowTitle);
+        ##
+        ## Update the window title
 
-    if Screens.current.windowSubTitle.length > 0
-        $("#SubTitle").html(Screens.current.windowSubTitle);
-        $("#SubTitle").show()
-        $("#MainTitle").removeClass("alone")
-    else
-        $("#SubTitle").hide()
-        $("#MainTitle").addClass("alone")
+        $("#MainTitle").html(Screens.current.windowTitle);
 
-    $(Screens.current.classid).show();
-    Screens.current.getScreenSize()
-    Screens.current.onShowScreen()
+        if Screens.current.windowSubTitle.length > 0
+            $("#SubTitle").html(Screens.current.windowSubTitle);
+            $("#SubTitle").show()
+            $("#MainTitle").removeClass("alone")
+        else
+            $("#SubTitle").hide()
+            $("#MainTitle").addClass("alone")
 
-    return
+        $(Screens.current.classid).show();
+        Screens.current.getScreenSize()
+        Screens.current.onShowScreen()
+        resolve(true)

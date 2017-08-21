@@ -59,7 +59,7 @@ $ ->
     ##|  Simple miller column using this
     ##|
     addTestButton "Miller Columns popup", "Open", ()->
-    	doPopupView('Miller', 'Miller Columns', 'miller_popup', 1000, 450).then (view) ->
+    	doPopupView 'Miller', 'Miller Columns', 'miller_popup', 1000, 450, (view) ->
     		## remove existing millerColumn instance to force render in popup
     		delete view.millerColumn
     		view.setData(MillerData)
@@ -72,15 +72,15 @@ $ ->
     ##|  Simple miller column using this
     ##|
     addTestButton "Miller Columns tab", "Open", ()->
-    	addHolder('renderTest1')
-    	tabs = new DynamicTabs('#renderTest1')
-    	tabs.doAddViewTab("Miller", "MillerTab", (view)->
-    		view.setData MillerData
-    		view.show()
-    		view.millerColumn.onSelected = (e, data) ->
-    			console.log('custom event callback from miller column', data)
-    	)   
-    	tabs.addTab "EmptyTab", '<h2>Another tab</h2>'
-    	
+    	addHolder()
+    	.setView "DynamicTabs", (tabs) ->
+	    	tabs.doAddViewTab("Miller", "MillerTab", (view)->
+	    		view.setData MillerData
+	    		view.show()
+	    		view.millerColumn.onSelected = (e, data) ->
+	    			console.log('custom event callback from miller column', data)
+	    	)   
+	    	tabs.addTab "EmptyTab", '<h2>Another tab</h2>'
+	    	
     	true
     go()

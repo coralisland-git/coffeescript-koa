@@ -38,5 +38,5 @@ class ErrorMessageBox extends ModalDialog
         @ok       = 'Close'
         @close    = ''
         @content  = message
-
+        @createModal()
         @show()
