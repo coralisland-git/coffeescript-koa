@@ -81,6 +81,9 @@
 .tt-suggestion p {
   margin: 0;
 }
+.modal-header h4 {
+  font-size: 18px;
+}
 .modal-body form {
   padding-top: 10px;
   padding-left: 15px;
