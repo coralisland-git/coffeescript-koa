@@ -1,40 +1,15 @@
-class ViewEditor extends View
+class ViewCodeEditor extends View
 
     getDependencyList: ()=>
         return [ "/ace/ace.js", "/ace/ext-language_tools.js" ]
-
-    setupNavbar: ()=>
-
-        ## -gao
-        ##  Toolbar button to save/cancel
-        ##
-        navButtonSave = new NavButton "Save", "toolbar-btn navbar-btn btn-primary"
-        navButtonSave.onClick = (e)=>
-           console.log "NavBar Save Button clicked.."
-           if @saveFunc? and typeof @saveFunc is "function" then @saveFunc(@codeEditor.getContent())
-           @closePopup()
-
-        navButtonCancel = new NavButton "Cancel", "toolbar-btn navbar-btn btn-danger cancel-btn"
-        navButtonCancel.onClick = (e)=>
-            console.log "NavBar Cancel Button clicked.."
-            @closePopup()
-
-        @viewNavbar.addToolbar [ navButtonSave, navButtonCancel ]
-        true
 
     ## -------------------------------------------------------------------------------------------------------------
     ## constructor to create new editor
     ##
     showEditor: () =>
-
-        console.log "Setting ViewDocked"
-        @setView "Docked", (dockView)=>
-            dockView.setDockSize 50
-            dockView.getFirst().setView "NavBar", (@viewNavbar)=>
-                @editorWidget = dockView.getSecond().addDiv "editor", "editor_" + GlobalValueManager.NextGlobalID()
-                @codeEditor = new CodeEditor @editorWidget.getTag()
-                @applyCodeEditorSettings()
-                @setupNavbar()
+        @editorWidget = @addDiv "editor", "editor_" + GlobalValueManager.NextGlobalID()
+        @codeEditor = new CodeEditor @editorWidget.getTag()
+        @applyCodeEditorSettings()
 
     ## -------------------------------------------------------------------------------------------------------------
     ## function to get the created editor instance
@@ -51,11 +26,6 @@ class ViewEditor extends View
         @editorWidget.html ""
 
     ## -gao
-    ## set function used to save content of editor
-    ##
-    setSaveFunc: (@saveFunc)=>
-
-    ## -gao
     ## set editor's settings
     ##
 
@@ -64,22 +34,26 @@ class ViewEditor extends View
         if @codeMode then @codeEditor.setMode @codeMode
         if @content then @codeEditor.setContent @content
         if @theme then @codeEditor.setTheme @theme
-
         if @popupMode? and typeof @popupMode is "boolean" then @codeEditor.popupMode @popupMode
+        this
 
-    setEditorTheme: (@theme)=>
+    setTheme: (@theme)=>
         if @codeEditor? and @theme then @codeEditor.setTheme @theme
+        this
 
-    setEditorMode: (@codeMode)=>
+    setMode: (@codeMode)=>
         if @codeEditor? and @codeMode then @codeEditor.setMode @codeMode
+        this
 
-    setEditorPopupMode: (@popupMode)=>
+    setPopupMode: (@popupMode)=>
         if @codeEditor? and @popupMode? and typeof @popupMode is "boolean" then @codeEditor.popupMode @popupMode
-    
-    setEditorOptions: (@_options)=>
+        this
+
+    setOptions: (@_options)=>
         if @codeEditor? and @_options then @codeEditor.setOptions @_options
         this
-    setEditorContent: (val) =>
+
+    setContent: (val) =>
 
         if !val
             @content = ''
@@ -88,8 +62,7 @@ class ViewEditor extends View
         else
             @content = val
         if @codeEditor? and @content then @codeEditor.setContent @content
+        this
 
-    getEditorContent: ()=>
+    getContent: ()=>
         @codeEditor.getContent()
-
-

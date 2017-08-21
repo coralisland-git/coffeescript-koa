@@ -50,7 +50,7 @@ class View extends NinjaContainer
 
 
     closePopup: ()=>
-        @popup.destroy()
+        @popup?.destroy()
         delete @popup
 
     showPopup: (optionalName, w, h, config = null)=>

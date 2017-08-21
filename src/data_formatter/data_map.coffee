@@ -404,6 +404,8 @@ class DataMap
 
 		path = "/#{tableName}/#{keyValue}"
 		dm = DataMap.getDataMap()
+		if !dm.types[tableName]?
+			dm.types[tableName] = new DataSetConfig.Table(tableName)
 		doc = dm.engine.set path, newData
 
 		##|
@@ -470,7 +472,8 @@ class DataMap
 		if !dm.types[tableName]?
 			dm.types[tableName] = new DataSetConfig.Table(tableName)
 
-		updated = dm.setDataTypesFromSingleObject(tableName, newData)
+		if typeof newData is "object"
+			updated = dm.setDataTypesFromSingleObject tableName, newData 
 
 		##|
 		##|  Remove any cached values that happen to exist
@@ -572,3 +575,27 @@ class DataMap
 		colorValue = colorFunction(value, keyValue, rowData)
 
 		return colorValue
+
+	@refreshTempTable: (tableName, data, isArray) =>
+		tableUpdated = false
+		i = 0
+		if !isArray
+			@removeTableData tableName
+			for id, rec of data
+				unless typeof rec is "object"
+					@addDataUpdateTable tableName, data.id || i++, data
+					tableUpdated = true
+					break
+
+			if tableUpdated == false
+				@importDataFromObjects tableName, data
+		else
+			@removeTableData tableName
+			for rec, id in data
+				unless typeof rec is "object"
+					@addDataUpdateTable tableName, i++, data
+					tableUpdated = true
+					break
+
+			if tableUpdated == false
+				@importDataFromObjects tableName, data
