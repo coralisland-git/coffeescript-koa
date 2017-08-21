@@ -793,8 +793,8 @@ ecc-jsbn@~0.1.1:
     jsbn "~0.1.0"
 
 "edgecommondatasetconfig@git+ssh://git@gitlab.protovate.com/Edge/EdgeCommonDataSetConfig.git":
-  version "1.18.0"
-  resolved "git+ssh://git@gitlab.protovate.com/Edge/EdgeCommonDataSetConfig.git#9b1cb93502ad5c1c16d10179678588b5bae2ff70"
+  version "1.26.0"
+  resolved "git+ssh://git@gitlab.protovate.com/Edge/EdgeCommonDataSetConfig.git#0301808b90854bea35adf8556afb1f3b98867c74"
   dependencies:
     expect "^1.20.2"
     jsonfile "^2.4.0"

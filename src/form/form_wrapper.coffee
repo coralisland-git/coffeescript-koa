@@ -80,10 +80,9 @@ class FormWrapper
     ## @param [Object] attrs object as attributes that will be included in the html
     ## @param [Function] fnValidate a validation function can be passed if it returns true value will be valid else invalid
     ##
-    addMultiselect: (fieldName, label, value, attrs, options = [], fnValidate) =>
+    addMultiselect: (fieldName, label, value, attrs, fnValidate) =>
         attrs = $.extend attrs,
             'multiple': 'multiple'
-            'options': options
 
         field = @addInput(@wgt_Form, fieldName, label, value, "select", attrs, fnValidate)
 

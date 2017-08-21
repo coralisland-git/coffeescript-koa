@@ -115,5 +115,3 @@ class FloatingWindow
 		@setSize newWidth, newHeight
 		@moveTo (w-newWidth-20), 20
 		true
-
-

@@ -68,7 +68,7 @@ class ViewImageStrip extends View
             # @imageViewHolder.setHeight(Math.floor(newHeight))
             @imageViewHolder.move offsetX, offsetY, newWidth, newHeight
 
-            if @selectedImgNumber >= @imageData.length
+            if @selectedImgNumber >= @imageData.length - 1
                 @btnRight.hide()
             else
                 @btnRight.show()
@@ -119,7 +119,7 @@ class ViewImageStrip extends View
             imageDataOne.li.el.attr "data-id", @imageData.length
 
             imageDataOne.li.bind "click", (e)=>
-                @setSelectedImgNumber $(e.currentTarget).attr("data-id")
+                @setSelectedImgNumber parseInt($(e.currentTarget).attr("data-id"))
 
             elNumber = imageDataOne.li.addDiv "number_body"
             elNumber.html @imageData.length+1
