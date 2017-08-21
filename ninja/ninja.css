@@ -1389,12 +1389,13 @@ span.fage {
   color: #003000;
   border: 1px solid #b0abbc;
   font-weight: 500;
-  max-width: 300px;
+  max-width: 400px;
   height: 60px;
   display: none;
 }
 .ninjaTooltip .text {
   padding: 10px;
+  line-height: 20px;
 }
 .ninjaTooltip table {
   padding-top: 10px;
