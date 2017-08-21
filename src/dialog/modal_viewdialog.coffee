@@ -7,24 +7,22 @@ class ModalViewDialog extends ModalDialog
 	## Just same as ModalDialog except this needs to create a view
 	constructor: (options) ->
 		super(options)
-		@view = new View()
 
 	## ------------------------------------------------------------------------------------------
 	## function to show modal, override ModalDialog's
-	## add a view into content of modal's body
-	## add a form into the view above
+	## you can add a view into WidgetTag viewContainer
+	## after that, you can add a form into the view above
 	##
 	## @param [Object] options: options to be used in showing modal
 	## @return [Boolean]
 	##
 	show: (options) =>
-		@content += "<div class='modal_ViewDialog' id='modal_ViewDialog#{@gid}' />"
-		@html = @template(this)
-		$("body").append @html
-		@view.AddToElement "#modal_ViewDialog#{@gid}"
-		@view.elHolder.append @getForm().getHtml()	
-		
+		$("body").append @modalContainer.getTag()
+
 		@modal = $("#modal#{@gid}")
+
+		@modal_body = @modal.find(".modal-body")
+
 		@modal.modal(options)
 		@modal.on "hidden.bs.modal", () =>
 			##|
@@ -62,9 +60,12 @@ class ModalViewDialog extends ModalDialog
 				'margin-top' : () =>
 					Math.max(0, ($(window).scrollTop() + ($(window).height() - @modal.height()) / 2 ))
 
-		if @formWrapper?
-			setTimeout ()=>
-				@formWrapper.onAfterShow()
-			, 10
+	## -gao
+	## function to set view of ModalViewDialog
+	##
+	setView: (@viewName, @viewCallback, @optionalData)=>
+		@viewContainer.setView @viewName, @viewCallback, @optionalData
 
-
+	setFormView : (@viewCallback, @optionalData) =>
+		@viewName = "Form"
+		@viewContainer.setView @viewName, @viewCallback, @optionalData
