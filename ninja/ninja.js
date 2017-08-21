@@ -8443,7 +8443,13 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
     };
 
     DataFormatSimpleObject.prototype.onFocus = function(e, col, data) {
-      return doPopupTableView(data[col], "Show " + col, "showTableClasses", 800, 400, function(view) {
+      var key, obj1;
+      key = data.id || e.path || e.rn;
+      return doPopupTableView((
+        obj1 = {},
+        obj1["" + key] = data[col],
+        obj1
+      ), "Show " + col, "showTableClasses", 800, 400, function(view) {
         return console.log("Popup table view created in DataFormatTypes?");
       });
     };
@@ -67913,10 +67919,13 @@ ModalDialog = (function() {
 
   function ModalDialog(options) {
     this.show = bind(this.show, this);
+    this.getViewContainer = bind(this.getViewContainer, this);
+    this.getBody = bind(this.getBody, this);
     this.hide = bind(this.hide, this);
     this.onButton2 = bind(this.onButton2, this);
     this.onButton1 = bind(this.onButton1, this);
     this.onClose = bind(this.onClose, this);
+    this.createModal = bind(this.createModal, this);
     this.getForm = bind(this.getForm, this);
     this.makeFormDialog = bind(this.makeFormDialog, this);
     var name, val;
@@ -67928,10 +67937,50 @@ ModalDialog = (function() {
         this[name] = val;
       }
     }
+    this.createModal();
     if (this.showOnCreate) {
       this.show();
     }
   }
+
+  ModalDialog.prototype.createModal = function() {
+    this.modalContainer = new WidgetTag("div", "modal", "modal" + this.gid, {
+      "tabindex": "-1",
+      "role": "dialog",
+      "aria-hidden": "true"
+    });
+    this.modalContainer.css("display", "none");
+    this.modalWrapper = this.modalContainer.addDiv("modal-dialog").addDiv("modal-content");
+    this.header = this.modalWrapper.addDiv("modal-header bg-primary");
+    this.buttonInHeader = this.header.add("button", "close", "button-" + this.gid, {
+      "data-dismiss": "modal",
+      "aria-label": "Close"
+    });
+    this.spanInButton = this.buttonInHeader.add("span", "", "", {
+      "aria-hidden": "true"
+    }).getTag().html('&times;');
+    this.header.add("h4", "modal-title").text("" + this.title);
+    this.body = this.modalWrapper.addDiv("modal-body");
+    this.body.add("p").text("" + this.content);
+    this.viewContainer = this.getBody().addDiv("modal-view", "modal-view" + this.gid);
+    if (this.showFooter) {
+      this.footer = this.modalWrapper.addDiv("modal-footer");
+      if (this.close) {
+        this.button1 = this.footer.add("button", "btn btn-sm btn-default btn1", "button1-" + this.gid, {
+          "type": "button",
+          "data-dismiss": "modal"
+        }).text("" + this.close);
+      }
+      if (this.ok) {
+        this.button2 = this.footer.add("button", "btn btn-sm btn-default btn1", "button2-" + this.gid, {
+          "type": "button",
+          "data-dismiss": "modal"
+        });
+        this.button2.add("i", "fa fa-check");
+        return this.button2.add("span").text(" " + this.ok);
+      }
+    }
+  };
 
   ModalDialog.prototype.onClose = function() {
     return true;
@@ -67957,16 +68006,23 @@ ModalDialog = (function() {
     return this.modal.modal('hide');
   };
 
+  ModalDialog.prototype.getBody = function() {
+    return this.body;
+  };
+
+  ModalDialog.prototype.getViewContainer = function() {
+    return this.viewContainer;
+  };
+
   ModalDialog.prototype.show = function(options) {
-    var html;
-    html = this.template(this);
-    $("body").append(html);
+    $("body").append(this.modalContainer.getTag());
     this.modal = $("#modal" + this.gid);
     this.modal_body = this.modal.find(".modal-body");
-    if (this.formWrapper != null) {
-      this.modal_body.append(this.formWrapper.getContent());
-      this.formWrapper.show();
-    }
+
+    /*if @formWrapper?		
+    			@modal_body.append @formWrapper.getContent()
+    			@formWrapper.show()
+     */
     this.modal.modal(options);
     this.modal.on("hidden.bs.modal", (function(_this) {
       return function() {
@@ -68010,13 +68066,6 @@ ModalDialog = (function() {
   return ModalDialog;
 
 })();
-
-
-/*		if @formWrapper?
-			setTimeout ()=>
-				@formWrapper.onAfterShow()
-			, 10
- */
 var FormField, substringMatcher,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
@@ -71123,21 +71172,15 @@ doLoadScreen = function(screenName, optionalArgs) {
 };
 
 showScreen = function(screenName, optionalArgs) {
-  return new Promise(function(resolve, reject) {
-    var className;
-    className = "Screen" + screenName;
-    if (!Screens[screenName] && typeof window[className] !== "function") {
-      return doLoadScreen(screenName, optionalArgs).then(function(loaded) {
-        return doShowScreen(screenName, optionalArgs);
-      }).then(function() {
-        return resolve(Screens[screenName]);
-      });
-    } else {
-      return doShowScreen(screenName, optionalArgs).then(function() {
-        return resolve(Screens[screenName]);
-      });
-    }
-  });
+  var className;
+  className = "Screen" + screenName;
+  if (!Screens[screenName] && typeof window[className] !== "function") {
+    return doLoadScreen(screenName, optionalArgs).then(function(loaded) {
+      return doShowScreen(screenName, optionalArgs);
+    });
+  } else {
+    return doShowScreen(screenName, optionalArgs);
+  }
 };
 
 doShowScreen = function(screenName, optionalArgs) {
@@ -71177,42 +71220,37 @@ doShowScreen = function(screenName, optionalArgs) {
     $(Screens.current.classid).hide();
   }
   Screens.current = Screens[screenName];
-  return activateCurrentScreen(optionalArgs, screenName);
+  activateCurrentScreen(optionalArgs, screenName);
 };
 
 activateCurrentScreen = function(optionalArgs, screenName) {
-  return new Promise((function(_this) {
-    return function(resolve, reject) {
-      var h, w;
-      if (!Screens.current.initialized) {
-        Screens.current.onSetupButtons();
-        Screens.current.initialized = true;
-      }
-      if (screenName !== "Login") {
-        document.location.hash = screenName;
-      }
-      doReplaceScreenContent(screenName);
-      Screens.current.onResetScreen();
-      w = $(window).width();
-      h = $(window).height();
-      globalTableEvents.emitEvent("resize", [w, h]);
-      window.scrollTo(0, 0);
-      Screens.current.optionalArgs = optionalArgs;
-      $("#MainTitle").html(Screens.current.windowTitle);
-      if (Screens.current.windowSubTitle.length > 0) {
-        $("#SubTitle").html(Screens.current.windowSubTitle);
-        $("#SubTitle").show();
-        $("#MainTitle").removeClass("alone");
-      } else {
-        $("#SubTitle").hide();
-        $("#MainTitle").addClass("alone");
-      }
-      $(Screens.current.classid).show();
-      Screens.current.getScreenSize();
-      Screens.current.onShowScreen();
-      return resolve(true);
-    };
-  })(this));
+  var h, w;
+  if (!Screens.current.initialized) {
+    Screens.current.onSetupButtons();
+    Screens.current.initialized = true;
+  }
+  if (screenName !== "Login") {
+    document.location.hash = screenName;
+  }
+  doReplaceScreenContent(screenName);
+  Screens.current.onResetScreen();
+  w = $(window).width();
+  h = $(window).height();
+  globalTableEvents.emitEvent("resize", [w, h]);
+  window.scrollTo(0, 0);
+  Screens.current.optionalArgs = optionalArgs;
+  $("#MainTitle").html(Screens.current.windowTitle);
+  if (Screens.current.windowSubTitle.length > 0) {
+    $("#SubTitle").html(Screens.current.windowSubTitle);
+    $("#SubTitle").show();
+    $("#MainTitle").removeClass("alone");
+  } else {
+    $("#SubTitle").hide();
+    $("#MainTitle").addClass("alone");
+  }
+  $(Screens.current.classid).show();
+  Screens.current.getScreenSize();
+  Screens.current.onShowScreen();
 };
 var WindowManager,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
@@ -76305,6 +76343,7 @@ ErrorMessageBox = (function(superClass) {
     this.ok = 'Close';
     this.close = '';
     this.content = message;
+    this.createModal();
     this.show();
   }
 

@@ -142,18 +142,12 @@ doPopupTableView = (data, title, settingsName, w, h) ->
             vertical = false
         else if typeof data == 'object'
             vertical = true
-            
 
-        doPopupView 'PopupTable', title, settingsName, w, h, (view)->
+        doPopupView 'Table', title, settingsName, w, h, (view)->
             if vertical == true
-                DataMap.removeTableData table_name
-                DataMap.importDataFromObjects table_name, data    
-                view.loadTable table_name, vertical
-            else
-                for id, rec of data
-                    DataMap.addDataUpdateTable table_name, id, rec
-                view.loadTable table_name, vertical
-
+                view.setDetailed()
+            DataMap.refreshTempTable table_name, data, !vertical
+            view.loadTable table_name
             resolve view
 
 ## - xg
@@ -175,6 +169,11 @@ doPopupViewOnce = (viewName, title, settingsName, w, h, tabName, callbackWithVie
 
         PopupViews[title].view.show "tab#{PopupViews[title].tabNames.indexOf(tabName)}"
         true
+
+removePopupView = (popupViewName) =>
+    PopupViews[popupViewName]?.destroy()
+    PopupViews[popupViewName] = null
+
 
 doLoadScreen = (screenName, optionalArgs) ->
 

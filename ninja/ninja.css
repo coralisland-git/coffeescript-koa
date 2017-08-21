@@ -81,6 +81,9 @@
 .tt-suggestion p {
   margin: 0;
 }
+.modal-header h4 {
+  font-size: 18px;
+}
 .modal-body form {
   padding-top: 10px;
   padding-left: 15px;
@@ -1318,6 +1321,11 @@ span#ruler {
   font-weight: 500;
   color: #b74f39;
   background-color: #fbf0ee;
+}
+.tableview .table-title {
+  background-color: #d3d3d3;
+  border-top: 1px solid #d6d6d6;
+  border-bottom: 1px solid #d6d6d6;
 }
 input.dataFilter:focus {
   border: 0px;

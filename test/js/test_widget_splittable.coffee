@@ -152,7 +152,8 @@ $ ->
 				view.getFirst().setView "Table", (viewTable1)->
 					viewTable1.loadTable "zipcode"
 
-				view.getSecond().setView "TableDetail", (viewTable2)->
+				view.getSecond().setView "Table", (viewTable2)->
+					viewTable2.setDetailed()
 					viewTable2.loadTable "zipcode"
 
 	go()

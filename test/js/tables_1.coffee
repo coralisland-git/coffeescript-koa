@@ -83,7 +83,6 @@ $ ->
             # table.groupBy("city")
             table.addActionColumn
                 name    : "Run"
-                source  : "id"
                 width   : 80
                 callback: (row)=>
                     console.log "Zipcode action column selected row:", row
@@ -96,5 +95,21 @@ $ ->
         .setView "Table", (view)->
             table = view.addTable "zipcode"
             table.setEnableCheckboxes(true)
+
+    addTestButton "Set Title Simple case", "Open", ()->
+
+        addHolder()
+        .setView "Table", (view)->
+            table = view.addTable "zipcode"
+            table.setTitle("Zipcode")
+    
+    addTestButton "Set Title: Grouping Columns", "Open", () ->
+
+        addHolder()
+        .setView "Table", (view)->
+            table = view.addTable "zipcode"
+            table.groupBy("county")
+            view.setTitle "Zipcode Table"
+        true
 
     go()
