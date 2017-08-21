@@ -184,7 +184,11 @@ $ ->
 			view.addSubmit "submit", "", "Submit"
 			view.setSubmitFunction (form) =>
 				alert "Form Submitted Successfully!\nTest value1 = #{form.input1.value},  Test Value2 = #{form.input2.value}"
+			view.setScrollable()
 			view.show()
+		.then (popupView) ->
+			console.log "PopupView: ", popupView
+			popupView.getBody().setScrollable()
 		true
 
 	addTestButton "Form in Tab", "Open", () ->
