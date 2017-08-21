@@ -193,6 +193,7 @@ class FormField
         for option in @attrs.options
             @selectWidget.add "option", "", "", 
                 value: "#{option}"
+            .text "#{option}"
 
         @el = @selectWidget.el
 
