@@ -83,7 +83,6 @@ $ ->
             # table.groupBy("city")
             table.addActionColumn
                 name    : "Run"
-                source  : "id"
                 width   : 80
                 callback: (row)=>
                     console.log "Zipcode action column selected row:", row
