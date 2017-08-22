@@ -121,7 +121,7 @@ class ModalDialog
 					"data-dismiss" 	: 	"modal"
 				.text "#{@close}"
 			if @ok
-				@button2 = @footer.add "button", "btn btn-sm btn-default btn1", "button2-#{@gid}", 
+				@button2 = @footer.add "button", "btn btn-sm btn-default btn2", "button2-#{@gid}", 
 					"type" 			:	"button"
 					"data-dismiss" 	: 	"modal"
 				@button2.add "i", "fa fa-check"

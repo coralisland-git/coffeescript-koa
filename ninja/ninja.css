@@ -97,6 +97,14 @@
   margin-top: 1px;
   margin-bottom: 1px;
 }
+.modal-body .modal-view {
+  position: relative;
+}
+.modal-body .modal-view .ViewForm {
+  position: relative !important;
+  height: auto !important;
+  width: 100% !important;
+}
 .form-container {
   padding: 10px;
 }
@@ -132,7 +140,8 @@
 .form-group .form-label-autowidth-custom {
   width: auto !important;
   line-height: 34px;
-  padding-right: 0;
+  padding-right: 0px;
+  padding-top: 0px;
 }
 .form-group .form-input-autowidth-custom {
   width: auto !important;
