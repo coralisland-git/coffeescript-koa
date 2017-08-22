@@ -221,9 +221,10 @@ class ModalDialog
 
 			options = {}
 			@modal.find("input,select").each (idx, el) =>
-				name = $(el).attr("name")
+				#name = $(el).attr("name")
+				id = $(el).attr("id")
 				val  = $(el).val()
-				options[name] = val
+				options[id] = val
 
 			if @onButton2(e, options) == true
 				@onClose()
