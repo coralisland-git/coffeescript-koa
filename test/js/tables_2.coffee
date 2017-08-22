@@ -235,25 +235,28 @@ $ ->
 						view.show()
 
 	addTestButton "editable popup on click", "Open", ()->
-
-		addHolder().setView "Table", (table)->
-			table.addTable "zipcode"
-
-		$('#renderTest1').prepend "<input type='button' id='createNew' class='btn btn-info' style='margin-bottom:15px;' value='Create New' />"
-		$('#createNew').on 'click', ()->
-			p = new PopupForm('zipcode', 'code')
-			p.onCreateNew = (tableName, data) ->
-				console.log tableName, data
-				##| apply filter or sorting to update the newly create row
-				setTimeout () ->
-					table.applyFilters()
-					table.updateRowData()
-				, 100
-				true
-
-		table.rowCallback = (data,e) ->
-			if data.id
-				new PopupForm('zipcode', 'code', data.id)
+		wgtHolder = addHolder()
+		wgtHolder.setView "Docked", (dockedView) =>
+			wgtInput = dockedView.getFirst().add "input", "btn btn-info", "createNew", 
+				type 	: 'button'
+				value 	: 'Create New'
+			wgtInput.css 'margin-bottom', '15px'
+			dockedView.getBody().setView "Table", (tableView)->
+				table = tableView.addTable "zipcode"
+				wgtInput.bind 'click',  ()->
+					p = new PopupForm('zipcode', 'code')
+					p.onCreateNew = (tableName, data) ->
+						console.log tableName, data
+						##| apply filter or sorting to update the newly create row
+						setTimeout () ->
+							table.applyFilters()
+							table.updateRowData()
+						, 100
+						true
+				#$('#renderTest1').prepend "<input type='button' id='createNew' class='btn btn-info' style='margin-bottom:15px;' value='Create New' />"
+				table.rowCallback = (data,e) ->
+					if data.id
+						new PopupForm('zipcode', 'code', data.id)
 		true
 
 	addTestButton "editable popup on click with custom columns", "Open", ()->

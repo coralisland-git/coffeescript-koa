@@ -41,7 +41,7 @@ class FormWrapper
     ## @param [Function] fnValidate a validation function can be passed if it returns true value will be valid else invalid
     ##
     addTextInput: (fieldName, label, value, attrs, fnValidate) =>
-        @addInput(@wgt_Form, fieldName, label, value, "text", attrs, fnValidate)
+        @addInput(fieldName, label, value, "text", attrs, fnValidate)
 
     ## -------------------------------------------------------------------------------------------------------------
     ## Add a text input field
@@ -54,7 +54,7 @@ class FormWrapper
     ##
     addTagsInput: (fieldName, label, value, attrs, fnValidate) =>
 
-        field = @addInput(@wgt_Form, fieldName, label, value, "text", attrs, fnValidate)
+        field = @addInput(fieldName, label, value, "text", attrs, fnValidate)
 
         field.superAfterShow = field.onAfterShow
         field.onAfterShow = ()->
@@ -84,7 +84,7 @@ class FormWrapper
         attrs = $.extend attrs,
             'multiple': 'multiple'
 
-        field = @addInput(@wgt_Form, fieldName, label, value, "select", attrs, fnValidate)
+        field = @addInput(fieldName, label, value, "select", attrs, fnValidate)
 
         field.superAfterShow = field.onAfterShow
         field.onAfterShow = ()->
@@ -107,12 +107,12 @@ class FormWrapper
     ## @param [Object] attrs object as attributes that will be included in the html
     ## @param [Function] fnValidate a validation function can be passed if it returns true value will be valid else invalid
     ##
-    addInput: (holderWidget, fieldName, label, value, type = "text",attrs = {},fnValidate) =>
+    addInput: (fieldName, label, value, type = "text",attrs = {},fnValidate) =>
         type = if type is "boolean" then "checkbox" else type
         if type is "checkbox" and value is 1
             attrs.checked = "checked"
         value = if type is "checkbox" then 1 else value
-        field = new FormField(holderWidget, fieldName, label, value, type, attrs, fnValidate)
+        field = new FormField(@wgt_Form, fieldName, label, value, type, attrs, fnValidate)
         @fields.push(field)
         return field
     ## -------------------------------------------------------------------------------------------------------------

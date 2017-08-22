@@ -35,7 +35,7 @@ class PopupForm extends ModalDialog
             @columns = DataMap.getColumnsFromTable @tableName#, (c) ->
                 #c.getEditable()
         ##| get formWrapper object
-        @formWrapper = new PopUpFormWrapper()
+        @formWrapper = new FormWrapper()
 
         ##| generate text fields
         @createInputFields()
