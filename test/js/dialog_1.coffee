@@ -94,8 +94,6 @@ $ ->
 		m.getForm().onSubmit = (form) =>
 			console.log "Submitted form, test value=", form.input1
 			m.hide()
-			#view.setSize 400, 100
-			console.log "model-view size: ", view.width(), view.height()
 		m.show()
 
 	addTestButton "Simple Form 2", "Open", () ->
