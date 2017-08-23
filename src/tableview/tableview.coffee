@@ -446,7 +446,7 @@ class TableView
 			##|
 			##|  Likely due to an open editor so now reset focus
 			@setFocusCell(@currentFocusRow, @currentFocusCol, e)
-			return false
+			#return false
 
 		if !@currentFocusCell? or !@currentFocusPath?
 			return false
