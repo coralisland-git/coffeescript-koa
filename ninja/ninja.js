@@ -6303,6 +6303,8 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
       if (varName === "renderFunction") {
         this.renderFunctionCache = null;
         this.render = value;
+      } else if (varName === "cellColor") {
+        this.colorFunctionCache = null;
       }
       this.data[varName] = value;
       delete this.formatter;
@@ -7427,9 +7429,10 @@ require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof requ
       }
       doPopupView("Editor", "SourceCodeEditor", "codeeditor", w, h, (function(_this) {
         return function(view) {
-          view.showEditor();
-          view.applyCodeEditorSettings(codeMode, currentValue, "tomorrow_night_eighties", true);
-          return view.setSaveFunc(_this.saveValue);
+          return view.showEditor().then(function(dockedView) {
+            view.applyCodeEditorSettings(codeMode, currentValue, "tomorrow_night_eighties", true);
+            return view.setSaveFunc(_this.saveValue);
+          });
         };
       })(this));
       return true;
@@ -68191,10 +68194,10 @@ ModalDialog = (function() {
         e.stopPropagation();
         options = {};
         _this.modal.find("input,select").each(function(idx, el) {
-          var name, val;
-          name = $(el).attr("name");
+          var id, val;
+          id = $(el).attr("id");
           val = $(el).val();
-          return options[name] = val;
+          return options[id] = val;
         });
         if (_this.onButton2(e, options) === true) {
           _this.onClose();
@@ -68529,12 +68532,12 @@ FormWrapper = (function() {
   }
 
   FormWrapper.prototype.addTextInput = function(fieldName, label, value, attrs, fnValidate) {
-    return this.addInput(this.wgt_Form, fieldName, label, value, "text", attrs, fnValidate);
+    return this.addInput(fieldName, label, value, "text", attrs, fnValidate);
   };
 
   FormWrapper.prototype.addTagsInput = function(fieldName, label, value, attrs, fnValidate) {
     var field;
-    field = this.addInput(this.wgt_Form, fieldName, label, value, "text", attrs, fnValidate);
+    field = this.addInput(fieldName, label, value, "text", attrs, fnValidate);
     field.superAfterShow = field.onAfterShow;
     field.onAfterShow = function() {
       this.el.selectize({
@@ -68559,7 +68562,7 @@ FormWrapper = (function() {
     attrs = $.extend(attrs, {
       'multiple': 'multiple'
     });
-    field = this.addInput(this.wgt_Form, fieldName, label, value, "select", attrs, fnValidate);
+    field = this.addInput(fieldName, label, value, "select", attrs, fnValidate);
     field.superAfterShow = field.onAfterShow;
     field.onAfterShow = function() {
       if (!Array.isArray(value)) {
@@ -68572,7 +68575,7 @@ FormWrapper = (function() {
     return field;
   };
 
-  FormWrapper.prototype.addInput = function(holderWidget, fieldName, label, value, type, attrs, fnValidate) {
+  FormWrapper.prototype.addInput = function(fieldName, label, value, type, attrs, fnValidate) {
     var field;
     if (type == null) {
       type = "text";
@@ -68585,7 +68588,7 @@ FormWrapper = (function() {
       attrs.checked = "checked";
     }
     value = type === "checkbox" ? 1 : value;
-    field = new FormField(holderWidget, fieldName, label, value, type, attrs, fnValidate);
+    field = new FormField(this.wgt_Form, fieldName, label, value, type, attrs, fnValidate);
     this.fields.push(field);
     return field;
   };
@@ -76358,7 +76361,7 @@ PopupForm = (function(superClass) {
     if (!this.columns) {
       this.columns = DataMap.getColumnsFromTable(this.tableName);
     }
-    this.formWrapper = new PopUpFormWrapper();
+    this.formWrapper = new FormWrapper();
     this.createInputFields();
     this.show();
   }
