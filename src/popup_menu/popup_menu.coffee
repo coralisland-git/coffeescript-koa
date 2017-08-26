@@ -193,7 +193,8 @@ class PopupMenu
 				true
 
 		window.popupMenuVisible = true
-		window.popupMenuHolder.removeClass("multicol")
+		#window.popupMenuHolder.removeClass("multicol")
+		@setMultiColumn 1
 		html = "<li class='title'>" + @title + "</li>"
 		window.popupMenuHolder.html(html)
 
