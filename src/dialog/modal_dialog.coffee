@@ -111,7 +111,8 @@ class ModalDialog
 		@spanInButton = @buttonInHeader.add("span", "", "", {"aria-hidden": "true"}).getTag().html '&times;'
 		@header.add("h4", "modal-title").text("#{@title}")
 		@body = @modalWrapper.addDiv "modal-body"
-		@body.add("p").text "#{@content}"
+		@contentWrapper = @body.add("p")
+		@contentWrapper.text "#{@content}"
 		@viewContainer = @getBody().addDiv "modal-view", "modal-view#{@gid}"
 		if @showFooter
 			@footer = @modalWrapper.addDiv "modal-footer"

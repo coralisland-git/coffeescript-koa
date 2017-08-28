@@ -75,10 +75,10 @@ class ModalSortItems extends ModalDialog
             <div id='tableColumnSortingList' class='tableColumnSortingList'>
             </div>
         '''
-
+        @columnSortingListWrapper = @contentWrapper.addDiv "tableColumnSortingList", "tableColumnSortingList"
         @show()
-        @sortItemsList = new WidgetTag("ul", "sortedItemsList", "sortedItemsList")
-        $("#tableColumnSortingList").append(@sortItemsList.el)
+        @sortItemsList = @columnSortingListWrapper.add "ul", "sortedItemsList", "sortedItemsList"
+        #$("#tableColumnSortingList").append(@sortItemsList.el)
 
         ##|
         ##|  Get the columns
