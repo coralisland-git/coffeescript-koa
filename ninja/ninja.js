@@ -68115,7 +68115,8 @@ ModalDialog = (function() {
     }).getTag().html('&times;');
     this.header.add("h4", "modal-title").text("" + this.title);
     this.body = this.modalWrapper.addDiv("modal-body");
-    this.body.add("p").text("" + this.content);
+    this.contentWrapper = this.body.add("p");
+    this.contentWrapper.text("" + this.content);
     this.viewContainer = this.getBody().addDiv("modal-view", "modal-view" + this.gid);
     if (this.showFooter) {
       this.footer = this.modalWrapper.addDiv("modal-footer");
@@ -69452,7 +69453,7 @@ PopupMenu = (function() {
       })(this));
     }
     window.popupMenuVisible = true;
-    window.popupMenuHolder.removeClass("multicol");
+    this.setMultiColumn(1);
     html = "<li class='title'>" + this.title + "</li>";
     window.popupMenuHolder.html(html);
     setTimeout(function() {
@@ -69907,6 +69908,7 @@ PopupWindow = (function() {
   };
 
   PopupWindow.prototype.modal = function(popupWidth, popupHeight) {
+    var f;
     this.popupWidth = popupWidth;
     this.popupHeight = popupHeight;
     this.shield = $("<div />");
@@ -69919,12 +69921,17 @@ PopupWindow = (function() {
       bottom: 0,
       backgroundColor: "rgba(0,0,0,0.6)"
     });
-    $(document).on("keypress", (function(_this) {
+    f = (function(_this) {
       return function(e) {
         return false;
       };
-    })(this));
+    })(this);
+    $(document).on("keypress", f);
     this.center();
+    this.shield.close = function() {
+      $(document).off("keypress", f);
+      return this.remove();
+    };
     return $("body").append(this.shield);
   };
 
@@ -70054,7 +70061,7 @@ PopupWindow = (function() {
     this.windowClose.el.on("click", (function(_this) {
       return function() {
         if (_this.shield != null) {
-          _this.shield.remove();
+          _this.shield.close();
         }
         if (_this.configurations && _this.configurations.keyValue) {
           return _this.close();
@@ -70276,7 +70283,7 @@ $(function() {
             return;
           }
           if (win.shield != null) {
-            win.shield.remove();
+            win.shield.close();
           }
           if (win.configurations && win.configurations.keyValue) {
             return win.close();
@@ -71956,7 +71963,6 @@ TableView = (function() {
     var c, fieldName, j, k, len1, len2, parts, path, record_id, ref, ref1, row, tableName;
     if ((this.currentFocusCell != null) && (this.currentFocusPath == null)) {
       this.setFocusCell(this.currentFocusRow, this.currentFocusCol, e);
-      return false;
     }
     if ((this.currentFocusCell == null) || (this.currentFocusPath == null)) {
       return false;
@@ -75708,9 +75714,9 @@ ModalSortItems = (function(superClass) {
     ModalSortItems.__super__.constructor.call(this);
     GlobalClassTools.addEventManager(this);
     this.content = '<div id=\'tableColumnSortingList\' class=\'tableColumnSortingList\'>\n</div>';
+    this.columnSortingListWrapper = this.contentWrapper.addDiv("tableColumnSortingList", "tableColumnSortingList");
     this.show();
-    this.sortItemsList = new WidgetTag("ul", "sortedItemsList", "sortedItemsList");
-    $("#tableColumnSortingList").append(this.sortItemsList.el);
+    this.sortItemsList = this.columnSortingListWrapper.add("ul", "sortedItemsList", "sortedItemsList");
     this.columns = DataMap.getColumnsFromTable(this.tableName);
     this.columns = this.columns.sort(function(a, b) {
       return a.getOrder() - b.getOrder();
