@@ -160,12 +160,14 @@ class PopupWindow
             right           : 0
             bottom          : 0
             backgroundColor : "rgba(0,0,0,0.6)"
-
-        $(document).on "keypress", (e)=>
-            # console.log "KEY=", e
+        f = (e) =>
             false
+        $(document).on "keypress", f
 
         @center()
+        @shield.close = () ->
+            $(document).off "keypress", f
+            @remove()
         $("body").append @shield
 
     ##|
@@ -331,7 +333,7 @@ class PopupWindow
         @windowClose = @windowTitle.add "div", "closebutton", "windowclose#{id}"
         @windowClose.html "<i class='glyphicon glyphicon-remove'></i>"
         @windowClose.el.on "click", () =>
-            if @shield? then @shield.remove()
+            if @shield? then @shield.close()
             if @configurations and @configurations.keyValue then @close() else @destroy()
 
         @popupWindowHolder.append @windowTitle.el
@@ -531,5 +533,5 @@ $ ->
                 win = visibleWindows[..].pop()
                 if !win then return
                 # console.log "Escape closing window:", win
-                if win.shield? then win.shield.remove()
+                if win.shield? then win.shield.close()
                 if win.configurations and win.configurations.keyValue then win.close() else win.destroy()

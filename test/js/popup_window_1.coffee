@@ -108,7 +108,7 @@ $ ->
 			w: 400
 			h: 500
 
-		popup.getBody().html $ "<div> Hello World </div>"
+		popup.getBody().html "<div> Hello World </div>"
 
 	addTestButton "Popup Modal", "Open", (e) ->
 
@@ -150,7 +150,7 @@ $ ->
 			view.addTextInput "input2", "Example Input 2"
 			view.addSubmit "submit", "Click this button to submit", "Submit"
 			view.setSubmitFunction (form) =>
-				alert "Form Submitted Successfully!\nTest value1 = #{form.input1},  Test Value2 = #{form.input2}"
+				alert "Form Submitted Successfully!\nTest value1 = #{form.input1.value},  Test Value2 = #{form.input2.value}"
 			view.show()
 
 	addTestButton "PopupViewOnce 2 Table", "Open", (e) ->
