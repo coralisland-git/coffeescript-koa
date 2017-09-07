@@ -40,7 +40,9 @@ class ViewImageStrip extends View
                 ##|
                 ##|  scroll into view only if not already in view
                 if (totalHeight - data.li.offsetTop() + currentTop < 0)
-                    data.li.element.scrollIntoView({behavior: "smooth"})
+                    data.li.element.scrollIntoView(true)
+                else if (data.li.offsetTop() - currentTop < 0)
+                    data.li.element.scrollIntoView(false)
             else
                 data.li.removeClass "selected"
 
